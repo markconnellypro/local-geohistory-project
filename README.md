@@ -1,4 +1,4 @@
-# Local Geohistory Project: Application
+# Local Geohistory Project: Application [![DOI](https://zenodo.org/badge/622757413.svg)](https://zenodo.org/badge/latestdoi/622757413)
 
 ## Summary
 
