@@ -1,0 +1,2 @@
+<link rel="stylesheet" href="/<?= ($online ? '/unpkg.com/leaflet@1.9.3/dist' : 'asset/map') ?>/leaflet.css" crossorigin="anonymous" />
+<script src="/<?= ($online ? '/unpkg.com/leaflet@1.9.3/dist' : 'asset/map') ?>/leaflet.js"></script>

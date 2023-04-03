@@ -1,0 +1,2 @@
+  var stateBaseMaps = {};
+  var stateOverlayMaps = {};

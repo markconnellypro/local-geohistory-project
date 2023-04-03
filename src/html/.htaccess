@@ -1,0 +1,25 @@
+RewriteEngine on
+RewriteBase /
+
+RewriteRule ^(asset)($|/) - [L]
+
+RewriteCond $1 !^(index\.php)
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^.*$ - [L]
+
+RewriteCond %{REQUEST_URI} !(.*)/$
+RewriteCond %{REQUEST_URI} !(robots.txt)$
+# dont rewrite if there was posted here!
+RewriteCond %{REQUEST_METHOD} !POST 
+RewriteRule ^(.*[^/])$ $1/ [L,R=301]
+
+RewriteRule ^(.*)$ ./index.php/$1 [L,QSA]
+
+ExpiresActive On
+
+ExpiresByType font/woff2 "access plus 1 year"
+ExpiresByType image/jpeg "access plus 1 month"
+ExpiresByType image/png "access plus 1 month"
+ExpiresByType image/svg+xml "access plus 1 month"
+ExpiresDefault "access plus 1 day"

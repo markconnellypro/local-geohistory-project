@@ -1,0 +1,611 @@
+@font-face {
+    font-family: 'Fredericka the Great';
+    font-style: normal;
+    font-weight: normal;
+    font-display: swap;
+    src: url('/asset/font/frederickathegreat.woff2') format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+    font-family: 'PT Serif';
+    font-style: italic;
+    font-weight: normal;
+    font-display: swap;
+    src: url('/asset/font/ptserif-italic.woff2') format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+    font-family: 'PT Serif';
+    font-style: italic;
+    font-weight: bold;
+    font-display: swap;
+    src: url('/asset/font/ptserif-italic-bold.woff2') format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+    font-family: 'PT Serif';
+    font-style: normal;
+    font-weight: normal;
+    font-display: swap;
+    src: url('/asset/font/ptserif.woff2') format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+    font-family: 'PT Serif';
+    font-style: normal;
+    font-weight: bold;
+    font-display: swap;
+    src: url('/asset/font/ptserif-bold.woff2') format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+.i {
+    font-style: italic;
+}
+
+.b {
+    font-weight: bold;
+}
+
+fieldset {
+    border: 0;
+    padding-left: 0px;
+    margin-bottom: 5px;
+}
+
+.option_radio_indent {
+    margin-top: 5px;
+    margin-left: 10px;
+}
+
+.option_indent {
+    margin-top: 5px;
+    margin-left: 14px;
+}
+
+legend,
+h2 {
+    padding-left: 0px;
+    font-size: 1.17em;
+    font-weight: bold;
+}
+
+section header {
+    font-size: 1.17em;
+    font-weight: bold;
+}
+
+html,
+body {
+    font-family: "PT Serif", serif;
+    margin: 0;
+    padding: 0;
+}
+
+.headerfooter {
+    width: 100%;
+}
+
+header .headerfooter {
+    min-height: 110px;
+    width: 100%;
+}
+
+#headertitle {
+    font-family: "Fredericka the Great", serif;
+}
+
+#headertext {
+    margin: 0 auto;
+    width: 94vw;
+    max-width: 960px;
+}
+
+header A:link,
+header A:visited,
+header A:active,
+header A:hover {
+    text-decoration: none;
+}
+
+.bodytext {
+    width: 94vw;
+    max-width: 960px;
+    margin: 0 auto;
+    font-size: 85%;
+}
+
+#welcome {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    z-index: 1;
+}
+
+#welcomewrapper {
+    overflow: hidden;
+    position: relative;
+    z-index: 2;
+}
+
+#welcomecontainer {
+    max-width: 87vw;
+    margin: 0 auto;
+}
+
+.welcomecontent {
+    padding: 10px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    background: rgba(255, 251, 247, 0.85);
+    color: #003A70;
+    /* Pantone 654 C */
+    text-align: center;
+}
+
+#welcometext {
+    padding-bottom: 20px;
+    font-size: 150%;
+}
+
+#map {
+    width: 100%;
+    height: 94vh;
+    max-width: 960px;
+    max-height: 640px;
+}
+
+#footertext {
+    text-align: center;
+}
+
+.keyicon,
+.keyicontext {
+    width: 14px;
+    height: 14px;
+    vertical-align: middle;
+}
+
+.keyiconcontainer {
+    margin: 2px 2px 2px 2px;
+    width: 30px;
+    height: 30px;
+    vertical-align: middle;
+    display: inline-block;
+}
+
+@media screen {
+    main .bodytext {
+        background-color: #FFFBF7;
+    }
+
+    .headerfooter {
+        background-color: #003A70;
+        /* Pantone 654 C */
+        color: #FFFBF7;
+    }
+
+    .headericon,
+    .keyicon,
+    .keyiconlarge {
+        fill: #FFFBF7;
+    }
+
+    header A:link,
+    header A:visited,
+    header A:active,
+    header A:hover {
+        color: #FFFBF7;
+    }
+
+    footer A:link,
+    footer A:visited,
+    footer A:active,
+    footer A:hover {
+        color: #FFFBF7;
+    }
+
+    table.dataTable thead tr {
+        background-color: #003A70;
+        /* Pantone 654 C */
+        color: #FFFBF7;
+    }
+
+    table.dataTable tr.odd {
+        background-color: #EFEFEE !important;
+    }
+
+    table.dataTable tr.even {
+        background-color: #E0DFDD !important;
+    }
+
+    .wrapper {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+    }
+
+    #footertext {
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+
+    footer {
+        margin-top: auto;
+    }
+}
+
+@media print {
+
+    html,
+    body {
+        background-color: white;
+    }
+
+    #welcome {
+        display: none;
+    }
+
+    .headerfooter {
+        background-color: white;
+        color: #003A70;
+        /* Pantone 654 C */
+    }
+
+    .headericon,
+    .keyicon,
+    .keyiconlarge {
+        /* filter: invert(13%) sepia(56%) saturate(3942%) hue-rotate(196deg) brightness(92%) contrast(101%); */
+        fill: #003A70;
+        /* Pantone 654 C */
+    }
+
+    header A:link,
+    header A:visited,
+    header A:active,
+    header A:hover {
+        color: #003A70;
+        /* Pantone 654 C */
+    }
+
+    footer A:link,
+    footer A:visited,
+    footer A:active,
+    footer A:hover {
+        color: #003A70;
+        /* Pantone 654 C */
+    }
+
+    table.dataTable thead tr {
+        background-color: white;
+        color: #003A70;
+        /* Pantone 654 C */
+    }
+
+    table.dataTable tr {
+        background-color: white !important;
+    }
+
+    table.dataTable th,
+    td {
+        border: 1px solid #003A70 !important;
+        /* Pantone 654 C */
+        border-spacing: 0px !important;
+        border-collapse: collapse !important;
+    }
+
+}
+
+@media screen and (max-width: 689px) {
+    .bodytext {
+        font-size: 85%;
+    }
+
+    #headerimagenavigation {
+        height: 110px;
+        width: 100%;
+    }
+
+    #headertitle {
+        font-size: 8vw;
+        text-align: center;
+    }
+
+    #welcometext {
+        font-size: 125% !important;
+    }
+}
+
+@media print and (max-width: 1019px),
+screen and (min-width: 690px) and (max-width: 1019px) {
+    .bodytext {
+        font-size: 90%;
+    }
+
+    #headertext {
+        display: flex;
+        flex-direction: row;
+        height: 110px;
+    }
+
+    #headertitle {
+        font-size: 200%;
+        text-align: left;
+        width: 416px;
+        margin-right: 40px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        white-space: nowrap;
+    }
+
+    #headerimagenavigation {
+        min-width: 175px;
+        width: 100%;
+    }
+}
+
+@media (max-width: 1019px) {
+    table.dataTable th {
+        white-space: normal !important;
+    }
+
+    .tablewrap {
+        overflow-x: auto;
+    }
+}
+
+@media (min-width: 1020px) {
+    #headertext {
+        display: flex;
+        flex-direction: row;
+        height: 110px;
+    }
+
+    #headerimagenavigation {
+        width: 544px;
+    }
+
+    .bodytext {
+        font-size: 90%;
+    }
+
+    #headertitle {
+        font-size: 200%;
+        text-align: left;
+        margin-right: 40px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+}
+
+.headerimageblock {
+    float: left;
+    width: 128px;
+    text-align: center;
+    margin-top: 5px;
+    line-height: 15px;
+}
+
+.bodyicon {
+    fill: #003A70;
+    /* Pantone 654 C */
+    height: auto;
+    width: auto;
+}
+
+.bodyiconcontainer:link,
+.bodyiconcontainer:visited,
+.bodyiconcontainer:active,
+.bodyiconcontainer:hover {
+    text-decoration: none;
+    color: #003A70;
+    /* Pantone 654 C */
+}
+
+#headernavigation {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+}
+
+#headernavigationpart {
+    height: 110px;
+    width: 80px;
+    display: flex;
+    align-items: center;
+}
+
+#topheader {
+    text-align: center;
+    font-size: 175%;
+}
+
+.warning {
+    color: #BE3A34;
+    /* Pantone 180 C */
+}
+
+/* Map */
+
+.info,
+.info2,
+.downloadbox {
+    padding: 6px 8px;
+    font-family: "PT Serif", serif;
+    background: white;
+    background: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+    max-width: 37vw;
+}
+
+.downloadbox {
+    display: none;
+}
+
+.timelapsebox {
+    display: none;
+}
+
+.leaflet-control-download-button {
+    background: #fff url(/asset/map/baseline_save_alt_black_24dp.png);
+}
+
+.leaflet-control-timelapse-button {
+    background: #fff url(/asset/map/baseline_timelapse_black_24dp.png);
+}
+
+.leaflet-control-regular-button {
+    background: #fff url(/asset/map/outline_cancel_black_24dp.png);
+}
+
+.leaflet-control-timelapse {
+    margin-left: 5px;
+}
+
+.leaflet-control-download-button,
+.leaflet-control-timelapse-button,
+.leaflet-control-regular-button {
+    background-position: 2px 2px;
+}
+
+#subselect {
+    margin: 0 auto;
+    text-align: center;
+}
+
+.togglebox {
+    display: none;
+}
+
+#primarybox {
+    display: inherit;
+}
+
+.mapwidth {
+    font-weight: bold;
+    min-width: 40px;
+    display: inline-block;
+}
+
+.mapwidth2 {
+    font-weight: bold;
+    min-width: 115px;
+    display: inline-block;
+}
+
+/* Search */
+
+.option_select {
+    display: none;
+}
+
+#option_event {
+    display: inherit;
+}
+
+#forms_event {
+    display: inherit;
+}
+
+.form_select {
+    display: none;
+}
+
+#form_event_government {
+    display: inherit;
+}
+
+#form_government_government {
+    display: inherit;
+}
+
+#form_location_address {
+    display: inherit;
+}
+
+#form_adjudication_number {
+    display: inherit;
+}
+
+#form_law_reference {
+    display: inherit;
+}
+
+.required.not-full {
+    background-color: #d4a8a5;
+}
+
+input.required {
+    background-color: #d4a8a5;
+}
+
+.forselectize {
+    vertical-align: 60%;
+}
+
+.selectize-control {
+    display: inline-block;
+}
+
+.selectize-input {
+    margin-bottom: 8px;
+}
+
+.selectize-input:focus {
+    border-color: black;
+    border-width: 2px;
+}
+
+.focus {
+    border-color: black !important;
+    border-width: 2px !important;
+}
+
+.submitbutton {
+    font-family: "PT Serif", serif;
+    font-size: 100%;
+    padding: 8px;
+    width: 80px;
+    border-radius: 3px;
+    font-weight: bold;
+}
+
+/* Statistics */
+
+.parameter {
+    display: table;
+}
+
+.parameter-line {
+    display: table-row;
+}
+
+.parameter-type {
+    font-weight: bold;
+    display: table-cell;
+    padding-right: 15px;
+}
+
+.parameter-value {
+    display: table-cell;
+}
+
+.statisticskey {
+    background: #003A70;
+    width: 20px;
+    display: inline-block;
+    height: 100%;
+}

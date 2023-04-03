@@ -1,0 +1,20 @@
+<section>
+    <h2>Map</h2>
+    <?php if (isset($includeDisclaimer)) { ?>
+        <p><span class="b">Note: </span>
+            This map shows the approximate area of the description, and is not of surveying or engineering quality.
+            Users are cautioned to examine the original description.
+        </p>
+    <?php } elseif (isset($eventIsMapped) and !$eventIsMapped) { ?>
+        <p><span class="b">Note: </span>
+            Mapping of this event is incomplete.
+        </p>
+    <?php } ?>
+    <?= (($live and $includeBase) ? '<div style="width: 40%; float: right;">Coordinates:&nbsp;<div id="coord" style="float: right;"></div></div>' : '') ?>
+    <div id="map">
+        <a class="maptilerlogo" href="https://www.maptiler.com" style="position:absolute;left:10px;bottom:10px;z-index:999;">
+            <img src="https://api.maptiler.com/resources/logo.svg" alt="MapTiler logo">
+        </a>
+    </div>
+    <input type="hidden" name="idholder" id="idholder" value="-100">
+</section>

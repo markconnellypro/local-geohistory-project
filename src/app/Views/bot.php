@@ -1,0 +1,3 @@
+		<h3>Summary</h3>
+		<p>The Local Geohistory Project aims to educate users and disseminate information concerning the geographic history and structure of political subdivisions and local government. This bot is used to facilitate downloading data or documents from official government sites to help further the goals of the project. If permission to use this bot has been granted by the officials responsible for placing the records online, this bot may not respect the <span class="i">robots.txt</span> file on that government's server. Inquiries concerning this bot may be directed to:</p>
+		<p>Mark A. Connelly<br />Email: <a href="mailto:Mark@MarkConnelly.Pro">Mark@MarkConnelly.Pro</a><br />Fax: +1 (215) 853-3653</p>

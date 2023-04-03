@@ -1,0 +1,47 @@
+version: '3.7'
+services:
+    php:
+        build:
+            context: ./
+            dockerfile: ./docker/php/Dockerfile
+            args:
+                CI_ENVIRONMENT: ${CI_ENVIRONMENT}
+        restart: always
+        environment:
+            TZ: ${TZ}
+        ports:
+            - ${app_port}:80
+        volumes:
+            - ./env:/env
+            - ${INPHP_E}:/inphp/e:ro
+            - ${INPHP_G}:/inphp/g:ro
+            - ${INPHP_L}:/inphp/l:ro
+            - ${INPHP_M}:/inphp/m:ro
+            - ${INPHP_P}:/inphp/p:ro
+            - ${INPHP_PROJECT}:/inphp/project:ro
+            - ${INPHP_S}:/inphp/s:ro
+            - ./src:/var/www
+        depends_on:
+            - postgis
+    postgis:
+        build:
+            context: ./
+            dockerfile: ./docker/postgis/Dockerfile
+        restart: always
+        command:
+          - "postgres"
+          - "-c"
+          - "shared_preload_libraries=pg_tle"
+        environment:
+            CI_ENVIRONMENT: ${CI_ENVIRONMENT}
+            POSTGRES_USER: ${POSTGRES_USER}
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+            POSTGRES_DB: ${POSTGRES_DB}
+            POSTGRES_OTHER_USER: ${POSTGRES_OTHER_USER}
+            POSTGRES_OTHER_PASSWORD: ${POSTGRES_OTHER_PASSWORD}
+            TZ: ${TZ}
+        ports:
+            - ${database_default_port}:5432
+        volumes:
+            - ./inpostgis:/inpostgis
+            - ./pgdata:/var/lib/postgresql/data
