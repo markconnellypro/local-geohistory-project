@@ -44,4 +44,5 @@ services:
             - ${database_default_port}:5432
         volumes:
             - ./inpostgis:/inpostgis
+            - ${OUTPOSTGIS}:/outpostgis
             - ./pgdata:/var/lib/postgresql/data
