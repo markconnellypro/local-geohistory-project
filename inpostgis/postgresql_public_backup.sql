@@ -254,10 +254,7 @@ CREATE FUNCTION extra.ci_model_adjudication_location(integer) RETURNS TABLE(adju
     AS $_$
 
  SELECT adjudicationlocationtype.adjudicationlocationtypelong,
-    CASE
-        WHEN adjudicationlocation.adjudicationlocationvolume = 'ver' THEN '?'
-        ELSE adjudicationlocation.adjudicationlocationvolume
-    END AS adjudicationlocationvolume,
+    adjudicationlocation.adjudicationlocationvolume,
     extra.rangefix(adjudicationlocation.adjudicationlocationpagefrom, adjudicationlocation.adjudicationlocationpageto) AS adjudicationlocationpage,
     adjudicationlocationtype.adjudicationlocationtypevolumetype,
     adjudicationlocationtype.adjudicationlocationtypepagetype,
@@ -5910,12 +5907,6 @@ CREATE FUNCTION extra.rangefix(text, text) RETURNS text
     BEGIN
         $1 := extra.nulltoempty($1::text);
         $2 := extra.nulltoempty($2::text);
-        IF $1 = 'ver' THEN
-            $1 := '?';
-        END IF;
-        IF $2 = 'ver' THEN
-            $2 := '?';
-        END IF;
         IF $2 = '' OR $1 = $2 THEN
             fullrange := $1;
         ELSEIF $1 = '' THEN
@@ -9647,6 +9638,13 @@ ALTER TABLE geohistory.sourcecitation OWNER TO postgres;
 --
 
 COMMENT ON COLUMN geohistory.sourcecitation.sourcecitationnotes IS 'This field has been superseded by sourcecitationdetail.';
+
+
+--
+-- Name: COLUMN sourcecitation.sourcecitationstatus; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.sourcecitation.sourcecitationstatus IS 'This field is used for internal tracking purposes, and is not included in open data.';
 
 
 --
