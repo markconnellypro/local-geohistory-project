@@ -5933,6 +5933,63 @@ $_$;
 ALTER FUNCTION extra.rangefix(text, text) OWNER TO postgres;
 
 --
+-- Name: refresh_sequence(); Type: FUNCTION; Schema: extra; Owner: postgres
+--
+
+CREATE FUNCTION extra.refresh_sequence() RETURNS void
+    LANGUAGE plpgsql STABLE
+    AS $_$
+
+    DECLARE
+
+        columncursor refcursor;
+        tableschema text;
+        tablename text;
+        columnname text;
+        columnsequence text;
+        maxidvalue bigint;
+
+    BEGIN
+
+        OPEN columncursor FOR
+        SELECT columns.table_schema::text,
+           columns.table_name::text,
+           columns.column_name::text,
+           split_part(columns.column_default::text, '''', 2) AS column_sequence
+          FROM information_schema.columns
+         WHERE columns.table_schema::text = ANY (ARRAY['geohistory'::text, 'gis'::text])
+           AND columns.column_default ~~ 'nextval(%'
+         ORDER BY 1, 2;
+
+        LOOP
+        
+          FETCH columncursor INTO tableschema, tablename, columnname, columnsequence;
+
+          IF NOT FOUND THEN
+            EXIT;
+          END IF;
+
+          EXECUTE format('SELECT COALESCE(max(%I.%I) + 1, 1) FROM %I.%I',
+            tablename,
+            columnname,
+            tableschema,
+            tablename)
+          INTO maxidvalue;
+
+		  EXECUTE 'SELECT pg_catalog.setval($1, $2, false)'
+		  USING columnsequence,
+		    maxidvalue;
+
+        END LOOP;
+
+    END;
+
+$_$;
+
+
+ALTER FUNCTION extra.refresh_sequence() OWNER TO postgres;
+
+--
 -- Name: refresh_view_long(); Type: FUNCTION; Schema: extra; Owner: postgres
 --
 
@@ -6922,25 +6979,11 @@ CREATE MATERIALIZED VIEW extra.adjudicationextracache AS
 ALTER TABLE extra.adjudicationextracache OWNER TO postgres;
 
 --
--- Name: government_governmentid_seq; Type: SEQUENCE; Schema: geohistory; Owner: postgres
---
-
-CREATE SEQUENCE geohistory.government_governmentid_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE geohistory.government_governmentid_seq OWNER TO postgres;
-
---
 -- Name: government; Type: TABLE; Schema: geohistory; Owner: postgres
 --
 
 CREATE TABLE geohistory.government (
-    governmentid integer DEFAULT nextval('geohistory.government_governmentid_seq'::regclass) NOT NULL,
+    governmentid integer NOT NULL,
     governmentname character varying(75) NOT NULL,
     governmenttype character varying(30) NOT NULL,
     governmentstatus character varying(35) DEFAULT ''::character varying NOT NULL,
@@ -7163,26 +7206,11 @@ COMMENT ON COLUMN geohistory.adjudicationlocationtype.adjudicationlocationtypesh
 
 
 --
--- Name: affectedgovernmentgroup_affectedgovernmentgroupid_seq; Type: SEQUENCE; Schema: geohistory; Owner: postgres
---
-
-CREATE SEQUENCE geohistory.affectedgovernmentgroup_affectedgovernmentgroupid_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE geohistory.affectedgovernmentgroup_affectedgovernmentgroupid_seq OWNER TO postgres;
-
---
 -- Name: affectedgovernmentgroup; Type: TABLE; Schema: geohistory; Owner: postgres
 --
 
 CREATE TABLE geohistory.affectedgovernmentgroup (
-    affectedgovernmentgroupid integer DEFAULT nextval('geohistory.affectedgovernmentgroup_affectedgovernmentgroupid_seq'::regclass) NOT NULL,
+    affectedgovernmentgroupid integer NOT NULL,
     event integer NOT NULL
 );
 
@@ -7190,26 +7218,11 @@ CREATE TABLE geohistory.affectedgovernmentgroup (
 ALTER TABLE geohistory.affectedgovernmentgroup OWNER TO postgres;
 
 --
--- Name: affectedgovernmentgrouppart_affectedgovernmentgrouppartid_seq; Type: SEQUENCE; Schema: geohistory; Owner: postgres
---
-
-CREATE SEQUENCE geohistory.affectedgovernmentgrouppart_affectedgovernmentgrouppartid_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE geohistory.affectedgovernmentgrouppart_affectedgovernmentgrouppartid_seq OWNER TO postgres;
-
---
 -- Name: affectedgovernmentgrouppart; Type: TABLE; Schema: geohistory; Owner: postgres
 --
 
 CREATE TABLE geohistory.affectedgovernmentgrouppart (
-    affectedgovernmentgrouppartid integer DEFAULT nextval('geohistory.affectedgovernmentgrouppart_affectedgovernmentgrouppartid_seq'::regclass) NOT NULL,
+    affectedgovernmentgrouppartid integer NOT NULL,
     affectedgovernmentgroup integer NOT NULL,
     affectedgovernmentpart integer NOT NULL,
     affectedgovernmentlevel integer NOT NULL
@@ -7219,26 +7232,11 @@ CREATE TABLE geohistory.affectedgovernmentgrouppart (
 ALTER TABLE geohistory.affectedgovernmentgrouppart OWNER TO postgres;
 
 --
--- Name: affectedgovernmentpart_affectedgovernmentpartid_seq; Type: SEQUENCE; Schema: geohistory; Owner: postgres
---
-
-CREATE SEQUENCE geohistory.affectedgovernmentpart_affectedgovernmentpartid_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE geohistory.affectedgovernmentpart_affectedgovernmentpartid_seq OWNER TO postgres;
-
---
 -- Name: affectedgovernmentpart; Type: TABLE; Schema: geohistory; Owner: postgres
 --
 
 CREATE TABLE geohistory.affectedgovernmentpart (
-    affectedgovernmentpartid integer DEFAULT nextval('geohistory.affectedgovernmentpart_affectedgovernmentpartid_seq'::regclass) NOT NULL,
+    affectedgovernmentpartid integer NOT NULL,
     governmentfrom integer,
     affectedtypefrom integer,
     governmentto integer,
@@ -7267,25 +7265,11 @@ CREATE TABLE geohistory.currentgovernment (
 ALTER TABLE geohistory.currentgovernment OWNER TO postgres;
 
 --
--- Name: event_eventid_seq; Type: SEQUENCE; Schema: geohistory; Owner: postgres
---
-
-CREATE SEQUENCE geohistory.event_eventid_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE geohistory.event_eventid_seq OWNER TO postgres;
-
---
 -- Name: event; Type: TABLE; Schema: geohistory; Owner: postgres
 --
 
 CREATE TABLE geohistory.event (
-    eventid integer DEFAULT nextval('geohistory.event_eventid_seq'::regclass) NOT NULL,
+    eventid integer NOT NULL,
     eventtype integer NOT NULL,
     eventmethod integer NOT NULL,
     eventlong character varying(500) NOT NULL,
@@ -7412,25 +7396,11 @@ COMMENT ON COLUMN geohistory.governmentsourceevent.governmentsourceeventrelation
 
 
 --
--- Name: law_lawid_seq; Type: SEQUENCE; Schema: geohistory; Owner: postgres
---
-
-CREATE SEQUENCE geohistory.law_lawid_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE geohistory.law_lawid_seq OWNER TO postgres;
-
---
 -- Name: law; Type: TABLE; Schema: geohistory; Owner: postgres
 --
 
 CREATE TABLE geohistory.law (
-    lawid integer DEFAULT nextval('geohistory.law_lawid_seq'::regclass) NOT NULL,
+    lawid integer NOT NULL,
     source integer NOT NULL,
     lawvolume character varying(20) DEFAULT ''::character varying NOT NULL,
     lawpage integer NOT NULL,
@@ -7460,25 +7430,11 @@ COMMENT ON COLUMN geohistory.law.lawtitle IS 'Certain placeholder values in this
 
 
 --
--- Name: lawsection_lawsectionid_seq; Type: SEQUENCE; Schema: geohistory; Owner: postgres
---
-
-CREATE SEQUENCE geohistory.lawsection_lawsectionid_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE geohistory.lawsection_lawsectionid_seq OWNER TO postgres;
-
---
 -- Name: lawsection; Type: TABLE; Schema: geohistory; Owner: postgres
 --
 
 CREATE TABLE geohistory.lawsection (
-    lawsectionid integer DEFAULT nextval('geohistory.lawsection_lawsectionid_seq'::regclass) NOT NULL,
+    lawsectionid integer NOT NULL,
     law integer NOT NULL,
     lawsectionfrom character varying(45) DEFAULT ''::character varying NOT NULL,
     lawsectionpagefrom integer,
@@ -10758,25 +10714,11 @@ COMMENT ON COLUMN geohistory.governmentform.governmentformextended IS 'This fiel
 
 
 --
--- Name: metesdescriptionline_metesdescriptionlineid_seq; Type: SEQUENCE; Schema: geohistory; Owner: postgres
---
-
-CREATE SEQUENCE geohistory.metesdescriptionline_metesdescriptionlineid_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE geohistory.metesdescriptionline_metesdescriptionlineid_seq OWNER TO postgres;
-
---
 -- Name: metesdescriptionline; Type: TABLE; Schema: geohistory; Owner: postgres
 --
 
 CREATE TABLE geohistory.metesdescriptionline (
-    metesdescriptionlineid integer DEFAULT nextval('geohistory.metesdescriptionline_metesdescriptionlineid_seq'::regclass) NOT NULL,
+    metesdescriptionlineid integer NOT NULL,
     metesdescription integer NOT NULL,
     metesdescriptionline smallint NOT NULL,
     thencepoint text DEFAULT ''::text NOT NULL,
@@ -10945,25 +10887,11 @@ COMMENT ON COLUMN geohistory.recording.recordingobtainedcopy IS 'This field is u
 
 
 --
--- Name: recordingevent_recordingeventid_seq; Type: SEQUENCE; Schema: geohistory; Owner: postgres
---
-
-CREATE SEQUENCE geohistory.recordingevent_recordingeventid_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE geohistory.recordingevent_recordingeventid_seq OWNER TO postgres;
-
---
 -- Name: recordingevent; Type: TABLE; Schema: geohistory; Owner: postgres
 --
 
 CREATE TABLE geohistory.recordingevent (
-    recordingeventid integer DEFAULT nextval('geohistory.recordingevent_recordingeventid_seq'::regclass) NOT NULL,
+    recordingeventid integer NOT NULL,
     event integer NOT NULL,
     recording integer NOT NULL,
     recordingeventrelationship character varying(10) NOT NULL,
@@ -11141,6 +11069,50 @@ ALTER SEQUENCE geohistory.adjudicationtype_adjudicationtypeid_seq OWNED BY geohi
 
 
 --
+-- Name: affectedgovernmentgroup_affectedgovernmentgroupid_seq; Type: SEQUENCE; Schema: geohistory; Owner: postgres
+--
+
+CREATE SEQUENCE geohistory.affectedgovernmentgroup_affectedgovernmentgroupid_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE geohistory.affectedgovernmentgroup_affectedgovernmentgroupid_seq OWNER TO postgres;
+
+--
+-- Name: affectedgovernmentgroup_affectedgovernmentgroupid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
+--
+
+ALTER SEQUENCE geohistory.affectedgovernmentgroup_affectedgovernmentgroupid_seq OWNED BY geohistory.affectedgovernmentgroup.affectedgovernmentgroupid;
+
+
+--
+-- Name: affectedgovernmentgrouppart_affectedgovernmentgrouppartid_seq; Type: SEQUENCE; Schema: geohistory; Owner: postgres
+--
+
+CREATE SEQUENCE geohistory.affectedgovernmentgrouppart_affectedgovernmentgrouppartid_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE geohistory.affectedgovernmentgrouppart_affectedgovernmentgrouppartid_seq OWNER TO postgres;
+
+--
+-- Name: affectedgovernmentgrouppart_affectedgovernmentgrouppartid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
+--
+
+ALTER SEQUENCE geohistory.affectedgovernmentgrouppart_affectedgovernmentgrouppartid_seq OWNED BY geohistory.affectedgovernmentgrouppart.affectedgovernmentgrouppartid;
+
+
+--
 -- Name: affectedgovernmentlevel_affectedgovernmentlevelid_seq; Type: SEQUENCE; Schema: geohistory; Owner: postgres
 --
 
@@ -11160,6 +11132,28 @@ ALTER TABLE geohistory.affectedgovernmentlevel_affectedgovernmentlevelid_seq OWN
 --
 
 ALTER SEQUENCE geohistory.affectedgovernmentlevel_affectedgovernmentlevelid_seq OWNED BY geohistory.affectedgovernmentlevel.affectedgovernmentlevelid;
+
+
+--
+-- Name: affectedgovernmentpart_affectedgovernmentpartid_seq; Type: SEQUENCE; Schema: geohistory; Owner: postgres
+--
+
+CREATE SEQUENCE geohistory.affectedgovernmentpart_affectedgovernmentpartid_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE geohistory.affectedgovernmentpart_affectedgovernmentpartid_seq OWNER TO postgres;
+
+--
+-- Name: affectedgovernmentpart_affectedgovernmentpartid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
+--
+
+ALTER SEQUENCE geohistory.affectedgovernmentpart_affectedgovernmentpartid_seq OWNED BY geohistory.affectedgovernmentpart.affectedgovernmentpartid;
 
 
 --
@@ -11313,6 +11307,27 @@ ALTER SEQUENCE geohistory.documentation_documentationid_seq OWNED BY geohistory.
 
 
 --
+-- Name: event_eventid_seq; Type: SEQUENCE; Schema: geohistory; Owner: postgres
+--
+
+CREATE SEQUENCE geohistory.event_eventid_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE geohistory.event_eventid_seq OWNER TO postgres;
+
+--
+-- Name: event_eventid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
+--
+
+ALTER SEQUENCE geohistory.event_eventid_seq OWNED BY geohistory.event.eventid;
+
+
+--
 -- Name: eventeffectivetype_eventeffectivetypeid_seq; Type: SEQUENCE; Schema: geohistory; Owner: postgres
 --
 
@@ -11453,25 +11468,11 @@ ALTER SEQUENCE geohistory.eventtype_eventtypeid_seq OWNED BY geohistory.eventtyp
 
 
 --
--- Name: filing_filingid_seq; Type: SEQUENCE; Schema: geohistory; Owner: postgres
---
-
-CREATE SEQUENCE geohistory.filing_filingid_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE geohistory.filing_filingid_seq OWNER TO postgres;
-
---
 -- Name: filing; Type: TABLE; Schema: geohistory; Owner: postgres
 --
 
 CREATE TABLE geohistory.filing (
-    filingid integer DEFAULT nextval('geohistory.filing_filingid_seq'::regclass) NOT NULL,
+    filingid integer NOT NULL,
     filingtype integer NOT NULL,
     filingspecific text DEFAULT ''::text NOT NULL,
     filingnotpresent character varying(30) DEFAULT ''::character varying NOT NULL,
@@ -11491,6 +11492,27 @@ ALTER TABLE geohistory.filing OWNER TO postgres;
 --
 
 COMMENT ON COLUMN geohistory.filing.filingnotpresent IS 'Rows with this field populated are used for internal tracking purposes, and are not included in open data.';
+
+
+--
+-- Name: filing_filingid_seq; Type: SEQUENCE; Schema: geohistory; Owner: postgres
+--
+
+CREATE SEQUENCE geohistory.filing_filingid_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE geohistory.filing_filingid_seq OWNER TO postgres;
+
+--
+-- Name: filing_filingid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
+--
+
+ALTER SEQUENCE geohistory.filing_filingid_seq OWNED BY geohistory.filing.filingid;
 
 
 --
@@ -11526,6 +11548,27 @@ ALTER TABLE geohistory.filingtype_filingtypeid_seq OWNER TO postgres;
 --
 
 ALTER SEQUENCE geohistory.filingtype_filingtypeid_seq OWNED BY geohistory.filingtype.filingtypeid;
+
+
+--
+-- Name: government_governmentid_seq; Type: SEQUENCE; Schema: geohistory; Owner: postgres
+--
+
+CREATE SEQUENCE geohistory.government_governmentid_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE geohistory.government_governmentid_seq OWNER TO postgres;
+
+--
+-- Name: government_governmentid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
+--
+
+ALTER SEQUENCE geohistory.government_governmentid_seq OWNED BY geohistory.government.governmentid;
 
 
 --
@@ -11746,6 +11789,27 @@ ALTER SEQUENCE geohistory.governmentsourceevent_governmentsourceeventid_seq OWNE
 
 
 --
+-- Name: law_lawid_seq; Type: SEQUENCE; Schema: geohistory; Owner: postgres
+--
+
+CREATE SEQUENCE geohistory.law_lawid_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE geohistory.law_lawid_seq OWNER TO postgres;
+
+--
+-- Name: law_lawid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
+--
+
+ALTER SEQUENCE geohistory.law_lawid_seq OWNED BY geohistory.law.lawid;
+
+
+--
 -- Name: lawalternate; Type: TABLE; Schema: geohistory; Owner: postgres
 --
 
@@ -11806,6 +11870,27 @@ ALTER SEQUENCE geohistory.lawalternatesection_lawalternatesectionid_seq OWNED BY
 
 
 --
+-- Name: lawsection_lawsectionid_seq; Type: SEQUENCE; Schema: geohistory; Owner: postgres
+--
+
+CREATE SEQUENCE geohistory.lawsection_lawsectionid_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE geohistory.lawsection_lawsectionid_seq OWNER TO postgres;
+
+--
+-- Name: lawsection_lawsectionid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
+--
+
+ALTER SEQUENCE geohistory.lawsection_lawsectionid_seq OWNED BY geohistory.lawsection.lawsectionid;
+
+
+--
 -- Name: lawsectionevent_lawsectioneventid_seq; Type: SEQUENCE; Schema: geohistory; Owner: postgres
 --
 
@@ -11845,6 +11930,27 @@ ALTER TABLE geohistory.metesdescription_metesdescriptionid_seq OWNER TO postgres
 --
 
 ALTER SEQUENCE geohistory.metesdescription_metesdescriptionid_seq OWNED BY geohistory.metesdescription.metesdescriptionid;
+
+
+--
+-- Name: metesdescriptionline_metesdescriptionlineid_seq; Type: SEQUENCE; Schema: geohistory; Owner: postgres
+--
+
+CREATE SEQUENCE geohistory.metesdescriptionline_metesdescriptionlineid_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE geohistory.metesdescriptionline_metesdescriptionlineid_seq OWNER TO postgres;
+
+--
+-- Name: metesdescriptionline_metesdescriptionlineid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
+--
+
+ALTER SEQUENCE geohistory.metesdescriptionline_metesdescriptionlineid_seq OWNED BY geohistory.metesdescriptionline.metesdescriptionlineid;
 
 
 --
@@ -12036,25 +12142,11 @@ ALTER SEQUENCE geohistory.plssfirstdivisionpart_plssfirstdivisionpartid_seq OWNE
 
 
 --
--- Name: plssmeridian_plssmeridianid_seq; Type: SEQUENCE; Schema: geohistory; Owner: postgres
---
-
-CREATE SEQUENCE geohistory.plssmeridian_plssmeridianid_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE geohistory.plssmeridian_plssmeridianid_seq OWNER TO postgres;
-
---
 -- Name: plssmeridian; Type: TABLE; Schema: geohistory; Owner: postgres
 --
 
 CREATE TABLE geohistory.plssmeridian (
-    plssmeridianid integer DEFAULT nextval('geohistory.plssmeridian_plssmeridianid_seq'::regclass) NOT NULL,
+    plssmeridianid integer NOT NULL,
     plssmeridianshort character varying(7) NOT NULL,
     plssmeridianlong character varying(200) NOT NULL,
     plssmeridianisspecialsurvey boolean DEFAULT false NOT NULL,
@@ -12070,6 +12162,27 @@ ALTER TABLE geohistory.plssmeridian OWNER TO postgres;
 --
 
 COMMENT ON TABLE geohistory.plssmeridian IS 'Lookup|Derived from "PLSS CadNSDI Standard Domains of Values, October 2014 - Updated May 2015," available on March 21, 2017, at http://nationalcad.org/download/PLSS_CadNSDI_Standard_Domains_of_Values.pdf, and from Maine "Township Listing and Map Reference," available on March 21, 2017, at http://www.maine.gov/revenue/propertytax/unorganizedterritory/township_map.htm';
+
+
+--
+-- Name: plssmeridian_plssmeridianid_seq; Type: SEQUENCE; Schema: geohistory; Owner: postgres
+--
+
+CREATE SEQUENCE geohistory.plssmeridian_plssmeridianid_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE geohistory.plssmeridian_plssmeridianid_seq OWNER TO postgres;
+
+--
+-- Name: plssmeridian_plssmeridianid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
+--
+
+ALTER SEQUENCE geohistory.plssmeridian_plssmeridianid_seq OWNED BY geohistory.plssmeridian.plssmeridianid;
 
 
 --
@@ -12276,6 +12389,27 @@ COMMENT ON COLUMN geohistory.plsstownship.plsstownshipfraction IS 'In Maine, thi
 
 
 --
+-- Name: plsstownship_plsstownshipid_seq; Type: SEQUENCE; Schema: geohistory; Owner: postgres
+--
+
+CREATE SEQUENCE geohistory.plsstownship_plsstownshipid_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE geohistory.plsstownship_plsstownshipid_seq OWNER TO postgres;
+
+--
+-- Name: plsstownship_plsstownshipid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
+--
+
+ALTER SEQUENCE geohistory.plsstownship_plsstownshipid_seq OWNED BY geohistory.plsstownship.plsstownshipid;
+
+
+--
 -- Name: recording_recordingid_seq; Type: SEQUENCE; Schema: geohistory; Owner: postgres
 --
 
@@ -12294,6 +12428,27 @@ ALTER TABLE geohistory.recording_recordingid_seq OWNER TO postgres;
 --
 
 ALTER SEQUENCE geohistory.recording_recordingid_seq OWNED BY geohistory.recording.recordingid;
+
+
+--
+-- Name: recordingevent_recordingeventid_seq; Type: SEQUENCE; Schema: geohistory; Owner: postgres
+--
+
+CREATE SEQUENCE geohistory.recordingevent_recordingeventid_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE geohistory.recordingevent_recordingeventid_seq OWNER TO postgres;
+
+--
+-- Name: recordingevent_recordingeventid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
+--
+
+ALTER SEQUENCE geohistory.recordingevent_recordingeventid_seq OWNED BY geohistory.recordingevent.recordingeventid;
 
 
 --
@@ -12945,10 +13100,31 @@ ALTER TABLE ONLY geohistory.adjudicationtype ALTER COLUMN adjudicationtypeid SET
 
 
 --
+-- Name: affectedgovernmentgroup affectedgovernmentgroupid; Type: DEFAULT; Schema: geohistory; Owner: postgres
+--
+
+ALTER TABLE ONLY geohistory.affectedgovernmentgroup ALTER COLUMN affectedgovernmentgroupid SET DEFAULT nextval('geohistory.affectedgovernmentgroup_affectedgovernmentgroupid_seq'::regclass);
+
+
+--
+-- Name: affectedgovernmentgrouppart affectedgovernmentgrouppartid; Type: DEFAULT; Schema: geohistory; Owner: postgres
+--
+
+ALTER TABLE ONLY geohistory.affectedgovernmentgrouppart ALTER COLUMN affectedgovernmentgrouppartid SET DEFAULT nextval('geohistory.affectedgovernmentgrouppart_affectedgovernmentgrouppartid_seq'::regclass);
+
+
+--
 -- Name: affectedgovernmentlevel affectedgovernmentlevelid; Type: DEFAULT; Schema: geohistory; Owner: postgres
 --
 
 ALTER TABLE ONLY geohistory.affectedgovernmentlevel ALTER COLUMN affectedgovernmentlevelid SET DEFAULT nextval('geohistory.affectedgovernmentlevel_affectedgovernmentlevelid_seq'::regclass);
+
+
+--
+-- Name: affectedgovernmentpart affectedgovernmentpartid; Type: DEFAULT; Schema: geohistory; Owner: postgres
+--
+
+ALTER TABLE ONLY geohistory.affectedgovernmentpart ALTER COLUMN affectedgovernmentpartid SET DEFAULT nextval('geohistory.affectedgovernmentpart_affectedgovernmentpartid_seq'::regclass);
 
 
 --
@@ -12977,6 +13153,13 @@ ALTER TABLE ONLY geohistory.currentgovernment ALTER COLUMN currentgovernmentid S
 --
 
 ALTER TABLE ONLY geohistory.documentation ALTER COLUMN documentationid SET DEFAULT nextval('geohistory.documentation_documentationid_seq'::regclass);
+
+
+--
+-- Name: event eventid; Type: DEFAULT; Schema: geohistory; Owner: postgres
+--
+
+ALTER TABLE ONLY geohistory.event ALTER COLUMN eventid SET DEFAULT nextval('geohistory.event_eventid_seq'::regclass);
 
 
 --
@@ -13022,10 +13205,24 @@ ALTER TABLE ONLY geohistory.eventtype ALTER COLUMN eventtypeid SET DEFAULT nextv
 
 
 --
+-- Name: filing filingid; Type: DEFAULT; Schema: geohistory; Owner: postgres
+--
+
+ALTER TABLE ONLY geohistory.filing ALTER COLUMN filingid SET DEFAULT nextval('geohistory.filing_filingid_seq'::regclass);
+
+
+--
 -- Name: filingtype filingtypeid; Type: DEFAULT; Schema: geohistory; Owner: postgres
 --
 
 ALTER TABLE ONLY geohistory.filingtype ALTER COLUMN filingtypeid SET DEFAULT nextval('geohistory.filingtype_filingtypeid_seq'::regclass);
+
+
+--
+-- Name: government governmentid; Type: DEFAULT; Schema: geohistory; Owner: postgres
+--
+
+ALTER TABLE ONLY geohistory.government ALTER COLUMN governmentid SET DEFAULT nextval('geohistory.government_governmentid_seq'::regclass);
 
 
 --
@@ -13085,6 +13282,13 @@ ALTER TABLE ONLY geohistory.governmentsourceevent ALTER COLUMN governmentsourcee
 
 
 --
+-- Name: law lawid; Type: DEFAULT; Schema: geohistory; Owner: postgres
+--
+
+ALTER TABLE ONLY geohistory.law ALTER COLUMN lawid SET DEFAULT nextval('geohistory.law_lawid_seq'::regclass);
+
+
+--
 -- Name: lawalternate lawalternateid; Type: DEFAULT; Schema: geohistory; Owner: postgres
 --
 
@@ -13099,6 +13303,13 @@ ALTER TABLE ONLY geohistory.lawalternatesection ALTER COLUMN lawalternatesection
 
 
 --
+-- Name: lawsection lawsectionid; Type: DEFAULT; Schema: geohistory; Owner: postgres
+--
+
+ALTER TABLE ONLY geohistory.lawsection ALTER COLUMN lawsectionid SET DEFAULT nextval('geohistory.lawsection_lawsectionid_seq'::regclass);
+
+
+--
 -- Name: lawsectionevent lawsectioneventid; Type: DEFAULT; Schema: geohistory; Owner: postgres
 --
 
@@ -13110,6 +13321,13 @@ ALTER TABLE ONLY geohistory.lawsectionevent ALTER COLUMN lawsectioneventid SET D
 --
 
 ALTER TABLE ONLY geohistory.metesdescription ALTER COLUMN metesdescriptionid SET DEFAULT nextval('geohistory.metesdescription_metesdescriptionid_seq'::regclass);
+
+
+--
+-- Name: metesdescriptionline metesdescriptionlineid; Type: DEFAULT; Schema: geohistory; Owner: postgres
+--
+
+ALTER TABLE ONLY geohistory.metesdescriptionline ALTER COLUMN metesdescriptionlineid SET DEFAULT nextval('geohistory.metesdescriptionline_metesdescriptionlineid_seq'::regclass);
 
 
 --
@@ -13141,6 +13359,13 @@ ALTER TABLE ONLY geohistory.plssfirstdivisionpart ALTER COLUMN plssfirstdivision
 
 
 --
+-- Name: plssmeridian plssmeridianid; Type: DEFAULT; Schema: geohistory; Owner: postgres
+--
+
+ALTER TABLE ONLY geohistory.plssmeridian ALTER COLUMN plssmeridianid SET DEFAULT nextval('geohistory.plssmeridian_plssmeridianid_seq'::regclass);
+
+
+--
 -- Name: plssseconddivision plssseconddivisionid; Type: DEFAULT; Schema: geohistory; Owner: postgres
 --
 
@@ -13155,10 +13380,24 @@ ALTER TABLE ONLY geohistory.plssspecialsurvey ALTER COLUMN plssspecialsurveyid S
 
 
 --
+-- Name: plsstownship plsstownshipid; Type: DEFAULT; Schema: geohistory; Owner: postgres
+--
+
+ALTER TABLE ONLY geohistory.plsstownship ALTER COLUMN plsstownshipid SET DEFAULT nextval('geohistory.plsstownship_plsstownshipid_seq'::regclass);
+
+
+--
 -- Name: recording recordingid; Type: DEFAULT; Schema: geohistory; Owner: postgres
 --
 
 ALTER TABLE ONLY geohistory.recording ALTER COLUMN recordingid SET DEFAULT nextval('geohistory.recording_recordingid_seq'::regclass);
+
+
+--
+-- Name: recordingevent recordingeventid; Type: DEFAULT; Schema: geohistory; Owner: postgres
+--
+
+ALTER TABLE ONLY geohistory.recordingevent ALTER COLUMN recordingeventid SET DEFAULT nextval('geohistory.recordingevent_recordingeventid_seq'::regclass);
 
 
 --

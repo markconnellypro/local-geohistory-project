@@ -40,6 +40,7 @@ if [ "$CI_ENVIRONMENT" = "production" ]; then
   ALTER TABLE gis.governmentshape ENABLE TRIGGER governmentshape_insert_trigger;
   SELECT extra.refresh_view_quick();
   SELECT extra.refresh_view_long();
+  SELECT extra.refresh_sequence();
   "
   ## Save combined commands
   echo "${tableString}" > /tmp/inpostgis/import.sql
