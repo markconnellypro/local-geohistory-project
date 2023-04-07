@@ -20,6 +20,8 @@ RUN install-php-extensions intl pgsql xsl
 # Adjust configuration files
 COPY /docker/php/mods-enabled/headers.conf /etc/apache2/mods-enabled/
 RUN mkdir /docker-php-entrypoint
+# OTHER OPERATING SYSTEMS: May need to use the commented version below instead of the uncommented version 2 lines down
+# COPY ./docker/php/import_common_php.sh /docker-php-entrypoint/
 COPY ./docker/php/import_common_php.sh ./src/private/development/docker/import_developmen[t]_php.sh ./src/private/production/docke[r]/* /docker-php-entrypoint/
 RUN chmod -R 764 /docker-php-entrypoint/*
 ARG CI_ENVIRONMENT

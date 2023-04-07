@@ -44,12 +44,16 @@ Within the newly-created **PHP** folder, the **env** folder contains a Sample.en
 
 First, copy the Sample.env, and name the copy **.env** (with nothing before the period). Then, populate the values labeled ***, following the directions in the file.
 
-Note that the application code uses symbolic links to propagate the .env file to 2 other locations without having to copy the .env file itself: the root of the **PHP** folder, and in the **src** folder. If you are deploying this application in another operating system, these symbolic links may not work, and the .env file in the **env** folder may have to be copied into these other locations. **If symbolic links are not used to propagate the .env files to other folders, the .gitignore file must be changed to prevent the inadvertent release of credentials by adding the following 2 files:**
+### Modifications for other operating systems
+
+The application uses symbolic links to propagate the .env file to 2 other locations without having to copy the .env file itself: the root of the **PHP** folder, and in the **src** folder. If you are deploying this application in another operating system, such as Windows, these symbolic links may not work, and the .env file in the **env** folder may have to be copied into these other locations. **If symbolic links are not used to propagate the .env files to other folders, the .gitignore file must be changed to prevent the inadvertent release of credentials by adding the following 2 files:**
 
 ```bash
 .env
 src/.env
 ```
+
+The application also contains 2 Dockerfiles, one in **docker/php** and one in **docker/postgis**, which may need to be modified in other operating systems where COPY statements will fail if the file does not exist. In these situations, uncomment the line below the line starting with **OTHER OPERATING SYSTEMS** by removing **#** from the beginning of the line, and then go to the following **COPY** line and add **#** to the beginning of the line to comment it out.
 
 ### Copy data files into the inpostgis folder
 
