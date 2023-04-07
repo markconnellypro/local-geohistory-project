@@ -175,7 +175,7 @@ ALTER FUNCTION extra.ci_model_adjudication_detail(integer, character varying) OW
 --
 
 CREATE FUNCTION extra.ci_model_adjudication_detail(character varying, character varying) RETURNS TABLE(adjudicationid integer, adjudicationtypelong character varying, tribunallong text, adjudicationnumber character varying, adjudicationterm text, textflag boolean, adjudicationlong text, adjudicationshort text, adjudicationnotes text, tribunalfilingoffice text, adjudicationtitle text)
-    LANGUAGE sql STABLE
+    LANGUAGE sql STABLE SECURITY DEFINER
     AS $_$
 
  SELECT * FROM extra.ci_model_adjudication_detail(extra.adjudicationslugid($1), $2);
