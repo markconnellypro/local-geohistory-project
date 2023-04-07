@@ -51,7 +51,7 @@ Note that the application code uses symbolic links to propagate the .env file to
 src/.env
 ```
 
-### Copy data files into inpostgis
+### Copy data files into the inpostgis folder
 
 The **inpostgis** folder contains 2 SQL files containing the structural elements of the database. To replicate the data as presented on the [project website](https://www.localgeohistory.pro/en/), download the tab-separated values (TSV) files from the **data** folder in the [Open Data repository](https://github.com/markconnellypro/local-geohistory-project-open-data) and place them in the **inpostgis** folder.
 
