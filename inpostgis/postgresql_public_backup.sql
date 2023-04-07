@@ -1761,8 +1761,11 @@ CREATE FUNCTION extra.ci_model_government_related(integer, character varying, ch
                 END AS governmentcolor,
             governmentparentcache.governmentparent = $1 AS isgovernmentsubstitute
            FROM extra.governmentparentcache
+             JOIN geohistory.government leadgovernment
+               ON governmentparentcache.governmentparent = leadgovernment.governmentid
              JOIN geohistory.government
                ON governmentparentcache.governmentid = government.governmentid
+               AND NOT (leadgovernment.governmentlevel < 3 AND (government.governmentlevel - leadgovernment.governmentlevel) > 1)
              JOIN extra.governmentsubstitutecache
                ON governmentparentcache.governmentparent = governmentsubstitutecache.governmentid
                AND governmentsubstitutecache.governmentsubstitute = $1
