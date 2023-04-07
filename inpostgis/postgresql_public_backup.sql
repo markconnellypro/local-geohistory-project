@@ -190,7 +190,7 @@ ALTER FUNCTION extra.ci_model_adjudication_detail(character varying, character v
 --
 
 CREATE FUNCTION extra.ci_model_adjudication_event(integer) RETURNS TABLE(eventslug text, eventtypeshort character varying, eventlong character varying, eventrange text, eventgranted character varying, eventeffective text, eventsortdate numeric, eventrelationship character varying)
-    LANGUAGE sql STABLE
+    LANGUAGE sql STABLE SECURITY DEFINER
     AS $_$
 SELECT DISTINCT eventextracache.eventslug,
     eventtype.eventtypeshort,
@@ -220,7 +220,7 @@ ALTER FUNCTION extra.ci_model_adjudication_event(integer) OWNER TO postgres;
 --
 
 CREATE FUNCTION extra.ci_model_adjudication_filing(integer, boolean) RETURNS TABLE(filingtypelong character varying, filingspecific text, filingdate text, filingdatesort character varying, filingfiled text, filingfiledsort character varying, filingother text, filingothersort character varying, filingothertype character varying, filingnotes text, filingnotpresent boolean)
-    LANGUAGE sql STABLE
+    LANGUAGE sql STABLE SECURITY DEFINER
     AS $_$
 
  SELECT filingtype.filingtypelong,
@@ -250,7 +250,7 @@ ALTER FUNCTION extra.ci_model_adjudication_filing(integer, boolean) OWNER TO pos
 --
 
 CREATE FUNCTION extra.ci_model_adjudication_location(integer) RETURNS TABLE(adjudicationlocationtypelong character varying, adjudicationlocationvolume character varying, adjudicationlocationpage text, adjudicationlocationtypevolumetype character varying, adjudicationlocationtypepagetype character varying, adjudicationlocationtypearchiveseries character varying, adjudicationlocationtypetype character varying, adjudicationlocationtypearchivetype text, tribunallong text, tribunalfilingoffice text)
-    LANGUAGE sql STABLE
+    LANGUAGE sql STABLE SECURITY DEFINER
     AS $_$
 
  SELECT adjudicationlocationtype.adjudicationlocationtypelong,
@@ -294,7 +294,7 @@ ALTER FUNCTION extra.ci_model_adjudication_location(integer) OWNER TO postgres;
 --
 
 CREATE FUNCTION extra.ci_model_adjudication_source(integer) RETURNS TABLE(adjudicationsourcecitationslug text, sourceshort character varying, adjudicationsourcecitationvolume smallint, adjudicationsourcecitationpage text, adjudicationsourcecitationyear character varying, adjudicationsourcecitationdate text, adjudicationsourcecitationdatesort character varying, adjudicationsourcecitationtitle text)
-    LANGUAGE sql STABLE
+    LANGUAGE sql STABLE SECURITY DEFINER
     AS $_$
 
  SELECT adjudicationsourcecitationextracache.adjudicationsourcecitationslug,
