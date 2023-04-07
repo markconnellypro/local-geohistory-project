@@ -9,7 +9,7 @@ $_pg_tle_$
 -- 1.5 -> 1.6: Correct regnalyeardaterangetext datatype
 --
 
-ALTER TABLE regnalyeartest
+ALTER TABLE calendar.regnalyear
   ALTER COLUMN regnalyeardaterangetext TYPE text;
 
 $_pg_tle_$
