@@ -5504,7 +5504,7 @@ CREATE FUNCTION extra.lawalternatesectionslug(integer) RETURNS text
     LANGUAGE sql STABLE
     AS $_$
 
- SELECT lower(replace(replace(regexp_replace(regexp_replace(extra.lawalternatesectioncitation($1, false), '[,\.\[\]\(\)\'']', '', 'g'), '([ :\–\—]| of )', '-', 'g'), '§', 's'), '¶', 'p')) AS lawalternatesectionslug;
+ SELECT lower(replace(replace(regexp_replace(regexp_replace(extra.lawalternatesectioncitation($1, false), '[,\.\[\]\(\)\'']', '', 'g'), '([ :\–\—\/]| of )', '-', 'g'), '§', 's'), '¶', 'p')) AS lawalternatesectionslug;
     
 $_$;
 
@@ -5664,7 +5664,7 @@ CREATE FUNCTION extra.lawsectionslug(integer) RETURNS text
     LANGUAGE sql STABLE
     AS $_$
 
- SELECT lower(replace(replace(regexp_replace(regexp_replace(extra.lawsectioncitation($1, false), '[,\.\[\]\(\)\'']', '', 'g'), '([ :\–\—]| of )', '-', 'g'), '§', 's'), '¶', 'p')) AS lawsectionslug;
+ SELECT lower(replace(replace(regexp_replace(regexp_replace(extra.lawsectioncitation($1, false), '[,\.\[\]\(\)\'']', '', 'g'), '([ :\–\—\/]| of )', '-', 'g'), '§', 's'), '¶', 'p')) AS lawsectionslug;
     
 $_$;
 
