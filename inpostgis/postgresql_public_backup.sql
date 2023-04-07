@@ -16045,6 +16045,7 @@ GRANT ALL ON FUNCTION extra.ci_model_adjudication_detail(character varying, char
 --
 
 REVOKE ALL ON FUNCTION extra.ci_model_adjudication_event(integer) FROM PUBLIC;
+GRANT ALL ON FUNCTION extra.ci_model_adjudication_event(integer) TO readonly;
 
 
 --
@@ -16052,6 +16053,7 @@ REVOKE ALL ON FUNCTION extra.ci_model_adjudication_event(integer) FROM PUBLIC;
 --
 
 REVOKE ALL ON FUNCTION extra.ci_model_adjudication_filing(integer, boolean) FROM PUBLIC;
+GRANT ALL ON FUNCTION extra.ci_model_adjudication_filing(integer, boolean) TO readonly;
 
 
 --
@@ -16059,6 +16061,7 @@ REVOKE ALL ON FUNCTION extra.ci_model_adjudication_filing(integer, boolean) FROM
 --
 
 REVOKE ALL ON FUNCTION extra.ci_model_adjudication_location(integer) FROM PUBLIC;
+GRANT ALL ON FUNCTION extra.ci_model_adjudication_location(integer) TO readonly;
 
 
 --
@@ -16066,6 +16069,7 @@ REVOKE ALL ON FUNCTION extra.ci_model_adjudication_location(integer) FROM PUBLIC
 --
 
 REVOKE ALL ON FUNCTION extra.ci_model_adjudication_source(integer) FROM PUBLIC;
+GRANT ALL ON FUNCTION extra.ci_model_adjudication_source(integer) TO readonly;
 
 
 --
