@@ -1,7 +1,7 @@
 SELECT pgtle.install_extension
 (
  'calendar',
- '1.5',
+ '1.6',
  'Support for non-standard calendars.',
 $_pg_tle_$
 
@@ -92,7 +92,7 @@ CREATE TABLE calendar.regnalyear
 (
     monarch text NOT NULL,
     regnalyearnumber integer NOT NULL,
-    regnalyeardaterangetext calendar.historicdaterangetext NOT NULL
+    regnalyeardaterangetext text NOT NULL
 );
 
 CREATE TABLE calendar.type (
