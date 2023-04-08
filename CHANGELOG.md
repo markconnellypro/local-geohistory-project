@@ -39,6 +39,6 @@
 
 - Public release of the Local Geohistory Project: Application repository.
 
-[Unreleased]: https://github.com/markconnellypro/local-geohistory-project/v1.0.1...HEAD
-[1.0.1]: https://github.com/markconnellypro/local-geohistory-project/v1.0.0...v1.0.1
+[Unreleased]: https://github.com/markconnellypro/local-geohistory-project/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/markconnellypro/local-geohistory-project/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/markconnellypro/local-geohistory-project/releases/tag/v1.0.0
