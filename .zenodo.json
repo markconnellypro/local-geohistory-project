@@ -2,7 +2,7 @@
     "creators": [
         {
             "orcid": "0000-0002-1212-5674",
-            "name": "Mark A. Connelly"
+            "name": "Connelly, Mark A."
         }
     ],
     "description": "<p>The Local Geohistory Project aims to educate users and disseminate information concerning the geographic history and structure of political subdivisions and local government. This repository contains the application code used to power the&nbsp;<a href=\"https://www.localgeohistory.pro/en/\">project website</a>. The application runs using the CodeIgniter 4 framework on a LAPP (Linux, Apache, PostgreSQL, PHP) stack, but can run on other operating systems when built using Docker.</p>\n\n<p>This repository does not contain the data, which can be found in the&nbsp;<a href=\"https://github.com/markconnellypro/local-geohistory-project-open-data\">Open Data repository</a>.</p>",
