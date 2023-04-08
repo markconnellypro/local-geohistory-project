@@ -5,6 +5,7 @@
 ### Added
 
 - Changelog.
+- Zenodo metadata file.
 
 ### Removed
 
