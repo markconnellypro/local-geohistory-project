@@ -8,6 +8,10 @@
 - Changelog.
 - Zenodo metadata file.
 
+### Changed
+
+- Host machine port set by .env instead of hardcoded in docker-compose.yaml.
+
 ### Removed
 
 - Detail in Research Log under Government Detail.
