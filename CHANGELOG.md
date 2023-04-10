@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [1.0.2] - 2023-04-10
 
 ### Added
 
@@ -45,6 +45,6 @@
 
 - Public release of the Local Geohistory Project: Application repository.
 
-[Unreleased]: https://github.com/markconnellypro/local-geohistory-project/compare/v1.0.1...HEAD
+[1.0.2]: https://github.com/markconnellypro/local-geohistory-project/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/markconnellypro/local-geohistory-project/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/markconnellypro/local-geohistory-project/releases/tag/v1.0.0
