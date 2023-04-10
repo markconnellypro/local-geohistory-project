@@ -4,6 +4,7 @@
 
 ### Added
 
+- Bandwidth and Data Extraction section to Disclaimers.
 - Changelog.
 - Zenodo metadata file.
 
