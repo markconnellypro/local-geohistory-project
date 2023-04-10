@@ -3,7 +3,6 @@
     <table class="normal row-border cell-border compact stripe">
         <thead>
             <tr>
-                <th>Detail</th>
                 <?php if ($isMultiple) { ?>
                     <th>Government</th>
                 <?php } ?>
@@ -13,16 +12,8 @@
             </tr>
         </thead>
         <tbody>
-            <?php foreach ($query as $row) {
-                $handleArray = str_getcsv(str_replace(['{', '}'], '', $row->internetarchivehandle), ',', "'");
-            ?>
+            <?php foreach ($query as $row) { ?>
                 <tr<?= ($row->researchlogismissing == 't' ? ' class="warning"' : '') ?>>
-                    <td><?php if (!empty($handleArray[0])) {
-                            foreach ($handleArray as $h) { ?>
-                                <a href="https://archive.org/details/<?= $h ?>">View</a><br />
-                        <?php }
-                        } ?>
-                    </td>
                     <?php if ($isMultiple) { ?>
                         <td><?= $row->governmentlong ?></td>
                     <?php } ?>
@@ -35,8 +26,8 @@
                         <?= ($row->researchlogvolume == '' ? '' : 'bk. ') . $row->researchlogvolume .
                             ($row->researchlogrange == '' ? '' : ' (' . $row->researchlogrange . ')') ?>
                     </td>
-                    </tr>
-                <?php } ?>
+                </tr>
+            <?php } ?>
         </tbody>
     </table>
 </section>

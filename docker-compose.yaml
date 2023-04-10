@@ -10,7 +10,7 @@ services:
         environment:
             TZ: ${TZ}
         ports:
-            - ${app_port}:80
+            - ${app_port}:${host_port}
         volumes:
             - ./env:/env
             - ${INPHP_E}:/inphp/e:ro
