@@ -60,10 +60,10 @@ class Law extends BaseController
                     echo view(ENVIRONMENT . '/ny_law_detail', ['query' => $query]);
                 }
             }
-            if (file_exists(APPPATH . 'Views/' . ENVIRONMENT . '/general_lawkey.php')) {
-                $query = $this->db->query('SELECT * FROM extra_development.ci_model_law_lawkey(?, ?)', [$id, $state])->getResult();
+            if (file_exists(APPPATH . 'Views/' . ENVIRONMENT . '/general_lawgroup.php')) {
+                $query = $this->db->query('SELECT * FROM extra_development.ci_model_law_lawgroup(?, ?)', [$id, $state])->getResult();
                 if (!empty($query)) {
-                    echo view(ENVIRONMENT . '/general_lawkey', ['query' => $query, 'includeForm' => false]);
+                    echo view(ENVIRONMENT . '/general_lawgroup', ['query' => $query, 'includeForm' => false]);
                 }
             }
             $query = $this->db->query('SELECT * FROM extra.ci_model_law' . $queryType . '_related(?)', [$id])->getResult();
