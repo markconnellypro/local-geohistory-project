@@ -7456,6 +7456,7 @@ CREATE TABLE geohistory.lawsectionevent (
     event integer NOT NULL,
     lawsectioneventrelationship character varying(10) NOT NULL,
     lawsectioneventnotes text DEFAULT ''::text NOT NULL,
+    lawgroup integer,
     CONSTRAINT lawsectionevent_check CHECK (((lawsectioneventrelationship)::text <> ALL (ARRAY[('reinstated'::character varying)::text, ('repealer'::character varying)::text, ('validation'::character varying)::text])))
 );
 
@@ -10944,6 +10945,31 @@ CREATE TABLE geohistory.recordingtype (
 ALTER TABLE geohistory.recordingtype OWNER TO postgres;
 
 --
+-- Name: lawgroup; Type: TABLE; Schema: geohistory; Owner: postgres
+--
+
+CREATE TABLE geohistory.lawgroup (
+    lawgroupid integer NOT NULL,
+    government integer NOT NULL,
+    lawgrouplong character varying(100) NOT NULL,
+    lawgroupfrom integer NOT NULL,
+    lawgroupto integer DEFAULT 9999 NOT NULL,
+    eventeffectivetype integer DEFAULT 61 NOT NULL,
+    lawgroupcourtname character varying(100) DEFAULT ''::character varying NOT NULL,
+    lawgrouprecording boolean,
+    lawgroupsecretaryofstate boolean,
+    lawgroupplanningagency boolean,
+    lawgroupprocedure text DEFAULT ''::text NOT NULL,
+    lawgroupgovernmenttype text[],
+    eventtype integer[],
+    lawgroupgroup text DEFAULT ''::text NOT NULL,
+    lawgroupsectionlead text DEFAULT ''::text NOT NULL
+);
+
+
+ALTER TABLE geohistory.lawgroup OWNER TO postgres;
+
+--
 -- Name: adjudication_adjudicationid_seq; Type: SEQUENCE; Schema: geohistory; Owner: postgres
 --
 
@@ -11868,6 +11894,71 @@ ALTER TABLE geohistory.lawalternatesection_lawalternatesectionid_seq OWNER TO po
 --
 
 ALTER SEQUENCE geohistory.lawalternatesection_lawalternatesectionid_seq OWNED BY geohistory.lawalternatesection.lawalternatesectionid;
+
+
+--
+-- Name: lawgroup_lawgroupid_seq; Type: SEQUENCE; Schema: geohistory; Owner: postgres
+--
+
+CREATE SEQUENCE geohistory.lawgroup_lawgroupid_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE geohistory.lawgroup_lawgroupid_seq OWNER TO postgres;
+
+--
+-- Name: lawgroup_lawgroupid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
+--
+
+ALTER SEQUENCE geohistory.lawgroup_lawgroupid_seq OWNED BY geohistory.lawgroup.lawgroupid;
+
+
+--
+-- Name: lawgroupsection; Type: TABLE; Schema: geohistory; Owner: postgres
+--
+
+CREATE TABLE geohistory.lawgroupsection (
+    lawgroupsectionid integer NOT NULL,
+    lawgroupsectionorder integer NOT NULL,
+    lawgroup integer NOT NULL,
+    lawsection integer NOT NULL,
+    lawsectionrelationship character varying(10) NOT NULL,
+    CONSTRAINT lawgroupsection_check CHECK (((lawsectionrelationship)::text <> ALL (ARRAY['direct'::text, 'enabling'::text, 'include'::text])))
+);
+
+
+ALTER TABLE geohistory.lawgroupsection OWNER TO postgres;
+
+--
+-- Name: COLUMN lawgroupsection.lawsectionrelationship; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.lawgroupsection.lawsectionrelationship IS 'This should eventually be renamed to eventrelationship converted to a proper foreign key referencing eventrelationshipid.';
+
+
+--
+-- Name: lawgroupsection_lawgroupsectionid_seq; Type: SEQUENCE; Schema: geohistory; Owner: postgres
+--
+
+CREATE SEQUENCE geohistory.lawgroupsection_lawgroupsectionid_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE geohistory.lawgroupsection_lawgroupsectionid_seq OWNER TO postgres;
+
+--
+-- Name: lawgroupsection_lawgroupsectionid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
+--
+
+ALTER SEQUENCE geohistory.lawgroupsection_lawgroupsectionid_seq OWNED BY geohistory.lawgroupsection.lawgroupsectionid;
 
 
 --
@@ -13304,6 +13395,20 @@ ALTER TABLE ONLY geohistory.lawalternatesection ALTER COLUMN lawalternatesection
 
 
 --
+-- Name: lawgroup lawgroupid; Type: DEFAULT; Schema: geohistory; Owner: postgres
+--
+
+ALTER TABLE ONLY geohistory.lawgroup ALTER COLUMN lawgroupid SET DEFAULT nextval('geohistory.lawgroup_lawgroupid_seq'::regclass);
+
+
+--
+-- Name: lawgroupsection lawgroupsectionid; Type: DEFAULT; Schema: geohistory; Owner: postgres
+--
+
+ALTER TABLE ONLY geohistory.lawgroupsection ALTER COLUMN lawgroupsectionid SET DEFAULT nextval('geohistory.lawgroupsection_lawgroupsectionid_seq'::regclass);
+
+
+--
 -- Name: lawsection lawsectionid; Type: DEFAULT; Schema: geohistory; Owner: postgres
 --
 
@@ -13923,6 +14028,22 @@ ALTER TABLE ONLY geohistory.lawalternate
 
 ALTER TABLE ONLY geohistory.lawalternatesection
     ADD CONSTRAINT lawalternatesection_pk PRIMARY KEY (lawalternatesectionid);
+
+
+--
+-- Name: lawgroup lawgroup_pk; Type: CONSTRAINT; Schema: geohistory; Owner: postgres
+--
+
+ALTER TABLE ONLY geohistory.lawgroup
+    ADD CONSTRAINT lawgroup_pk PRIMARY KEY (lawgroupid);
+
+
+--
+-- Name: lawgroupsection lawgroupsection_pk; Type: CONSTRAINT; Schema: geohistory; Owner: postgres
+--
+
+ALTER TABLE ONLY geohistory.lawgroupsection
+    ADD CONSTRAINT lawgroupsection_pk PRIMARY KEY (lawgroupsectionid);
 
 
 --
@@ -14893,6 +15014,27 @@ CREATE INDEX lawalternatesection_lawsection_idx ON geohistory.lawalternatesectio
 
 
 --
+-- Name: lawgroup_eventeffectivetype_idx; Type: INDEX; Schema: geohistory; Owner: postgres
+--
+
+CREATE INDEX lawgroup_eventeffectivetype_idx ON geohistory.lawgroup USING btree (eventeffectivetype);
+
+
+--
+-- Name: lawgroupsection_lawgroup_idx; Type: INDEX; Schema: geohistory; Owner: postgres
+--
+
+CREATE INDEX lawgroupsection_lawgroup_idx ON geohistory.lawgroupsection USING btree (lawgroup);
+
+
+--
+-- Name: lawgroupsection_lawsection_idx; Type: INDEX; Schema: geohistory; Owner: postgres
+--
+
+CREATE INDEX lawgroupsection_lawsection_idx ON geohistory.lawgroupsection USING btree (lawsection);
+
+
+--
 -- Name: lawsection_eventtype_idx; Type: INDEX; Schema: geohistory; Owner: postgres
 --
 
@@ -14925,6 +15067,13 @@ CREATE INDEX lawsection_lawsectionnewlaw_idx ON geohistory.lawsection USING btre
 --
 
 CREATE INDEX lawsectionevent_event_idx ON geohistory.lawsectionevent USING btree (event);
+
+
+--
+-- Name: lawsectionevent_lawgroup_idx; Type: INDEX; Schema: geohistory; Owner: postgres
+--
+
+CREATE INDEX lawsectionevent_lawgroup_idx ON geohistory.lawsectionevent USING btree (lawgroup);
 
 
 --
@@ -15602,6 +15751,38 @@ ALTER TABLE ONLY geohistory.lawalternatesection
 
 
 --
+-- Name: lawgroup lawgroup_eventeffectivetype_fk; Type: FK CONSTRAINT; Schema: geohistory; Owner: postgres
+--
+
+ALTER TABLE ONLY geohistory.lawgroup
+    ADD CONSTRAINT lawgroup_eventeffectivetype_fk FOREIGN KEY (eventeffectivetype) REFERENCES geohistory.eventeffectivetype(eventeffectivetypeid) DEFERRABLE;
+
+
+--
+-- Name: lawgroupsection lawgroupsection_lawgroup_fk; Type: FK CONSTRAINT; Schema: geohistory; Owner: postgres
+--
+
+ALTER TABLE ONLY geohistory.lawgroupsection
+    ADD CONSTRAINT lawgroupsection_lawgroup_fk FOREIGN KEY (lawgroup) REFERENCES geohistory.lawgroup(lawgroupid) DEFERRABLE;
+
+
+--
+-- Name: lawgroupsection lawgroupsection_lawsection_fk; Type: FK CONSTRAINT; Schema: geohistory; Owner: postgres
+--
+
+ALTER TABLE ONLY geohistory.lawgroupsection
+    ADD CONSTRAINT lawgroupsection_lawsection_fk FOREIGN KEY (lawsection) REFERENCES geohistory.lawsection(lawsectionid) DEFERRABLE;
+
+
+--
+-- Name: lawgroupsection lawgroupsection_lawsectionrelationship_fk; Type: FK CONSTRAINT; Schema: geohistory; Owner: postgres
+--
+
+ALTER TABLE ONLY geohistory.lawgroupsection
+    ADD CONSTRAINT lawgroupsection_lawsectionrelationship_fk FOREIGN KEY (lawsectionrelationship) REFERENCES geohistory.eventrelationship(eventrelationshipshort) DEFERRABLE;
+
+
+--
 -- Name: lawsection lawsection_eventtype_fk; Type: FK CONSTRAINT; Schema: geohistory; Owner: postgres
 --
 
@@ -15639,6 +15820,14 @@ ALTER TABLE ONLY geohistory.lawsection
 
 ALTER TABLE ONLY geohistory.lawsectionevent
     ADD CONSTRAINT lawsectionevent_event_fk FOREIGN KEY (event) REFERENCES geohistory.event(eventid) DEFERRABLE;
+
+
+--
+-- Name: lawsectionevent lawsectionevent_lawgroup_fk; Type: FK CONSTRAINT; Schema: geohistory; Owner: postgres
+--
+
+ALTER TABLE ONLY geohistory.lawsectionevent
+    ADD CONSTRAINT lawsectionevent_lawgroup_fk FOREIGN KEY (lawgroup) REFERENCES geohistory.lawgroup(lawgroupid) DEFERRABLE;
 
 
 --
