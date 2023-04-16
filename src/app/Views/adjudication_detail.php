@@ -3,12 +3,18 @@
     <table class="normal row-border cell-border compact stripe">
         <thead>
             <tr>
+                <?php if ($live) { ?>
+                    <th>ID</th>
+                <?php } ?>
                 <th>Tribunal</th>
                 <th>Current Filing Office</th>
             </tr>
         </thead>
         <tbody>
             <tr>
+                <?php if ($live) { ?>
+                    <td><?= $row->adjudicationid ?></td>
+                <?php } ?>
                 <td><?= $row->tribunallong ?></td>
                 <td><?= $row->tribunalfilingoffice ?></td>
             </tr>
