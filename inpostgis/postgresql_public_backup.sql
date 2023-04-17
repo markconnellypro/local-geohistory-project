@@ -971,7 +971,7 @@ ALTER FUNCTION extra.ci_model_event_governmentsource(integer, character varying,
 -- Name: ci_model_event_law(integer); Type: FUNCTION; Schema: extra; Owner: postgres
 --
 
-CREATE FUNCTION extra.ci_model_event_law(integer) RETURNS TABLE(lawsectionslug text, lawapproved character varying, lawsectioncitation text, lawsectioneventrelationship character varying, lawsectionfrom character varying, lawnumberchapter smallint)
+CREATE FUNCTION extra.ci_model_event_law(integer) RETURNS TABLE(lawsectionslug text, lawapproved character varying, lawsectioncitation text, lawsectioneventrelationship character varying, lawsectionfrom character varying, lawnumberchapter smallint, lawgrouplong character varying)
     LANGUAGE sql STABLE SECURITY DEFINER
     AS $_$
 
@@ -980,7 +980,8 @@ CREATE FUNCTION extra.ci_model_event_law(integer) RETURNS TABLE(lawsectionslug t
     lawsectionextracache.lawsectioncitation,
     lawsectionevent.lawsectioneventrelationship,
     lawsection.lawsectionfrom,
-    law.lawnumberchapter
+    law.lawnumberchapter,
+    lawgroup.lawgrouplong
    FROM geohistory.law
    JOIN geohistory.lawsection
      ON law.lawid = lawsection.law   
@@ -989,6 +990,8 @@ CREATE FUNCTION extra.ci_model_event_law(integer) RETURNS TABLE(lawsectionslug t
    JOIN geohistory.lawsectionevent
      ON lawsection.lawsectionid = lawsectionevent.lawsection 
      AND lawsectionevent.event = $1
+   LEFT JOIN geohistory.lawgroup
+     ON lawsectionevent.lawgroup = lawgroup.lawgroupid
   ORDER BY 4, 2, 1;
  
 $_$;
@@ -2585,7 +2588,7 @@ ALTER FUNCTION extra.ci_model_law_detail(text, character varying, boolean) OWNER
 -- Name: ci_model_law_event(integer); Type: FUNCTION; Schema: extra; Owner: postgres
 --
 
-CREATE FUNCTION extra.ci_model_law_event(integer) RETURNS TABLE(eventslug text, eventtypeshort character varying, eventlong character varying, eventrange text, eventgranted character varying, eventeffective text, eventsortdate numeric, eventrelationship character varying)
+CREATE FUNCTION extra.ci_model_law_event(integer) RETURNS TABLE(eventslug text, eventtypeshort character varying, eventlong character varying, eventrange text, eventgranted character varying, eventeffective text, eventsortdate numeric, eventrelationship character varying, lawgrouplong character varying)
     LANGUAGE sql STABLE SECURITY DEFINER
     AS $_$
 SELECT DISTINCT eventextracache.eventslug,
@@ -2595,7 +2598,8 @@ SELECT DISTINCT eventextracache.eventslug,
     event.eventgranted,
     extra.shortdate(event.eventeffective) AS eventeffective,
     extra.eventsortdate(event.eventid) AS eventsortdate,
-    lawsectionevent.lawsectioneventrelationship AS eventrelationship
+    lawsectionevent.lawsectioneventrelationship AS eventrelationship,
+    lawgroup.lawgrouplong
    FROM geohistory.event
    JOIN geohistory.eventtype
      ON event.eventtype = eventtype.eventtypeid
@@ -2605,6 +2609,8 @@ SELECT DISTINCT eventextracache.eventslug,
    JOIN geohistory.lawsectionevent
      ON event.eventid = lawsectionevent.event
      AND lawsectionevent.lawsection = $1
+   LEFT JOIN geohistory.lawgroup
+     ON lawsectionevent.lawgroup = lawgroup.lawgroupid
   ORDER BY (extra.eventsortdate(event.eventid)), event.eventlong;
 $_$;
 
@@ -6590,6 +6596,40 @@ $$;
 ALTER FUNCTION geohistory.lawalternatesection_insertupdate() OWNER TO postgres;
 
 --
+-- Name: lawgroupsection_deleteupdate(); Type: FUNCTION; Schema: geohistory; Owner: postgres
+--
+
+CREATE FUNCTION geohistory.lawgroupsection_deleteupdate() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+    lawsectioneventidcheck integer;
+BEGIN
+    SELECT lawsectionevent.lawsectioneventid INTO lawsectioneventidcheck
+    FROM geohistory.lawsectionevent
+    WHERE lawsectionevent.lawgroup = OLD.lawgroup
+      AND lawsectionevent.lawsection = OLD.lawsection
+      AND (
+        (
+          OLD.lawsectionrelationship IN ('indirect', 'reinstated', 'validation')
+            AND lawsectionevent.lawsectioneventrelationship = 'indirect'
+        ) OR (
+          OLD.lawsectionrelationship <> 'repealed'
+          AND lawsectionevent.lawsectioneventrelationship = 'reference'
+        )
+      );
+
+    IF lawsectioneventidcheck IS NULL THEN
+      RAISE EXCEPTION 'Law section-law group match.';
+    END IF;
+    RETURN NEW;
+END
+$$;
+
+
+ALTER FUNCTION geohistory.lawgroupsection_deleteupdate() OWNER TO postgres;
+
+--
 -- Name: lawsection_update(); Type: FUNCTION; Schema: geohistory; Owner: postgres
 --
 
@@ -6614,6 +6654,42 @@ $$;
 
 
 ALTER FUNCTION geohistory.lawsection_update() OWNER TO postgres;
+
+--
+-- Name: lawsectionevent_insertupdate(); Type: FUNCTION; Schema: geohistory; Owner: postgres
+--
+
+CREATE FUNCTION geohistory.lawsectionevent_insertupdate() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+    lawgroupsectionidcheck integer;
+BEGIN
+    IF NEW.lawgroup IS NOT NULL THEN
+        SELECT lawgroupsection.lawgroupsectionid INTO lawgroupsectionidcheck
+        FROM geohistory.lawgroupsection
+        WHERE lawgroupsection.lawgroup = NEW.lawgroup
+          AND lawgroupsection.lawsection = NEW.lawsection
+          AND (
+            (
+              lawgroupsection.lawsectionrelationship IN ('indirect', 'reinstated', 'validation')
+                AND NEW.lawsectioneventrelationship = 'indirect'
+            ) OR (
+              lawgroupsection.lawsectionrelationship <> 'repealed'
+              AND NEW.lawsectioneventrelationship = 'reference'
+            )
+          );
+    
+        IF lawgroupsectionidcheck IS NULL THEN
+          RAISE EXCEPTION 'Law section-law group mismatch.';
+        END IF;
+    END IF;
+    RETURN NEW;
+END
+$$;
+
+
+ALTER FUNCTION geohistory.lawsectionevent_insertupdate() OWNER TO postgres;
 
 --
 -- Name: metesdescriptionline_insertupdate(); Type: FUNCTION; Schema: geohistory; Owner: postgres
@@ -14039,11 +14115,35 @@ ALTER TABLE ONLY geohistory.lawgroup
 
 
 --
+-- Name: lawgroup lawgroup_unique; Type: CONSTRAINT; Schema: geohistory; Owner: postgres
+--
+
+ALTER TABLE ONLY geohistory.lawgroup
+    ADD CONSTRAINT lawgroup_unique UNIQUE (lawgrouplong);
+
+
+--
 -- Name: lawgroupsection lawgroupsection_pk; Type: CONSTRAINT; Schema: geohistory; Owner: postgres
 --
 
 ALTER TABLE ONLY geohistory.lawgroupsection
     ADD CONSTRAINT lawgroupsection_pk PRIMARY KEY (lawgroupsectionid);
+
+
+--
+-- Name: lawgroupsection lawgroupsection_unique_order; Type: CONSTRAINT; Schema: geohistory; Owner: postgres
+--
+
+ALTER TABLE ONLY geohistory.lawgroupsection
+    ADD CONSTRAINT lawgroupsection_unique_order UNIQUE (lawgroup, lawgroupsectionorder);
+
+
+--
+-- Name: lawgroupsection lawgroupsection_unique_section; Type: CONSTRAINT; Schema: geohistory; Owner: postgres
+--
+
+ALTER TABLE ONLY geohistory.lawgroupsection
+    ADD CONSTRAINT lawgroupsection_unique_section UNIQUE (lawgroup, lawsection);
 
 
 --
@@ -15301,10 +15401,24 @@ CREATE TRIGGER lawalternatesection_insertupdate_trigger BEFORE INSERT OR UPDATE 
 
 
 --
+-- Name: lawgroupsection lawgroupsection_deleteupdate_trigger; Type: TRIGGER; Schema: geohistory; Owner: postgres
+--
+
+CREATE TRIGGER lawgroupsection_deleteupdate_trigger BEFORE DELETE OR UPDATE OF lawsection, lawsectionrelationship, lawgroup ON geohistory.lawgroupsection FOR EACH ROW EXECUTE FUNCTION geohistory.lawgroupsection_deleteupdate();
+
+
+--
 -- Name: lawsection lawsection_update_trigger; Type: TRIGGER; Schema: geohistory; Owner: postgres
 --
 
 CREATE TRIGGER lawsection_update_trigger BEFORE UPDATE OF law ON geohistory.lawsection FOR EACH ROW EXECUTE FUNCTION geohistory.lawsection_update();
+
+
+--
+-- Name: lawsectionevent lawsectionevent_insertupdate_trigger; Type: TRIGGER; Schema: geohistory; Owner: postgres
+--
+
+CREATE TRIGGER lawsectionevent_insertupdate_trigger BEFORE INSERT OR UPDATE OF lawgroup, lawsection, lawsectioneventrelationship ON geohistory.lawsectionevent FOR EACH ROW EXECUTE FUNCTION geohistory.lawsectionevent_insertupdate();
 
 
 --

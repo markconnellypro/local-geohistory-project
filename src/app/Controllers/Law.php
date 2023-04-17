@@ -76,7 +76,7 @@ class Law extends BaseController
             }
             $query = $this->db->query('SELECT * FROM extra.ci_model_law' . $queryType . '_event(?)', [$id])->getResult();
             if (count($query) > 0) {
-                echo view('general_event', ['query' => $query, 'state' => $state, 'title' => 'Event Links', 'eventRelationship' => true]);
+                echo view('general_event', ['query' => $query, 'state' => $state, 'title' => 'Event Links', 'eventRelationship' => true, 'includeLawGroup' => true]);
             }
             echo view('footer');
         }
