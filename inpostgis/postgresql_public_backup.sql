@@ -6009,6 +6009,17 @@ RAISE INFO '%', clock_timestamp();
        governmentshapereference IS NOT NULL AND governmentshapereference <> governmentshapeid
      );
 RAISE INFO '%', clock_timestamp();
+    DELETE FROM geohistory.affectedgovernmentgrouppart
+    WHERE affectedgovernmentpart IN (
+      SELECT DISTINCT affectedgovernmentpart.affectedgovernmentpartid
+      FROM geohistory.affectedgovernmentpart
+      WHERE affectedgovernmentpart.governmentfrom IS NULL
+        AND affectedgovernmentpart.affectedtypefrom IS NULL
+        AND affectedgovernmentpart.governmentto IS NULL
+        AND affectedgovernmentpart.affectedtypeto IS NULL
+        AND affectedgovernmentpart.governmentformto IS NULL
+    );
+RAISE INFO '%', clock_timestamp();
     DELETE FROM geohistory.affectedgovernmentpart
 	WHERE affectedgovernmentpartid IN (
       SELECT DISTINCT affectedgovernmentpart.affectedgovernmentpartid
@@ -6016,7 +6027,15 @@ RAISE INFO '%', clock_timestamp();
       LEFT JOIN geohistory.affectedgovernmentgrouppart
       ON affectedgovernmentpart.affectedgovernmentpartid = affectedgovernmentgrouppart.affectedgovernmentpart
       WHERE affectedgovernmentgrouppart.affectedgovernmentpart IS NULL
-	);
+	) AND affectedgovernmentpartid NOT IN (
+      SELECT DISTINCT affectedgovernmentpart.affectedgovernmentpartid
+      FROM geohistory.affectedgovernmentpart
+      WHERE affectedgovernmentpart.governmentfrom IS NULL
+        AND affectedgovernmentpart.affectedtypefrom IS NULL
+        AND affectedgovernmentpart.governmentto IS NULL
+        AND affectedgovernmentpart.affectedtypeto IS NULL
+        AND affectedgovernmentpart.governmentformto IS NULL
+    );
 RAISE INFO '%', clock_timestamp();
     REFRESH MATERIALIZED VIEW extra.adjudicationgovernmentcache;
 RAISE INFO '%', clock_timestamp();
