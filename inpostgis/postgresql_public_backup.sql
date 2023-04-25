@@ -11065,6 +11065,29 @@ CREATE TABLE geohistory.lawgroup (
 ALTER TABLE geohistory.lawgroup OWNER TO postgres;
 
 --
+-- Name: lawgroupsection; Type: TABLE; Schema: geohistory; Owner: postgres
+--
+
+CREATE TABLE geohistory.lawgroupsection (
+    lawgroupsectionid integer NOT NULL,
+    lawgroupsectionorder integer NOT NULL,
+    lawgroup integer NOT NULL,
+    lawsection integer NOT NULL,
+    lawsectionrelationship character varying(10) NOT NULL,
+    CONSTRAINT lawgroupsection_check CHECK (((lawsectionrelationship)::text <> ALL (ARRAY['direct'::text, 'enabling'::text, 'include'::text])))
+);
+
+
+ALTER TABLE geohistory.lawgroupsection OWNER TO postgres;
+
+--
+-- Name: COLUMN lawgroupsection.lawsectionrelationship; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.lawgroupsection.lawsectionrelationship IS 'This should eventually be renamed to eventrelationship converted to a proper foreign key referencing eventrelationshipid.';
+
+
+--
 -- Name: adjudication_adjudicationid_seq; Type: SEQUENCE; Schema: geohistory; Owner: postgres
 --
 
@@ -12010,29 +12033,6 @@ ALTER TABLE geohistory.lawgroup_lawgroupid_seq OWNER TO postgres;
 --
 
 ALTER SEQUENCE geohistory.lawgroup_lawgroupid_seq OWNED BY geohistory.lawgroup.lawgroupid;
-
-
---
--- Name: lawgroupsection; Type: TABLE; Schema: geohistory; Owner: postgres
---
-
-CREATE TABLE geohistory.lawgroupsection (
-    lawgroupsectionid integer NOT NULL,
-    lawgroupsectionorder integer NOT NULL,
-    lawgroup integer NOT NULL,
-    lawsection integer NOT NULL,
-    lawsectionrelationship character varying(10) NOT NULL,
-    CONSTRAINT lawgroupsection_check CHECK (((lawsectionrelationship)::text <> ALL (ARRAY['direct'::text, 'enabling'::text, 'include'::text])))
-);
-
-
-ALTER TABLE geohistory.lawgroupsection OWNER TO postgres;
-
---
--- Name: COLUMN lawgroupsection.lawsectionrelationship; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.lawgroupsection.lawsectionrelationship IS 'This should eventually be renamed to eventrelationship converted to a proper foreign key referencing eventrelationshipid.';
 
 
 --
