@@ -1376,16 +1376,15 @@ ALTER FUNCTION extra.ci_model_government_current(integer) OWNER TO postgres;
 -- Name: ci_model_government_detail(integer, character varying, boolean); Type: FUNCTION; Schema: extra; Owner: postgres
 --
 
-CREATE FUNCTION extra.ci_model_government_detail(integer, character varying, boolean) RETURNS TABLE(governmentid integer, governmentlong text, governmenttype character varying, governmentlevel text, governmentcurrenthomerule text, textflag boolean, governmentcreationevent text, governmentcreationtext text, governmentcreationlong text, governmentaltercount integer, governmentdissolutionevent text, governmentdissolutiontext text, hasmap boolean, governmentmapstatus integer, governmentmapstatustimelapse boolean, governmentsubstitutemultiple boolean, governmentsubstituteslug text)
+CREATE FUNCTION extra.ci_model_government_detail(integer, character varying, boolean) RETURNS TABLE(governmentid integer, governmentlong text, governmenttype character varying, governmentlevel text, textflag boolean, governmentcreationevent text, governmentcreationtext text, governmentcreationlong text, governmentaltercount integer, governmentdissolutionevent text, governmentdissolutiontext text, hasmap boolean, governmentmapstatus integer, governmentmapstatustimelapse boolean, governmentsubstitutemultiple boolean, governmentsubstituteslug text)
     LANGUAGE sql STABLE
     AS $_$
 
  SELECT government.governmentid,
     extra.governmentlong(government.governmentid, upper($2)) AS governmentlong,
-    government.governmenttype::text ||
         CASE
-            WHEN government.governmentclass::text = ''::text THEN ''::text
-            ELSE (' (Class: '::text || government.governmentclass::text) || ')'::text
+            WHEN government.governmentcurrentform IS NULL THEN government.governmenttype
+            ELSE governmentform.governmentformlongextended
         END AS governmenttype,
         CASE
             WHEN government.governmentstatus IN ('placeholder') THEN 'placeholder'::text
@@ -1394,10 +1393,6 @@ CREATE FUNCTION extra.ci_model_government_detail(integer, character varying, boo
             WHEN government.governmentlevel = 3 THEN 'county'::text
             ELSE 'municipality or lower'::text
         END AS governmentlevel,
-        CASE
-            WHEN government.governmentcurrenthomerule THEN 'yes'::text
-            ELSE 'no'::text
-        END AS governmentcurrenthomerule,
         NOT (governmentchangecountcache.creationevent IS NULL
           AND governmentchangecountcache.altertotal = 0
           AND governmentchangecountcache.dissolutionevent IS NULL
@@ -1438,6 +1433,8 @@ CREATE FUNCTION extra.ci_model_government_detail(integer, character varying, boo
      ON government.governmentmapstatus = governmentmapstatus.governmentmapstatusid
    JOIN extra.governmentsubstitutecache
      ON government.governmentid = governmentsubstitutecache.governmentid
+   LEFT JOIN geohistory.governmentform
+     ON government.governmentcurrentform = governmentform.governmentformid
    LEFT JOIN extra.governmentchangecountcache
      ON government.governmentid = governmentchangecountcache.governmentid
    JOIN extra.governmentrelationcache
@@ -1467,7 +1464,7 @@ ALTER FUNCTION extra.ci_model_government_detail(integer, character varying, bool
 -- Name: ci_model_government_detail(text, character varying, boolean); Type: FUNCTION; Schema: extra; Owner: postgres
 --
 
-CREATE FUNCTION extra.ci_model_government_detail(text, character varying, boolean) RETURNS TABLE(governmentid integer, governmentlong text, governmenttype character varying, governmentlevel text, governmentcurrenthomerule text, textflag boolean, governmentcreationevent text, governmentcreationtext text, governmentcreationlong text, governmentaltercount integer, governmentdissolutionevent text, governmentdissolutiontext text, hasmap boolean, governmentmapstatus integer, governmentmapstatustimelapse boolean, governmentsubstitutemultiple boolean, governmentsubstituteslug text)
+CREATE FUNCTION extra.ci_model_government_detail(text, character varying, boolean) RETURNS TABLE(governmentid integer, governmentlong text, governmenttype character varying, governmentlevel text, textflag boolean, governmentcreationevent text, governmentcreationtext text, governmentcreationlong text, governmentaltercount integer, governmentdissolutionevent text, governmentdissolutiontext text, hasmap boolean, governmentmapstatus integer, governmentmapstatustimelapse boolean, governmentsubstitutemultiple boolean, governmentsubstituteslug text)
     LANGUAGE sql STABLE SECURITY DEFINER
     AS $_$
  
@@ -7085,8 +7082,6 @@ CREATE TABLE geohistory.government (
     governmentlead1983stateplane character varying(2) DEFAULT ''::character varying NOT NULL,
     governmenthasmultiple1983stateplane boolean,
     governmentdefaultsrid integer,
-    governmentclass character varying(3) DEFAULT ''::character varying NOT NULL,
-    governmentcurrenthomerule boolean,
     governmentnotecreation character varying(5) DEFAULT ''::character varying NOT NULL,
     governmentnotedissolution character varying(5) DEFAULT ''::character varying NOT NULL,
     governmentnotecurrentleadparent boolean DEFAULT false NOT NULL,
@@ -7101,6 +7096,7 @@ CREATE TABLE geohistory.government (
     governmentlocale character varying(2) DEFAULT 'en'::character varying NOT NULL,
     governmentarticle character varying(10) DEFAULT ''::character varying NOT NULL,
     governmentconnectingarticle character varying(10) DEFAULT ''::character varying NOT NULL,
+    governmentcurrentform integer,
     CONSTRAINT government_check CHECK (((((governmentstatus)::text = ANY (ARRAY['cadastral'::text, 'defunct'::text, 'nonfunctioning'::text, 'paper'::text, 'placeholder'::text, 'proposed'::text, 'unincorporated'::text, 'unknown'::text, ''::text])) OR (((governmentstatus)::text = ANY (ARRAY['alternate'::text, 'language'::text])) AND (governmentsubstitute IS NOT NULL))) AND (governmentlevel >= 1) AND (governmentlevel <= 5) AND ((governmentlevel = 2) OR ((governmentlevel <> 2) AND ((government1983stateplaneauthority)::text = ''::text))) AND ((governmentlevel = 3) OR ((governmentlevel <> 3) AND ((governmentlead1983stateplane)::text = ''::text))) AND ((governmentlevel = 3) OR ((governmentlevel <> 3) AND (governmenthasmultiple1983stateplane IS NULL))) AND (((governmentname)::text <> ''::text) OR ((governmentnumber)::text <> ''::text)) AND ((governmenttype)::text <> ''::text) AND ((governmentlocale)::text = ANY (ARRAY['de'::text, ('en'::character varying)::text, 'es'::text, ('fr'::character varying)::text, ('nl'::character varying)::text, 'pl'::text])) AND (NOT (((governmentstatus)::text = ANY (ARRAY['placeholder'::text, 'proposed'::text, 'unincorporated'::text])) AND (governmentmapstatus <> 0))) AND (((governmentlevel = 1) AND (governmentcurrentleadparent IS NULL)) OR ((governmentlevel > 1) AND (governmentcurrentleadparent IS NOT NULL) AND (governmentid <> governmentcurrentleadparent)))))
 );
 
@@ -8449,6 +8445,7 @@ CREATE VIEW extra.affectedgovernmentform AS
     extra.governmenttype(governmentforms.government) AS "Government Type",
     extra.governmentformlongreport(governmentforms.governmentform) AS "Form",
     extra.governmentformlong(governmentforms.governmentform, true) AS "Form Detailed",
+    governmentforms.governmentform AS "Form ID",
     (('J'::text || trunc(extra.eventsortdate(governmentforms.event), 0)))::date AS "Date",
     governmentforms.event AS "Event",
     (extra.governmenttype(governmentforms.government) = split_part(replace(extra.governmentformlong(governmentforms.governmentform), ' '::text, ','::text), ','::text, 1)) AS "Type-Form Match",
@@ -8473,6 +8470,7 @@ CREATE MATERIALIZED VIEW extra.affectedgovernmentformcache AS
     affectedgovernmentform."Government Type",
     affectedgovernmentform."Form",
     affectedgovernmentform."Form Detailed",
+    affectedgovernmentform."Form ID",
     affectedgovernmentform."Date",
     affectedgovernmentform."Event",
     affectedgovernmentform."Type-Form Match",
@@ -14993,6 +14991,13 @@ CREATE INDEX filing_filingtype_idx ON geohistory.filing USING btree (filingtype)
 
 
 --
+-- Name: fki_government_governmentform_fk; Type: INDEX; Schema: geohistory; Owner: postgres
+--
+
+CREATE INDEX fki_government_governmentform_fk ON geohistory.government USING btree (governmentcurrentform);
+
+
+--
 -- Name: fki_plss_plsstownship_fk; Type: INDEX; Schema: geohistory; Owner: postgres
 --
 
@@ -15729,6 +15734,14 @@ ALTER TABLE ONLY geohistory.filing
 
 ALTER TABLE ONLY geohistory.filing
     ADD CONSTRAINT filing_filingtype_fk FOREIGN KEY (filingtype) REFERENCES geohistory.filingtype(filingtypeid) DEFERRABLE;
+
+
+--
+-- Name: government government_governmentcurrentform_fk; Type: FK CONSTRAINT; Schema: geohistory; Owner: postgres
+--
+
+ALTER TABLE ONLY geohistory.government
+    ADD CONSTRAINT government_governmentcurrentform_fk FOREIGN KEY (governmentcurrentform) REFERENCES geohistory.governmentform(governmentformid) DEFERRABLE;
 
 
 --
