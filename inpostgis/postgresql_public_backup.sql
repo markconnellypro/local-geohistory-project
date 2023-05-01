@@ -2059,17 +2059,17 @@ $_$;
 ALTER FUNCTION extra.ci_model_governmentabbreviationid(text) OWNER TO postgres;
 
 --
--- Name: ci_model_governmentidentifier_detail(text, text); Type: FUNCTION; Schema: extra; Owner: postgres
+-- Name: ci_model_governmentidentifier_detail(text, text, text); Type: FUNCTION; Schema: extra; Owner: postgres
 --
 
-CREATE FUNCTION extra.ci_model_governmentidentifier_detail(text, text) RETURNS TABLE(governmentidentifiertypetype character varying, governmentidentifiertypeshort character varying, governmentidentifier text, governmentidentifiertypeurl text, governmentidentifierids integer[], governments text[])
+CREATE FUNCTION extra.ci_model_governmentidentifier_detail(text, text, text) RETURNS TABLE(governmentidentifiertypetype character varying, governmentidentifiertypeshort character varying, governmentidentifier text, governmentidentifiertypeurl text, governmentidentifierids integer[], governments text[])
     LANGUAGE sql STABLE SECURITY DEFINER
     AS $_$
 
  SELECT governmentidentifiertype.governmentidentifiertypetype,
     governmentidentifiertype.governmentidentifiertypeshort,
     governmentidentifier.governmentidentifierprefix || governmentidentifiertype.governmentidentifiertypeprefixdelimiter || governmentidentifier.governmentidentifier AS governmentidentifier,
-    replace(governmentidentifiertype.governmentidentifiertypeurl, '<Identifier>', governmentidentifier.governmentidentifierprefix || governmentidentifiertype.governmentidentifiertypeprefixdelimiter || governmentidentifier.governmentidentifier) AS governmentidentifiertypeurl,
+    replace(replace(governmentidentifiertype.governmentidentifiertypeurl, '<Identifier>', governmentidentifier.governmentidentifierprefix || governmentidentifiertype.governmentidentifiertypeprefixdelimiter || governmentidentifier.governmentidentifier), '<Language>', $3) AS governmentidentifiertypeurl,
     array_agg(DISTINCT governmentidentifier.governmentidentifierid ORDER BY governmentidentifier.governmentidentifierid) AS governmentidentifierids,
     string_to_array(array_to_string(array_agg(DISTINCT governmentidentifier.government ORDER BY governmentidentifier.government), '|'), '|') AS governments
    FROM geohistory.governmentidentifier
@@ -2082,7 +2082,7 @@ CREATE FUNCTION extra.ci_model_governmentidentifier_detail(text, text) RETURNS T
 $_$;
 
 
-ALTER FUNCTION extra.ci_model_governmentidentifier_detail(text, text) OWNER TO postgres;
+ALTER FUNCTION extra.ci_model_governmentidentifier_detail(text, text, text) OWNER TO postgres;
 
 --
 -- Name: ci_model_governmentidentifier_government(integer[], character varying); Type: FUNCTION; Schema: extra; Owner: postgres
@@ -2102,10 +2102,10 @@ $_$;
 ALTER FUNCTION extra.ci_model_governmentidentifier_government(integer[], character varying) OWNER TO postgres;
 
 --
--- Name: ci_model_governmentidentifier_related(integer[], integer[]); Type: FUNCTION; Schema: extra; Owner: postgres
+-- Name: ci_model_governmentidentifier_related(integer[], integer[], text); Type: FUNCTION; Schema: extra; Owner: postgres
 --
 
-CREATE FUNCTION extra.ci_model_governmentidentifier_related(integer[], integer[]) RETURNS TABLE(governmentidentifiertypetype character varying, governmentidentifiertypeslug text, governmentidentifiertypeshort character varying, governmentidentifier text, governmentidentifiertypeurl text)
+CREATE FUNCTION extra.ci_model_governmentidentifier_related(integer[], integer[], text) RETURNS TABLE(governmentidentifiertypetype character varying, governmentidentifiertypeslug text, governmentidentifiertypeshort character varying, governmentidentifier text, governmentidentifiertypeurl text)
     LANGUAGE sql STABLE SECURITY DEFINER
     AS $_$
 
@@ -2113,7 +2113,7 @@ CREATE FUNCTION extra.ci_model_governmentidentifier_related(integer[], integer[]
     governmentidentifiertype.governmentidentifiertypeslug,
     governmentidentifiertype.governmentidentifiertypeshort,
     governmentidentifier.governmentidentifierprefix || governmentidentifiertype.governmentidentifiertypeprefixdelimiter || governmentidentifier.governmentidentifier AS governmentidentifier,
-    replace(governmentidentifiertype.governmentidentifiertypeurl, '<Identifier>', governmentidentifier.governmentidentifierprefix || governmentidentifiertype.governmentidentifiertypeprefixdelimiter || governmentidentifier.governmentidentifier) AS governmentidentifiertypeurl
+    replace(replace(governmentidentifiertype.governmentidentifiertypeurl, '<Identifier>', governmentidentifier.governmentidentifierprefix || governmentidentifiertype.governmentidentifiertypeprefixdelimiter || governmentidentifier.governmentidentifier), '<Language>', $3) AS governmentidentifiertypeurl
    FROM geohistory.governmentidentifier
      JOIN geohistory.governmentidentifiertype
        ON governmentidentifier.governmentidentifiertype = governmentidentifiertype.governmentidentifiertypeid
@@ -2123,7 +2123,7 @@ CREATE FUNCTION extra.ci_model_governmentidentifier_related(integer[], integer[]
 $_$;
 
 
-ALTER FUNCTION extra.ci_model_governmentidentifier_related(integer[], integer[]) OWNER TO postgres;
+ALTER FUNCTION extra.ci_model_governmentidentifier_related(integer[], integer[], text) OWNER TO postgres;
 
 --
 -- Name: ci_model_governmentlong(integer, character varying); Type: FUNCTION; Schema: extra; Owner: postgres
@@ -16689,11 +16689,11 @@ GRANT ALL ON FUNCTION extra.ci_model_governmentabbreviationid(text) TO readonly;
 
 
 --
--- Name: FUNCTION ci_model_governmentidentifier_detail(text, text); Type: ACL; Schema: extra; Owner: postgres
+-- Name: FUNCTION ci_model_governmentidentifier_detail(text, text, text); Type: ACL; Schema: extra; Owner: postgres
 --
 
-REVOKE ALL ON FUNCTION extra.ci_model_governmentidentifier_detail(text, text) FROM PUBLIC;
-GRANT ALL ON FUNCTION extra.ci_model_governmentidentifier_detail(text, text) TO readonly;
+REVOKE ALL ON FUNCTION extra.ci_model_governmentidentifier_detail(text, text, text) FROM PUBLIC;
+GRANT ALL ON FUNCTION extra.ci_model_governmentidentifier_detail(text, text, text) TO readonly;
 
 
 --
@@ -16705,11 +16705,11 @@ GRANT ALL ON FUNCTION extra.ci_model_governmentidentifier_government(integer[], 
 
 
 --
--- Name: FUNCTION ci_model_governmentidentifier_related(integer[], integer[]); Type: ACL; Schema: extra; Owner: postgres
+-- Name: FUNCTION ci_model_governmentidentifier_related(integer[], integer[], text); Type: ACL; Schema: extra; Owner: postgres
 --
 
-REVOKE ALL ON FUNCTION extra.ci_model_governmentidentifier_related(integer[], integer[]) FROM PUBLIC;
-GRANT ALL ON FUNCTION extra.ci_model_governmentidentifier_related(integer[], integer[]) TO readonly;
+REVOKE ALL ON FUNCTION extra.ci_model_governmentidentifier_related(integer[], integer[], text) FROM PUBLIC;
+GRANT ALL ON FUNCTION extra.ci_model_governmentidentifier_related(integer[], integer[], text) TO readonly;
 
 
 --
