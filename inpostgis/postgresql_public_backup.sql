@@ -2796,7 +2796,7 @@ ALTER FUNCTION extra.ci_model_lawalternate_detail(text, character varying, boole
 -- Name: ci_model_lawalternate_event(integer); Type: FUNCTION; Schema: extra; Owner: postgres
 --
 
-CREATE FUNCTION extra.ci_model_lawalternate_event(integer) RETURNS TABLE(eventslug text, eventtypeshort character varying, eventlong character varying, eventrange text, eventgranted character varying, eventeffective text, eventsortdate numeric, eventrelationship character varying)
+CREATE FUNCTION extra.ci_model_lawalternate_event(integer) RETURNS TABLE(eventslug text, eventtypeshort character varying, eventlong character varying, eventrange text, eventgranted character varying, eventeffective text, eventsortdate numeric, eventrelationship character varying, lawgrouplong character varying)
     LANGUAGE sql STABLE SECURITY DEFINER
     AS $_$
 SELECT DISTINCT eventextracache.eventslug,
@@ -2806,7 +2806,8 @@ SELECT DISTINCT eventextracache.eventslug,
     event.eventgranted,
     extra.shortdate(event.eventeffective) AS eventeffective,
     extra.eventsortdate(event.eventid) AS eventsortdate,
-    lawsectionevent.lawsectioneventrelationship AS eventrelationship
+    lawsectionevent.lawsectioneventrelationship AS eventrelationship,
+    lawgroup.lawgrouplong
    FROM geohistory.event
    JOIN geohistory.eventtype
      ON event.eventtype = eventtype.eventtypeid
@@ -2818,6 +2819,8 @@ SELECT DISTINCT eventextracache.eventslug,
    JOIN geohistory.lawalternatesection
      ON lawsectionevent.lawsection = lawalternatesection.lawsection
      AND lawalternatesection.lawalternatesectionid = $1
+   LEFT JOIN geohistory.lawgroup
+     ON lawsectionevent.lawgroup = lawgroup.lawgroupid
   ORDER BY (extra.eventsortdate(event.eventid)), event.eventlong;
 $_$;
 
