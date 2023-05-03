@@ -6739,6 +6739,29 @@ $$;
 ALTER FUNCTION geohistory.metesdescriptionline_insertupdate() OWNER TO postgres;
 
 --
+-- Name: source_insert(); Type: FUNCTION; Schema: geohistory; Owner: postgres
+--
+
+CREATE FUNCTION geohistory.source_insert() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+
+BEGIN
+
+   IF NEW.sourceurlsubstitute IS NULL THEN
+     
+      NEW.sourceurlsubstitute := NEW.sourceid;
+   
+   END IF;
+
+   RETURN NEW;
+END;
+$$;
+
+
+ALTER FUNCTION geohistory.source_insert() OWNER TO postgres;
+
+--
 -- Name: source_update(); Type: FUNCTION; Schema: geohistory; Owner: postgres
 --
 
@@ -7515,6 +7538,13 @@ ALTER TABLE geohistory.law OWNER TO postgres;
 --
 
 COMMENT ON COLUMN geohistory.law.lawtitle IS 'Certain placeholder values in this field that are used for internal tracking purposes are omitted from open data.';
+
+
+--
+-- Name: COLUMN law.lawdescriptiondone; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.law.lawdescriptiondone IS 'This field is used for internal tracking purposes, and is always reflected as FALSE in open data.';
 
 
 --
@@ -15456,6 +15486,13 @@ CREATE TRIGGER metesdescriptionline_insertupdate_trigger BEFORE INSERT OR UPDATE
 
 
 --
+-- Name: source source_insert_trigger; Type: TRIGGER; Schema: geohistory; Owner: postgres
+--
+
+CREATE TRIGGER source_insert_trigger BEFORE INSERT ON geohistory.source FOR EACH ROW EXECUTE FUNCTION geohistory.source_insert();
+
+
+--
 -- Name: source source_update_trigger; Type: TRIGGER; Schema: geohistory; Owner: postgres
 --
 
@@ -17817,6 +17854,13 @@ REVOKE ALL ON FUNCTION extra.zeropad(integer, integer) FROM PUBLIC;
 --
 
 REVOKE ALL ON FUNCTION extra.zeropad(text, integer) FROM PUBLIC;
+
+
+--
+-- Name: FUNCTION source_insert(); Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+REVOKE ALL ON FUNCTION geohistory.source_insert() FROM PUBLIC;
 
 
 --
