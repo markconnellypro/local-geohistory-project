@@ -7619,7 +7619,7 @@ CREATE TABLE geohistory.metesdescription (
     metesdescriptionname character varying(500) DEFAULT ''::character varying NOT NULL,
     event integer NOT NULL,
     metesdescriptionacres double precision DEFAULT 0 NOT NULL,
-    CONSTRAINT metesdescription_check CHECK ((((metesdescriptionsource)::text <> ''::text) AND ((metesdescriptiontype)::text <> ''::text)))
+    CONSTRAINT metesdescription_check CHECK (((metesdescriptionacres >= (0)::double precision) AND ((metesdescriptionsource)::text <> ''::text) AND ((metesdescriptiontype)::text <> ''::text)))
 );
 
 
