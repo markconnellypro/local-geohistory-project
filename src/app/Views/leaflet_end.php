@@ -28,5 +28,5 @@ map.addControl(new L.Control.Fullscreen());
     document.getElementById("coord").innerHTML = +e.latlng.lng.toFixed(7) + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + +e.latlng.lat.toFixed(7);
     });
 <?php } ?>
-map.attributionControl.setPrefix('Boundaries are approximate. Not of surveying or engineering quality.');
+map.attributionControl.setPrefix(Object.getPrototypeOf(map.attributionControl).options.prefix + ' | Boundaries approximate, not a survey product.');
 </script>

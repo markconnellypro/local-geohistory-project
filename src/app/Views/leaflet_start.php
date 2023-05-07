@@ -10,7 +10,7 @@ if ($needRotation) { /* Version 0.9.3 */ ?>
 <link rel="stylesheet" href="/<?= ($online ? '/unpkg.com/maplibre-gl@2.4.0/dist' : 'asset/map') ?>/maplibre-gl.css" crossorigin="anonymous" />
 <script src="//unpkg.com/dom-to-image@2.6.0/dist/dom-to-image.min.js"></script>
 <script src="/asset/map/stamen.js"></script>
-<?php if ($state == 'de' or $state == 'nj') /* Version 2.5.3, Remove attributionControl.setPrefix */ { ?>
+<?php if ($state == 'de' or $state == 'nj') /* Version 3.0.10, with forked modifications */ { ?>
     <script src="/asset/map/esri-leaflet.js"></script>
 <?php } ?>
 <script src="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/leaflet/"></script>
