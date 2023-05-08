@@ -3715,27 +3715,6 @@ $_$;
 ALTER FUNCTION extra.ci_model_source_event(integer) OWNER TO postgres;
 
 --
--- Name: ci_model_source_itemcode(integer); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.ci_model_source_itemcode(integer) RETURNS TABLE(sourceabbreviation character varying, sourcetype character varying, sourcefullcitation text)
-    LANGUAGE sql STABLE SECURITY DEFINER
-    AS $_$
-
- SELECT sourceextra.sourceabbreviation,
-    source.sourcetype,
-    sourceextra.sourcefullcitation
-   FROM geohistory.source
-   JOIN extra.sourceextra
-     ON source.sourceid = sourceextra.sourceid
-  WHERE source.sourceid = $1;
-  
-$_$;
-
-
-ALTER FUNCTION extra.ci_model_source_itemcode(integer) OWNER TO postgres;
-
---
 -- Name: ci_model_source_note(integer); Type: FUNCTION; Schema: extra; Owner: postgres
 --
 
@@ -3814,100 +3793,6 @@ $_$;
 
 
 ALTER FUNCTION extra.ci_model_source_url(integer) OWNER TO postgres;
-
---
--- Name: ci_model_sourceitem_citation(integer); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.ci_model_sourceitem_citation(integer) RETURNS TABLE(sourcecitationslug integer, sourcecitationdate text, sourcecitationdatesort character varying, sourcecitationdaterange text, sourcecitationdaterangesort character varying, sourcecitationvolume character varying, sourcecitationpage text, sourcecitationtypetitle text, sourcecitationperson text, sourcecitationgovernmentreferences character varying, sourcecitationid integer, sourcecitationnothandled boolean, citationcount bigint, citationeventnothandledcount bigint)
-    LANGUAGE sql STABLE
-    AS $_$
-
- SELECT sourcecitation.sourcecitationid AS sourcecitationslug,
-    sourcecitation.sourcecitationdatetype || 
-        CASE WHEN sourcecitation.sourcecitationdatetype = '' THEN '' ELSE ' ' END ||
-        extra.shortdate(sourcecitation.sourcecitationdate) AS sourcecitationdate,
-    sourcecitation.sourcecitationdate AS sourcecitationdatesort,
-    sourcecitation.sourcecitationdaterangetype || 
-        CASE WHEN sourcecitation.sourcecitationdaterangetype = '' THEN '' ELSE ' ' END ||
-    extra.shortdate(sourcecitation.sourcecitationdaterange) AS sourcecitationdaterange,
-    sourcecitation.sourcecitationdaterange AS sourcecitationdaterangesort,
-    sourcecitation.sourcecitationvolume,
-    extra.rangefix(sourcecitation.sourcecitationpagefrom, sourcecitation.sourcecitationpageto) AS sourcecitationpage,
-    sourcecitation.sourcecitationtypetitle,
-    sourcecitation.sourcecitationperson,
-    sourcecitation.sourcecitationgovernmentreferences,
-    sourcecitation.sourcecitationid,
-    sourcecitation.sourcecitationstatus = '' AS sourcecitationnothandled,
-    count(sourcecitationevent.sourcecitationeventid) AS citationcount,
-    sum(CASE
-        WHEN sourcecitationevent.sourcecitationeventinclude IS NULL THEN 1
-        ELSE 0
-    END) AS citationeventnothandledcount
-   FROM geohistory.sourcecitation
-   LEFT JOIN geohistory.sourcecitationevent
-     ON sourcecitation.sourcecitationid = sourcecitationevent.sourcecitation
-   WHERE sourcecitation.source = $1
-  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
-  ORDER BY 1, 5, 6, 9;
- 
-$_$;
-
-
-ALTER FUNCTION extra.ci_model_sourceitem_citation(integer) OWNER TO postgres;
-
---
--- Name: ci_model_sourceitem_detail(integer); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.ci_model_sourceitem_detail(integer) RETURNS TABLE(sourceitemsort text, sourceitemedition character varying, sourceitemvolume character varying, sourceitemyear smallint, sourceitemurl text, sourceitemurlcompletepart boolean)
-    LANGUAGE sql STABLE SECURITY DEFINER
-    AS $_$
-SELECT DISTINCT trim(sourceitem.sourceitemedition || '-' ||
-        CASE
-            WHEN sourceitem.sourceitemyear IS NOT NULL THEN sourceitem.sourceitemyear || '-'
-            ELSE ''
-        END || extra.zeropad(CASE
-        WHEN sourceitem.sourceitemvolume <> '' THEN sourceitem.sourceitemvolume
-		ELSE sourceitem.sourceitemreferencevolume
-    END, 4), '-') AS sourceitemsort,
-    sourceitem.sourceitemedition,
-    CASE
-        WHEN sourceitem.sourceitemvolume <> '' THEN sourceitem.sourceitemvolume
-		ELSE sourceitem.sourceitemreferencevolume
-    END AS sourceitemvolume,
-    sourceitem.sourceitemyear,
-    sourceitem.sourceitemurl || sourceitem.sourceitemurlafter AS sourceitemurl,
-    sourceitem.sourceitemurlcompletepart
-   FROM geohistory.sourceitem
-   WHERE source = ANY (extra.sourceurlid($1))
-  ORDER BY 1;
-$_$;
-
-
-ALTER FUNCTION extra.ci_model_sourceitem_detail(integer) OWNER TO postgres;
-
---
--- Name: ci_model_sourceitem_index(); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.ci_model_sourceitem_index() RETURNS TABLE(sourceid integer, sourceabbreviation character varying, sourcetype character varying, sourcefullcitation text, linktype text)
-    LANGUAGE sql STABLE
-    AS $$
-
- SELECT DISTINCT source.sourceid,
-    sourceextra.sourceabbreviation,
-    source.sourcetype,
-    sourceextra.sourcefullcitation,
-    'sourceitem' AS linktype
-   FROM geohistory.source
-   JOIN extra.sourceextra
-     ON source.sourceid = sourceextra.sourceid
-   ORDER BY 2, 3, 4, 1;
-$$;
-
-
-ALTER FUNCTION extra.ci_model_sourceitem_index() OWNER TO postgres;
 
 --
 -- Name: ci_model_statistics_createddissolved_nation_part(character varying, integer, integer, character varying, boolean); Type: FUNCTION; Schema: extra; Owner: postgres
@@ -17137,13 +17022,6 @@ GRANT ALL ON FUNCTION extra.ci_model_source_event(integer) TO readonly;
 
 
 --
--- Name: FUNCTION ci_model_source_itemcode(integer); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.ci_model_source_itemcode(integer) FROM PUBLIC;
-
-
---
 -- Name: FUNCTION ci_model_source_note(integer); Type: ACL; Schema: extra; Owner: postgres
 --
 
@@ -17157,27 +17035,6 @@ GRANT ALL ON FUNCTION extra.ci_model_source_note(integer) TO readonly;
 
 REVOKE ALL ON FUNCTION extra.ci_model_source_url(integer) FROM PUBLIC;
 GRANT ALL ON FUNCTION extra.ci_model_source_url(integer) TO readonly;
-
-
---
--- Name: FUNCTION ci_model_sourceitem_citation(integer); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.ci_model_sourceitem_citation(integer) FROM PUBLIC;
-
-
---
--- Name: FUNCTION ci_model_sourceitem_detail(integer); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.ci_model_sourceitem_detail(integer) FROM PUBLIC;
-
-
---
--- Name: FUNCTION ci_model_sourceitem_index(); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.ci_model_sourceitem_index() FROM PUBLIC;
 
 
 --
