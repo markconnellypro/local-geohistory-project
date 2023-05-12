@@ -14,7 +14,9 @@ var stateParcel = L.esri.featureLayer({
 url: stateParcelURL,
 attribution: stateParcelATT,
 style: {
-color: 'white'
+fillOpacity: 0,
+color: 'black',
+weight: 1
 }
 });
 
