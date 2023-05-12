@@ -805,7 +805,7 @@ ALTER FUNCTION extra.ci_model_event_currentgovernment(integer, character varying
 -- Name: ci_model_event_detail(integer, character varying); Type: FUNCTION; Schema: extra; Owner: postgres
 --
 
-CREATE FUNCTION extra.ci_model_event_detail(integer, character varying) RETURNS TABLE(eventid integer, eventtypeshort character varying, eventmethodlong character varying, eventlong character varying, eventgranted character varying, textflag boolean, eventrange text, eventeffective text, eventeffectivetype text, otherdate text, otherdatetype character varying, eventismapped boolean)
+CREATE FUNCTION extra.ci_model_event_detail(integer, character varying) RETURNS TABLE(eventid integer, eventtypeshort character varying, eventmethodlong character varying, eventlong character varying, eventgranted character varying, textflag boolean, eventrange text, eventeffective text, eventeffectivetype text, otherdate text, otherdatetype character varying, eventismapped boolean, government text)
     LANGUAGE sql STABLE
     AS $_$
 
@@ -816,7 +816,7 @@ CREATE FUNCTION extra.ci_model_event_detail(integer, character varying) RETURNS 
     event.eventlong,
     event.eventgranted,
         CASE
-            WHEN event.eventfrom = 0 AND event.eventto = 0 AND event.eventeffective::text = ''::text AND event.eventeffectivetypepresumedsource IS NULL AND other.otherdatetype IS NULL THEN false
+            WHEN event.eventgranted = 'government' OR (event.eventfrom = 0 AND event.eventto = 0 AND event.eventeffective::text = ''::text AND event.eventeffectivetypepresumedsource IS NULL AND other.otherdatetype IS NULL) THEN false
             ELSE true
         END AS textflag,
     extra.rangefix(event.eventfrom::text, event.eventto::text) AS eventrange,
@@ -828,7 +828,8 @@ CREATE FUNCTION extra.ci_model_event_detail(integer, character varying) RETURNS 
         END AS eventeffectivetype,
     other.otherdate,
     other.otherdatetype,
-    event.eventismapped
+    event.eventismapped,
+    extra.governmentstatelink(event.government, $2, 'en') AS government
    FROM geohistory.event 
      JOIN geohistory.eventmethod
        ON event.eventmethod = eventmethod.eventmethodid 
@@ -877,7 +878,7 @@ ALTER FUNCTION extra.ci_model_event_detail(integer, character varying) OWNER TO 
 -- Name: ci_model_event_detail(text, character varying); Type: FUNCTION; Schema: extra; Owner: postgres
 --
 
-CREATE FUNCTION extra.ci_model_event_detail(text, character varying) RETURNS TABLE(eventid integer, eventtypeshort character varying, eventmethodlong character varying, eventlong character varying, eventgranted character varying, textflag boolean, eventrange text, eventeffective text, eventeffectivetype text, otherdate text, otherdatetype character varying, eventismapped boolean, eventslugnew text)
+CREATE FUNCTION extra.ci_model_event_detail(text, character varying) RETURNS TABLE(eventid integer, eventtypeshort character varying, eventmethodlong character varying, eventlong character varying, eventgranted character varying, textflag boolean, eventrange text, eventeffective text, eventeffectivetype text, otherdate text, otherdatetype character varying, eventismapped boolean, government text, eventslugnew text)
     LANGUAGE sql STABLE SECURITY DEFINER
     AS $_$
   WITH slugs AS (
@@ -1775,7 +1776,7 @@ CREATE FUNCTION extra.ci_model_government_related(integer, character varying, ch
                AND (government.governmentstatus <> ALL (ARRAY['proposed', 'unincorporated']))
           WHERE governmentparentcache.governmentparentstatus <> 'placeholder'
         UNION
-         SELECT DISTINCT '' AS governmentstatelink,
+         SELECT DISTINCT '/en/' || lower($2) || '/event/' || eventextracache.eventslug || '/' AS governmentstatelink,
             extra.governmentlong(government.governmentid, upper($2)) AS governmentlong,
                 CASE
                     WHEN government.governmentstatus = ANY (ARRAY['alternate', 'language']) THEN 'Variant'
@@ -1792,6 +1793,11 @@ CREATE FUNCTION extra.ci_model_government_related(integer, character varying, ch
                ON government.governmentid = governmentsubstitutecache.governmentid
                AND governmentsubstitutecache.governmentsubstitute = $1
                AND government.governmentid <> governmentsubstitutecache.governmentsubstitute
+             LEFT JOIN geohistory.event
+               ON government.governmentid = event.government
+             LEFT JOIN extra.eventextracache
+               ON event.eventid = eventextracache.eventid
+               AND eventextracache.eventslugnew IS NULL
         ), relationrank AS (
          SELECT relationpart.governmentstatelink,
             relationpart.governmentlong,
