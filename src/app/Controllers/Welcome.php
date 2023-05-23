@@ -21,7 +21,7 @@ class Welcome extends BaseController
     public function index()
     {
         if ($this->data['live']) {
-            $stateArray = ['de', 'me', 'ma', 'md', 'mi', 'mn', 'nj', 'ny', 'oh', 'pa', 'va', 'wi'];
+            $stateArray = ['de', 'dc', 'me', 'ma', 'md', 'mi', 'mn', 'nj', 'ny', 'oh', 'pa', 'va', 'wi'];
         } else {
             $stateArray = ['nj', 'pa'];
         }
