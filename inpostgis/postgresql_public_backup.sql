@@ -6826,6 +6826,157 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
+-- Name: government; Type: TABLE; Schema: geohistory; Owner: postgres
+--
+
+CREATE TABLE geohistory.government (
+    governmentid integer NOT NULL,
+    governmentname character varying(75) NOT NULL,
+    governmenttype character varying(30) NOT NULL,
+    governmentstatus character varying(35) DEFAULT ''::character varying NOT NULL,
+    governmentstatusdefacto boolean DEFAULT false NOT NULL,
+    governmentstyle character varying(20) DEFAULT ''::character varying NOT NULL,
+    governmentlevel smallint NOT NULL,
+    governmentcurrentleadparent integer,
+    governmentabbreviation character varying(10) DEFAULT ''::character varying NOT NULL,
+    government1983stateplaneauthority character varying(100) DEFAULT ''::character varying NOT NULL,
+    governmentlead1983stateplane character varying(2) DEFAULT ''::character varying NOT NULL,
+    governmenthasmultiple1983stateplane boolean,
+    governmentdefaultsrid integer,
+    governmentnotecreation character varying(5) DEFAULT ''::character varying NOT NULL,
+    governmentnotedissolution character varying(5) DEFAULT ''::character varying NOT NULL,
+    governmentnotecurrentleadparent boolean DEFAULT false NOT NULL,
+    governmentcharterstatus integer,
+    governmentbooknote text[],
+    governmentbookcomplete jsonb,
+    governmentmultilevel boolean DEFAULT false NOT NULL,
+    governmentindigobook character varying(20) DEFAULT ''::character varying NOT NULL,
+    governmentsubstitute integer,
+    governmentnumber character varying(3) DEFAULT ''::character varying NOT NULL,
+    governmentmapstatus integer DEFAULT 1 NOT NULL,
+    governmentlocale character varying(2) DEFAULT 'en'::character varying NOT NULL,
+    governmentarticle character varying(10) DEFAULT ''::character varying NOT NULL,
+    governmentconnectingarticle character varying(10) DEFAULT ''::character varying NOT NULL,
+    governmentcurrentform integer,
+    CONSTRAINT government_check CHECK (((((governmentstatus)::text = ANY (ARRAY['cadastral'::text, 'defunct'::text, 'nonfunctioning'::text, 'paper'::text, 'placeholder'::text, 'proposed'::text, 'unincorporated'::text, 'unknown'::text, ''::text])) OR (((governmentstatus)::text = ANY (ARRAY['alternate'::text, 'language'::text])) AND (governmentsubstitute IS NOT NULL))) AND (governmentlevel >= 1) AND (governmentlevel <= 5) AND ((governmentlevel = 2) OR ((governmentlevel <> 2) AND ((government1983stateplaneauthority)::text = ''::text))) AND ((governmentlevel = 3) OR ((governmentlevel <> 3) AND ((governmentlead1983stateplane)::text = ''::text))) AND ((governmentlevel = 3) OR ((governmentlevel <> 3) AND (governmenthasmultiple1983stateplane IS NULL))) AND (((governmentname)::text <> ''::text) OR ((governmentnumber)::text <> ''::text)) AND ((governmenttype)::text <> ''::text) AND ((governmentlocale)::text = ANY (ARRAY['de'::text, ('en'::character varying)::text, 'es'::text, ('fr'::character varying)::text, ('nl'::character varying)::text, 'pl'::text])) AND (NOT (((governmentstatus)::text = ANY (ARRAY['placeholder'::text, 'proposed'::text, 'unincorporated'::text])) AND (governmentmapstatus <> 0))) AND (((governmentlevel = 1) AND (governmentcurrentleadparent IS NULL)) OR ((governmentlevel > 1) AND (governmentcurrentleadparent IS NOT NULL) AND (governmentid <> governmentcurrentleadparent)))))
+);
+
+
+ALTER TABLE geohistory.government OWNER TO postgres;
+
+--
+-- Name: COLUMN government.governmentstyle; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.government.governmentstyle IS 'Signifies if the government uses a government type in its formal name that is different than its actual government type.';
+
+
+--
+-- Name: COLUMN government.governmentlevel; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.government.governmentlevel IS '1 = Nation; 2 = State/Province; 3 = County/Parish; 4 = Township/Municipality; 5 = Unincorporated Ward/Populated Place. Generally = floor((OSM admin_level + 1)/2) or GeoNames administrative division order + 1';
+
+
+--
+-- Name: COLUMN government.government1983stateplaneauthority; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.government.government1983stateplaneauthority IS 'Last checked January 29, 2017.';
+
+
+--
+-- Name: COLUMN government.governmentlead1983stateplane; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.government.governmentlead1983stateplane IS 'Last checked January 29, 2017.';
+
+
+--
+-- Name: COLUMN government.governmenthasmultiple1983stateplane; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.government.governmenthasmultiple1983stateplane IS 'Last checked January 29, 2017.';
+
+
+--
+-- Name: COLUMN government.governmentcharterstatus; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.government.governmentcharterstatus IS 'This field is used for internal tracking purposes, and is not included in open data.';
+
+
+--
+-- Name: COLUMN government.governmentbooknote; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.government.governmentbooknote IS 'This field is used for internal tracking purposes, and is not included in open data.';
+
+
+--
+-- Name: COLUMN government.governmentbookcomplete; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.government.governmentbookcomplete IS 'This field is used for internal tracking purposes, and is not included in open data.';
+
+
+--
+-- Name: COLUMN government.governmentmapstatus; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.government.governmentmapstatus IS 'The values have been simplified in open data to remove certain information used for internal tracking purposes.';
+
+
+--
+-- Name: governmentidentifier; Type: TABLE; Schema: geohistory; Owner: postgres
+--
+
+CREATE TABLE geohistory.governmentidentifier (
+    governmentidentifierid integer NOT NULL,
+    government integer,
+    governmentidentifiertype integer NOT NULL,
+    governmentidentifierprefix character varying(20) DEFAULT ''::character varying NOT NULL,
+    governmentidentifier character varying(20) DEFAULT ''::character varying NOT NULL,
+    governmentidentifiernote text DEFAULT ''::text NOT NULL,
+    governmentidentifiermatchtype character varying(30) DEFAULT ''::character varying NOT NULL,
+    governmentidentifiermatchdate date,
+    governmentidentifierlead boolean GENERATED ALWAYS AS ((((governmentidentifiermatchtype)::text ~~ 'current%'::text) OR ((governmentidentifiermatchtype)::text = 'full'::text) OR ((governmentidentifiermatchtype)::text ~~ '%lead'::text))) STORED,
+    governmentidentifierstatus text GENERATED ALWAYS AS (
+CASE
+    WHEN (((governmentidentifiermatchtype)::text ~~ 'current%'::text) OR ((governmentidentifiermatchtype)::text = 'full'::text) OR ((governmentidentifiermatchtype)::text ~~ '%lead'::text)) THEN 'Lead'::text
+    WHEN ((governmentidentifiermatchtype)::text = ANY (ARRAY[('historic-successor'::character varying)::text, ('reference'::character varying)::text])) THEN 'Reference'::text
+    WHEN ((governmentidentifiermatchtype)::text ~~ 'historic%'::text) THEN 'Historic'::text
+    WHEN ((governmentidentifiermatchtype)::text = ''::text) THEN ''::text
+    ELSE 'Other'::text
+END) STORED
+);
+
+
+ALTER TABLE geohistory.governmentidentifier OWNER TO postgres;
+
+--
+-- Name: COLUMN governmentidentifier.governmentidentifiermatchtype; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.governmentidentifier.governmentidentifiermatchtype IS 'current-alternate: Current government with correct spelling shown as USGS alternate.
+current-obsolete: Current government with obsolete USGS spelling.
+current-spelling: Current government with USGS spelling mismatch.
+current-status: Current government with USGS historic flag.
+delete: Should be merged into another feature ID.
+full: Spelling and status match.
+historic-alternate: Historic government with correct spelling shown as USGS alternate.
+historic-county: Temporary historic government created after county division.
+historic-match: Secondary records with spelling match.
+historic-missing: Successor current government does not list as USGS alternate (name change).
+historic-obsolete: Historic government with USGS spelling match.
+historic-spelling: Historic government with USGS alternate spelling mismatch.
+historic-status: Historic government missing USGS historic flag.
+historic-successor: Successor current government does not list as USGS alternate (merger-consolidation).
+
+Entries other than current-* or full can also be combined with -lead flag.';
+
+
+--
 -- Name: adjudication; Type: TABLE; Schema: geohistory; Owner: postgres
 --
 
@@ -6980,108 +7131,6 @@ CREATE MATERIALIZED VIEW extra.adjudicationextracache AS
 
 
 ALTER TABLE extra.adjudicationextracache OWNER TO postgres;
-
---
--- Name: government; Type: TABLE; Schema: geohistory; Owner: postgres
---
-
-CREATE TABLE geohistory.government (
-    governmentid integer NOT NULL,
-    governmentname character varying(75) NOT NULL,
-    governmenttype character varying(30) NOT NULL,
-    governmentstatus character varying(35) DEFAULT ''::character varying NOT NULL,
-    governmentstatusdefacto boolean DEFAULT false NOT NULL,
-    governmentstyle character varying(20) DEFAULT ''::character varying NOT NULL,
-    governmentlevel smallint NOT NULL,
-    governmentcurrentleadparent integer,
-    governmentabbreviation character varying(10) DEFAULT ''::character varying NOT NULL,
-    government1983stateplaneauthority character varying(100) DEFAULT ''::character varying NOT NULL,
-    governmentlead1983stateplane character varying(2) DEFAULT ''::character varying NOT NULL,
-    governmenthasmultiple1983stateplane boolean,
-    governmentdefaultsrid integer,
-    governmentnotecreation character varying(5) DEFAULT ''::character varying NOT NULL,
-    governmentnotedissolution character varying(5) DEFAULT ''::character varying NOT NULL,
-    governmentnotecurrentleadparent boolean DEFAULT false NOT NULL,
-    governmentcharterstatus integer,
-    governmentbooknote text[],
-    governmentbookcomplete jsonb,
-    governmentmultilevel boolean DEFAULT false NOT NULL,
-    governmentindigobook character varying(20) DEFAULT ''::character varying NOT NULL,
-    governmentsubstitute integer,
-    governmentnumber character varying(3) DEFAULT ''::character varying NOT NULL,
-    governmentmapstatus integer DEFAULT 1 NOT NULL,
-    governmentlocale character varying(2) DEFAULT 'en'::character varying NOT NULL,
-    governmentarticle character varying(10) DEFAULT ''::character varying NOT NULL,
-    governmentconnectingarticle character varying(10) DEFAULT ''::character varying NOT NULL,
-    governmentcurrentform integer,
-    CONSTRAINT government_check CHECK (((((governmentstatus)::text = ANY (ARRAY['cadastral'::text, 'defunct'::text, 'nonfunctioning'::text, 'paper'::text, 'placeholder'::text, 'proposed'::text, 'unincorporated'::text, 'unknown'::text, ''::text])) OR (((governmentstatus)::text = ANY (ARRAY['alternate'::text, 'language'::text])) AND (governmentsubstitute IS NOT NULL))) AND (governmentlevel >= 1) AND (governmentlevel <= 5) AND ((governmentlevel = 2) OR ((governmentlevel <> 2) AND ((government1983stateplaneauthority)::text = ''::text))) AND ((governmentlevel = 3) OR ((governmentlevel <> 3) AND ((governmentlead1983stateplane)::text = ''::text))) AND ((governmentlevel = 3) OR ((governmentlevel <> 3) AND (governmenthasmultiple1983stateplane IS NULL))) AND (((governmentname)::text <> ''::text) OR ((governmentnumber)::text <> ''::text)) AND ((governmenttype)::text <> ''::text) AND ((governmentlocale)::text = ANY (ARRAY['de'::text, ('en'::character varying)::text, 'es'::text, ('fr'::character varying)::text, ('nl'::character varying)::text, 'pl'::text])) AND (NOT (((governmentstatus)::text = ANY (ARRAY['placeholder'::text, 'proposed'::text, 'unincorporated'::text])) AND (governmentmapstatus <> 0))) AND (((governmentlevel = 1) AND (governmentcurrentleadparent IS NULL)) OR ((governmentlevel > 1) AND (governmentcurrentleadparent IS NOT NULL) AND (governmentid <> governmentcurrentleadparent)))))
-);
-
-
-ALTER TABLE geohistory.government OWNER TO postgres;
-
---
--- Name: COLUMN government.governmentstyle; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.government.governmentstyle IS 'Signifies if the government uses a government type in its formal name that is different than its actual government type.';
-
-
---
--- Name: COLUMN government.governmentlevel; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.government.governmentlevel IS '1 = Nation; 2 = State/Province; 3 = County/Parish; 4 = Township/Municipality; 5 = Unincorporated Ward/Populated Place. Generally = floor((OSM admin_level + 1)/2) or GeoNames administrative division order + 1';
-
-
---
--- Name: COLUMN government.government1983stateplaneauthority; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.government.government1983stateplaneauthority IS 'Last checked January 29, 2017.';
-
-
---
--- Name: COLUMN government.governmentlead1983stateplane; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.government.governmentlead1983stateplane IS 'Last checked January 29, 2017.';
-
-
---
--- Name: COLUMN government.governmenthasmultiple1983stateplane; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.government.governmenthasmultiple1983stateplane IS 'Last checked January 29, 2017.';
-
-
---
--- Name: COLUMN government.governmentcharterstatus; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.government.governmentcharterstatus IS 'This field is used for internal tracking purposes, and is not included in open data.';
-
-
---
--- Name: COLUMN government.governmentbooknote; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.government.governmentbooknote IS 'This field is used for internal tracking purposes, and is not included in open data.';
-
-
---
--- Name: COLUMN government.governmentbookcomplete; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.government.governmentbookcomplete IS 'This field is used for internal tracking purposes, and is not included in open data.';
-
-
---
--- Name: COLUMN government.governmentmapstatus; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.government.governmentmapstatus IS 'The values have been simplified in open data to remove certain information used for internal tracking purposes.';
-
 
 --
 -- Name: governmentsubstitute; Type: VIEW; Schema: extra; Owner: postgres
@@ -9839,55 +9888,6 @@ CREATE VIEW extra.sourceextra AS
 
 
 ALTER TABLE extra.sourceextra OWNER TO postgres;
-
---
--- Name: governmentidentifier; Type: TABLE; Schema: geohistory; Owner: postgres
---
-
-CREATE TABLE geohistory.governmentidentifier (
-    governmentidentifierid integer NOT NULL,
-    government integer,
-    governmentidentifiertype integer NOT NULL,
-    governmentidentifierprefix character varying(20) DEFAULT ''::character varying NOT NULL,
-    governmentidentifier character varying(20) DEFAULT ''::character varying NOT NULL,
-    governmentidentifiernote text DEFAULT ''::text NOT NULL,
-    governmentidentifiermatchtype character varying(30) DEFAULT ''::character varying NOT NULL,
-    governmentidentifiermatchdate date,
-    governmentidentifierlead boolean GENERATED ALWAYS AS ((((governmentidentifiermatchtype)::text ~~ 'current%'::text) OR ((governmentidentifiermatchtype)::text = 'full'::text) OR ((governmentidentifiermatchtype)::text ~~ '%lead'::text))) STORED,
-    governmentidentifierstatus text GENERATED ALWAYS AS (
-CASE
-    WHEN (((governmentidentifiermatchtype)::text ~~ 'current%'::text) OR ((governmentidentifiermatchtype)::text = 'full'::text) OR ((governmentidentifiermatchtype)::text ~~ '%lead'::text)) THEN 'Lead'::text
-    WHEN ((governmentidentifiermatchtype)::text = ANY (ARRAY[('historic-successor'::character varying)::text, ('reference'::character varying)::text])) THEN 'Reference'::text
-    WHEN ((governmentidentifiermatchtype)::text ~~ 'historic%'::text) THEN 'Historic'::text
-    WHEN ((governmentidentifiermatchtype)::text = ''::text) THEN ''::text
-    ELSE 'Other'::text
-END) STORED
-);
-
-
-ALTER TABLE geohistory.governmentidentifier OWNER TO postgres;
-
---
--- Name: COLUMN governmentidentifier.governmentidentifiermatchtype; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.governmentidentifier.governmentidentifiermatchtype IS 'current-alternate: Current government with correct spelling shown as USGS alternate.
-current-obsolete: Current government with obsolete USGS spelling.
-current-spelling: Current government with USGS spelling mismatch.
-current-status: Current government with USGS historic flag.
-delete: Should be merged into another feature ID.
-full: Spelling and status match.
-historic-alternate: Historic government with correct spelling shown as USGS alternate.
-historic-county: Temporary historic government created after county division.
-historic-match: Secondary records with spelling match.
-historic-missing: Successor current government does not list as USGS alternate (name change).
-historic-obsolete: Historic government with USGS spelling match.
-historic-spelling: Historic government with USGS alternate spelling mismatch.
-historic-status: Historic government missing USGS historic flag.
-historic-successor: Successor current government does not list as USGS alternate (merger-consolidation).
-
-Entries other than current-* or full can also be combined with -lead flag.';
-
 
 --
 -- Name: statistics_createddissolved; Type: MATERIALIZED VIEW; Schema: extra; Owner: postgres
