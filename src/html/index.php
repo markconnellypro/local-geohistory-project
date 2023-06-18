@@ -1,6 +1,6 @@
 <?php
 
-/* Codeigniter 4.3.5 */
+/* Codeigniter 4.3.6 */
 
 // Check PHP version.
 $minPhpVersion = '7.4'; // If you update this, don't forget to update `spark`.
