@@ -45,7 +45,7 @@ if (mb_strpos(base_url(), $_ENV['app_baseLocalGeohistoryProjectUrl']) !== FALSE)
         $nationStateProvinceRegex = '{locale}/(nj|pa)';
     }
 
-    $controllerRegex = ['adjudication', 'area', 'event', 'government', 'governmentsource', 'law', 'metes', 'reporter', 'source', 'survey-township'];
+    $controllerRegex = ['adjudication', 'area', 'event', 'government', 'governmentsource', 'law', 'metes', 'reporter', 'source'];
     $mainSearchRegex = '(event|government|adjudication|law)';
 
     foreach ($controllerRegex as $c) {
