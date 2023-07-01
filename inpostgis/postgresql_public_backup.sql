@@ -824,7 +824,7 @@ CREATE FUNCTION extra.ci_model_event_detail(integer, character varying) RETURNS 
     eventeffectivetype.eventeffectivetypegroup::text ||
         CASE
             WHEN eventeffectivetype.eventeffectivetypequalifier IS NOT NULL AND eventeffectivetype.eventeffectivetypequalifier::text = ''::text THEN ''::text
-            ELSE ' - '::text || eventeffectivetype.eventeffectivetypequalifier::text
+            ELSE ': '::text || eventeffectivetype.eventeffectivetypequalifier::text
         END AS eventeffectivetype,
     other.otherdate,
     other.otherdatetype,
@@ -10380,7 +10380,7 @@ CREATE MATERIALIZED VIEW extra.statistics_mapped AS
    FROM ((geohistory.government
      JOIN geohistory.governmentmapstatus ON ((government.governmentmapstatus = governmentmapstatus.governmentmapstatusid)))
      LEFT JOIN geohistory.governmentidentifier ON (((government.governmentcurrentleadparent = governmentidentifier.government) AND (governmentidentifier.governmentidentifiertype = 1))))
-  WHERE ((government.governmentsubstitute IS NULL) AND (government.governmentlevel = 4) AND ((government.governmenttype)::text <> ALL (ARRAY['Hundred'::text, 'Place'::text, 'School District'::text, 'Township'::text, 'Ward'::text])) AND ((government.governmentstatus)::text = ANY (ARRAY[('defunct'::character varying)::text, 'nonfunctioning'::text, 'paper'::text, 'unknown'::text, (''::character varying)::text])))
+  WHERE ((government.governmentsubstitute IS NULL) AND (government.governmentlevel = 4) AND ((government.governmenttype)::text <> ALL (ARRAY['Hundred'::text, 'Independent School District'::text, 'Place'::text, 'School District'::text, 'Township'::text, 'Ward'::text])) AND ((government.governmentstatus)::text = ANY (ARRAY[('defunct'::character varying)::text, 'nonfunctioning'::text, 'paper'::text, 'unknown'::text, (''::character varying)::text])))
   GROUP BY 'incorporated'::text, 'county'::text, (extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentcurrentleadparent))), government.governmentcurrentleadparent, governmentidentifier.governmentidentifier
 UNION
  SELECT 'total'::text AS grouptype,
@@ -10398,7 +10398,7 @@ UNION
    FROM ((geohistory.government
      JOIN geohistory.governmentmapstatus ON ((government.governmentmapstatus = governmentmapstatus.governmentmapstatusid)))
      LEFT JOIN geohistory.governmentidentifier ON (((government.governmentcurrentleadparent = governmentidentifier.government) AND (governmentidentifier.governmentidentifiertype = 1))))
-  WHERE ((government.governmentsubstitute IS NULL) AND (government.governmentlevel = 4) AND ((government.governmenttype)::text <> ALL (ARRAY['Place'::text, 'School District'::text, 'Ward'::text])) AND ((government.governmentstatus)::text = ANY (ARRAY[('defunct'::character varying)::text, 'nonfunctioning'::text, 'paper'::text, 'unknown'::text, (''::character varying)::text])))
+  WHERE ((government.governmentsubstitute IS NULL) AND (government.governmentlevel = 4) AND ((government.governmenttype)::text <> ALL (ARRAY['Independent School District'::text, 'Place'::text, 'School District'::text, 'Ward'::text])) AND ((government.governmentstatus)::text = ANY (ARRAY[('defunct'::character varying)::text, 'nonfunctioning'::text, 'paper'::text, 'unknown'::text, (''::character varying)::text])))
   GROUP BY 'total'::text, 'county'::text, (extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentcurrentleadparent))), government.governmentcurrentleadparent, governmentidentifier.governmentidentifier
 UNION
  SELECT 'incorporated'::text AS grouptype,
@@ -10412,7 +10412,7 @@ UNION
         END))::numeric / (COALESCE(count(*), (1)::bigint))::numeric) * (100)::numeric), 2) AS percentmapped
    FROM (geohistory.government
      JOIN geohistory.governmentmapstatus ON ((government.governmentmapstatus = governmentmapstatus.governmentmapstatusid)))
-  WHERE ((government.governmentsubstitute IS NULL) AND (government.governmentlevel = 4) AND ((government.governmenttype)::text <> ALL (ARRAY['Hundred'::text, 'Place'::text, 'School District'::text, 'Township'::text, 'Ward'::text])) AND ((government.governmentstatus)::text = ANY (ARRAY[('defunct'::character varying)::text, 'nonfunctioning'::text, 'paper'::text, 'unknown'::text, (''::character varying)::text])))
+  WHERE ((government.governmentsubstitute IS NULL) AND (government.governmentlevel = 4) AND ((government.governmenttype)::text <> ALL (ARRAY['Hundred'::text, 'Independent School District'::text, 'Place'::text, 'School District'::text, 'Township'::text, 'Ward'::text])) AND ((government.governmentstatus)::text = ANY (ARRAY[('defunct'::character varying)::text, 'nonfunctioning'::text, 'paper'::text, 'unknown'::text, (''::character varying)::text])))
   GROUP BY 'incorporated'::text, 'state'::text, (extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentcurrentleadparent))), 0::integer
 UNION
  SELECT 'total'::text AS grouptype,
@@ -10426,7 +10426,7 @@ UNION
         END))::numeric / (COALESCE(count(*), (1)::bigint))::numeric) * (100)::numeric), 2) AS percentmapped
    FROM (geohistory.government
      JOIN geohistory.governmentmapstatus ON ((government.governmentmapstatus = governmentmapstatus.governmentmapstatusid)))
-  WHERE ((government.governmentsubstitute IS NULL) AND (government.governmentlevel = 4) AND ((government.governmenttype)::text <> ALL (ARRAY['Place'::text, 'School District'::text, 'Ward'::text])) AND ((government.governmentstatus)::text = ANY (ARRAY[('defunct'::character varying)::text, 'nonfunctioning'::text, 'paper'::text, 'unknown'::text, (''::character varying)::text])))
+  WHERE ((government.governmentsubstitute IS NULL) AND (government.governmentlevel = 4) AND ((government.governmenttype)::text <> ALL (ARRAY['Independent School District'::text, 'Place'::text, 'School District'::text, 'Ward'::text])) AND ((government.governmentstatus)::text = ANY (ARRAY[('defunct'::character varying)::text, 'nonfunctioning'::text, 'paper'::text, 'unknown'::text, (''::character varying)::text])))
   GROUP BY 'total'::text, 'state'::text, (extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentcurrentleadparent))), 0::integer
 UNION
  SELECT 'incorporated'::text AS grouptype,
@@ -10440,7 +10440,7 @@ UNION
         END))::numeric / (COALESCE(count(*), (1)::bigint))::numeric) * (100)::numeric), 2) AS percentmapped
    FROM (geohistory.government
      JOIN geohistory.governmentmapstatus ON ((government.governmentmapstatus = governmentmapstatus.governmentmapstatusid)))
-  WHERE ((government.governmentsubstitute IS NULL) AND (government.governmentlevel = 4) AND ((government.governmenttype)::text <> ALL (ARRAY['Hundred'::text, 'Place'::text, 'School District'::text, 'Township'::text, 'Ward'::text])) AND ((government.governmentstatus)::text = ANY (ARRAY[('defunct'::character varying)::text, 'nonfunctioning'::text, 'paper'::text, 'unknown'::text, (''::character varying)::text])) AND (extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentcurrentleadparent)) = ANY (ARRAY['DE'::text, 'ME'::text, 'MA'::text, 'MD'::text, 'MI'::text, 'MN'::text, 'NJ'::text, 'NJ'::text, 'OH'::text, 'PA'::text])))
+  WHERE ((government.governmentsubstitute IS NULL) AND (government.governmentlevel = 4) AND ((government.governmenttype)::text <> ALL (ARRAY['Hundred'::text, 'Independent School District'::text, 'Place'::text, 'School District'::text, 'Township'::text, 'Ward'::text])) AND ((government.governmentstatus)::text = ANY (ARRAY[('defunct'::character varying)::text, 'nonfunctioning'::text, 'paper'::text, 'unknown'::text, (''::character varying)::text])) AND (extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentcurrentleadparent)) = ANY (ARRAY['DE'::text, 'ME'::text, 'MA'::text, 'MD'::text, 'MI'::text, 'MN'::text, 'NJ'::text, 'NJ'::text, 'OH'::text, 'PA'::text])))
   GROUP BY 'incorporated'::text, 'state'::text, (extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentcurrentleadparent))), 0::integer
 UNION
  SELECT 'total'::text AS grouptype,
@@ -10454,7 +10454,7 @@ UNION
         END))::numeric / (COALESCE(count(*), (1)::bigint))::numeric) * (100)::numeric), 2) AS percentmapped
    FROM (geohistory.government
      JOIN geohistory.governmentmapstatus ON ((government.governmentmapstatus = governmentmapstatus.governmentmapstatusid)))
-  WHERE ((government.governmentsubstitute IS NULL) AND (government.governmentlevel = 4) AND ((government.governmenttype)::text <> ALL (ARRAY['Place'::text, 'School District'::text, 'Ward'::text])) AND ((government.governmentstatus)::text = ANY (ARRAY[('defunct'::character varying)::text, 'nonfunctioning'::text, 'paper'::text, 'unknown'::text, (''::character varying)::text])) AND (extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentcurrentleadparent)) = ANY (ARRAY['DE'::text, 'ME'::text, 'MA'::text, 'MD'::text, 'MI'::text, 'MN'::text, 'NJ'::text, 'NJ'::text, 'OH'::text, 'PA'::text])))
+  WHERE ((government.governmentsubstitute IS NULL) AND (government.governmentlevel = 4) AND ((government.governmenttype)::text <> ALL (ARRAY['Independent School District'::text, 'Place'::text, 'School District'::text, 'Ward'::text])) AND ((government.governmentstatus)::text = ANY (ARRAY[('defunct'::character varying)::text, 'nonfunctioning'::text, 'paper'::text, 'unknown'::text, (''::character varying)::text])) AND (extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentcurrentleadparent)) = ANY (ARRAY['DE'::text, 'ME'::text, 'MA'::text, 'MD'::text, 'MI'::text, 'MN'::text, 'NJ'::text, 'NJ'::text, 'OH'::text, 'PA'::text])))
   GROUP BY 'total'::text, 'state'::text, (extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentcurrentleadparent))), 0::integer
 UNION
  SELECT 'incorporated'::text AS grouptype,
@@ -10468,7 +10468,7 @@ UNION
         END))::numeric / (COALESCE(count(*), (1)::bigint))::numeric) * (100)::numeric), 2) AS percentmapped
    FROM (geohistory.government
      JOIN geohistory.governmentmapstatus ON ((government.governmentmapstatus = governmentmapstatus.governmentmapstatusid)))
-  WHERE ((government.governmentsubstitute IS NULL) AND (government.governmentlevel = 4) AND ((government.governmenttype)::text <> ALL (ARRAY['Hundred'::text, 'Place'::text, 'School District'::text, 'Township'::text, 'Ward'::text])) AND ((government.governmentstatus)::text = ANY (ARRAY[('defunct'::character varying)::text, 'nonfunctioning'::text, 'paper'::text, 'unknown'::text, (''::character varying)::text])) AND (extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentcurrentleadparent)) = ANY (ARRAY['NJ'::text, 'PA'::text])))
+  WHERE ((government.governmentsubstitute IS NULL) AND (government.governmentlevel = 4) AND ((government.governmenttype)::text <> ALL (ARRAY['Hundred'::text, 'Independent School District'::text, 'Place'::text, 'School District'::text, 'Township'::text, 'Ward'::text])) AND ((government.governmentstatus)::text = ANY (ARRAY[('defunct'::character varying)::text, 'nonfunctioning'::text, 'paper'::text, 'unknown'::text, (''::character varying)::text])) AND (extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentcurrentleadparent)) = ANY (ARRAY['NJ'::text, 'PA'::text])))
   GROUP BY 'incorporated'::text, 'state'::text, (extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentcurrentleadparent))), 0::integer
 UNION
  SELECT 'total'::text AS grouptype,
@@ -10482,7 +10482,7 @@ UNION
         END))::numeric / (COALESCE(count(*), (1)::bigint))::numeric) * (100)::numeric), 2) AS percentmapped
    FROM (geohistory.government
      JOIN geohistory.governmentmapstatus ON ((government.governmentmapstatus = governmentmapstatus.governmentmapstatusid)))
-  WHERE ((government.governmentsubstitute IS NULL) AND (government.governmentlevel = 4) AND ((government.governmenttype)::text <> ALL (ARRAY['Place'::text, 'School District'::text, 'Ward'::text])) AND ((government.governmentstatus)::text = ANY (ARRAY[('defunct'::character varying)::text, 'nonfunctioning'::text, 'paper'::text, 'unknown'::text, (''::character varying)::text])) AND (extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentcurrentleadparent)) = ANY (ARRAY['NJ'::text, 'PA'::text])))
+  WHERE ((government.governmentsubstitute IS NULL) AND (government.governmentlevel = 4) AND ((government.governmenttype)::text <> ALL (ARRAY['Independent School District'::text, 'Place'::text, 'School District'::text, 'Ward'::text])) AND ((government.governmentstatus)::text = ANY (ARRAY[('defunct'::character varying)::text, 'nonfunctioning'::text, 'paper'::text, 'unknown'::text, (''::character varying)::text])) AND (extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentcurrentleadparent)) = ANY (ARRAY['NJ'::text, 'PA'::text])))
   GROUP BY 'total'::text, 'state'::text, (extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentcurrentleadparent))), 0::integer
 UNION
  SELECT 'incorporated_review'::text AS grouptype,
@@ -10500,7 +10500,7 @@ UNION
    FROM ((geohistory.government
      JOIN geohistory.governmentmapstatus ON ((government.governmentmapstatus = governmentmapstatus.governmentmapstatusid)))
      LEFT JOIN geohistory.governmentidentifier ON (((government.governmentcurrentleadparent = governmentidentifier.government) AND (governmentidentifier.governmentidentifiertype = 1))))
-  WHERE ((government.governmentsubstitute IS NULL) AND (government.governmentlevel = 4) AND ((government.governmenttype)::text <> ALL (ARRAY['Hundred'::text, 'Place'::text, 'School District'::text, 'Township'::text, 'Ward'::text])) AND ((government.governmentstatus)::text = ANY (ARRAY[('defunct'::character varying)::text, 'nonfunctioning'::text, 'paper'::text, 'unknown'::text, (''::character varying)::text])))
+  WHERE ((government.governmentsubstitute IS NULL) AND (government.governmentlevel = 4) AND ((government.governmenttype)::text <> ALL (ARRAY['Hundred'::text, 'Independent School District'::text, 'Place'::text, 'School District'::text, 'Township'::text, 'Ward'::text])) AND ((government.governmentstatus)::text = ANY (ARRAY[('defunct'::character varying)::text, 'nonfunctioning'::text, 'paper'::text, 'unknown'::text, (''::character varying)::text])))
   GROUP BY 'incorporated_review'::text, 'county'::text, (extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentcurrentleadparent))), government.governmentcurrentleadparent, governmentidentifier.governmentidentifier
 UNION
  SELECT 'total_review'::text AS grouptype,
@@ -10518,7 +10518,7 @@ UNION
    FROM ((geohistory.government
      JOIN geohistory.governmentmapstatus ON ((government.governmentmapstatus = governmentmapstatus.governmentmapstatusid)))
      LEFT JOIN geohistory.governmentidentifier ON (((government.governmentcurrentleadparent = governmentidentifier.government) AND (governmentidentifier.governmentidentifiertype = 1))))
-  WHERE ((government.governmentsubstitute IS NULL) AND (government.governmentlevel = 4) AND ((government.governmenttype)::text <> ALL (ARRAY['Place'::text, 'School District'::text, 'Ward'::text])) AND ((government.governmentstatus)::text = ANY (ARRAY[('defunct'::character varying)::text, 'nonfunctioning'::text, 'paper'::text, 'unknown'::text, (''::character varying)::text])))
+  WHERE ((government.governmentsubstitute IS NULL) AND (government.governmentlevel = 4) AND ((government.governmenttype)::text <> ALL (ARRAY['Independent School District'::text, 'Place'::text, 'School District'::text, 'Ward'::text])) AND ((government.governmentstatus)::text = ANY (ARRAY[('defunct'::character varying)::text, 'nonfunctioning'::text, 'paper'::text, 'unknown'::text, (''::character varying)::text])))
   GROUP BY 'total_review'::text, 'county'::text, (extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentcurrentleadparent))), government.governmentcurrentleadparent, governmentidentifier.governmentidentifier
 UNION
  SELECT 'incorporated_review'::text AS grouptype,
@@ -10532,7 +10532,7 @@ UNION
         END))::numeric / (COALESCE(count(*), (1)::bigint))::numeric) * (100)::numeric), 2) AS percentmapped
    FROM (geohistory.government
      JOIN geohistory.governmentmapstatus ON ((government.governmentmapstatus = governmentmapstatus.governmentmapstatusid)))
-  WHERE ((government.governmentsubstitute IS NULL) AND (government.governmentlevel = 4) AND ((government.governmenttype)::text <> ALL (ARRAY['Hundred'::text, 'Place'::text, 'School District'::text, 'Township'::text, 'Ward'::text])) AND ((government.governmentstatus)::text = ANY (ARRAY[('defunct'::character varying)::text, 'nonfunctioning'::text, 'paper'::text, 'unknown'::text, (''::character varying)::text])))
+  WHERE ((government.governmentsubstitute IS NULL) AND (government.governmentlevel = 4) AND ((government.governmenttype)::text <> ALL (ARRAY['Hundred'::text, 'Independent School District'::text, 'Place'::text, 'School District'::text, 'Township'::text, 'Ward'::text])) AND ((government.governmentstatus)::text = ANY (ARRAY[('defunct'::character varying)::text, 'nonfunctioning'::text, 'paper'::text, 'unknown'::text, (''::character varying)::text])))
   GROUP BY 'incorporated_review'::text, 'state'::text, (extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentcurrentleadparent))), 0::integer
 UNION
  SELECT 'total_review'::text AS grouptype,
@@ -10546,7 +10546,7 @@ UNION
         END))::numeric / (COALESCE(count(*), (1)::bigint))::numeric) * (100)::numeric), 2) AS percentmapped
    FROM (geohistory.government
      JOIN geohistory.governmentmapstatus ON ((government.governmentmapstatus = governmentmapstatus.governmentmapstatusid)))
-  WHERE ((government.governmentsubstitute IS NULL) AND (government.governmentlevel = 4) AND ((government.governmenttype)::text <> ALL (ARRAY['Place'::text, 'School District'::text, 'Ward'::text])) AND ((government.governmentstatus)::text = ANY (ARRAY[('defunct'::character varying)::text, 'nonfunctioning'::text, 'paper'::text, 'unknown'::text, (''::character varying)::text])))
+  WHERE ((government.governmentsubstitute IS NULL) AND (government.governmentlevel = 4) AND ((government.governmenttype)::text <> ALL (ARRAY['Independent School District'::text, 'Place'::text, 'School District'::text, 'Ward'::text])) AND ((government.governmentstatus)::text = ANY (ARRAY[('defunct'::character varying)::text, 'nonfunctioning'::text, 'paper'::text, 'unknown'::text, (''::character varying)::text])))
   GROUP BY 'total_review'::text, 'state'::text, (extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentcurrentleadparent))), 0::integer
 UNION
  SELECT 'incorporated_review'::text AS grouptype,
@@ -10560,7 +10560,7 @@ UNION
         END))::numeric / (COALESCE(count(*), (1)::bigint))::numeric) * (100)::numeric), 2) AS percentmapped
    FROM (geohistory.government
      JOIN geohistory.governmentmapstatus ON ((government.governmentmapstatus = governmentmapstatus.governmentmapstatusid)))
-  WHERE ((government.governmentsubstitute IS NULL) AND (government.governmentlevel = 4) AND ((government.governmenttype)::text <> ALL (ARRAY['Hundred'::text, 'Place'::text, 'School District'::text, 'Township'::text, 'Ward'::text])) AND ((government.governmentstatus)::text = ANY (ARRAY[('defunct'::character varying)::text, 'nonfunctioning'::text, 'paper'::text, 'unknown'::text, (''::character varying)::text])) AND (extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentcurrentleadparent)) = ANY (ARRAY['DE'::text, 'ME'::text, 'MA'::text, 'MD'::text, 'MI'::text, 'MN'::text, 'NJ'::text, 'NJ'::text, 'OH'::text, 'PA'::text])))
+  WHERE ((government.governmentsubstitute IS NULL) AND (government.governmentlevel = 4) AND ((government.governmenttype)::text <> ALL (ARRAY['Hundred'::text, 'Independent School District'::text, 'Place'::text, 'School District'::text, 'Township'::text, 'Ward'::text])) AND ((government.governmentstatus)::text = ANY (ARRAY[('defunct'::character varying)::text, 'nonfunctioning'::text, 'paper'::text, 'unknown'::text, (''::character varying)::text])) AND (extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentcurrentleadparent)) = ANY (ARRAY['DE'::text, 'ME'::text, 'MA'::text, 'MD'::text, 'MI'::text, 'MN'::text, 'NJ'::text, 'NJ'::text, 'OH'::text, 'PA'::text])))
   GROUP BY 'incorporated_review'::text, 'state'::text, (extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentcurrentleadparent))), 0::integer
 UNION
  SELECT 'total_review'::text AS grouptype,
@@ -10574,7 +10574,7 @@ UNION
         END))::numeric / (COALESCE(count(*), (1)::bigint))::numeric) * (100)::numeric), 2) AS percentmapped
    FROM (geohistory.government
      JOIN geohistory.governmentmapstatus ON ((government.governmentmapstatus = governmentmapstatus.governmentmapstatusid)))
-  WHERE ((government.governmentsubstitute IS NULL) AND (government.governmentlevel = 4) AND ((government.governmenttype)::text <> ALL (ARRAY['Place'::text, 'School District'::text, 'Ward'::text])) AND ((government.governmentstatus)::text = ANY (ARRAY[('defunct'::character varying)::text, 'nonfunctioning'::text, 'paper'::text, 'unknown'::text, (''::character varying)::text])) AND (extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentcurrentleadparent)) = ANY (ARRAY['DE'::text, 'ME'::text, 'MA'::text, 'MD'::text, 'MI'::text, 'MN'::text, 'NJ'::text, 'NJ'::text, 'OH'::text, 'PA'::text])))
+  WHERE ((government.governmentsubstitute IS NULL) AND (government.governmentlevel = 4) AND ((government.governmenttype)::text <> ALL (ARRAY['Independent School District'::text, 'Place'::text, 'School District'::text, 'Ward'::text])) AND ((government.governmentstatus)::text = ANY (ARRAY[('defunct'::character varying)::text, 'nonfunctioning'::text, 'paper'::text, 'unknown'::text, (''::character varying)::text])) AND (extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentcurrentleadparent)) = ANY (ARRAY['DE'::text, 'ME'::text, 'MA'::text, 'MD'::text, 'MI'::text, 'MN'::text, 'NJ'::text, 'NJ'::text, 'OH'::text, 'PA'::text])))
   GROUP BY 'total_review'::text, 'state'::text, (extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentcurrentleadparent))), 0::integer
 UNION
  SELECT 'incorporated_review'::text AS grouptype,
@@ -10588,7 +10588,7 @@ UNION
         END))::numeric / (COALESCE(count(*), (1)::bigint))::numeric) * (100)::numeric), 2) AS percentmapped
    FROM (geohistory.government
      JOIN geohistory.governmentmapstatus ON ((government.governmentmapstatus = governmentmapstatus.governmentmapstatusid)))
-  WHERE ((government.governmentsubstitute IS NULL) AND (government.governmentlevel = 4) AND ((government.governmenttype)::text <> ALL (ARRAY['Hundred'::text, 'Place'::text, 'School District'::text, 'Township'::text, 'Ward'::text])) AND ((government.governmentstatus)::text = ANY (ARRAY[('defunct'::character varying)::text, 'nonfunctioning'::text, 'paper'::text, 'unknown'::text, (''::character varying)::text])) AND (extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentcurrentleadparent)) = ANY (ARRAY['NJ'::text, 'PA'::text])))
+  WHERE ((government.governmentsubstitute IS NULL) AND (government.governmentlevel = 4) AND ((government.governmenttype)::text <> ALL (ARRAY['Hundred'::text, 'Independent School District'::text, 'Place'::text, 'School District'::text, 'Township'::text, 'Ward'::text])) AND ((government.governmentstatus)::text = ANY (ARRAY[('defunct'::character varying)::text, 'nonfunctioning'::text, 'paper'::text, 'unknown'::text, (''::character varying)::text])) AND (extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentcurrentleadparent)) = ANY (ARRAY['NJ'::text, 'PA'::text])))
   GROUP BY 'incorporated_review'::text, 'state'::text, (extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentcurrentleadparent))), 0::integer
 UNION
  SELECT 'total_review'::text AS grouptype,
@@ -10602,7 +10602,7 @@ UNION
         END))::numeric / (COALESCE(count(*), (1)::bigint))::numeric) * (100)::numeric), 2) AS percentmapped
    FROM (geohistory.government
      JOIN geohistory.governmentmapstatus ON ((government.governmentmapstatus = governmentmapstatus.governmentmapstatusid)))
-  WHERE ((government.governmentsubstitute IS NULL) AND (government.governmentlevel = 4) AND ((government.governmenttype)::text <> ALL (ARRAY['Place'::text, 'School District'::text, 'Ward'::text])) AND ((government.governmentstatus)::text = ANY (ARRAY[('defunct'::character varying)::text, 'nonfunctioning'::text, 'paper'::text, 'unknown'::text, (''::character varying)::text])) AND (extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentcurrentleadparent)) = ANY (ARRAY['NJ'::text, 'PA'::text])))
+  WHERE ((government.governmentsubstitute IS NULL) AND (government.governmentlevel = 4) AND ((government.governmenttype)::text <> ALL (ARRAY['Independent School District'::text, 'Place'::text, 'School District'::text, 'Ward'::text])) AND ((government.governmentstatus)::text = ANY (ARRAY[('defunct'::character varying)::text, 'nonfunctioning'::text, 'paper'::text, 'unknown'::text, (''::character varying)::text])) AND (extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentcurrentleadparent)) = ANY (ARRAY['NJ'::text, 'PA'::text])))
   GROUP BY 'total_review'::text, 'state'::text, (extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentcurrentleadparent))), 0::integer
   ORDER BY 1, 2, 3, 4
   WITH NO DATA;
@@ -10780,6 +10780,7 @@ CREATE TABLE geohistory.researchlog (
     researchlognotes text DEFAULT ''::text NOT NULL,
     researchlogdisposition character varying(2) DEFAULT ''::character varying NOT NULL,
     internetarchivehandle text[],
+    event integer,
     CONSTRAINT researchlog_check CHECK (((((researchlogfrom)::text = ''::text) AND ((researchlogto)::text = ''::text)) OR (((researchlogfrom)::text <> ''::text) AND ((researchlogto)::text <> ''::text) AND ((researchlogvolumefrom)::text = ''::text) AND ((researchlogvolumeto)::text = ''::text)) OR (((researchlogvolumefrom)::text <> ''::text) AND ((researchlogvolumeto)::text <> ''::text))))
 );
 
@@ -10810,6 +10811,13 @@ c = All ordinances in code obtained, or good faith investigation through 1974 or
 o = No follow-up necessary; 
 p = Some records obtained from alternate sources; 
 x = No records obtained from alternate sources.';
+
+
+--
+-- Name: COLUMN researchlog.event; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.researchlog.event IS 'Items where this field is populated are not included in open data.';
 
 
 --
@@ -10985,6 +10993,62 @@ CREATE TABLE geohistory.lawgroup (
 
 
 ALTER TABLE geohistory.lawgroup OWNER TO postgres;
+
+--
+-- Name: COLUMN lawgroup.eventeffectivetype; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.lawgroup.eventeffectivetype IS 'This field is used for internal tracking purposes, and is not included in open data.';
+
+
+--
+-- Name: COLUMN lawgroup.lawgroupcourtname; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.lawgroup.lawgroupcourtname IS 'This field is used for internal tracking purposes, and is not included in open data.';
+
+
+--
+-- Name: COLUMN lawgroup.lawgrouprecording; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.lawgroup.lawgrouprecording IS 'This field is used for internal tracking purposes, and is not included in open data.';
+
+
+--
+-- Name: COLUMN lawgroup.lawgroupsecretaryofstate; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.lawgroup.lawgroupsecretaryofstate IS 'This field is used for internal tracking purposes, and is not included in open data.';
+
+
+--
+-- Name: COLUMN lawgroup.lawgroupplanningagency; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.lawgroup.lawgroupplanningagency IS 'This field is used for internal tracking purposes, and is not included in open data.';
+
+
+--
+-- Name: COLUMN lawgroup.lawgroupprocedure; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.lawgroup.lawgroupprocedure IS 'This field is used for internal tracking purposes, and is not included in open data.';
+
+
+--
+-- Name: COLUMN lawgroup.lawgroupgroup; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.lawgroup.lawgroupgroup IS 'This field is used for internal tracking purposes, and is not included in open data.';
+
+
+--
+-- Name: COLUMN lawgroup.lawgroupsectionlead; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.lawgroup.lawgroupsectionlead IS 'This field is used for internal tracking purposes, and is not included in open data.';
+
 
 --
 -- Name: lawgroupsection; Type: TABLE; Schema: geohistory; Owner: postgres
@@ -16073,6 +16137,14 @@ ALTER TABLE ONLY geohistory.recordingoffice
 
 ALTER TABLE ONLY geohistory.recordingoffice
     ADD CONSTRAINT recordingoffice_recordingofficetype_fk FOREIGN KEY (recordingofficetype) REFERENCES geohistory.recordingofficetype(recordingofficetypeid) DEFERRABLE;
+
+
+--
+-- Name: researchlog researchlog_event_fk; Type: FK CONSTRAINT; Schema: geohistory; Owner: postgres
+--
+
+ALTER TABLE ONLY geohistory.researchlog
+    ADD CONSTRAINT researchlog_event_fk FOREIGN KEY (event) REFERENCES geohistory.event(eventid) DEFERRABLE;
 
 
 --
