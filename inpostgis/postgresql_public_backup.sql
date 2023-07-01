@@ -11012,7 +11012,7 @@ ALTER TABLE geohistory.lawgroup OWNER TO postgres;
 -- Name: COLUMN lawgroup.eventeffectivetype; Type: COMMENT; Schema: geohistory; Owner: postgres
 --
 
-COMMENT ON COLUMN geohistory.lawgroup.eventeffectivetype IS 'This field is used for internal tracking purposes, and is not included in open data.';
+COMMENT ON COLUMN geohistory.lawgroup.eventeffectivetype IS 'This field is used for internal tracking purposes, and only a placeholder value is included in open data.';
 
 
 --
