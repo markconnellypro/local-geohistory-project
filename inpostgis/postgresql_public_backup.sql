@@ -10900,6 +10900,20 @@ COMMENT ON COLUMN geohistory.recording.recordingrepositoryshort IS 'Conform with
 
 
 --
+-- Name: COLUMN recording.recordingrepositoryitemfrom; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.recording.recordingrepositoryitemfrom IS 'For instances where this field is used for internal tracking purposes, particular values may be omitted in open data.';
+
+
+--
+-- Name: COLUMN recording.recordingrepositoryitemto; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.recording.recordingrepositoryitemto IS 'For instances where this field is used for internal tracking purposes, particular values may be omitted in open data.';
+
+
+--
 -- Name: COLUMN recording.recordingisrelevant; Type: COMMENT; Schema: geohistory; Owner: postgres
 --
 
