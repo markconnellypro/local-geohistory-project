@@ -10,8 +10,7 @@
                 <?php } ?>
                 <th>Name</th>
                 <th>Level <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#governmentlevel" aria-label="Level Key"><?= view('general_svg_icon', ['iconLabel' => 'key icon', 'iconName' => 'key', 'iconType' => 'keyicon']); ?></a></th>
-                <th>Type/Class</th>
-                <th>Home Rule?</th>
+                <th>Type</th>
             </tr>
         </thead>
         <tbody>
@@ -22,7 +21,6 @@
                 <td><?= $row->governmentlong ?></td>
                 <td><?= $row->governmentlevel ?></td>
                 <td><?= $row->governmenttype ?></td>
-                <td><?= $row->governmentcurrenthomerule ?></td>
             </tr>
         </tbody>
     </table>

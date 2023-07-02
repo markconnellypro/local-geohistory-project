@@ -43,6 +43,7 @@ use ReflectionProperty;
  * @method $this groupBy($by, ?bool $escape = null)
  * @method $this groupEnd()
  * @method $this groupStart()
+ * @method $this having($key, $value = null, ?bool $escape = null)
  * @method $this havingGroupEnd()
  * @method $this havingGroupStart()
  * @method $this havingIn(?string $key = null, $values = null, ?bool $escape = null)
@@ -799,11 +800,7 @@ class Model extends BaseModel
             return parent::__get($name);
         }
 
-        if (isset($this->builder()->{$name})) {
-            return $this->builder()->{$name};
-        }
-
-        return null;
+        return $this->builder()->{$name} ?? null;
     }
 
     /**

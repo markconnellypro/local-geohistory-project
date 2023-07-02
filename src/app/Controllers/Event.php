@@ -89,7 +89,7 @@ class Event extends BaseController
             }
             $query = $this->db->query('SELECT * FROM extra.ci_model_event_law(?)', [$id])->getResult();
             if (count($query) > 0) {
-                echo view('general_law', ['query' => $query, 'state' => $state, 'title' => 'Law', 'type' => 'relationship']);
+                echo view('general_law', ['query' => $query, 'state' => $state, 'title' => 'Law', 'type' => 'relationship', 'includeLawGroup' => true]);
             }
             $query = $this->db->query('SELECT * FROM extra.ci_model_event_recording(?, ?, ?)', [$id, $state, $this->request->getLocale()])->getResult();
             if (count($query) > 0) {

@@ -1,4 +1,5 @@
-<?php /* Verified February 14, 2021 */ ?>
+<?php /* Verified May 11, 2023 */ ?>
+
 var stateImageryURL = 'https://imagery.pasda.psu.edu/arcgis/services/pasda/PEMAImagery2018_2020/MapServer/WMSServer';
 var stateImageryATT = 'Base map: <a href="https://www.pasda.psu.edu/uci/DataSummary.aspx?dataset=5158">PASDA</a>.';
 

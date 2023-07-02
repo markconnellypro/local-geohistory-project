@@ -22,11 +22,11 @@ sudo apt-get install git docker docker-compose
 
 More detailed installation instructions for Docker and Docker Compose are available at:
 
-https://docs.docker.com/compose/install/
+<https://docs.docker.com/compose/install/>
 
 More detailed installation instructions for Git are available at:
 
-https://git-scm.com/downloads
+<https://git-scm.com/downloads>
 
 ### Clone main repository into new Code folder
 
@@ -69,10 +69,10 @@ sudo docker-compose up --detach
 
 ### Check installation
 
-Navigate to http://[::1]/en/ in your web browser to check if the application build was successful.
+Navigate to <http://[::1]/en/> in your web browser to check if the application build was successful.
 
 ## Next steps
 
 Once the application is built, tools such as pgAdmin can be used for data analysis with SQL. Because the PostgreSQL instance is installed locally, the hostname for connection is **localhost**, and the remaining credentials are stored in the .env file. More information concerning the installation of pgAdmin is available at:
 
-https://www.pgadmin.org/download/
+<https://www.pgadmin.org/download/>

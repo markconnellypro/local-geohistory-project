@@ -95,7 +95,7 @@ $(function () {
         }
     });
 
-    $('.lawkey').DataTable({
+    $('.lawgroup').DataTable({
         'info': false,
         'paging': false,
         'searching': false,

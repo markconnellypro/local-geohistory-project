@@ -57,7 +57,7 @@ class Map extends BaseController
         echo json_encode($json);
     }
 
-    public function tile($state = '', $z, $x, $y)
+    public function tile($z, $x, $y, $state = '')
     {
         $this->response->setHeader('Content-Type', 'application/x-protobuf');
         $query = $this->db->query('SELECT * FROM extra.ci_model_map_tile(?, ?, ?, ?)', [$state, $z, $x, $y])->getResult();

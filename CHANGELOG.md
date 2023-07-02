@@ -1,5 +1,47 @@
 # Changelog
 
+## [1.1.0] - 2023-07-01
+
+### Added
+
+- Database column comment indicating partial or full omission from open data in law.lawdescriptiondone, lawgroup.eventeffectivetype, lawgroup.lawgroupcourtname, lawgroup.lawgroupgroup, lawgroup.lawgroupplanningagency, lawgroup.lawgroupprocedure, lawgroup.lawgrouprecording, lawgroup.lawgroupsecretaryofstate, lawgroup.lawgroupsectionlead, recording.recordingrepositoryitemfrom, recording.recordingrepositoryitemto, and researchlog.event.
+- Database columns geohistory.lawsectionevent.lawgroup and geohistory.researchlog.event.
+- Database function changes to accommodate future mutilingual support for Government Identifier Detail.
+- Database tables geohistory.lawgroup and geohistory.lawgroupsection.
+- Database triggers to ensure database integrity when changes made in lawgroupsection, lawsectionevent.
+- Database trigger when source inserted.
+- Group to Law table under Event Detail and Event Links under Law Detail.
+- Support for alternate government name information in Event Detail, and links to pages from Government Detail.
+- Various accommodations for use in development version.
+
+### Changed
+
+- Codeigniter from 4.3.1 to 4.3.6.
+- Database constraint on geohistory.metesdescription to ensure metesdescriptionacres cannot be negative.
+- Database extract pg_dump and OS versions.
+- Database functions to remove placeholder affected government part references when other materialized views refreshed.
+- Database table geohistory.government to remove governmentclass and governmentcurrenthomerule fields and substitute with governmentcurrentform field.
+- Delimiter in How Effective Date Determined in Event Detail.
+- Esri Leaflet from 2.5.3 (manually modified) to 3.0.10 (forked with modifications).
+- Maplibre GL JS from 1.15.3 to 3.0.0.
+- Maplibre GL Leaflet from 0.0.18 to 0.0.19.
+- Parcel map style in New Jersey.
+- Statistics for mapped governments to omit Independent School Districts.
+- Stylistic and minor changes to changelog and README.
+
+### Fixed
+
+- HTML validation issues in several views.
+- Leaflet attribution for maps.
+- Linting errors in changelog and README.
+- Obsolete state GIS links.
+- Parameter order for map tile display to put optional parameter last.
+
+### Removed
+
+- Survey Township page.
+- Various database functions only used in development version.
+
 ## [1.0.2] - 2023-04-10
 
 ### Added
@@ -45,6 +87,7 @@
 
 - Public release of the Local Geohistory Project: Application repository.
 
+[1.1.0]: https://github.com/markconnellypro/local-geohistory-project/compare/v1.0.2...v1.1.0
 [1.0.2]: https://github.com/markconnellypro/local-geohistory-project/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/markconnellypro/local-geohistory-project/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/markconnellypro/local-geohistory-project/releases/tag/v1.0.0

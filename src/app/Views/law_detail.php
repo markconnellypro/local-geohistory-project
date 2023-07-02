@@ -3,6 +3,9 @@
     <table class="normal row-border cell-border compact stripe">
         <thead>
             <tr>
+                <?php if ($live) { ?>
+                    <th>ID</th>
+                <?php } ?>
                 <th>Citation <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#law" aria-label="Law Key"><?= view('general_svg_icon', ['iconLabel' => 'key icon', 'iconName' => 'key', 'iconType' => 'keyicon']); ?></a></th>
                 <th>Title</th>
                 <th>Page Begin</th>
@@ -10,6 +13,9 @@
         </thead>
         <tbody>
             <tr>
+                <?php if ($live) { ?>
+                    <td><?= $query[0]->lawsectionid ?></td>
+                <?php } ?>
                 <td><?= $query[0]->lawsectioncitation ?></td>
                 <td><?= $query[0]->lawtitle ?></td>
                 <td><?= $query[0]->lawsectionpagefrom ?></td>

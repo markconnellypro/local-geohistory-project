@@ -31,7 +31,7 @@ class Governmentidentifier extends BaseController
             $this->response->setStatusCode(301);
             return redirect()->to("/" . $this->request->getLocale() . '/governmentidentifier/' . $type . '/' . strtolower($id) . '/');
         }
-        $query = $this->db->query('SELECT * FROM extra.ci_model_governmentidentifier_detail(?, ?)', [$type, $id])->getResult();
+        $query = $this->db->query('SELECT * FROM extra.ci_model_governmentidentifier_detail(?, ?, ?)', [$type, $id, \Config\Services::request()->getLocale()])->getResult();
         if (count($query) != 1) {
             $this->noRecord();
         } else {
@@ -43,7 +43,7 @@ class Governmentidentifier extends BaseController
             if (count($query) > 0) {
                 echo view('general_government', ['query' => $query, 'title' => 'Government', 'type' => 'identifier']);
             }
-            $query = $this->db->query('SELECT * FROM extra.ci_model_governmentidentifier_related(?, ?)', [$governments, $governmentidentifierids])->getResult();
+            $query = $this->db->query('SELECT * FROM extra.ci_model_governmentidentifier_related(?, ?, ?)', [$governments, $governmentidentifierids, \Config\Services::request()->getLocale()])->getResult();
             if (count($query) > 0) {
                 echo view('general_governmentidentifier', ['query' => $query, 'title' => 'Related']);
             }
