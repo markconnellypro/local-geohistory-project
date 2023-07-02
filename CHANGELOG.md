@@ -27,13 +27,13 @@
 - Maplibre GL Leaflet from 0.0.18 to 0.0.19.
 - Parcel map style in New Jersey.
 - Statistics for mapped governments to omit Independent School Districts.
-- Stylistic changes to changelog.
+- Stylistic and minor changes to changelog and README.
 
 ### Fixed
 
 - HTML validation issues in several views.
 - Leaflet attribution for maps.
-- Linting errors in changelog and readme.
+- Linting errors in changelog and README.
 - Obsolete state GIS links.
 - Parameter order for map tile display to put optional parameter last.
 
