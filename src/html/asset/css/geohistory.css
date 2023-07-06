@@ -261,7 +261,6 @@ header A:hover {
     .headericon,
     .keyicon,
     .keyiconlarge {
-        /* filter: invert(13%) sepia(56%) saturate(3942%) hue-rotate(196deg) brightness(92%) contrast(101%); */
         fill: #003A70;
         /* Pantone 654 C */
     }
