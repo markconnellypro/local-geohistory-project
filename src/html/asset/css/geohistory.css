@@ -185,40 +185,36 @@ header A:hover {
 }
 
 @media screen {
-    main .bodytext {
-        background-color: #FFFBF7;
-    }
-
     .headerfooter {
         background-color: #003A70;
         /* Pantone 654 C */
-        color: #FFFBF7;
+        color: white;
     }
 
     .headericon,
     .keyicon,
     .keyiconlarge {
-        fill: #FFFBF7;
+        fill: white;
     }
 
     header A:link,
     header A:visited,
     header A:active,
     header A:hover {
-        color: #FFFBF7;
+        color: white;
     }
 
     footer A:link,
     footer A:visited,
     footer A:active,
     footer A:hover {
-        color: #FFFBF7;
+        color: white;
     }
 
     table.dataTable thead tr {
         background-color: #003A70;
         /* Pantone 654 C */
-        color: #FFFBF7;
+        color: white;
     }
 
     table.dataTable tr.odd {
