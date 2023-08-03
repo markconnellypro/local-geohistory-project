@@ -1,6 +1,6 @@
 <section>
     <h2>Tribunal</h2>
-    <table class="normal row-border cell-border compact stripe">
+    <table class="normal cell-border compact stripe">
         <thead>
             <tr>
                 <?php if ($live) { ?>
@@ -23,7 +23,7 @@
 </section>
 <section>
     <h2>Summary</h2>
-    <table class="normal row-border cell-border compact stripe">
+    <table class="normal cell-border compact stripe">
         <thead>
             <tr>
                 <th>Type</th>
@@ -43,7 +43,7 @@
 <?php if ($row->textflag == 't') { ?>
     <section>
         <h2>Detail</h2>
-        <table class="normal row-border cell-border compact stripe">
+        <table class="normal cell-border compact stripe">
             <thead>
                 <tr>
                     <th>Long Caption</th>

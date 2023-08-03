@@ -5,7 +5,7 @@
         Courses and distances have been converted to decimal degrees and feet, respectively, and some corrections may have been made.
         Users are cautioned to examine the original description.
     </p>
-    <table class="normal row-border cell-border compact stripe">
+    <table class="normal cell-border compact stripe">
         <thead>
             <tr>
                 <th>Point</th>

@@ -2,7 +2,7 @@
     <?php if ($isComplete) { ?>
         <h2>Affected Government</h2>
     <?php } ?>
-    <table class="normal row-border cell-border compact stripe wrap">
+    <table class="normal cell-border compact stripe wrap">
         <thead>
             <tr>
                 <?php if ($includeDate) { ?>

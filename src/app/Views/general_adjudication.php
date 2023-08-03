@@ -1,6 +1,6 @@
 <section>
     <h2>Adjudication</h2>
-    <table class="normal row-border cell-border compact stripe">
+    <table class="normal cell-border compact stripe">
         <thead>
             <tr>
                 <th>Detail</th>

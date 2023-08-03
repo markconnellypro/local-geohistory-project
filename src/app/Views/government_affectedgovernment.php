@@ -2,7 +2,7 @@
     <?php if (!$isHistory) { ?>
         <h2>Affected Government</h2>
     <?php } ?>
-    <table class="normal row-border cell-border compact stripe">
+    <table class="normal cell-border compact stripe">
         <thead>
             <tr>
                 <th><?= ($isHistory ? 'Label' : 'Detail') ?></th>
