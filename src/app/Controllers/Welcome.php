@@ -20,11 +20,7 @@ class Welcome extends BaseController
 
     public function index()
     {
-        if ($this->data['live']) {
-            $stateArray = ['de', 'dc', 'me', 'ma', 'md', 'mi', 'mn', 'nj', 'ny', 'oh', 'pa', 'va', 'wi'];
-        } else {
-            $stateArray = ['nj', 'pa'];
-        }
+        $stateArray = $this->getJurisdictions();
         echo view('header', $this->data);
         echo view('welcome', ['isInternetExplorer' => $this->data['isInternetExplorer'], 'stateArray' => $stateArray]);
         echo view('footer');

@@ -1,5 +1,5 @@
 <?php
-$iconPath = (in_array($iconName, ['about', 'key', 'home', 'nj', 'pa', 'search', 'statistics']) ? '' : 'development/') . 'image/' . $iconName;
+$iconPath = (in_array($iconName, array_merge(['about', 'key', 'home', 'search', 'statistics'], \App\Controllers\BaseController::getProductionJurisdictions())) ? '' : 'development/') . 'image/' . $iconName;
 if ($isInternetExplorer) { ?><img src="/asset/<?= $iconPath ?>.svg" class="<?= $iconType ?>" alt="<?= $iconLabel ?>" /><?php } else {
                                                                                                                         switch ($iconType) {
                                                                                                                             case 'bodyicon':

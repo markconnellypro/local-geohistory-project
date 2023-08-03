@@ -41,8 +41,8 @@ if (mb_strpos(base_url(), $_ENV['app_baseLocalGeohistoryProjectUrl']) !== FALSE)
         $stateProvinceRegex = $nationStateProvinceRegex;
     } else {
         // Only selected states
-        $stateProvinceRegex = '{locale}/(nj|pa)';
-        $nationStateProvinceRegex = '{locale}/(nj|pa)';
+        $stateProvinceRegex = '{locale}/('. $_ENV['app_jurisdiction'] . ')';
+        $nationStateProvinceRegex = '{locale}/('. $_ENV['app_jurisdiction'] . ')';
     }
 
     $controllerRegex = ['adjudication', 'area', 'event', 'government', 'governmentsource', 'law', 'metes', 'reporter', 'source'];

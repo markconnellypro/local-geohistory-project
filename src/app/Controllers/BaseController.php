@@ -126,6 +126,22 @@ abstract class BaseController extends Controller
         }
     }
 
+    protected function getJurisdictions()
+    {
+        $jurisdictions = trim(($_ENV['app_jurisdiction'] ?? '') . '|' . ($_ENV['app_jurisdiction_development'] ?? ''), '|');
+        $jurisdictions = explode('|', $jurisdictions);
+        sort($jurisdictions);
+        return $jurisdictions;
+    }
+
+    public static function getProductionJurisdictions()
+    {
+        $jurisdictions = trim(($_ENV['app_jurisdiction'] ?? ''), '|');
+        $jurisdictions = explode('|', $jurisdictions);
+        sort($jurisdictions);
+        return $jurisdictions;
+    }
+
     protected function isLive(): bool
     {
         return (ENVIRONMENT == 'development');

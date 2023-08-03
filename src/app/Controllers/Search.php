@@ -101,11 +101,7 @@ class Search extends BaseController
 
     public function index($state = '')
     {
-        if ($this->data['live']) {
-            $stateArray = ['de', 'me', 'ma', 'md', 'mi', 'mn', 'nj', 'ny', 'oh', 'pa', 'wi'];
-        } else {
-            $stateArray = ['nj', 'pa'];
-        }
+        $stateArray = $this->getJurisdictions();
         $this->data['state'] = $state;
         echo view('header', $this->data);
         if (!$this->data['live'] and !in_array($state, $stateArray)) {
