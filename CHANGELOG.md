@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.1.1] - 2023-08-26
+
+### Fixed
+
+- Missing Government name on Government Detail timelapse maps for some pages that group related, sequential governments.
+
 ## [1.1.0] - 2023-07-01
 
 ### Added
@@ -87,6 +93,7 @@
 
 - Public release of the Local Geohistory Project: Application repository.
 
+[1.1.1]: https://github.com/markconnellypro/local-geohistory-project/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/markconnellypro/local-geohistory-project/compare/v1.0.2...v1.1.0
 [1.0.2]: https://github.com/markconnellypro/local-geohistory-project/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/markconnellypro/local-geohistory-project/compare/v1.0.0...v1.0.1

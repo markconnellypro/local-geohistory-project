@@ -119,14 +119,15 @@ function toTimeLine() {
   				if (item.eventstatus == 'add' || item.eventstatus == 'name' || item.eventstatus == 'remove' ) {
   					if (!shapeTime.hasOwnProperty(item.eventsortdate)) {
   						shapeTime[item.eventsortdate] = {};
-              shapeTimeText[item.eventsortdate] = item.eventtextsortdate;
+                        shapeTimeText[item.eventsortdate] = item.eventtextsortdate;
   					}
   					if (!shapeNameText.hasOwnProperty(item.eventsortdate)) {
-              shapeNameText[item.eventsortdate] = '';
-  					} else if (item.eventgovernmentlong && shapeNameText[item.eventsortdate] != item.eventgovernmentlong) {
-              shapeNameText[item.eventsortdate] = item.eventgovernmentlong;
-              shapeNameCount++;
-            }
+                        shapeNameText[item.eventsortdate] = '';
+  					}
+                    if (item.eventgovernmentlong && shapeNameText[item.eventsortdate] != item.eventgovernmentlong) {
+                        shapeNameText[item.eventsortdate] = item.eventgovernmentlong;
+                        shapeNameCount++;
+                    }
   					shapeTime[item.eventsortdate][featureIndex] = item.eventstatus;
   				}
   			} catch (err1) {
