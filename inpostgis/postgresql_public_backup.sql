@@ -8827,14 +8827,7 @@ CREATE VIEW extra.governmentchangecount AS
             affectedtype.affectedtypecreationdissolution,
             extra.eventsortdatedate((event.eventeffective)::character varying, event.eventfrom, event.eventto) AS eventsortdatedate,
             extra.eventtextshortdate((event.eventeffective)::character varying, event.eventfrom, event.eventto) AS eventtextshortdate,
-                CASE
-                    WHEN ((length((event.eventeffective)::text) = 0) AND (event.eventfrom <> event.eventto)) THEN 'None (Range)'::text
-                    WHEN (length((event.eventeffective)::text) = 0) THEN 'None'::text
-                    WHEN (length((event.eventeffective)::text) = 10) THEN 'Day'::text
-                    WHEN ("position"((event.eventeffective)::text, '~'::text) = 9) THEN 'Month'::text
-                    WHEN ("position"((event.eventeffective)::text, '~'::text) = 6) THEN 'Year'::text
-                    ELSE 'Unknown'::text
-                END AS eventeffectiveprecision,
+            initcap(((event.eventeffective)::calendar.historicdate)."precision") AS eventeffectiveprecision,
             extra.eventeffectivetype(eventeffectivetype.eventeffectivetypegroup, eventeffectivetype.eventeffectivetypequalifier) AS eventeffectivetype,
             sum(
                 CASE
@@ -8933,8 +8926,8 @@ CREATE VIEW extra.governmentchangecount AS
             ELSE ''::text
         END AS creationtext,
         CASE
-            WHEN (array_length(creation.eventid, 1) = 1) THEN creation.eventeffectiveprecision[1]
-            ELSE ''::text
+            WHEN (array_length(creation.eventid, 1) = 1) THEN COALESCE(creation.eventeffectiveprecision[1], 'None'::text)
+            ELSE 'None'::text
         END AS creationprecision,
         CASE
             WHEN (array_length(creation.eventid, 1) = 1) THEN creation.eventsortdatedate[1]
@@ -8959,8 +8952,8 @@ CREATE VIEW extra.governmentchangecount AS
             ELSE ''::text
         END AS dissolutiontext,
         CASE
-            WHEN (array_length(dissolution.eventid, 1) = 1) THEN dissolution.eventeffectiveprecision[1]
-            ELSE ''::text
+            WHEN (array_length(dissolution.eventid, 1) = 1) THEN COALESCE(dissolution.eventeffectiveprecision[1], 'None'::text)
+            ELSE 'None'::text
         END AS dissolutionprecision,
         CASE
             WHEN (array_length(dissolution.eventid, 1) = 1) THEN dissolution.eventsortdatedate[1]
@@ -9059,14 +9052,7 @@ CREATE VIEW extra.governmentchangecountpart AS
             affectedtype.affectedtypecreationdissolution,
             extra.eventsortdatedate((event.eventeffective)::character varying, event.eventfrom, event.eventto) AS eventsortdatedate,
             extra.eventtextshortdate((event.eventeffective)::character varying, event.eventfrom, event.eventto) AS eventtextshortdate,
-                CASE
-                    WHEN ((length((event.eventeffective)::text) = 0) AND (event.eventfrom <> event.eventto)) THEN 'None (Range)'::text
-                    WHEN (length((event.eventeffective)::text) = 0) THEN 'None'::text
-                    WHEN (length((event.eventeffective)::text) = 10) THEN 'Day'::text
-                    WHEN ("position"((event.eventeffective)::text, '~'::text) = 9) THEN 'Month'::text
-                    WHEN ("position"((event.eventeffective)::text, '~'::text) = 6) THEN 'Year'::text
-                    ELSE 'Unknown'::text
-                END AS eventeffectiveprecision,
+            initcap(((event.eventeffective)::calendar.historicdate)."precision") AS eventeffectiveprecision,
             extra.eventeffectivetype(eventeffectivetype.eventeffectivetypegroup, eventeffectivetype.eventeffectivetypequalifier) AS eventeffectivetype,
             sum(
                 CASE
@@ -9140,8 +9126,8 @@ CREATE VIEW extra.governmentchangecountpart AS
             ELSE ''::text
         END AS creationtext,
         CASE
-            WHEN (array_length(creation.eventid, 1) = 1) THEN creation.eventeffectiveprecision[1]
-            ELSE ''::text
+            WHEN (array_length(creation.eventid, 1) = 1) THEN COALESCE(creation.eventeffectiveprecision[1], 'None'::text)
+            ELSE 'None'::text
         END AS creationprecision,
         CASE
             WHEN (array_length(creation.eventid, 1) = 1) THEN creation.eventsortdatedate[1]
@@ -9165,8 +9151,8 @@ CREATE VIEW extra.governmentchangecountpart AS
             ELSE ''::text
         END AS dissolutiontext,
         CASE
-            WHEN (array_length(dissolution.eventid, 1) = 1) THEN dissolution.eventeffectiveprecision[1]
-            ELSE ''::text
+            WHEN (array_length(dissolution.eventid, 1) = 1) THEN COALESCE(dissolution.eventeffectiveprecision[1], 'None'::text)
+            ELSE 'None'::text
         END AS dissolutionprecision,
         CASE
             WHEN (array_length(dissolution.eventid, 1) = 1) THEN dissolution.eventsortdatedate[1]
