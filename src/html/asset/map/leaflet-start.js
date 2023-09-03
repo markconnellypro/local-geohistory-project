@@ -1,8 +1,5 @@
-var stamenMap = new L.StamenTileLayer('terrain');
-
 var baseMaps = {
-    "Street (KlokanTech)": baseMap,
-    "Street (Stamen)": stamenMap
+    "Street (KlokanTech)": baseMap
 };
 
 var usgsATT = 'Base map: <a href="http://www.nationalmap.gov/">USGS</a>.';
