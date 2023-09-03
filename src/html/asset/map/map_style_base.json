@@ -730,6 +730,10 @@
                     "base": 1.4,
                     "stops": [
                         [
+                            5,
+                            0
+                        ],
+                        [
                             6,
                             0.5
                         ],
@@ -771,6 +775,10 @@
                     "base": 1.4,
                     "stops": [
                         [
+                            5,
+                            0
+                        ],
+                        [
                             6,
                             0.5
                         ],
@@ -810,6 +818,10 @@
                 "line-width": {
                     "base": 1.4,
                     "stops": [
+                        [
+                            5,
+                            0
+                        ],
                         [
                             8,
                             1
@@ -1115,7 +1127,19 @@
             ],
             "paint": {
                 "line-color": "rgba(47, 46, 46, 0.3)",
-                "line-width": 2,
+                "line-width": {
+                    "base": 1.3,
+                    "stops": [
+                        [
+                            4,
+                            1
+                        ],
+                        [
+                            6,
+                            2
+                        ]
+                    ]
+                },
                 "line-dasharray": [
                     3,
                     1
@@ -1155,7 +1179,7 @@
                     "stops": [
                         [
                             3,
-                            2
+                            1
                         ],
                         [
                             22,
@@ -1342,6 +1366,7 @@
             "type": "symbol",
             "source": "openmaptiles",
             "source-layer": "place",
+            "minzoom": 5,
             "maxzoom": 16,
             "filter": [
                 "all",
@@ -1365,7 +1390,7 @@
                 "text-size": {
                     "stops": [
                         [
-                            3,
+                            5,
                             12
                         ],
                         [
@@ -1388,6 +1413,7 @@
             "type": "symbol",
             "source": "openmaptiles",
             "source-layer": "place",
+            "minzoom": 4,
             "maxzoom": 12,
             "filter": [
                 "all",
@@ -1416,7 +1442,7 @@
                 "text-size": {
                     "stops": [
                         [
-                            3,
+                            4,
                             11
                         ],
                         [
@@ -1484,6 +1510,47 @@
                 "text-halo-color": "rgba(255,255,255,0.75)",
                 "text-halo-width": 2,
                 "text-halo-blur": 0
+            }
+        },
+        {
+            "id": "base_klokantech_waterway-label",
+            "type": "symbol",
+            "source": "openmaptiles",
+            "source-layer": "waterway",
+            "filter": [
+                "==",
+                "$type",
+                "LineString"
+            ],
+            "layout": {
+                "symbol-placement": "line",
+                "symbol-spacing": 600,
+                "text-field": "{name:latin} {name:nonlatin}",
+                "text-font": [
+                    "Noto Sans Regular"
+                ],
+                "text-letter-spacing": 0.1,
+                "text-size": {
+                    "base": 1.4,
+                    "stops": [
+                        [
+                            10,
+                            8
+                        ],
+                        [
+                            20,
+                            14
+                        ]
+                    ]
+                },
+                "text-rotation-alignment": "map",
+                "text-transform": "uppercase",
+                "visibility": "visible"
+            },
+            "paint": {
+                "text-color": "#000",
+                "text-halo-color": "hsl(0, 0%, 100%)",
+                "text-halo-width": 2
             }
         },
         {
