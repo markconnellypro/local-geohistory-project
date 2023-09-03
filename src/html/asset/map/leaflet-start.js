@@ -3,7 +3,6 @@ var baseMaps = {
 };
 
 var usgsATT = 'Base map: <a href="http://www.nationalmap.gov/">USGS</a>.';
-var usgsTopoURL = 'https://services.nationalmap.gov/arcgis/services/USGSTopoLarge/MapServer/WMSServer';
 
 var usgsImagery = L.tileLayer('https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryOnly/MapServer/tile/{z}/{y}/{x}', {
     attribution: usgsATT,
