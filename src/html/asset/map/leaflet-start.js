@@ -1,12 +1,8 @@
-var stamenMap = new L.StamenTileLayer('terrain');
-
 var baseMaps = {
-    "Street (KlokanTech)": baseMap,
-    "Street (Stamen)": stamenMap
+    "Street (MapTiler)": baseMap
 };
 
 var usgsATT = 'Base map: <a href="http://www.nationalmap.gov/">USGS</a>.';
-var usgsTopoURL = 'https://services.nationalmap.gov/arcgis/services/USGSTopoLarge/MapServer/WMSServer';
 
 var usgsImagery = L.tileLayer('https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryOnly/MapServer/tile/{z}/{y}/{x}', {
     attribution: usgsATT,
@@ -44,8 +40,8 @@ $(function () {
     });
     $('.imagedownload').click(function (event) {
         event.preventDefault();
-        if ($('.leaflet-control-layers-selector[type=radio]:checked')[0].parentNode.innerText.trim() == 'Street (KlokanTech)') {
-            alert('Image download not available for Street (KlokanTech) background.');
+        if ($('.leaflet-control-layers-selector[type=radio]:checked')[0].parentNode.innerText.trim() == 'Street (MapTiler)') {
+            alert('Image download not available for Street (MapTiler) background.');
             return;
         }
         function filter(node) {
@@ -78,7 +74,7 @@ $(function () {
             });
     });
     map.on('baselayerchange', function (e) {
-        if ($('.leaflet-control-layers-selector[type=radio]:checked')[0].parentNode.innerText.trim() == 'Street (KlokanTech)') {
+        if ($('.leaflet-control-layers-selector[type=radio]:checked')[0].parentNode.innerText.trim() == 'Street (MapTiler)') {
             $('.maptilerlogo').css('display', 'inherit');
         } else {
             $('.maptilerlogo').css('display', 'none');
