@@ -1,5 +1,25 @@
 # Changelog
 
+## [1.1.2] - 2023-09-03
+
+### Added
+
+- Map labels for water on MapTiler layers.
+
+### Changed
+
+- Layer labels for KlokanTech layers to reference MapTiler.
+- Map style to declutter smaller scale maps on MapTiler layers.
+- Reorganized references to libraries and styles used to create base maps.
+
+### Fixed
+
+- CORS issue with CSS stylesheet preventing full screen icon from appearing on map.
+
+### Removed
+
+- Stamen and other obsolete map layer content.
+
 ## [1.1.1] - 2023-08-26
 
 ### Fixed
@@ -93,6 +113,7 @@
 
 - Public release of the Local Geohistory Project: Application repository.
 
+[1.1.2]: https://github.com/markconnellypro/local-geohistory-project/compare/v1.1.1...v1.1.2
 [1.1.1]: https://github.com/markconnellypro/local-geohistory-project/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/markconnellypro/local-geohistory-project/compare/v1.0.2...v1.1.0
 [1.0.2]: https://github.com/markconnellypro/local-geohistory-project/compare/v1.0.1...v1.0.2
