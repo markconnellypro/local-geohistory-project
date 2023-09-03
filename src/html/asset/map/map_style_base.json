@@ -1513,6 +1513,41 @@
             }
         },
         {
+            "id": "base_klokantech_water-label",
+            "type": "symbol",
+            "source": "openmaptiles",
+            "source-layer": "water_name",
+            "layout": {
+                "symbol-placement": "line",
+                "symbol-spacing": 600,
+                "text-field": "{name:latin} {name:nonlatin}",
+                "text-font": [
+                    "Noto Sans Regular"
+                ],
+                "text-letter-spacing": 0.1,
+                "text-size": {
+                    "base": 1.4,
+                    "stops": [
+                        [
+                            6,
+                            12
+                        ],
+                        [
+                            20,
+                            16
+                        ]
+                    ]
+                },
+                "text-transform": "uppercase",
+                "visibility": "visible"
+            },
+            "paint": {
+                "text-color": "#000",
+                "text-halo-color": "hsl(0, 0%, 100%)",
+                "text-halo-width": 2
+            }
+        },
+        {
             "id": "base_klokantech_waterway-label",
             "type": "symbol",
             "source": "openmaptiles",
@@ -1534,7 +1569,7 @@
                     "base": 1.4,
                     "stops": [
                         [
-                            10,
+                            8,
                             8
                         ],
                         [
