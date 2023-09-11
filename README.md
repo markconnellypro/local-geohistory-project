@@ -61,7 +61,7 @@ The **inpostgis** folder contains 2 SQL files containing the structural elements
 
 ### Build
 
-The final step to deploying the application is to build it using Docker Compose. Run the following command using a program such as Command Prompt (Windows), Git BASH, or Terminal, and run the following code:
+The final step to deploying the application is to build it using Docker Compose. Run the following command using a program such as Command Prompt (Windows), Git BASH, or Terminal:
 
 ```bash
 sudo docker-compose up --detach
