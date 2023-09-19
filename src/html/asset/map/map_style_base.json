@@ -1214,7 +1214,7 @@
                 ],
                 "icon-size": 1,
                 "text-anchor": "top",
-                "text-field": "{name:latin}\n{name:nonlatin}",
+                "text-field": "{name}",
                 "text-max-width": 8,
                 "visibility": "visible"
             },
@@ -1250,7 +1250,7 @@
                 ],
                 "icon-size": 1,
                 "text-anchor": "top",
-                "text-field": "{name:latin}\n{name:nonlatin}",
+                "text-field": "{name}",
                 "text-max-width": 8,
                 "visibility": "visible"
             },
@@ -1273,7 +1273,7 @@
             ],
             "layout": {
                 "symbol-placement": "line",
-                "text-field": "{name:latin} {name:nonlatin}",
+                "text-field": "{name}",
                 "text-font": [
                     "Regular"
                 ],
@@ -1324,7 +1324,7 @@
                 ]
             ],
             "layout": {
-                "text-field": "{name:latin}\n{name:nonlatin}",
+                "text-field": "{name}",
                 "text-font": [
                     "Regular"
                 ],
@@ -1372,7 +1372,7 @@
                 ]
             ],
             "layout": {
-                "text-field": "{name:latin}\n{name:nonlatin}",
+                "text-field": "{name}",
                 "text-font": [
                     "Regular"
                 ],
@@ -1424,7 +1424,7 @@
                 ]
             ],
             "layout": {
-                "text-field": "{name:latin}",
+                "text-field": "{name}",
                 "text-font": [
                     "Regular"
                 ],
@@ -1475,7 +1475,7 @@
                 ]
             ],
             "layout": {
-                "text-field": "{name:latin}",
+                "text-field": "{name}",
                 "text-font": [
                     "Bold"
                 ],
@@ -1510,7 +1510,7 @@
             "layout": {
                 "symbol-placement": "line",
                 "symbol-spacing": 600,
-                "text-field": "{name:latin} {name:nonlatin}",
+                "text-field": "{name}",
                 "text-font": [
                     "Regular"
                 ],
@@ -1550,7 +1550,7 @@
             "layout": {
                 "symbol-placement": "line",
                 "symbol-spacing": 600,
-                "text-field": "{name:latin} {name:nonlatin}",
+                "text-field": "{name}",
                 "text-font": [
                     "Regular"
                 ],
