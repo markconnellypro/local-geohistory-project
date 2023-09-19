@@ -3,8 +3,12 @@ function fixFirefoxPrint() {
 return navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
 }
 
-var baseMapATT = 'Base map: <a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>.  Hillshading: <a href="https://aws.amazon.com/public-datasets/terrain/">AWS</a> &copy; <a href="https://github.com/tilezen/joerd/blob/master/docs/attribution.md">Mapzen contributors</a>.';
+var baseMapATT = 'Base: <a href="https://daylightmap.org/attribution.html" target="_blank">Daylight</a> &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>, Microsoft, Esri Community Maps, <a href="https://www.openmaptiles.org/" target="_blank">OpenMapTiles</a>.';
 var baseMapUrl = '/<?= \Config\Services::request()->getLocale() ?>/<?= (empty($state) ? '' : $state . "/") ?>map-base/<?= ($zoom ? "zoom/" : '') ?>';
+
+<?php if (!empty($state) OR !empty($zoom)) { ?>
+baseMapATT = baseMapATT + ' Hillshading: <a href="https://aws.amazon.com/public-datasets/terrain/">AWS</a> &copy; <a href="https://github.com/tilezen/joerd/blob/master/docs/attribution.md">Mapzen</a>.';
+<?php } ?>
 
 <?php if (!empty($state)) { ?>
 var governmentOverlayMap = L.maplibreGL({

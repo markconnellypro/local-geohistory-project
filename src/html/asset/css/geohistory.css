@@ -434,11 +434,14 @@ screen and (min-width: 690px) and (max-width: 1019px) {
 
 /* Map */
 
+.leaflet-control {
+    font-family: "PT Serif", serif;
+}
+
 .info,
 .info2,
 .downloadbox {
     padding: 6px 8px;
-    font-family: "PT Serif", serif;
     background: white;
     background: rgba(255, 255, 255, 0.8);
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
