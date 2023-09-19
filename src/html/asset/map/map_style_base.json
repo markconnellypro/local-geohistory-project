@@ -1,23 +1,15 @@
 {
     "version": 8,
-    "name": "Klokantech Basic",
-    "metadata": {
-        "mapbox:autocomposite": false,
-        "mapbox:type": "template",
-        "maputnik:renderer": "mbgljs",
-        "openmaptiles:version": "3.x",
-        "openmaptiles:mapbox:owner": "openmaptiles",
-        "openmaptiles:mapbox:source:url": "mapbox://openmaptiles.4qljc88t"
-    },
+    "name": "Mark A. Connelly",
     "bearing": 0,
     "pitch": 0,
     "sources": {
-        "openmaptiles": {
+        "street-tile": {
             "type": "vector",
             "url": "",
             "attribution": "Base map: &copy; <a href=\"https:\/\/www.maptiler.com\/copyright\/\" target=\"_blank\">MapTiler<\/a> &copy; <a href=\"https:\/\/www.openstreetmap.org\/copyright\" target=\"_blank\">OpenStreetMap contributors<\/a>."
         },
-        "elevationtiles": {
+        "elevation-tile": {
             "type": "raster-dem",
             "tiles": [],
             "maxzoom": 15,
@@ -28,7 +20,7 @@
     "glyphs": "",
     "layers": [
         {
-            "id": "base_klokantech_background",
+            "id": "background",
             "type": "background",
             "paint": {
                 "background-color": "hsl(47, 26%, 88%)"
@@ -38,9 +30,9 @@
             }
         },
         {
-            "id": "base_klokantech_landuse-residential",
+            "id": "landuse-residential",
             "type": "fill",
-            "source": "openmaptiles",
+            "source": "street-tile",
             "source-layer": "landuse",
             "filter": [
                 "all",
@@ -64,9 +56,9 @@
             }
         },
         {
-            "id": "base_klokantech_landcover-grass",
+            "id": "landcover-grass",
             "type": "fill",
-            "source": "openmaptiles",
+            "source": "street-tile",
             "source-layer": "landcover",
             "filter": [
                 "==",
@@ -82,9 +74,9 @@
             }
         },
         {
-            "id": "base_klokantech_park",
+            "id": "park",
             "type": "fill",
-            "source": "openmaptiles",
+            "source": "street-tile",
             "source-layer": "park",
             "paint": {
                 "fill-color": "rgba(192, 216, 151, 0.53)",
@@ -95,9 +87,9 @@
             }
         },
         {
-            "id": "base_klokantech_landcover-wood",
+            "id": "landcover-wood",
             "type": "fill",
-            "source": "openmaptiles",
+            "source": "street-tile",
             "source-layer": "landcover",
             "filter": [
                 "==",
@@ -125,9 +117,9 @@
             }
         },
         {
-            "id": "base_klokantech_water",
+            "id": "water",
             "type": "fill",
-            "source": "openmaptiles",
+            "source": "street-tile",
             "source-layer": "water",
             "filter": [
                 "==",
@@ -142,9 +134,9 @@
             }
         },
         {
-            "id": "base_klokantech_landcover-ice-shelf",
+            "id": "landcover-ice-shelf",
             "type": "fill",
-            "source": "openmaptiles",
+            "source": "street-tile",
             "source-layer": "landcover",
             "filter": [
                 "==",
@@ -160,9 +152,9 @@
             }
         },
         {
-            "id": "base_klokantech_landcover-glacier",
+            "id": "landcover-glacier",
             "type": "fill",
-            "source": "openmaptiles",
+            "source": "street-tile",
             "source-layer": "landcover",
             "filter": [
                 "==",
@@ -190,9 +182,9 @@
             }
         },
         {
-            "id": "base_klokantech_landuse",
+            "id": "landuse",
             "type": "fill",
-            "source": "openmaptiles",
+            "source": "street-tile",
             "source-layer": "landuse",
             "filter": [
                 "==",
@@ -207,9 +199,9 @@
             }
         },
         {
-            "id": "base_klokantech_landuse-overlay-national-park",
+            "id": "landuse-overlay-national-park",
             "type": "fill",
-            "source": "openmaptiles",
+            "source": "street-tile",
             "source-layer": "landcover",
             "filter": [
                 "==",
@@ -237,9 +229,9 @@
             }
         },
         {
-            "id": "base_klokantech_waterway",
+            "id": "waterway",
             "type": "line",
-            "source": "openmaptiles",
+            "source": "street-tile",
             "source-layer": "waterway",
             "filter": [
                 "==",
@@ -268,9 +260,9 @@
             }
         },
         {
-            "id": "base_klokantech_tunnel-railway-transit",
+            "id": "tunnel-railway-transit",
             "type": "line",
-            "source": "openmaptiles",
+            "source": "street-tile",
             "source-layer": "transportation",
             "minzoom": 0,
             "filter": [
@@ -318,9 +310,9 @@
             }
         },
         {
-            "id": "base_klokantech_building",
+            "id": "building",
             "type": "fill",
-            "source": "openmaptiles",
+            "source": "street-tile",
             "source-layer": "building",
             "paint": {
                 "fill-color": "rgba(222, 211, 190, 1)",
@@ -356,9 +348,9 @@
             }
         },
         {
-            "id": "base_klokantech_housenumber",
+            "id": "housenumber",
             "type": "symbol",
-            "source": "openmaptiles",
+            "source": "street-tile",
             "source-layer": "housenumber",
             "minzoom": 17,
             "filter": [
@@ -379,9 +371,9 @@
             }
         },
         {
-            "id": "base_klokantech_road-path",
+            "id": "road-path",
             "type": "line",
-            "source": "openmaptiles",
+            "source": "street-tile",
             "source-layer": "transportation",
             "filter": [
                 "all",
@@ -424,9 +416,9 @@
             }
         },
         {
-            "id": "base_klokantech_road-minor",
+            "id": "road-minor",
             "type": "line",
-            "source": "openmaptiles",
+            "source": "street-tile",
             "source-layer": "transportation",
             "filter": [
                 "all",
@@ -465,9 +457,9 @@
             }
         },
         {
-            "id": "base_klokantech_tunnel-minor",
+            "id": "tunnel-minor",
             "type": "line",
-            "source": "openmaptiles",
+            "source": "street-tile",
             "source-layer": "transportation",
             "filter": [
                 "all",
@@ -514,9 +506,9 @@
             }
         },
         {
-            "id": "base_klokantech_tunnel-major",
+            "id": "tunnel-major",
             "type": "line",
-            "source": "openmaptiles",
+            "source": "street-tile",
             "source-layer": "transportation",
             "filter": [
                 "all",
@@ -566,12 +558,12 @@
             }
         },
         {
-            "id": "base_klokantech_aeroway-area",
+            "id": "aeroway-area",
             "type": "fill",
             "metadata": {
                 "mapbox:group": "1444849345966.4436"
             },
-            "source": "openmaptiles",
+            "source": "street-tile",
             "source-layer": "aeroway",
             "minzoom": 4,
             "filter": [
@@ -609,12 +601,12 @@
             }
         },
         {
-            "id": "base_klokantech_aeroway-taxiway",
+            "id": "aeroway-taxiway",
             "type": "line",
             "metadata": {
                 "mapbox:group": "1444849345966.4436"
             },
-            "source": "openmaptiles",
+            "source": "street-tile",
             "source-layer": "aeroway",
             "minzoom": 12,
             "filter": [
@@ -654,12 +646,12 @@
             }
         },
         {
-            "id": "base_klokantech_aeroway-runway",
+            "id": "aeroway-runway",
             "type": "line",
             "metadata": {
                 "mapbox:group": "1444849345966.4436"
             },
-            "source": "openmaptiles",
+            "source": "street-tile",
             "source-layer": "aeroway",
             "minzoom": 4,
             "filter": [
@@ -699,9 +691,9 @@
             }
         },
         {
-            "id": "base_klokantech_road-trunk-primary",
+            "id": "road-trunk-primary",
             "type": "line",
-            "source": "openmaptiles",
+            "source": "street-tile",
             "source-layer": "transportation",
             "filter": [
                 "all",
@@ -744,9 +736,9 @@
             }
         },
         {
-            "id": "base_klokantech_road-secondary-tertiary",
+            "id": "road-secondary-tertiary",
             "type": "line",
-            "source": "openmaptiles",
+            "source": "street-tile",
             "source-layer": "transportation",
             "filter": [
                 "all",
@@ -789,9 +781,9 @@
             }
         },
         {
-            "id": "base_klokantech_road-major-motorway",
+            "id": "road-major-motorway",
             "type": "line",
-            "source": "openmaptiles",
+            "source": "street-tile",
             "source-layer": "transportation",
             "filter": [
                 "all",
@@ -834,9 +826,9 @@
             }
         },
         {
-            "id": "base_klokantech_railway-transit",
+            "id": "railway-transit",
             "type": "line",
-            "source": "openmaptiles",
+            "source": "street-tile",
             "source-layer": "transportation",
             "filter": [
                 "all",
@@ -872,9 +864,9 @@
             }
         },
         {
-            "id": "base_klokantech_railway",
+            "id": "railway",
             "type": "line",
-            "source": "openmaptiles",
+            "source": "street-tile",
             "source-layer": "transportation",
             "filter": [
                 "==",
@@ -902,9 +894,9 @@
             }
         },
         {
-            "id": "base_klokantech_bridge-minor-case",
+            "id": "bridge-minor-case",
             "type": "line",
-            "source": "openmaptiles",
+            "source": "street-tile",
             "source-layer": "transportation",
             "filter": [
                 "all",
@@ -960,9 +952,9 @@
             }
         },
         {
-            "id": "base_klokantech_bridge-major-case",
+            "id": "bridge-major-case",
             "type": "line",
-            "source": "openmaptiles",
+            "source": "street-tile",
             "source-layer": "transportation",
             "filter": [
                 "all",
@@ -1021,9 +1013,9 @@
             }
         },
         {
-            "id": "base_klokantech_bridge-minor",
+            "id": "bridge-minor",
             "type": "line",
-            "source": "openmaptiles",
+            "source": "street-tile",
             "source-layer": "transportation",
             "filter": [
                 "all",
@@ -1066,9 +1058,9 @@
             }
         },
         {
-            "id": "base_klokantech_bridge-major",
+            "id": "bridge-major",
             "type": "line",
-            "source": "openmaptiles",
+            "source": "street-tile",
             "source-layer": "transportation",
             "filter": [
                 "all",
@@ -1114,9 +1106,9 @@
             }
         },
         {
-            "id": "base_klokantech_admin-sub",
+            "id": "admin-sub",
             "type": "line",
-            "source": "openmaptiles",
+            "source": "street-tile",
             "source-layer": "boundary",
             "filter": [
                 "in",
@@ -1148,9 +1140,9 @@
             }
         },
         {
-            "id": "base_klokantech_admin-country",
+            "id": "admin-country",
             "type": "line",
-            "source": "openmaptiles",
+            "source": "street-tile",
             "source-layer": "boundary",
             "filter": [
                 "all",
@@ -1192,9 +1184,9 @@
             }
         },
         {
-            "id": "base_klokantech_poi-label",
+            "id": "poi-label",
             "type": "symbol",
-            "source": "openmaptiles",
+            "source": "street-tile",
             "source-layer": "poi",
             "minzoom": 14,
             "maxzoom": 24,
@@ -1234,9 +1226,9 @@
             }
         },
         {
-            "id": "base_klokantech_airport-label",
+            "id": "airport-label",
             "type": "symbol",
-            "source": "openmaptiles",
+            "source": "street-tile",
             "source-layer": "aerodrome_label",
             "minzoom": 10,
             "maxzoom": 24,
@@ -1270,9 +1262,9 @@
             }
         },
         {
-            "id": "base_klokantech_road-major-label",
+            "id": "road-major-label",
             "type": "symbol",
-            "source": "openmaptiles",
+            "source": "street-tile",
             "source-layer": "transportation_name",
             "filter": [
                 "==",
@@ -1310,9 +1302,9 @@
             }
         },
         {
-            "id": "base_klokantech_place-label-other",
+            "id": "place-label-other",
             "type": "symbol",
-            "source": "openmaptiles",
+            "source": "street-tile",
             "source-layer": "place",
             "minzoom": 8,
             "filter": [
@@ -1360,9 +1352,9 @@
             }
         },
         {
-            "id": "base_klokantech_place-label-city",
+            "id": "place-label-city",
             "type": "symbol",
-            "source": "openmaptiles",
+            "source": "street-tile",
             "source-layer": "place",
             "minzoom": 5,
             "maxzoom": 16,
@@ -1407,9 +1399,9 @@
             }
         },
         {
-            "id": "base_klokantech_country-label-other",
+            "id": "country-label-other",
             "type": "symbol",
-            "source": "openmaptiles",
+            "source": "street-tile",
             "source-layer": "place",
             "minzoom": 4,
             "maxzoom": 12,
@@ -1460,9 +1452,9 @@
             }
         },
         {
-            "id": "base_klokantech_country-label",
+            "id": "country-label",
             "type": "symbol",
-            "source": "openmaptiles",
+            "source": "street-tile",
             "source-layer": "place",
             "maxzoom": 12,
             "filter": [
@@ -1511,9 +1503,9 @@
             }
         },
         {
-            "id": "base_klokantech_water-label",
+            "id": "water-label",
             "type": "symbol",
-            "source": "openmaptiles",
+            "source": "street-tile",
             "source-layer": "water_name",
             "layout": {
                 "symbol-placement": "line",
@@ -1546,9 +1538,9 @@
             }
         },
         {
-            "id": "base_klokantech_waterway-label",
+            "id": "waterway-label",
             "type": "symbol",
-            "source": "openmaptiles",
+            "source": "street-tile",
             "source-layer": "waterway",
             "filter": [
                 "==",
@@ -1587,8 +1579,8 @@
             }
         },
         {
-            "id": "base_klokantech_hillshading",
-            "source": "elevationtiles",
+            "id": "hillshading",
+            "source": "elevation-tile",
             "type": "hillshade",
             "layout": {
                 "visibility": "visible"

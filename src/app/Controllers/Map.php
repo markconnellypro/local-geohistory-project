@@ -24,12 +24,12 @@ class Map extends BaseController
         $this->response->setHeader('Cache-Control', 'max-age=86400');
         $this->response->setHeader('Content-Type', 'application/json');
         $json = json_decode(file_get_contents(__DIR__ . '/../../html/asset/map/map_style_base.json'), true);
-        $json['sources']['openmaptiles']['url'] = getenv('map_tile');
+        $json['sources']['street-tile']['url'] = getenv('map_tile');
         $json['glyphs'] = getenv('map_glyph');
         if (!empty(getenv('map_elevation'))) {
-            $json['sources']['elevationtiles']['tiles'][] = getenv('map_elevation');
+            $json['sources']['elevation-tile']['tiles'][] = getenv('map_elevation');
         } else {
-            unset($json['sources']['elevationtiles']);
+            unset($json['sources']['elevation-tile']);
             for ($i = count($json['layers']) - 1; $i >= 0; $i--) {
                 if ($json['layers'][$i]['id'] == 'base_klokantech_hillshading') {
                     unset($json['layers'][$i]);
