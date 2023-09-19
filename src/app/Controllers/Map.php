@@ -24,8 +24,8 @@ class Map extends BaseController
         $this->response->setHeader('Cache-Control', 'max-age=86400');
         $this->response->setHeader('Content-Type', 'application/json');
         $json = json_decode(file_get_contents(__DIR__ . '/../../html/asset/map/map_style_base.json'), true);
-        $json['sources']['openmaptiles']['url'] .= getenv('maptiler_key');
-        $json['glyphs'] .= getenv('maptiler_key');
+        $json['sources']['openmaptiles']['url'] = getenv('map_tile');
+        $json['glyphs'] .= getenv('map_glyph');
         echo json_encode($json);
     }
 
