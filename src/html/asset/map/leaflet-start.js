@@ -1,5 +1,5 @@
 var baseMaps = {
-    "Street (MapTiler)": baseMap
+    "Street": baseMap
 };
 
 var usgsATT = 'Base map: <a href="http://www.nationalmap.gov/">USGS</a>.';
@@ -40,10 +40,6 @@ $(function () {
     });
     $('.imagedownload').click(function (event) {
         event.preventDefault();
-        if ($('.leaflet-control-layers-selector[type=radio]:checked')[0].parentNode.innerText.trim() == 'Street (MapTiler)') {
-            alert('Image download not available for Street (MapTiler) background.');
-            return;
-        }
         function filter(node) {
             if (node.classList === undefined) {
                 return true;
