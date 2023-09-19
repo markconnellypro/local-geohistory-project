@@ -42,8 +42,16 @@ class Map extends BaseController
         }
         $baseFont .= ' ';
         foreach ($json['layers'] AS $layerNumber => $layerContent) {
-            if (!empty($layerContent['layout']['text-field'])) {
-                $json['layers'][$layerNumber]['layout']['text-field'] = str_replace('name', 'name_' . \Config\Services::request()->getLocale(), $layerContent['layout']['text-field']);
+            if (!empty($layerContent['layout']['text-field']) AND $layerContent['layout']['text-field'] == '{name}') {
+                $json['layers'][$layerNumber]['layout']['text-field'] = [
+                    'coalesce',
+                    ['get', 'name_' . \Config\Services::request()->getLocale()],
+                    ['get', 'name:' . \Config\Services::request()->getLocale()],
+                    ['get', 'name']
+                ];
+                if (!in_array(\Config\Services::request()->getLocale(), ['de', 'en'])) {
+                    $json['layers'][$layerNumber]['layout']['text-field'][] = ['get', 'name_en'];
+                }
             }
             if (!empty($layerContent['layout']['text-font'][0])) {
                 $json['layers'][$layerNumber]['layout']['text-font'][0] = $baseFont . $layerContent['layout']['text-font'][0];
