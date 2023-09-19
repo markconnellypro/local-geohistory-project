@@ -4,7 +4,7 @@ return navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
 }
 
 var baseMapATT = 'Base map: <a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>.  Hillshading: <a href="https://aws.amazon.com/public-datasets/terrain/">AWS</a> &copy; <a href="https://github.com/tilezen/joerd/blob/master/docs/attribution.md">Mapzen contributors</a>.';
-var baseMapUrl = '/en/<?= (empty($state) ? '' : $state . "/") ?>map-base/';
+var baseMapUrl = '/en/map-base/<?= ($zoom ? 'zoom/' : '') ?>';
 
 <?php if (!empty($state)) { ?>
 var governmentOverlayMap = L.maplibreGL({

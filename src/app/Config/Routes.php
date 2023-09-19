@@ -66,7 +66,7 @@ if (mb_strpos(base_url(), $_ENV['app_baseLocalGeohistoryProjectUrl']) !== FALSE)
     $routes->add($stateProvinceRegex . '/leaflet', 'Map::leaflet/$1');
 
     $routes->add($stateProvinceRegex . '/about', 'About::index/$1');
-    $routes->add($stateProvinceRegex . '/map-base', 'Map::baseStyle/$1');
+    $routes->add($stateProvinceRegex . '/map-base', 'Map::baseStyle');
     $routes->add($stateProvinceRegex . '/map-overlay', 'Map::overlayStyle/$1');
     $routes->add($stateProvinceRegex . '/map-tile/(:num)/(:num)/(:num)', 'Map::tile/$2/$3/$4/$1');
     $routes->add('{locale}/about', 'About::index');

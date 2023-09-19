@@ -18,37 +18,44 @@ class Map extends BaseController
         ];
     }
 
-    public function baseStyle($state = '')
+    public function baseStyle($maxZoom = 14, $baseFont = 'PT Serif', $response)
     {
-        $this->response->removeHeader('Cache-Control');
-        $this->response->setHeader('Cache-Control', 'max-age=86400');
-        $this->response->setHeader('Content-Type', 'application/json');
+        if (empty($response)) {
+            $response = $this->response;
+        }
+        $response->removeHeader('Cache-Control');
+        $response->setHeader('Cache-Control', 'max-age=86400');
+        $response->setHeader('Content-Type', 'application/json');
         $json = json_decode(file_get_contents(__DIR__ . '/../../html/asset/map/map_style_base.json'), true);
         $json['sources']['street-tile']['url'] = getenv('map_tile');
         $json['glyphs'] = getenv('map_glyph');
-        if (!empty(getenv('map_elevation'))) {
+        if (!empty(getenv('map_elevation')) AND $maxZoom == 14) {
             $json['sources']['elevation-tile']['tiles'][] = getenv('map_elevation');
         } else {
             unset($json['sources']['elevation-tile']);
             for ($i = count($json['layers']) - 1; $i >= 0; $i--) {
-                if ($json['layers'][$i]['id'] == 'base_klokantech_hillshading') {
+                if ($json['layers'][$i]['id'] == 'hillshading') {
                     unset($json['layers'][$i]);
                     break;
                 }
             }
         }
-        $baseFont = (empty($state) ? 'Signika' : 'PT Serif') . ' ';
+        $baseFont .= ' ';
         foreach ($json['layers'] AS $layerNumber => $layerContent) {
             if (!empty($layerContent['layout']['text-font'][0])) {
                 $json['layers'][$layerNumber]['layout']['text-font'][0] = $baseFont . $layerContent['layout']['text-font'][0];
             }
+        }
+        if ($maxZoom < 14) {
+            $json['sources']['street-tile']['maxzoom'] = $maxZoom;
         }
         echo json_encode($json);
     }
 
     public function leaflet($state = '')
     {
-        $this->data['state'] = $state;
+        $this->data['state'] = ($state == 'zoom' ? '' : $state);
+        $this->data['zoom'] = ($state == 'zoom');
         $this->response->removeHeader('Cache-Control');
         $this->response->setHeader('Cache-Control', 'max-age=86400');
         $this->response->setHeader('Content-Type', 'application/javascript');
