@@ -37,6 +37,12 @@ class Map extends BaseController
                 }
             }
         }
+        $baseFont = (empty($state) ? 'Signika' : 'PT Serif') . ' ';
+        foreach ($json['layers'] AS $layerNumber => $layerContent) {
+            if (!empty($layerContent['layout']['text-font'][0])) {
+                $json['layers'][$layerNumber]['layout']['text-font'][0] = $baseFont . $layerContent['layout']['text-font'][0];
+            }
+        }
         echo json_encode($json);
     }
 

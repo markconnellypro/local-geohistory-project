@@ -370,7 +370,7 @@
                 "text-field": "{housenumber}",
                 "text-size": 10,
                 "text-font": [
-                    "Noto Sans Regular"
+                    "Regular"
                 ],
                 "visibility": "visible"
             },
@@ -1214,7 +1214,7 @@
             "layout": {
                 "text-size": 11,
                 "text-font": [
-                    "Noto Sans Regular"
+                    "Regular"
                 ],
                 "text-offset": [
                     0,
@@ -1250,7 +1250,7 @@
             "layout": {
                 "text-size": 11,
                 "text-font": [
-                    "Noto Sans Regular"
+                    "Regular"
                 ],
                 "text-offset": [
                     0,
@@ -1283,7 +1283,7 @@
                 "symbol-placement": "line",
                 "text-field": "{name:latin} {name:nonlatin}",
                 "text-font": [
-                    "Noto Sans Regular"
+                    "Regular"
                 ],
                 "text-transform": "uppercase",
                 "text-letter-spacing": 0.1,
@@ -1334,7 +1334,7 @@
             "layout": {
                 "text-field": "{name:latin}\n{name:nonlatin}",
                 "text-font": [
-                    "Noto Sans Regular"
+                    "Regular"
                 ],
                 "text-max-width": 6,
                 "text-size": {
@@ -1382,7 +1382,7 @@
             "layout": {
                 "text-field": "{name:latin}\n{name:nonlatin}",
                 "text-font": [
-                    "Noto Sans Regular"
+                    "Regular"
                 ],
                 "text-max-width": 10,
                 "text-size": {
@@ -1434,7 +1434,7 @@
             "layout": {
                 "text-field": "{name:latin}",
                 "text-font": [
-                    "Noto Sans Regular"
+                    "Regular"
                 ],
                 "text-max-width": 10,
                 "text-size": {
@@ -1485,7 +1485,7 @@
             "layout": {
                 "text-field": "{name:latin}",
                 "text-font": [
-                    "Noto Sans Bold"
+                    "Bold"
                 ],
                 "text-max-width": 10,
                 "text-size": {
@@ -1520,7 +1520,7 @@
                 "symbol-spacing": 600,
                 "text-field": "{name:latin} {name:nonlatin}",
                 "text-font": [
-                    "Noto Sans Regular"
+                    "Regular"
                 ],
                 "text-letter-spacing": 0.1,
                 "text-size": {
@@ -1560,7 +1560,7 @@
                 "symbol-spacing": 600,
                 "text-field": "{name:latin} {name:nonlatin}",
                 "text-font": [
-                    "Noto Sans Regular"
+                    "Regular"
                 ],
                 "text-letter-spacing": 0.1,
                 "text-size": {
