@@ -73,13 +73,6 @@ $(function () {
                 }, 1000);
             });
     });
-    map.on('baselayerchange', function (e) {
-        if ($('.leaflet-control-layers-selector[type=radio]:checked')[0].parentNode.innerText.trim() == 'Street (MapTiler)') {
-            $('.maptilerlogo').css('display', 'inherit');
-        } else {
-            $('.maptilerlogo').css('display', 'none');
-        }
-    });
 });
 
 var downloadActive = false;
