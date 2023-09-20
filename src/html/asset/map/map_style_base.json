@@ -1111,9 +1111,17 @@
             "source": "street-tile",
             "source-layer": "boundary",
             "filter": [
-                "in",
-                "admin_level",
-                4
+                "all",
+                [
+                    "in",
+                    "admin_level",
+                    4
+                ],
+                [
+                    "in",
+                    "maritime",
+                    0
+                ]
             ],
             "paint": {
                 "line-color": "rgba(47, 46, 46, 0.3)",
@@ -1150,6 +1158,11 @@
                     "<=",
                     "admin_level",
                     2
+                ],
+                [
+                    "in",
+                    "maritime",
+                    0
                 ],
                 [
                     "==",
