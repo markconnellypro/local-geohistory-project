@@ -1,8 +1,8 @@
 <section>
-    <a href="#date">Date</a><br />
-    <a href="#name-abbreviation">Name and Abbreviation</a><br />
+    <a href="#date">Date</a><br>
+    <a href="#name-abbreviation">Name and Abbreviation</a><br>
     <?php foreach ($keys as $key => $value) { ?>
-        <a href="#<?= $key ?>"><?= $value ?></a><br />
+        <a href="#<?= $key ?>"><?= $value ?></a><br>
     <?php } ?>
 </section>
 <section>

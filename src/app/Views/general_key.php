@@ -9,7 +9,7 @@
                 <th>Term</th>
                 <th>Description</th>
                 <?php if ($type == 'eventtype') { ?>
-                    <th>Only<br />Border<br />Changes?</th>
+                    <th>Only<br>Border<br>Changes?</th>
                 <?php } ?>
             </tr>
         </thead>

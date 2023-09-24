@@ -26,7 +26,7 @@
                                 <?php } elseif (isset($row->eventslug)) {
                                 $i = 0;
                                 foreach (explode(',', str_replace(['{', '}'], '', $row->eventslug)) as $event) { ?>
-                                    <?= ($i > 0 ? '<br />' : '') ?><a href="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/event/<?= $event ?>/">View</a>
+                                    <?= ($i > 0 ? '<br>' : '') ?><a href="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/event/<?= $event ?>/">View</a>
                             <?php $i++;
                                 }
                             } ?>

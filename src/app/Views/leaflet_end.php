@@ -14,10 +14,10 @@ downloadBox.update = function() {
     var textToAdd = '<span class="b">Select a layer to download:</span>';
     Object.keys(overlayMaps).forEach(function (element) {
     if (element.indexOf("Parcels") == -1 && element !== "Approximate Current Boundaries") {
-    textToAdd += '<br /><a class="datadownload" id="' + overlayMaps[element].options.title + '" href="#">' + element + '</a>';
+    textToAdd += '<br><a class="datadownload" id="' + overlayMaps[element].options.title + '" href="#">' + element + '</a>';
     }
     });
-    textToAdd += '<br /><a class="imagedownload" href="#">Image</a>';
+    textToAdd += '<br><a class="imagedownload" href="#">Image</a>';
 <?php } ?>
 this._div.innerHTML = textToAdd;
 };

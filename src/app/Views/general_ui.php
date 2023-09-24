@@ -1,2 +1,2 @@
 <script src="/<?= ($online ? '/cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.2/js/standalone' : 'asset/tool/selectize') ?>/selectize.min.js"></script>
-<link rel="stylesheet" href="/<?= ($online ? '/cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.2/css' : 'asset/tool/selectize') ?>/selectize.min.css" />
+<link rel="stylesheet" href="/<?= ($online ? '/cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.2/css' : 'asset/tool/selectize') ?>/selectize.min.css">

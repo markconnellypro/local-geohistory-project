@@ -21,8 +21,8 @@
                 } ?>
                 <tr>
                     <td><a href="<?= $row->government ?>"><?= $row->governmentshort ?></a></td>
-                    <td><?= $row->recordingtype . ($row->hasbothtype == 't' ? '<br />' : '') . $row->recordingnumbertype ?></td>
-                    <td><?= $row->recordinglocation . ($row->hasbothtype == 't' ? '<br />' : '') . $row->recordingnumberlocation ?></td>
+                    <td><?= $row->recordingtype . ($row->hasbothtype == 't' ? '<br>' : '') . $row->recordingnumbertype ?></td>
+                    <td><?= $row->recordinglocation . ($row->hasbothtype == 't' ? '<br>' : '') . $row->recordingnumberlocation ?></td>
                     <td><?= (empty($row->recordingrepositoryshort) ? '' : $row->recordingrepositoryshort .
                             (empty($row->recordingrepositoryseries) ? '' : ', series ' . $row->recordingrepositoryseries) .
                             (empty($row->recordingrepositorycontainer) ? '' : ', container ' . $row->recordingrepositorycontainer) .

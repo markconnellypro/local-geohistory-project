@@ -1,6 +1,6 @@
 <section>
     <?php foreach ($query as $row) { ?>
-        <a href="#<?= $row->keysort ?>"><?= $row->keyshort ?></a><br />
+        <a href="#<?= $row->keysort ?>"><?= $row->keyshort ?></a><br>
     <?php } ?>
 </section>
 <?php foreach ($query as $row) { ?>

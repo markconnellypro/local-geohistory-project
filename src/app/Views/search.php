@@ -1,29 +1,29 @@
 <fieldset>
     <legend>Search For:</legend>
     <div class="option_radio_indent">
-        <input type="radio" name="for" id="for_event" value="event" checked="checked" /><label for="for_event">Event</label><br />
-        <input type="radio" name="for" id="for_government" value="government" /><label for="for_government">Government</label><br />
-        <input type="radio" name="for" id="for_location" value="location" /><label for="for_location">Location</label><br />
-        <input type="radio" name="for" id="for_law" value="law" /><label for="for_law">Law</label>
+        <input type="radio" name="for" id="for_event" value="event" checked="checked"><label for="for_event">Event</label><br>
+        <input type="radio" name="for" id="for_government" value="government"><label for="for_government">Government</label><br>
+        <input type="radio" name="for" id="for_location" value="location"><label for="for_location">Location</label><br>
+        <input type="radio" name="for" id="for_law" value="law"><label for="for_law">Law</label>
     </div>
 </fieldset>
 <fieldset>
     <legend>Search By:</legend>
     <div id="option_event" class="option_select option_radio_indent">
-        <input type="radio" name="by_event" id="by_event_government" value="government" /><label for="by_event_government">Government</label><br />
+        <input type="radio" name="by_event" id="by_event_government" value="government"><label for="by_event_government">Government</label><br>
     </div>
     <div id="option_government" class="option_select option_radio_indent">
-        <input type="radio" name="by_government" id="by_government_government" value="government" /><label for="by_government_government">Government</label><br />
-        <input type="radio" name="by_government" id="by_government_statewide" value="statewide" /><label for="by_government_statewide">Statewide</label><br />
-        <input type="radio" name="by_government" id="by_government_identifier" value="identifier" /><label for="by_government_identifier">Identifier</label>
+        <input type="radio" name="by_government" id="by_government_government" value="government"><label for="by_government_government">Government</label><br>
+        <input type="radio" name="by_government" id="by_government_statewide" value="statewide"><label for="by_government_statewide">Statewide</label><br>
+        <input type="radio" name="by_government" id="by_government_identifier" value="identifier"><label for="by_government_identifier">Identifier</label>
     </div>
     <div id="option_location" class="option_select option_radio_indent">
-        <input type="radio" name="by_location" id="by_location_address" value="address" checked="checked" /><label for="by_location_address">Address</label><br />
-        <input type="radio" name="by_location" id="by_location_point" value="point" checked="checked" /><label for="by_location_point">Coordinates</label><br />
+        <input type="radio" name="by_location" id="by_location_address" value="address" checked="checked"><label for="by_location_address">Address</label><br>
+        <input type="radio" name="by_location" id="by_location_point" value="point" checked="checked"><label for="by_location_point">Coordinates</label><br>
     </div>
     <div id="option_law" class="option_select option_radio_indent">
-        <input type="radio" name="by_law" id="by_law_reference" value="reference" checked="checked" /><label for="by_law_reference">Reference</label><br />
-        <input type="radio" name="by_law" id="by_law_dateevent" value="dateevent" /><label for="by_law_dateevent">Date and Event Type</label>
+        <input type="radio" name="by_law" id="by_law_reference" value="reference" checked="checked"><label for="by_law_reference">Reference</label><br>
+        <input type="radio" name="by_law" id="by_law_dateevent" value="dateevent"><label for="by_law_dateevent">Date and Event Type</label>
     </div>
 </fieldset>
 <fieldset>
@@ -55,13 +55,13 @@
             ?>
         </form>
         <form method="post" action="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/search/government/" class="form_select" id="form_government_identifier">
-            <label class="forselectize" for="form_government_identifier_governmentidentifiertype">Identifier Source</label><br />
+            <label class="forselectize" for="form_government_identifier_governmentidentifiertype">Identifier Source</label><br>
             <select id="form_government_identifier_governmentidentifiertype" name="governmentidentifiertype" style="width: 300px;" required="required">
             </select>
-            <br />
-            <label class="forselectize" for="form_government_identifier_identifier">Identifier</label><br />
-            <input id="form_government_identifier_identifier" class="selectize-input forselectize stringcheck required" name="identifier" type="text" style="width: 200px;" required="required" />
-            <br /><br />
+            <br>
+            <label class="forselectize" for="form_government_identifier_identifier">Identifier</label><br>
+            <input id="form_government_identifier_identifier" class="selectize-input forselectize stringcheck required" name="identifier" type="text" style="width: 200px;" required="required">
+            <br><br>
             <?php
             echo view('search_submit', ['type' => 'identifier']);
             ?>
@@ -69,19 +69,19 @@
     </div>
     <div id="forms_location" class="option_select option_indent">
         <form method="post" action="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/address/" class="form_select" id="form_location_address">
-            <label for="form_location_address_address" class="forselectize">Address</label><br />
-            <input id="form_location_address_address" class="selectize-input forselectize stringcheck required" name="address" type="text" style="width: 300px;" required="required" /><br />
-            <br />
+            <label for="form_location_address_address" class="forselectize">Address</label><br>
+            <input id="form_location_address_address" class="selectize-input forselectize stringcheck required" name="address" type="text" style="width: 300px;" required="required"><br>
+            <br>
             <?php
             echo view('search_submit', ['type' => 'address']);
             ?>
         </form>
         <form method="post" action="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/point/" class="form_select" id="form_location_point">
-            <label for="form_location_point_y" class="forselectize">Latitude</label><br />
-            <input id="form_location_point_y" class="selectize-input forselectize stringcheck required" name="y" type="number" min="-180" max="180" step="any" style="width: 150px;" required="required" /><br />
-            <label for="form_location_point_x" class="forselectize">Longitude</label><br />
-            <input id="form_location_point_x" class="selectize-input forselectize stringcheck required" name="x" type="number" min="-90" max="90" step="any" style="width: 150px;" required="required" /><br />
-            <br />
+            <label for="form_location_point_y" class="forselectize">Latitude</label><br>
+            <input id="form_location_point_y" class="selectize-input forselectize stringcheck required" name="y" type="number" min="-180" max="180" step="any" style="width: 150px;" required="required"><br>
+            <label for="form_location_point_x" class="forselectize">Longitude</label><br>
+            <input id="form_location_point_x" class="selectize-input forselectize stringcheck required" name="x" type="number" min="-90" max="90" step="any" style="width: 150px;" required="required"><br>
+            <br>
             <?php
             echo view('search_submit', ['type' => 'point']);
             ?>
@@ -89,27 +89,27 @@
     </div>
     <div id="forms_law" class="option_select option_indent">
         <form method="post" action="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/search/law/" class="form_select" id="form_law_reference">
-            <label for="form_law_reference_yearvolume" class="forselectize">Year/Volume</label><br />
-            <input id="form_law_reference_yearvolume" class="selectize-input required stringcheck forselectize" name="yearvolume" type="text" required="required" style="width: 100px;" />
-            <br />
-            <label for="form_law_reference_page" class="forselectize">Page</label><br />
-            <input id="form_law_reference_page" class="selectize-input forselectize" name="page" type="number" style="width: 100px;" />
-            <br />
-            <label for="form_law_reference_numberchapter" class="forselectize">Number/Chapter</label><br />
-            <input id="form_law_reference_numberchapter" class="selectize-input forselectize" name="numberchapter" type="number" style="width: 100px;" />
-            <br /><br />
+            <label for="form_law_reference_yearvolume" class="forselectize">Year/Volume</label><br>
+            <input id="form_law_reference_yearvolume" class="selectize-input required stringcheck forselectize" name="yearvolume" type="text" required="required" style="width: 100px;">
+            <br>
+            <label for="form_law_reference_page" class="forselectize">Page</label><br>
+            <input id="form_law_reference_page" class="selectize-input forselectize" name="page" type="number" style="width: 100px;">
+            <br>
+            <label for="form_law_reference_numberchapter" class="forselectize">Number/Chapter</label><br>
+            <input id="form_law_reference_numberchapter" class="selectize-input forselectize" name="numberchapter" type="number" style="width: 100px;">
+            <br><br>
             <?php
             echo view('search_submit', ['type' => 'reference']);
             ?>
         </form>
         <form method="post" action="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/search/law/" class="form_select" id="form_law_dateevent">
-            <label for="form_law_dateevent_date" class="forselectize">Date</label><br />
-            <input id="form_law_dateevent_date" class="selectize-input required stringcheck forselectize" name="date" type="date" required="required" pattern="\d{4}-\d{2}-\d{2}" title="Date should be formatted as YYYY-MM-DD." style="width: 150px;" />
-            <br />
+            <label for="form_law_dateevent_date" class="forselectize">Date</label><br>
+            <input id="form_law_dateevent_date" class="selectize-input required stringcheck forselectize" name="date" type="date" required="required" pattern="\d{4}-\d{2}-\d{2}" title="Date should be formatted as YYYY-MM-DD." style="width: 150px;">
+            <br>
             <?php
             echo view('search_form_eventtype', ['isRequired' => true, 'form' => 'form_law_dateevent']);
             ?>
-            <br />
+            <br>
             <?php
             echo view('search_submit', ['type' => 'dateevent']);
             ?>

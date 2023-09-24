@@ -33,18 +33,18 @@
     <h2>Change Measurement Units</h2>
     <form id="courseform">
         <span class="b">Courses&#58;&nbsp;</span>
-        <input value="1" name="metesdegreetype" type="radio" checked="checked" />Degrees&#59;
-        <input value="2" name="metesdegreetype" type="radio" />Degrees &amp; minutes&#59; or
-        <input value="3" name="metesdegreetype" type="radio" />Degrees, minutes, &amp; seconds.
+        <input value="1" name="metesdegreetype" type="radio" checked="checked">Degrees&#59;
+        <input value="2" name="metesdegreetype" type="radio">Degrees &amp; minutes&#59; or
+        <input value="3" name="metesdegreetype" type="radio">Degrees, minutes, &amp; seconds.
     </form>
     <form id="distanceform">
         <span class="b">Distances&#58;&nbsp;</span>
-        <input value="1" name="metesfoottype" type="radio" checked="checked" />Feet&#59;
-        <input value="2" name="metesfoottype" type="radio" />Feet &amp; inches&#59;
-        <input value="3" name="metesfoottype" type="radio" />Rods&#59;
-        <input value="4" name="metesfoottype" type="radio" />Rods &amp; feet&#59;
-        <input value="5" name="metesfoottype" type="radio" />Rods, feet, &amp; inches&#59; or
-        <input value="6" name="metesfoottype" type="radio" />Chains.
+        <input value="1" name="metesfoottype" type="radio" checked="checked">Feet&#59;
+        <input value="2" name="metesfoottype" type="radio">Feet &amp; inches&#59;
+        <input value="3" name="metesfoottype" type="radio">Rods&#59;
+        <input value="4" name="metesfoottype" type="radio">Rods &amp; feet&#59;
+        <input value="5" name="metesfoottype" type="radio">Rods, feet, &amp; inches&#59; or
+        <input value="6" name="metesfoottype" type="radio">Chains.
     </form>
 </section>
 <script src="/asset/tool/js/metes.js"></script>

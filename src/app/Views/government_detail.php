@@ -53,7 +53,7 @@
                     <?php if ($live) { ?>
                         <td>
                             <form action="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/governmentmapcomplete/" method="post">
-                                <input type="hidden" name="id" value="<?= $row->governmentid ?>" />
+                                <input type="hidden" name="id" value="<?= $row->governmentid ?>">
                                 <select name="mapcomplete">
                                     <?php foreach ($statuses as $status) { ?>
                                         <option value="<?= $status->governmentmapstatusid ?>" <?= (($status->governmentmapstatusid == $row->governmentmapstatus) ? ' selected="selected"' : '') ?>><?= $status->governmentmapstatusshort ?></option>

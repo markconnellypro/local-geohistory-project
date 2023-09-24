@@ -4,7 +4,7 @@
         <div id="map" class="map"></div>
     </section>
     <section>
-        <h2>By Year: <a href="#" class="chartdownload"><img style="vertical-align: middle;" src="/asset/map/baseline_save_alt_black_24dp.png" alt="Download" /></a></h2>
+        <h2>By Year: <a href="#" class="chartdownload"><img style="vertical-align: middle;" src="/asset/map/baseline_save_alt_black_24dp.png" alt="Download"></a></h2>
         <div id="chart" class="chart"></div>
     </section>
     <section>
@@ -40,5 +40,5 @@
     <script src="/asset/map/classybrew.js"></script>
     <script src="/asset/map/statistics.js"></script>
 <?php } else { ?>
-    <br />No results found!
+    <br>No results found!
 <?php } ?>
