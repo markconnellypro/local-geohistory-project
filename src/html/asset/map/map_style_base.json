@@ -368,7 +368,7 @@
                 "text-field": "{housenumber}",
                 "text-size": 10,
                 "text-font": [
-                    "Regular"
+                    "lora-regular"
                 ],
                 "visibility": "visible"
             },
@@ -1229,7 +1229,7 @@
             "layout": {
                 "text-size": 11,
                 "text-font": [
-                    "Regular"
+                    "lora-regular"
                 ],
                 "text-offset": [
                     0,
@@ -1265,7 +1265,7 @@
             "layout": {
                 "text-size": 11,
                 "text-font": [
-                    "Regular"
+                    "lora-regular"
                 ],
                 "text-offset": [
                     0,
@@ -1298,7 +1298,7 @@
                 "symbol-placement": "line",
                 "text-field": "{name}",
                 "text-font": [
-                    "Regular"
+                    "lora-regular"
                 ],
                 "text-transform": "uppercase",
                 "text-letter-spacing": 0.1,
@@ -1349,7 +1349,7 @@
             "layout": {
                 "text-field": "{name}",
                 "text-font": [
-                    "Regular"
+                    "lora-regular"
                 ],
                 "text-max-width": 6,
                 "text-size": {
@@ -1397,7 +1397,7 @@
             "layout": {
                 "text-field": "{name}",
                 "text-font": [
-                    "Regular"
+                    "lora-regular"
                 ],
                 "text-max-width": 10,
                 "text-size": {
@@ -1449,7 +1449,7 @@
             "layout": {
                 "text-field": "{name}",
                 "text-font": [
-                    "Regular"
+                    "lora-regular"
                 ],
                 "text-max-width": 10,
                 "text-size": {
@@ -1500,7 +1500,7 @@
             "layout": {
                 "text-field": "{name}",
                 "text-font": [
-                    "Bold"
+                    "lora-semibold"
                 ],
                 "text-max-width": 10,
                 "text-size": {
@@ -1535,7 +1535,7 @@
                 "symbol-spacing": 600,
                 "text-field": "{name}",
                 "text-font": [
-                    "Regular"
+                    "lora-regular"
                 ],
                 "text-letter-spacing": 0.1,
                 "text-size": {
@@ -1575,7 +1575,7 @@
                 "symbol-spacing": 600,
                 "text-field": "{name}",
                 "text-font": [
-                    "Regular"
+                    "lora-regular"
                 ],
                 "text-letter-spacing": 0.1,
                 "text-size": {

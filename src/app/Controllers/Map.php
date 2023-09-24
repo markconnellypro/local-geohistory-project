@@ -18,7 +18,7 @@ class Map extends BaseController
         ];
     }
 
-    public function baseStyle($maxZoom = 14, $baseFont = 'PT Serif', $response = NULL)
+    public function baseStyle($maxZoom = 14, $response = NULL)
     {
         if (empty($response)) {
             $response = $this->response;
@@ -40,7 +40,6 @@ class Map extends BaseController
                 }
             }
         }
-        $baseFont .= ' ';
         foreach ($json['layers'] AS $layerNumber => $layerContent) {
             if (!empty($layerContent['layout']['text-field']) AND $layerContent['layout']['text-field'] == '{name}') {
                 $json['layers'][$layerNumber]['layout']['text-field'] = [
@@ -52,9 +51,6 @@ class Map extends BaseController
                 if (!in_array(\Config\Services::request()->getLocale(), ['de', 'en'])) {
                     $json['layers'][$layerNumber]['layout']['text-field'][] = ['get', 'name_en'];
                 }
-            }
-            if (!empty($layerContent['layout']['text-font'][0])) {
-                $json['layers'][$layerNumber]['layout']['text-font'][0] = $baseFont . $layerContent['layout']['text-font'][0];
             }
         }
         if ($maxZoom < 14) {
