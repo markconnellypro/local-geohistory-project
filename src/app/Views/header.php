@@ -5,7 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta charset="UTF-8">
     <title><?= (!isset($pageTitle) ? '' : $pageTitle . ' | ') . (!isset($pageTitleType) ? '' : $pageTitleType . ' | ') . $title . ' | ' . (empty($state) ? '' : strtoupper($state) . ' | ') ?><?= lang('Template.projectName') ?></title>
-    <link rel="preload" href="/asset/font/lora-regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    <link rel="preload" href="/asset/production/font/lora-regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    <link rel="preload" href="/asset/production/font/lora-semibold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    <link rel="preload" href="/asset/production/font/lora-italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    <link rel="preload" href="/asset/production/font/lora-semibolditalic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
     <link rel="preload" href="/asset/font/frederickathegreat.woff2" as="font" type="font/woff2" crossorigin="anonymous">
     <link rel="stylesheet" href="/asset/css/geohistory.css" media="all">
     <?php if (ENVIRONMENT == 'development') { ?>
