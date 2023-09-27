@@ -27,7 +27,13 @@ class Map extends BaseController
         $response->setHeader('Cache-Control', 'max-age=86400');
         $response->setHeader('Content-Type', 'application/json');
         $json = json_decode(file_get_contents(__DIR__ . '/../../html/asset/map/map_style_base.json'), true);
-        $json['sources']['street-tile']['url'] = getenv('map_tile');
+        if (strpos(getenv('map_tile'), '.json') !== FALSE OR strpos(getenv('map_tile'), '.pmtiles') !== FALSE) {
+            $json['sources']['street-tile']['url'] = getenv('map_tile');
+            unset($json['sources']['street-tile']['tiles']);
+        } else {
+            $json['sources']['street-tile']['tiles'][] = getenv('map_tile');
+            unset($json['sources']['street-tile']['url']);
+        }
         $json['glyphs'] = getenv('map_glyph');
         if (!empty(getenv('map_elevation')) AND $maxZoom == 14) {
             $json['sources']['elevation-tile']['tiles'][] = getenv('map_elevation');

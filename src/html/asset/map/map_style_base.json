@@ -13,6 +13,7 @@
         "street-tile": {
             "type": "vector",
             "url": "",
+            "tiles": [],
             "attribution": "Base: <a href=\"https:\/\/daylightmap.org\/attribution.html\" target=\"_blank\">Daylight<\/a> &copy; <a href=\"https:\/\/www.openstreetmap.org\/copyright\" target=\"_blank\">OpenStreetMap<\/a>, <a href=\"https:\/\/github.com\/microsoft\/GlobalMLBuildingFootprints\/\" target=\"_blank\">Microsoft<\/a>, <a href=\"https:\/\/communitymaps.arcgis.com\/home\/\" target=\"_blank\">Esri<\/a>, <a href=\"https:\/\/www.openmaptiles.org\/\" target=\"_blank\">OpenMapTiles<\/a>."
         },
         "elevation-tile": {
