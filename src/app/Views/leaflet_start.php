@@ -1,8 +1,8 @@
 <?php
 echo view('leaflet_source');
-if ($needRotation) { /* Version 0.9.3 */ ?>
-    <script src="/asset/development/map/leaflet.geometryutil.js"></script>
-<?php } ?>
+if (file_exists(APPPATH . 'Views/' . ENVIRONMENT . '/leaflet_rotation.php') AND $needRotation) {
+    echo view(ENVIRONMENT . '/leaflet_rotation');
+} ?>
 <script src="/<?= ($online ? '/unpkg.com/leaflet-fullscreen@1.0.2/dist' : 'asset/map') ?>/Leaflet.fullscreen.min.js"></script>
 <link rel="stylesheet" href="/<?= ($online ? '/unpkg.com/leaflet-fullscreen@1.0.2/dist' : 'asset/map') ?>/leaflet.fullscreen.css">
 <script src="//unpkg.com/dom-to-image@2.6.0/dist/dom-to-image.min.js"></script>
