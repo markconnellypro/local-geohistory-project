@@ -3,7 +3,7 @@ FROM postgis/postgis:16-3.4
 RUN apt-get update
 RUN apt-get install -y flex git make postgresql-server-dev-16
 RUN mkdir /tmp/pg_tle/
-RUN git clone -b v1.2.0 https://github.com/aws/pg_tle.git /tmp/pg_tle/
+RUN git clone -b v1.1.1 https://github.com/aws/pg_tle.git /tmp/pg_tle/
 RUN make -C /tmp/pg_tle/
 RUN make -C /tmp/pg_tle/ install
 # Copy scripts and imports to launch database
