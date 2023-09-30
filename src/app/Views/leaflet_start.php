@@ -3,8 +3,8 @@ echo view('leaflet_source');
 if ($needRotation) { /* Version 0.9.3 */ ?>
     <script src="/asset/development/map/leaflet.geometryutil.js"></script>
 <?php } ?>
-<script src="/<?= ($online ? '/api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1' : 'asset/map') ?>/Leaflet.fullscreen.min.js"></script>
-<link rel="stylesheet" href="/<?= ($online ? '/api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1' : 'asset/map') ?>/leaflet.fullscreen.css">
+<script src="/<?= ($online ? '/unpkg.com/leaflet-fullscreen@1.0.2/dist' : 'asset/map') ?>/Leaflet.fullscreen.min.js"></script>
+<link rel="stylesheet" href="/<?= ($online ? '/unpkg.com/leaflet-fullscreen@1.0.2/dist' : 'asset/map') ?>/leaflet.fullscreen.css">
 <script src="//unpkg.com/dom-to-image@2.6.0/dist/dom-to-image.min.js"></script>
 <?php if ($state == 'de' or $state == 'nj') { ?>
     <script src="/<?= ($online ? '/unpkg.com/esri-leaflet@3.0.11/dist' : 'asset/map') ?>/esri-leaflet.js"></script>
