@@ -53,7 +53,7 @@ $(function () {
         attributionElement = $('.leaflet-control-attribution')[0];
         attributionElement.innerHTML = '<div class="temporarySpace" style="display: inline;"><span style="font-family: ' + "'Fredericka the Great'" + ', serif; color: #003A70; font-size: 15px;">Local Geohistory Project</span> | </div>' + attributionElement.innerHTML + '<div class="temporarySpace" style="width: 5px; float: right;">&nbsp;</div>';
         temporaryElement = $('.temporarySpace');
-        domtoimage.toPng(mapElement, { width: mapWidth, height: mapHeight, filter: filter })
+        htmlToImage.toPng(mapElement, { width: mapWidth, height: mapHeight, filter: filter })
             .then(function (url) {
                 temporaryElement.each(function (index, el) {
                     el.parentNode.removeChild(el);

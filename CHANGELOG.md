@@ -6,7 +6,6 @@
 
 - Additional points of interest to base map style.
 - Attribution disclaimer in ENV for commercial tile services.
-- Dom To Image (local copy).
 - License files for additional dependencies.
 - Locale-specific map label support.
 - PMTiles 2.11.0.
@@ -23,6 +22,7 @@
 - Database extract pg_dump and OS versions.
 - Database views extra.governmentchangecount and extra.governmentchangecountpart to use calendar.historicdate.precision value to determine precision.
 - DataTables from 1.11.3 to 1.13.6.
+- Dom To Image 2.6.0 to Html to Image 1.11.11.
 - Fonts to standardize Lora as default.
 - Gitignore to exclude anything in /env except Sample.env.
 - jQuery from 3.6.0 to 3.7.1.
