@@ -1,12 +1,12 @@
 {
     "version": 8,
     "name": "Mark A. Connelly",
-	"metadata": {
-		"customizedFrom": {
+    "metadata": {
+        "customizedFrom": {
             "name": "Klokantech Basic",
             "url": "https://github.com/openmaptiles/maptiler-basic-gl-style/releases/tag/v1.4"
         }
-	},
+    },
     "bearing": 0,
     "pitch": 0,
     "sources": {
