@@ -1,5 +1,58 @@
 # Changelog
 
+## [1.2.0] - 2023-10-01
+
+### Added
+
+- Additional points of interest to base map style.
+- Attribution disclaimer in ENV for commercial tile services.
+- Dom To Image (local copy).
+- License files for additional dependencies.
+- Locale-specific map label support.
+- PMTiles 2.11.0.
+- Self-hosted map tile and glyph support.
+- Zip extension to PHP dockerfile.
+
+### Changed
+
+- Attribution in maps (self-hosted tile transition).
+- Base map style to simplify identifiers, generalize some attributes for re-use in other places, and to specify original style from which customized.
+- CodeIgniter from 4.3.6 to 4.4.1.
+- CSS to make background color white and make other stylistic and minor changes.
+- Database column default for sourceitemurlcompletepart in geohistory.sourceitem to use true instead of false.
+- Database extract pg_dump and OS versions.
+- Database views extra.governmentchangecount and extra.governmentchangecountpart to use calendar.historicdate.precision value to determine precision.
+- DataTables from 1.11.3 to 1.13.6.
+- Fonts to standardize Lora as default.
+- Gitignore to exclude anything in /env except Sample.env.
+- jQuery from 3.6.0 to 3.7.1.
+- Jurisdictions covered moved to ENV.
+- Leaflet from 1.9.3 to 1.9.4.
+- Leaflet Fullscreen from 1.0.1 to 1.02.
+- MapLibre GL JS from 3.0.0 to 3.3.1.
+- MapLibre GL Leaflet from 0.0.19 to 0.0.20.
+- Pg_tle clone command in dockerfile to specify v1.1.1 tag instead of default.
+- PHP docker image from 8.2.4-apache to 8.2.11-apache.
+- Postgis/postgis docker image from 15-3.3 to 16.3.4.
+- Stylistic and minor changes to changelog and README.
+- Tile URLs moved to ENV.
+
+### Fixed
+
+- Line break character inconsistencies (use standard Unix LF endings).
+- Permissions on files and folders.
+
+### Removed
+
+- Empty test view.
+- jQuery UI (not used in production).
+- Language list in database constraint government_check in geohistory.government.
+- Leaflet GeometryUtil (not used in production).
+- MapTiler required logo and limitations (self-hosted tile transition).
+- Maritime administrative boundaries from base map style.
+- State and province administrative boundaries from base map style at or below zoom level 2.
+- Trailing slashes on void tags that were required in XHTML but not in HTML5.
+
 ## [1.1.2] - 2023-09-03
 
 ### Added
@@ -42,15 +95,15 @@
 
 ### Changed
 
-- Codeigniter from 4.3.1 to 4.3.6.
+- CodeIgniter from 4.3.1 to 4.3.6.
 - Database constraint on geohistory.metesdescription to ensure metesdescriptionacres cannot be negative.
 - Database extract pg_dump and OS versions.
 - Database functions to remove placeholder affected government part references when other materialized views refreshed.
 - Database table geohistory.government to remove governmentclass and governmentcurrenthomerule fields and substitute with governmentcurrentform field.
 - Delimiter in How Effective Date Determined in Event Detail.
 - Esri Leaflet from 2.5.3 (manually modified) to 3.0.10 (forked with modifications).
-- Maplibre GL JS from 1.15.3 to 3.0.0.
-- Maplibre GL Leaflet from 0.0.18 to 0.0.19.
+- MapLibre GL JS from 1.15.3 to 3.0.0.
+- MapLibre GL Leaflet from 0.0.18 to 0.0.19.
 - Parcel map style in New Jersey.
 - Statistics for mapped governments to omit Independent School Districts.
 - Stylistic and minor changes to changelog and README.
@@ -113,6 +166,7 @@
 
 - Public release of the Local Geohistory Project: Application repository.
 
+[1.2.0]: https://github.com/markconnellypro/local-geohistory-project/compare/v1.1.2...v1.2.0
 [1.1.2]: https://github.com/markconnellypro/local-geohistory-project/compare/v1.1.1...v1.1.2
 [1.1.1]: https://github.com/markconnellypro/local-geohistory-project/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/markconnellypro/local-geohistory-project/compare/v1.0.2...v1.1.0
