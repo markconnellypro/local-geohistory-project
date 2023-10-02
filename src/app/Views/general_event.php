@@ -1,6 +1,6 @@
 <section>
     <?= ($title == '' ? '' : '<h2>' . $title . '</h2>') ?>
-    <table id="<?= (isset($tableId) ? $tableId : 'event') ?>" class="normal row-border cell-border compact stripe">
+    <table id="<?= (isset($tableId) ? $tableId : 'event') ?>" class="normal cell-border compact stripe">
         <thead>
             <tr>
                 <th>Detail</th>

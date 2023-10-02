@@ -2,25 +2,28 @@
 <html lang="<?= \Config\Services::request()->getLocale() ?>">
 
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
     <title><?= (!isset($pageTitle) ? '' : $pageTitle . ' | ') . (!isset($pageTitleType) ? '' : $pageTitleType . ' | ') . $title . ' | ' . (empty($state) ? '' : strtoupper($state) . ' | ') ?><?= lang('Template.projectName') ?></title>
-    <link rel="preload" href="/asset/font/ptserif.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
-    <link rel="preload" href="/asset/font/frederickathegreat.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
-    <link rel="stylesheet" href="/asset/css/geohistory.css" media="all" />
+    <link rel="preload" href="/asset/font/lora-regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    <link rel="preload" href="/asset/font/lora-semibold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    <link rel="preload" href="/asset/font/lora-italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    <link rel="preload" href="/asset/font/lora-semibolditalic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    <link rel="preload" href="/asset/font/frederickathegreat.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    <link rel="stylesheet" href="/asset/css/geohistory.css" media="all">
     <?php if (ENVIRONMENT == 'development') { ?>
-        <link rel="stylesheet" href="/asset/development/css/development.css" media="all" />
+        <link rel="stylesheet" href="/asset/development/css/development.css" media="all">
     <?php } ?>
-    <link rel="icon" href="/asset/image/favicon.png" type="image/png" />
-    <script src="/<?= ($online ? '/unpkg.com/jquery@3.6.0/dist' : 'asset/tool/jquery') ?>/jquery.min.js"></script>
-    <script src="/<?= ($online ? '/cdn.datatables.net/1.11.3/js' : 'asset/tool/datatables') ?>/jquery.dataTables.min.js"></script>
-    <link rel="stylesheet" href="/<?= ($online ? '/cdn.datatables.net/1.11.3/css' : 'asset/tool/datatables') ?>/jquery.dataTables.min.css" crossorigin="anonymous" />
+    <link rel="icon" href="/asset/image/favicon.png" type="image/png">
+    <script src="/<?= ($online ? '/unpkg.com/jquery@3.7.1/dist' : 'asset/tool/jquery') ?>/jquery.min.js"></script>
+    <script src="/<?= ($online ? '/cdn.datatables.net/1.13.6/js' : 'asset/tool/datatables') ?>/jquery.dataTables.min.js"></script>
+    <link rel="stylesheet" href="/<?= ($online ? '/cdn.datatables.net/1.13.6/css' : 'asset/tool/datatables') ?>/jquery.dataTables.min.css" crossorigin="anonymous">
     <script src="/asset/tool/datatables/table.js"></script>
 </head>
 
 <body>
     <?php if ($title == 'Welcome') { ?>
-        <img src="/asset/image/ct001800.jpg" id="welcome" alt="Map of annexations to Los Angeles from 1916" />
+        <img src="/asset/image/ct001800.jpg" id="welcome" alt="Map of annexations to Los Angeles from 1916">
     <?php } ?>
     <div class="wrapper" <?= ($title == 'Welcome' ? ' id="welcomewrapper"' : '') ?>>
         <header class="headerfooter">
@@ -31,7 +34,7 @@
                         <?php if (!empty($state) and $state != 'usa') { ?>
                             <a href="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/" aria-label="<?= strtoupper($state) ?>">
                                 <?= view('general_svg_icon', ['iconLabel' => strtoupper($state) . ' map icon', 'iconName' => $state, 'iconType' => 'headericon']); ?>
-                                <br /><?= strtoupper($state) ?>
+                                <br><?= strtoupper($state) ?>
                             </a>
                         <?php } ?>
                     </div>

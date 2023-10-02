@@ -1,4 +1,4 @@
-FROM php:8.2.4-apache
+FROM php:8.2.11-apache
 # Create writable dictory for CodeIgniter
 RUN mkdir /writable
 RUN mkdir /writable/cache
@@ -16,7 +16,7 @@ RUN a2enmod rewrite
 RUN a2enmod ssl
 # Add PHP extensions
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
-RUN install-php-extensions intl pgsql xsl
+RUN install-php-extensions intl pgsql xsl zip
 # Adjust configuration files
 COPY /docker/php/mods-enabled/headers.conf /etc/apache2/mods-enabled/
 RUN mkdir /docker-php-entrypoint

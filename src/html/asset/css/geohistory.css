@@ -1,54 +1,51 @@
 @font-face {
     font-family: 'Fredericka the Great';
-    font-style: normal;
     font-weight: normal;
+    font-style: normal;
     font-display: swap;
     src: url('/asset/font/frederickathegreat.woff2') format('woff2');
-    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
-@font-face {
-    font-family: 'PT Serif';
-    font-style: italic;
-    font-weight: normal;
-    font-display: swap;
-    src: url('/asset/font/ptserif-italic.woff2') format('woff2');
-    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
+/* https://github.com/cyrealtype/Lora-Cyrillic/releases/tag/v3.005 */
 
 @font-face {
-    font-family: 'PT Serif';
-    font-style: italic;
+    font-family: 'Lora';
     font-weight: bold;
+    font-style: normal;
     font-display: swap;
-    src: url('/asset/font/ptserif-italic-bold.woff2') format('woff2');
-    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+    src: url('/asset/font/lora-semibold.woff2') format('woff2');
 }
 
 @font-face {
-    font-family: 'PT Serif';
-    font-style: normal;
-    font-weight: normal;
-    font-display: swap;
-    src: url('/asset/font/ptserif.woff2') format('woff2');
-    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-
-@font-face {
-    font-family: 'PT Serif';
-    font-style: normal;
+    font-family: 'Lora';
     font-weight: bold;
+    font-style: italic;
     font-display: swap;
-    src: url('/asset/font/ptserif-bold.woff2') format('woff2');
-    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+    src: url('/asset/font/lora-semibolditalic.woff2') format('woff2');
 }
 
-.i {
+@font-face {
+    font-family: 'Lora';
+    font-weight: normal;
     font-style: italic;
+    font-display: swap;
+    src: url('/asset/font/lora-italic.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Lora';
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+    src: url('/asset/font/lora-regular.woff2') format('woff2');
 }
 
 .b {
     font-weight: bold;
+}
+
+.i {
+    font-style: italic;
 }
 
 fieldset {
@@ -81,7 +78,7 @@ section header {
 
 html,
 body {
-    font-family: "PT Serif", serif;
+    font-family: "Lora", serif;
     margin: 0;
     padding: 0;
 }
@@ -185,40 +182,36 @@ header A:hover {
 }
 
 @media screen {
-    main .bodytext {
-        background-color: #FFFBF7;
-    }
-
     .headerfooter {
         background-color: #003A70;
         /* Pantone 654 C */
-        color: #FFFBF7;
+        color: white;
     }
 
     .headericon,
     .keyicon,
     .keyiconlarge {
-        fill: #FFFBF7;
+        fill: white;
     }
 
     header A:link,
     header A:visited,
     header A:active,
     header A:hover {
-        color: #FFFBF7;
+        color: white;
     }
 
     footer A:link,
     footer A:visited,
     footer A:active,
     footer A:hover {
-        color: #FFFBF7;
+        color: white;
     }
 
     table.dataTable thead tr {
         background-color: #003A70;
         /* Pantone 654 C */
-        color: #FFFBF7;
+        color: white;
     }
 
     table.dataTable tr.odd {
@@ -265,7 +258,6 @@ header A:hover {
     .headericon,
     .keyicon,
     .keyiconlarge {
-        /* filter: invert(13%) sepia(56%) saturate(3942%) hue-rotate(196deg) brightness(92%) contrast(101%); */
         fill: #003A70;
         /* Pantone 654 C */
     }
@@ -439,11 +431,14 @@ screen and (min-width: 690px) and (max-width: 1019px) {
 
 /* Map */
 
+.leaflet-control {
+    font-family: "Lora", serif;
+}
+
 .info,
 .info2,
 .downloadbox {
     padding: 6px 8px;
-    font-family: "PT Serif", serif;
     background: white;
     background: rgba(255, 255, 255, 0.8);
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
@@ -575,7 +570,7 @@ input.required {
 }
 
 .submitbutton {
-    font-family: "PT Serif", serif;
+    font-family: "Lora", serif;
     font-size: 100%;
     padding: 8px;
     width: 80px;

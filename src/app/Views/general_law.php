@@ -2,7 +2,7 @@
     <?php if (!isset($omitTitle)) { ?>
         <h2><?= $title ?></h2>
     <?php } ?>
-    <table class="normal row-border cell-border compact stripe">
+    <table class="normal cell-border compact stripe">
         <thead>
             <tr>
                 <th>Detail</th>

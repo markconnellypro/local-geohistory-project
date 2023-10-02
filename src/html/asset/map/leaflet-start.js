@@ -1,5 +1,5 @@
 var baseMaps = {
-    "Street (MapTiler)": baseMap
+    "Street": baseMap
 };
 
 var usgsATT = 'Base map: <a href="http://www.nationalmap.gov/">USGS</a>.';
@@ -40,10 +40,6 @@ $(function () {
     });
     $('.imagedownload').click(function (event) {
         event.preventDefault();
-        if ($('.leaflet-control-layers-selector[type=radio]:checked')[0].parentNode.innerText.trim() == 'Street (MapTiler)') {
-            alert('Image download not available for Street (MapTiler) background.');
-            return;
-        }
         function filter(node) {
             if (node.classList === undefined) {
                 return true;
@@ -57,7 +53,7 @@ $(function () {
         attributionElement = $('.leaflet-control-attribution')[0];
         attributionElement.innerHTML = '<div class="temporarySpace" style="display: inline;"><span style="font-family: ' + "'Fredericka the Great'" + ', serif; color: #003A70; font-size: 15px;">Local Geohistory Project</span> | </div>' + attributionElement.innerHTML + '<div class="temporarySpace" style="width: 5px; float: right;">&nbsp;</div>';
         temporaryElement = $('.temporarySpace');
-        domtoimage.toPng(mapElement, { width: mapWidth, height: mapHeight, filter: filter })
+        htmlToImage.toPng(mapElement, { width: mapWidth, height: mapHeight, filter: filter })
             .then(function (url) {
                 temporaryElement.each(function (index, el) {
                     el.parentNode.removeChild(el);
@@ -72,13 +68,6 @@ $(function () {
                     window.URL.revokeObjectURL(url);
                 }, 1000);
             });
-    });
-    map.on('baselayerchange', function (e) {
-        if ($('.leaflet-control-layers-selector[type=radio]:checked')[0].parentNode.innerText.trim() == 'Street (MapTiler)') {
-            $('.maptilerlogo').css('display', 'inherit');
-        } else {
-            $('.maptilerlogo').css('display', 'none');
-        }
     });
 });
 

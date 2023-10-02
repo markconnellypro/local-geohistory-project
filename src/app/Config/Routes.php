@@ -1,30 +1,9 @@
 <?php
 
-namespace Config;
+use CodeIgniter\Router\RouteCollection;
 
-// Create a new instance of our RouteCollection class.
-$routes = Services::routes();
-
-/*
- * --------------------------------------------------------------------
- * Router Setup
- * --------------------------------------------------------------------
- */
-$routes->setDefaultNamespace('App\Controllers');
-// $routes->setDefaultController('Home');
-// $routes->setDefaultMethod('index');
-$routes->setTranslateURIDashes(false);
-// $routes->set404Override();
-// The Auto Routing (Legacy) is very dangerous. It is easy to create vulnerable apps
-// where controller filters or CSRF protection are bypassed.
-// If you don't want to define all routes, please use the Auto Routing (Improved).
-// Set `$autoRoutesImproved` to true in `app/Config/Feature.php` and set the following to true.
-// $routes->setAutoRoute(false);
-
-/*
- * --------------------------------------------------------------------
- * Route Definitions
- * --------------------------------------------------------------------
+/**
+ * @var RouteCollection $routes
  */
 
 $routes->add('robots.txt', 'Bot::robotsTxt');
@@ -41,8 +20,8 @@ if (mb_strpos(base_url(), $_ENV['app_baseLocalGeohistoryProjectUrl']) !== FALSE)
         $stateProvinceRegex = $nationStateProvinceRegex;
     } else {
         // Only selected states
-        $stateProvinceRegex = '{locale}/(nj|pa)';
-        $nationStateProvinceRegex = '{locale}/(nj|pa)';
+        $stateProvinceRegex = '{locale}/('. $_ENV['app_jurisdiction'] . ')';
+        $nationStateProvinceRegex = '{locale}/('. $_ENV['app_jurisdiction'] . ')';
     }
 
     $controllerRegex = ['adjudication', 'area', 'event', 'government', 'governmentsource', 'law', 'metes', 'reporter', 'source'];
@@ -66,7 +45,7 @@ if (mb_strpos(base_url(), $_ENV['app_baseLocalGeohistoryProjectUrl']) !== FALSE)
     $routes->add($stateProvinceRegex . '/leaflet', 'Map::leaflet/$1');
 
     $routes->add($stateProvinceRegex . '/about', 'About::index/$1');
-    $routes->add($stateProvinceRegex . '/map-base', 'Map::baseStyle/$1');
+    $routes->add($stateProvinceRegex . '/map-base', 'Map::baseStyle');
     $routes->add($stateProvinceRegex . '/map-overlay', 'Map::overlayStyle/$1');
     $routes->add($stateProvinceRegex . '/map-tile/(:num)/(:num)/(:num)', 'Map::tile/$2/$3/$4/$1');
     $routes->add('{locale}/about', 'About::index');

@@ -2,7 +2,7 @@
     <?php if (!$isHistory) { ?>
         <h2>Summary</h2>
     <?php } ?>
-    <table class="normal row-border cell-border compact stripe">
+    <table class="normal cell-border compact stripe">
         <thead>
             <tr>
                 <?php if ($live) { ?>
@@ -28,7 +28,7 @@
 <?php if ($row->textflag == 't' and !$isHistory) { ?>
     <section>
         <h2>Detail</h2>
-        <table class="normal row-border cell-border compact stripe">
+        <table class="normal cell-border compact stripe">
             <thead>
                 <tr>
                     <th>Created <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#date" aria-label="Date Key"><?= view('general_svg_icon', ['iconLabel' => 'key icon', 'iconName' => 'key', 'iconType' => 'keyicon']); ?></a></th>
@@ -53,7 +53,7 @@
                     <?php if ($live) { ?>
                         <td>
                             <form action="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/governmentmapcomplete/" method="post">
-                                <input type="hidden" name="id" value="<?= $row->governmentid ?>" />
+                                <input type="hidden" name="id" value="<?= $row->governmentid ?>">
                                 <select name="mapcomplete">
                                     <?php foreach ($statuses as $status) { ?>
                                         <option value="<?= $status->governmentmapstatusid ?>" <?= (($status->governmentmapstatusid == $row->governmentmapstatus) ? ' selected="selected"' : '') ?>><?= $status->governmentmapstatusshort ?></option>

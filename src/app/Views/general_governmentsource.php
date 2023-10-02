@@ -1,6 +1,6 @@
 <section>
     <h2>Government Action</h2>
-    <table class="normal row-border cell-border compact stripe">
+    <table class="normal cell-border compact stripe">
         <thead>
             <tr>
                 <?php if ($type !== 'source') { ?>
@@ -26,7 +26,7 @@
                                 <?php } elseif (isset($row->eventslug)) {
                                 $i = 0;
                                 foreach (explode(',', str_replace(['{', '}'], '', $row->eventslug)) as $event) { ?>
-                                    <?= ($i > 0 ? '<br />' : '') ?><a href="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/event/<?= $event ?>/">View</a>
+                                    <?= ($i > 0 ? '<br>' : '') ?><a href="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/event/<?= $event ?>/">View</a>
                             <?php $i++;
                                 }
                             } ?>

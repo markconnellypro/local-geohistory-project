@@ -3,19 +3,19 @@ function fixFirefoxPrint() {
 return navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
 }
 
-var baseMapATT = 'Base map: <a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>.';
+var baseMapATT = 'Base: <a href="https://daylightmap.org/attribution.html" target="_blank">Daylight</a> &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>, <a href="https://github.com/microsoft/GlobalMLBuildingFootprints/" target="_blank">Microsoft</a>, <a href="https://communitymaps.arcgis.com/home/" target="_blank">Esri</a>, <a href="https://www.openmaptiles.org/" target="_blank">OpenMapTiles</a>.';
+var baseMapUrl = '/<?= \Config\Services::request()->getLocale() ?>/<?= (empty($state) ? '' : $state . "/") ?>map-base/<?= ($zoom ? "zoom/" : '') ?>';
+
+<?php if (!empty($state) OR !empty($zoom)) { ?>
+baseMapATT = baseMapATT + ' Hillshading: <a href="https://aws.amazon.com/public-datasets/terrain/">AWS</a> &copy; <a href="https://github.com/tilezen/joerd/blob/master/docs/attribution.md">Mapzen</a>.';
+<?php } ?>
 
 <?php if (!empty($state)) { ?>
-baseMapATT = baseMapATT + ' Hillshading: <a href="https://aws.amazon.com/public-datasets/terrain/">AWS</a> &copy; <a href="https://github.com/tilezen/joerd/blob/master/docs/attribution.md">Mapzen contributors</a>.';
-
-var baseMapUrl = '/en/<?= $state ?>/map-base/';
 var governmentOverlayMap = L.maplibreGL({
-style: '/en/<?= $state ?>/map-overlay/',
+style: '/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/map-overlay/',
 preserveDrawingBuffer: fixFirefoxPrint(), // Taken from http://fuzzytolerance.info/blog/2016/07/01/Printing-Mapbox-GL-JS-maps-in-Firefox/
 pane: 'overlayPane'
 });
-<?php } else { ?>
-var baseMapUrl = 'https://api.maptiler.com/maps/outdoor-v2/style.json?key=<?= getenv('maptiler_key') ?>';
 <?php } ?>
 
 var baseMap = L.maplibreGL({

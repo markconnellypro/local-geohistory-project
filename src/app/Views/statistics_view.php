@@ -4,7 +4,7 @@
         <div id="map" class="map"></div>
     </section>
     <section>
-        <h2>By Year: <a href="#" class="chartdownload"><img style="vertical-align: middle;" src="/asset/map/baseline_save_alt_black_24dp.png" alt="Download" /></a></h2>
+        <h2>By Year: <a href="#" class="chartdownload"><img style="vertical-align: middle;" src="/asset/map/baseline_save_alt_black_24dp.png" alt="Download"></a></h2>
         <div id="chart" class="chart"></div>
     </section>
     <section>
@@ -25,7 +25,7 @@
     <script>
         var mapPath = [
             <?php if ($state == 'ma' and (empty($dateRange) or substr($dateRange, 0, 4) < '1821')) { ?> '/asset/development/map/statistics/me.geojson',
-            <?php } ?> '/asset/<?= (($live and (empty($state) or !in_array($state, ['nj', 'pa']))) ? 'development/' : '') ?>map/statistics/<?= (empty($state) ? ($live ? 'development' : 'production') : $state) ?>.geojson'
+            <?php } ?> '/asset/<?= (($live and (empty($state) or !in_array($state, \App\Controllers\BaseController::getProductionJurisdictions()))) ? 'development/' : '') ?>map/statistics/<?= (empty($state) ? ($live ? 'development' : 'production') : $state) ?>.geojson'
         ];
         var partData = <?= $query ?>;
         var lastLayer = "";
@@ -40,5 +40,5 @@
     <script src="/asset/map/classybrew.js"></script>
     <script src="/asset/map/statistics.js"></script>
 <?php } else { ?>
-    <br />No results found!
+    <br>No results found!
 <?php } ?>

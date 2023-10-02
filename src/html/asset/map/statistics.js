@@ -211,7 +211,7 @@ info.onAdd = function (map) {
 };
 
 info.update = function (props) {
-    this._div.innerHTML = (props ? '<span class="b">Government: </span>' + (props.NAME + ' ' + props.TYPE).trim() + '</span><br /><span class="b">Count: </span>' + props.COUNT : '<span class="b">'
+    this._div.innerHTML = (props ? '<span class="b">Government: </span>' + (props.NAME + ' ' + props.TYPE).trim() + '</span><br><span class="b">Count: </span>' + props.COUNT : '<span class="b">'
         + 'Click on an area for more info.</span>');
 };
 
@@ -276,6 +276,6 @@ downloadBox.onAdd = function (map) {
     return this._div;
 };
 downloadBox.update = function () {
-    this._div.innerHTML = '<span class="b">Select a layer to download:</span><br /><a class="datadownload" id="statistics" href="#">Statistics</a>';
+    this._div.innerHTML = '<span class="b">Select a layer to download:</span><br><a class="datadownload" id="statistics" href="#">Statistics</a>';
 };
 downloadBox.addTo(map);

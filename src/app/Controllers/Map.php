@@ -18,20 +18,57 @@ class Map extends BaseController
         ];
     }
 
-    public function baseStyle($state = '')
+    public function baseStyle($maxZoom = 14, $response = NULL)
     {
-        $this->response->removeHeader('Cache-Control');
-        $this->response->setHeader('Cache-Control', 'max-age=86400');
-        $this->response->setHeader('Content-Type', 'application/json');
+        if (empty($response)) {
+            $response = $this->response;
+        }
+        $response->removeHeader('Cache-Control');
+        $response->setHeader('Cache-Control', 'max-age=86400');
+        $response->setHeader('Content-Type', 'application/json');
         $json = json_decode(file_get_contents(__DIR__ . '/../../html/asset/map/map_style_base.json'), true);
-        $json['sources']['openmaptiles']['url'] .= getenv('maptiler_key');
-        $json['glyphs'] .= getenv('maptiler_key');
+        if (strpos(getenv('map_tile'), '.json') !== FALSE OR strpos(getenv('map_tile'), '.pmtiles') !== FALSE) {
+            $json['sources']['street-tile']['url'] = getenv('map_tile');
+            unset($json['sources']['street-tile']['tiles']);
+        } else {
+            $json['sources']['street-tile']['tiles'][] = getenv('map_tile');
+            unset($json['sources']['street-tile']['url']);
+        }
+        $json['glyphs'] = getenv('map_glyph');
+        if (!empty(getenv('map_elevation')) AND $maxZoom == 14) {
+            $json['sources']['elevation-tile']['tiles'][] = getenv('map_elevation');
+        } else {
+            unset($json['sources']['elevation-tile']);
+            for ($i = count($json['layers']) - 1; $i >= 0; $i--) {
+                if ($json['layers'][$i]['id'] == 'hillshading') {
+                    unset($json['layers'][$i]);
+                    break;
+                }
+            }
+        }
+        foreach ($json['layers'] AS $layerNumber => $layerContent) {
+            if (!empty($layerContent['layout']['text-field']) AND $layerContent['layout']['text-field'] == '{name}') {
+                $json['layers'][$layerNumber]['layout']['text-field'] = [
+                    'coalesce',
+                    ['get', 'name_' . \Config\Services::request()->getLocale()],
+                    ['get', 'name:' . \Config\Services::request()->getLocale()],
+                    ['get', 'name']
+                ];
+                if (!in_array(\Config\Services::request()->getLocale(), ['de', 'en'])) {
+                    $json['layers'][$layerNumber]['layout']['text-field'][] = ['get', 'name_en'];
+                }
+            }
+        }
+        if ($maxZoom < 14) {
+            $json['sources']['street-tile']['maxzoom'] = $maxZoom;
+        }
         echo json_encode($json);
     }
 
     public function leaflet($state = '')
     {
-        $this->data['state'] = $state;
+        $this->data['state'] = ($state == 'zoom' ? '' : $state);
+        $this->data['zoom'] = ($state == 'zoom');
         $this->response->removeHeader('Cache-Control');
         $this->response->setHeader('Cache-Control', 'max-age=86400');
         $this->response->setHeader('Content-Type', 'application/javascript');

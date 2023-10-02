@@ -1,4 +1,5 @@
-env/.env
+env/**
+!env/Sample.env
 pgdata/**
 inphp/e/**
 !inphp/e/.gitkeep

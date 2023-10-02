@@ -44,16 +44,16 @@ infoRegularUpdate = function(props) {
   if(props) {
     t = (props.plsstownshipshort !== '' ? '<div class="mapwidth2">Survey Township: </div>'
       + (props.plsstownship !== '' ? '<a href="' + props.plsstownship + '">' : '')
-      + props.plsstownshipshort + (props.plsstownship !== '' ? '</a>' : '') + '<br />' : '')
+      + props.plsstownshipshort + (props.plsstownship !== '' ? '</a>' : '') + '<br>' : '')
       + (props.submunicipalitylong !== '' ? '<div class="mapwidth2">Sub-Municipality: </div><a href="' + props.submunicipality + '">'
-      + props.submunicipalitylong + '</a><br />' : '') + '<div class="mapwidth2">Municipality: </div>'
+      + props.submunicipalitylong + '</a><br>' : '') + '<div class="mapwidth2">Municipality: </div>'
       + (props.municipality !== '' ? '<a href="' + props.municipality + '">' : '')
-      + props.municipalitylong + (props.municipality !== '' ? '</a>' : '') + '<br />'
+      + props.municipalitylong + (props.municipality !== '' ? '</a>' : '') + '<br>'
       + '<div class="mapwidth2">County: </div>'
       + (props.county !== '' ? '<a href="' + props.county + '">' : '')
       + props.countyshort + (props.county !== '' ? '</a>' : '')
-      + '<br /><div class="mapwidth2">Status: </div><a href="/<?= \Config\Services::request()->getLocale() ?>/key/#governmentmapstatus">'
-      + dispositionColorName(props.disposition) + '</a><br />';
+      + '<br><div class="mapwidth2">Status: </div><a href="/<?= \Config\Services::request()->getLocale() ?>/key/#governmentmapstatus">'
+      + dispositionColorName(props.disposition) + '</a><br>';
     for (i = 0; i < props.event.length; i++) {
       if (i == 0) {
         t += '<div class="mapwidth2">Event' + (props.event.length > 1 ? 's' : '') + ': </div>';
@@ -61,11 +61,11 @@ infoRegularUpdate = function(props) {
         t += '<div class="mapwidth2"></div>';
       }
       t += '<a href="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/event/' + props.event[i].eventslug + '/">'
-        + props.event[i].eventtextshortdate + '</a><br />';
+        + props.event[i].eventtextshortdate + '</a><br>';
     }
     t += '<div class="mapwidth2">Area: </div><a href="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/area/' + props.governmentshapeslug + '/">View</a>';
   } else {
-    t = '<div class="b">Click on any shaded<br />area for more info.</span>';
+    t = '<div class="b">Click on any shaded<br>area for more info.</span>';
   }
 	this._div.innerHTML = t;
 };
@@ -86,7 +86,7 @@ info2.onAdd = function(map) {
 
 info2RegularUpdate = function(props) {
 	this._div.innerHTML = (props ? '<div class="mapwidth">Event: </div><a href="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/event/' + props.event + '/">'
-    + props.metesdescriptionlong + '</a> <br />' : '<div class="b">Click on any description for more info.</span>');
+    + props.metesdescriptionlong + '</a> <br>' : '<div class="b">Click on any description for more info.</span>');
 };
 
 info2.update = info2RegularUpdate;
@@ -157,7 +157,7 @@ function toTimeLine() {
   infoTimeUpdate = function(props) {
     newTimeString = '<span class="b">Event Date <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#date" aria-label="Date Key"><?= str_replace(["\r\n", "\n", "\r"], '', view('general_svg_icon', ['iconLabel' => 'key icon', 'iconName' => 'key', 'iconType' => 'keyicontext'])); ?></a>:</span> ' + timeString;
     if (nameString) {
-      newTimeString += '<br /><span class="b">Government:</span> ' + nameString;
+      newTimeString += '<br><span class="b">Government:</span> ' + nameString;
     }
     this._div.innerHTML = newTimeString;
   }
@@ -221,7 +221,7 @@ var timelapseControlActive = false;
 var timelapseBox = L.control();
 timelapseBox.onAdd = function(map) {
 	this._div = L.DomUtil.create('div', 'timelapsebox');
-  this._div.innerHTML = '<div class="info leaflet-control-timelapse"><input type="range" class="leaflet-bar-part leaflet-control-timelapse-range" name="leaflet-control-timelapse-range" value="0" min="0" /></div>';
+  this._div.innerHTML = '<div class="info leaflet-control-timelapse"><input type="range" class="leaflet-bar-part leaflet-control-timelapse-range" name="leaflet-control-timelapse-range" value="0" min="0"></div>';
 	return this._div;
 };
 timelapseBox.addTo(map);

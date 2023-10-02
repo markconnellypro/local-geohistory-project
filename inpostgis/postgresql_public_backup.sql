@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 15.2 (Debian 15.2-1.pgdg110+1)
--- Dumped by pg_dump version 15.3 (Ubuntu 15.3-1.pgdg22.04+1)
+-- Dumped from database version 15.3 (Debian 15.3-1.pgdg110+1)
+-- Dumped by pg_dump version 15.4 (Ubuntu 15.4-2.pgdg22.04+1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -6858,7 +6858,7 @@ CREATE TABLE geohistory.government (
     governmentarticle character varying(10) DEFAULT ''::character varying NOT NULL,
     governmentconnectingarticle character varying(10) DEFAULT ''::character varying NOT NULL,
     governmentcurrentform integer,
-    CONSTRAINT government_check CHECK (((((governmentstatus)::text = ANY (ARRAY['cadastral'::text, 'defunct'::text, 'nonfunctioning'::text, 'paper'::text, 'placeholder'::text, 'proposed'::text, 'unincorporated'::text, 'unknown'::text, ''::text])) OR (((governmentstatus)::text = ANY (ARRAY['alternate'::text, 'language'::text])) AND (governmentsubstitute IS NOT NULL))) AND (governmentlevel >= 1) AND (governmentlevel <= 5) AND ((governmentlevel = 2) OR ((governmentlevel <> 2) AND ((government1983stateplaneauthority)::text = ''::text))) AND ((governmentlevel = 3) OR ((governmentlevel <> 3) AND ((governmentlead1983stateplane)::text = ''::text))) AND ((governmentlevel = 3) OR ((governmentlevel <> 3) AND (governmenthasmultiple1983stateplane IS NULL))) AND (((governmentname)::text <> ''::text) OR ((governmentnumber)::text <> ''::text)) AND ((governmenttype)::text <> ''::text) AND ((governmentlocale)::text = ANY (ARRAY['de'::text, ('en'::character varying)::text, 'es'::text, ('fr'::character varying)::text, ('nl'::character varying)::text, 'pl'::text])) AND (NOT (((governmentstatus)::text = ANY (ARRAY['placeholder'::text, 'proposed'::text, 'unincorporated'::text])) AND (governmentmapstatus <> 0))) AND (((governmentlevel = 1) AND (governmentcurrentleadparent IS NULL)) OR ((governmentlevel > 1) AND (governmentcurrentleadparent IS NOT NULL) AND (governmentid <> governmentcurrentleadparent)))))
+    CONSTRAINT government_check CHECK (((((governmentstatus)::text = ANY (ARRAY['cadastral'::text, 'defunct'::text, 'nonfunctioning'::text, 'paper'::text, 'placeholder'::text, 'proposed'::text, 'unincorporated'::text, 'unknown'::text, ''::text])) OR (((governmentstatus)::text = ANY (ARRAY['alternate'::text, 'language'::text])) AND (governmentsubstitute IS NOT NULL))) AND (governmentlevel >= 1) AND (governmentlevel <= 5) AND ((governmentlevel = 2) OR ((governmentlevel <> 2) AND ((government1983stateplaneauthority)::text = ''::text))) AND ((governmentlevel = 3) OR ((governmentlevel <> 3) AND ((governmentlead1983stateplane)::text = ''::text))) AND ((governmentlevel = 3) OR ((governmentlevel <> 3) AND (governmenthasmultiple1983stateplane IS NULL))) AND (((governmentname)::text <> ''::text) OR ((governmentnumber)::text <> ''::text)) AND ((governmenttype)::text <> ''::text) AND ((governmentlocale)::text <> ''::text) AND (NOT (((governmentstatus)::text = ANY (ARRAY['placeholder'::text, 'proposed'::text, 'unincorporated'::text])) AND (governmentmapstatus <> 0))) AND (((governmentlevel = 1) AND (governmentcurrentleadparent IS NULL)) OR ((governmentlevel > 1) AND (governmentcurrentleadparent IS NOT NULL) AND (governmentid <> governmentcurrentleadparent)))))
 );
 
 
@@ -8827,14 +8827,7 @@ CREATE VIEW extra.governmentchangecount AS
             affectedtype.affectedtypecreationdissolution,
             extra.eventsortdatedate((event.eventeffective)::character varying, event.eventfrom, event.eventto) AS eventsortdatedate,
             extra.eventtextshortdate((event.eventeffective)::character varying, event.eventfrom, event.eventto) AS eventtextshortdate,
-                CASE
-                    WHEN ((length((event.eventeffective)::text) = 0) AND (event.eventfrom <> event.eventto)) THEN 'None (Range)'::text
-                    WHEN (length((event.eventeffective)::text) = 0) THEN 'None'::text
-                    WHEN (length((event.eventeffective)::text) = 10) THEN 'Day'::text
-                    WHEN ("position"((event.eventeffective)::text, '~'::text) = 9) THEN 'Month'::text
-                    WHEN ("position"((event.eventeffective)::text, '~'::text) = 6) THEN 'Year'::text
-                    ELSE 'Unknown'::text
-                END AS eventeffectiveprecision,
+            initcap(((event.eventeffective)::calendar.historicdate)."precision") AS eventeffectiveprecision,
             extra.eventeffectivetype(eventeffectivetype.eventeffectivetypegroup, eventeffectivetype.eventeffectivetypequalifier) AS eventeffectivetype,
             sum(
                 CASE
@@ -8933,8 +8926,8 @@ CREATE VIEW extra.governmentchangecount AS
             ELSE ''::text
         END AS creationtext,
         CASE
-            WHEN (array_length(creation.eventid, 1) = 1) THEN creation.eventeffectiveprecision[1]
-            ELSE ''::text
+            WHEN (array_length(creation.eventid, 1) = 1) THEN COALESCE(creation.eventeffectiveprecision[1], 'None'::text)
+            ELSE 'None'::text
         END AS creationprecision,
         CASE
             WHEN (array_length(creation.eventid, 1) = 1) THEN creation.eventsortdatedate[1]
@@ -8959,8 +8952,8 @@ CREATE VIEW extra.governmentchangecount AS
             ELSE ''::text
         END AS dissolutiontext,
         CASE
-            WHEN (array_length(dissolution.eventid, 1) = 1) THEN dissolution.eventeffectiveprecision[1]
-            ELSE ''::text
+            WHEN (array_length(dissolution.eventid, 1) = 1) THEN COALESCE(dissolution.eventeffectiveprecision[1], 'None'::text)
+            ELSE 'None'::text
         END AS dissolutionprecision,
         CASE
             WHEN (array_length(dissolution.eventid, 1) = 1) THEN dissolution.eventsortdatedate[1]
@@ -9059,14 +9052,7 @@ CREATE VIEW extra.governmentchangecountpart AS
             affectedtype.affectedtypecreationdissolution,
             extra.eventsortdatedate((event.eventeffective)::character varying, event.eventfrom, event.eventto) AS eventsortdatedate,
             extra.eventtextshortdate((event.eventeffective)::character varying, event.eventfrom, event.eventto) AS eventtextshortdate,
-                CASE
-                    WHEN ((length((event.eventeffective)::text) = 0) AND (event.eventfrom <> event.eventto)) THEN 'None (Range)'::text
-                    WHEN (length((event.eventeffective)::text) = 0) THEN 'None'::text
-                    WHEN (length((event.eventeffective)::text) = 10) THEN 'Day'::text
-                    WHEN ("position"((event.eventeffective)::text, '~'::text) = 9) THEN 'Month'::text
-                    WHEN ("position"((event.eventeffective)::text, '~'::text) = 6) THEN 'Year'::text
-                    ELSE 'Unknown'::text
-                END AS eventeffectiveprecision,
+            initcap(((event.eventeffective)::calendar.historicdate)."precision") AS eventeffectiveprecision,
             extra.eventeffectivetype(eventeffectivetype.eventeffectivetypegroup, eventeffectivetype.eventeffectivetypequalifier) AS eventeffectivetype,
             sum(
                 CASE
@@ -9140,8 +9126,8 @@ CREATE VIEW extra.governmentchangecountpart AS
             ELSE ''::text
         END AS creationtext,
         CASE
-            WHEN (array_length(creation.eventid, 1) = 1) THEN creation.eventeffectiveprecision[1]
-            ELSE ''::text
+            WHEN (array_length(creation.eventid, 1) = 1) THEN COALESCE(creation.eventeffectiveprecision[1], 'None'::text)
+            ELSE 'None'::text
         END AS creationprecision,
         CASE
             WHEN (array_length(creation.eventid, 1) = 1) THEN creation.eventsortdatedate[1]
@@ -9165,8 +9151,8 @@ CREATE VIEW extra.governmentchangecountpart AS
             ELSE ''::text
         END AS dissolutiontext,
         CASE
-            WHEN (array_length(dissolution.eventid, 1) = 1) THEN dissolution.eventeffectiveprecision[1]
-            ELSE ''::text
+            WHEN (array_length(dissolution.eventid, 1) = 1) THEN COALESCE(dissolution.eventeffectiveprecision[1], 'None'::text)
+            ELSE 'None'::text
         END AS dissolutionprecision,
         CASE
             WHEN (array_length(dissolution.eventid, 1) = 1) THEN dissolution.eventsortdatedate[1]
@@ -12873,7 +12859,7 @@ CREATE TABLE geohistory.sourceitem (
     sourceitemyear smallint,
     sourceitemurl text DEFAULT ''::text NOT NULL,
     sourceitemurlcomplete boolean DEFAULT false NOT NULL,
-    sourceitemurlcompletepart boolean DEFAULT false NOT NULL,
+    sourceitemurlcompletepart boolean DEFAULT true NOT NULL,
     sourceitempublicdomain boolean,
     sourceitempublicdomainreason text DEFAULT ''::text NOT NULL,
     sourceitemreferenceyearfrom smallint,

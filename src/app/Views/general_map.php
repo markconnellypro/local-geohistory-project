@@ -12,9 +12,6 @@
     <?php } ?>
     <?= (($live and $includeBase) ? '<div style="width: 40%; float: right;">Coordinates:&nbsp;<div id="coord" style="float: right;"></div></div>' : '') ?>
     <div id="map">
-        <a class="maptilerlogo" href="https://www.maptiler.com" style="position:absolute;left:10px;bottom:10px;z-index:999;">
-            <img src="https://api.maptiler.com/resources/logo.svg" alt="MapTiler logo">
-        </a>
     </div>
     <input type="hidden" name="idholder" id="idholder" value="-100">
 </section>

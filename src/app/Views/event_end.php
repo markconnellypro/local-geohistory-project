@@ -46,7 +46,7 @@ keyNumber = 0;
 keyText = key[0].toUpperCase() + key.substring(1);
 Object.values(affectedgovernmenttype[key]).forEach(value => {
 if (props[keyText + ' ' + value + ' Long']) {
-affectedGovernmentString += (keyText == 'To' || keyNumber > 0 ? '<br />' : '') + '<div class="mapwidth">' + (keyNumber == 0 ? keyText + ': ' : '') + '</div>';
+affectedGovernmentString += (keyText == 'To' || keyNumber > 0 ? '<br>' : '') + '<div class="mapwidth">' + (keyNumber == 0 ? keyText + ': ' : '') + '</div>';
 affectedGovernmentString += (props[keyText + ' ' + value + ' Link'] ? '<a href="' + props[keyText + ' ' + value + ' Link'] + '">' : '');
     affectedGovernmentString += props[keyText + ' ' + value + ' Long'];
     affectedGovernmentString += (props[keyText + ' ' + value + ' Link'] ? '</a>' : '');
@@ -56,7 +56,7 @@ keyNumber++;
 });
 });
 } else {
-affectedGovernmentString = '<div class="b">Click on any area in<br />red for more info.</span>';
+affectedGovernmentString = '<div class="b">Click on any area in<br>red for more info.</span>';
     }
     this._div.innerHTML = affectedGovernmentString;
     };
