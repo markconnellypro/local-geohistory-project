@@ -76,3 +76,7 @@ Navigate to <http://[::1]/en/> in your web browser to check if the application b
 Once the application is built, tools such as pgAdmin can be used for data analysis with SQL. Because the PostgreSQL instance is installed locally, the hostname for connection is **localhost**, and the remaining credentials are stored in the .env file. More information concerning the installation of pgAdmin is available at:
 
 <https://www.pgadmin.org/download/>
+
+## Notes
+
+This project is tested with BrowserStack.
