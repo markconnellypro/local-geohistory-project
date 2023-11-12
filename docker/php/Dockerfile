@@ -32,4 +32,3 @@ RUN service apache2 restart
 RUN apt-get update
 RUN apt-get install -y unzip zip
 COPY --from=composer:2.6.5 /usr/bin/composer /usr/bin/composer
-ENTRYPOINT ["/usr/src/docker/docker-php-entrypoint.sh"]
