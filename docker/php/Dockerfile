@@ -3,8 +3,6 @@ FROM php:8.2.11-apache
 RUN apt-get update
 RUN apt-get install -y unzip zip
 COPY --from=composer:2.6.5 /usr/bin/composer /usr/bin/composer
-WORKDIR /var/www/
-RUN composer install --no-dev
 # Create writable dictory for CodeIgniter
 RUN mkdir /writable
 RUN mkdir /writable/cache
