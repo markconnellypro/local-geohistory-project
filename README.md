@@ -6,7 +6,7 @@
 
 The Local Geohistory Project aims to educate users and disseminate information concerning the geographic history and structure of political subdivisions and local government. This repository contains the application code used to power the [project website](https://www.localgeohistory.pro/en/). The application runs using the CodeIgniter 4 framework on a LAPP (Linux, Apache, PostgreSQL, PHP) stack, but can run on other operating systems when built using Docker.
 
-This repository does not contain the data, which can be found in the [Open Data repository](https://github.com/markconnellypro/local-geohistory-project-open-data).
+This repository does not contain the data, which can be found in the [Open Data repository](https://github.com/localgeohistoryproject/open-data).
 
 ## Deployment
 
@@ -33,7 +33,7 @@ More detailed installation instructions for Git are available at:
 Navigate to the folder where the application code will be downloaded, then run the following command using a program such as Command Prompt (Windows), Git BASH, or Terminal, and run the following code:
 
 ```bash
-git clone https://github.com/markconnellypro/local-geohistory-project.git PHP
+git clone https://github.com/localgeohistoryproject/application.git PHP
 ```
 
 This will create a subfolder named **PHP**, which contains the application code.
@@ -57,7 +57,7 @@ The application also contains 2 Dockerfiles, one in **docker/php** and one in **
 
 ### Copy data files into the inpostgis folder
 
-The **inpostgis** folder contains 2 SQL files containing the structural elements of the database. To replicate the data as presented on the [project website](https://www.localgeohistory.pro/en/), download the tab-separated values (TSV) files from the **data** folder in the [Open Data repository](https://github.com/markconnellypro/local-geohistory-project-open-data) and place them in the **inpostgis** folder.
+The **inpostgis** folder contains 2 SQL files containing the structural elements of the database. To replicate the data as presented on the [project website](https://www.localgeohistory.pro/en/), download the tab-separated values (TSV) files from the **data** folder in the [Open Data repository](https://github.com/localgeohistoryproject/open-data) and place them in the **inpostgis** folder.
 
 ### Build
 

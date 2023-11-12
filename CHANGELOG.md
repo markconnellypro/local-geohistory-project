@@ -13,6 +13,7 @@
 - CodeIgniter Paths settings to accommodate Composer.
 - PHP Dockerfile to accommodate Composer install at entrypoint.
 - PHP Dockerfile to change server paths for shell scripts.
+- Repository paths to accommodate moving repository to organization.
 
 ### Removed
 
