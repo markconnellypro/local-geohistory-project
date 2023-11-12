@@ -19,21 +19,19 @@ COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr
 RUN install-php-extensions intl pgsql xsl zip
 # Adjust configuration files
 COPY /docker/php/mods-enabled/headers.conf /etc/apache2/mods-enabled/
-RUN mkdir /docker-php-entrypoint
+RUN mkdir /usr/src/docker
 # OTHER OPERATING SYSTEMS: May need to use the commented version below instead of the uncommented version 2 lines down
-# COPY ./docker/php/import_common_php.sh /docker-php-entrypoint/
-COPY ./docker/php/import_common_php.sh ./src/private/development/docker/import_developmen[t]_php.sh ./src/private/production/docke[r]/* /docker-php-entrypoint/
-RUN chmod -R 764 /docker-php-entrypoint/*
+# COPY ./docker/php/import_common_php.sh /usr/src/docker/
+COPY ./docker/php/import_common_php.sh ./src/private/development/docker/import_developmen[t]_php.sh ./src/private/production/docke[r]/* /usr/src/docker/
+RUN chmod -R 764 /usr/src/docker/*
 ARG CI_ENVIRONMENT
-RUN /docker-php-entrypoint/import_common_php.sh
+RUN /usr/src/docker/import_common_php.sh
 # Restart Apache
 RUN service apache2 restart
 # Install Composer and prerequisites
 RUN apt-get update
 RUN apt-get install -y unzip zip
 COPY --from=composer:2.6.5 /usr/bin/composer /usr/bin/composer
-RUN mkdir /usr/src/composer
-COPY /docker/php/composer.json /usr/src/composer
-WORKDIR /usr/src/composer
-RUN composer install --no-dev
-RUN chown -R www-data:www-data /usr/src/composer
+RUN mkdir /docker-php-entrypoint/
+COPY /docker/php/docker-php-entrypoint.sh /docker-php-entrypoint
+ENTRYPOINT ["/docker-php-entrypoint/docker-php-entrypoint.sh"]
