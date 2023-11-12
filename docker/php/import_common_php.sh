@@ -11,6 +11,3 @@ fi
 if [[ -e "/docker-php-entrypoint/import_production_php.sh" ]]; then
   /docker-php-entrypoint/import_production_php.sh
 fi
-# Run Composer
-cd /var/www
-composer install --no-dev

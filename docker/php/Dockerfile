@@ -32,3 +32,6 @@ ARG CI_ENVIRONMENT
 RUN /docker-php-entrypoint/import_common_php.sh
 # Restart Apache
 RUN service apache2 restart
+# Run Composer
+WORKDIR /var/www
+CMD composer install --no-dev
