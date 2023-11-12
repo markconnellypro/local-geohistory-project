@@ -27,4 +27,3 @@ src/private/development/**
 !src/private/development/.gitkeep
 src/private/production/**
 !src/private/production/.gitkeep
-src/vendor/**
