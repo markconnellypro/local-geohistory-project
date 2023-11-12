@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.2.2] - 2023-11-12
+
+### Added
+
+- BrowserStack note to changelog.
+- Composer.
+
+### Changed
+
+- CodeIgniter from 4.4.1 to 4.4.3.
+- CodeIgniter Paths settings to accommodate Composer.
+- PHP Dockerfile to accommodate Composer install at entrypoint.
+- PHP Dockerfile to change server paths for shell scripts.
+
+### Removed
+
+- CodeIgniter system folder from repository.
+
 ## [1.2.1] - 2023-10-01
 
 ### Fixed
@@ -172,11 +190,12 @@
 
 - Public release of the Local Geohistory Project: Application repository.
 
-[1.2.1]: https://github.com/markconnellypro/local-geohistory-project/compare/v1.2.0...v1.2.1
-[1.2.0]: https://github.com/markconnellypro/local-geohistory-project/compare/v1.1.2...v1.2.0
-[1.1.2]: https://github.com/markconnellypro/local-geohistory-project/compare/v1.1.1...v1.1.2
-[1.1.1]: https://github.com/markconnellypro/local-geohistory-project/compare/v1.1.0...v1.1.1
-[1.1.0]: https://github.com/markconnellypro/local-geohistory-project/compare/v1.0.2...v1.1.0
-[1.0.2]: https://github.com/markconnellypro/local-geohistory-project/compare/v1.0.1...v1.0.2
-[1.0.1]: https://github.com/markconnellypro/local-geohistory-project/compare/v1.0.0...v1.0.1
-[1.0.0]: https://github.com/markconnellypro/local-geohistory-project/releases/tag/v1.0.0
+[1.2.2]: https://github.com/localgeohistoryproject/application/compare/v1.2.0...v1.2.2
+[1.2.1]: https://github.com/localgeohistoryproject/application/compare/v1.2.0...v1.2.1
+[1.2.0]: https://github.com/localgeohistoryproject/application/compare/v1.1.2...v1.2.0
+[1.1.2]: https://github.com/localgeohistoryproject/application/compare/v1.1.1...v1.1.2
+[1.1.1]: https://github.com/localgeohistoryproject/application/compare/v1.1.0...v1.1.1
+[1.1.0]: https://github.com/localgeohistoryproject/application/compare/v1.0.2...v1.1.0
+[1.0.2]: https://github.com/localgeohistoryproject/application/compare/v1.0.1...v1.0.2
+[1.0.1]: https://github.com/localgeohistoryproject/application/compare/v1.0.0...v1.0.1
+[1.0.0]: https://github.com/localgeohistoryproject/application/releases/tag/v1.0.0
