@@ -1,8 +1,4 @@
 FROM php:8.2.11-apache
-# Install Composer and prerequisites
-RUN apt-get update
-RUN apt-get install -y unzip zip
-COPY --from=composer:2.6.5 /usr/bin/composer /usr/bin/composer
 # Create writable dictory for CodeIgniter
 RUN mkdir /writable
 RUN mkdir /writable/cache
@@ -32,6 +28,12 @@ ARG CI_ENVIRONMENT
 RUN /docker-php-entrypoint/import_common_php.sh
 # Restart Apache
 RUN service apache2 restart
-# Run Composer
-WORKDIR /var/www
-CMD composer install --no-dev
+# Install Composer and prerequisites
+RUN apt-get update
+RUN apt-get install -y unzip zip
+COPY --from=composer:2.6.5 /usr/bin/composer /usr/bin/composer
+RUN mkdir /usr/src/composer
+COPY /docker/php/composer.json /usr/src/composer
+WORKDIR /usr/src/composer
+RUN composer install --no-dev
+RUN chown -R www-data:www-data /usr/src/composer
