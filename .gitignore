@@ -25,6 +25,10 @@ outpostgis/**
 !outpostgis/.gitkeep
 src/private/development/**
 !src/private/development/.gitkeep
+src/private/personal-development/**
+!src/private/personal-development/.gitkeep
+src/private/personal-production/**
+!src/private/personal-production/.gitkeep
 src/private/production/**
 !src/private/production/.gitkeep
 src/vendor/**
