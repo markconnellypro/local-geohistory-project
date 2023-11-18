@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 15.3 (Debian 15.3-1.pgdg110+1)
--- Dumped by pg_dump version 15.4 (Ubuntu 15.4-2.pgdg22.04+1)
+-- Dumped from database version 16.0 (Debian 16.0-1.pgdg110+1)
+-- Dumped by pg_dump version 16.0 (Ubuntu 16.0-1.pgdg22.04+1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -6826,157 +6826,6 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
--- Name: government; Type: TABLE; Schema: geohistory; Owner: postgres
---
-
-CREATE TABLE geohistory.government (
-    governmentid integer NOT NULL,
-    governmentname character varying(75) NOT NULL,
-    governmenttype character varying(30) NOT NULL,
-    governmentstatus character varying(35) DEFAULT ''::character varying NOT NULL,
-    governmentstatusdefacto boolean DEFAULT false NOT NULL,
-    governmentstyle character varying(20) DEFAULT ''::character varying NOT NULL,
-    governmentlevel smallint NOT NULL,
-    governmentcurrentleadparent integer,
-    governmentabbreviation character varying(10) DEFAULT ''::character varying NOT NULL,
-    government1983stateplaneauthority character varying(100) DEFAULT ''::character varying NOT NULL,
-    governmentlead1983stateplane character varying(2) DEFAULT ''::character varying NOT NULL,
-    governmenthasmultiple1983stateplane boolean,
-    governmentdefaultsrid integer,
-    governmentnotecreation character varying(5) DEFAULT ''::character varying NOT NULL,
-    governmentnotedissolution character varying(5) DEFAULT ''::character varying NOT NULL,
-    governmentnotecurrentleadparent boolean DEFAULT false NOT NULL,
-    governmentcharterstatus integer,
-    governmentbooknote text[],
-    governmentbookcomplete jsonb,
-    governmentmultilevel boolean DEFAULT false NOT NULL,
-    governmentindigobook character varying(20) DEFAULT ''::character varying NOT NULL,
-    governmentsubstitute integer,
-    governmentnumber character varying(3) DEFAULT ''::character varying NOT NULL,
-    governmentmapstatus integer DEFAULT 1 NOT NULL,
-    governmentlocale character varying(2) DEFAULT 'en'::character varying NOT NULL,
-    governmentarticle character varying(10) DEFAULT ''::character varying NOT NULL,
-    governmentconnectingarticle character varying(10) DEFAULT ''::character varying NOT NULL,
-    governmentcurrentform integer,
-    CONSTRAINT government_check CHECK (((((governmentstatus)::text = ANY (ARRAY['cadastral'::text, 'defunct'::text, 'nonfunctioning'::text, 'paper'::text, 'placeholder'::text, 'proposed'::text, 'unincorporated'::text, 'unknown'::text, ''::text])) OR (((governmentstatus)::text = ANY (ARRAY['alternate'::text, 'language'::text])) AND (governmentsubstitute IS NOT NULL))) AND (governmentlevel >= 1) AND (governmentlevel <= 5) AND ((governmentlevel = 2) OR ((governmentlevel <> 2) AND ((government1983stateplaneauthority)::text = ''::text))) AND ((governmentlevel = 3) OR ((governmentlevel <> 3) AND ((governmentlead1983stateplane)::text = ''::text))) AND ((governmentlevel = 3) OR ((governmentlevel <> 3) AND (governmenthasmultiple1983stateplane IS NULL))) AND (((governmentname)::text <> ''::text) OR ((governmentnumber)::text <> ''::text)) AND ((governmenttype)::text <> ''::text) AND ((governmentlocale)::text <> ''::text) AND (NOT (((governmentstatus)::text = ANY (ARRAY['placeholder'::text, 'proposed'::text, 'unincorporated'::text])) AND (governmentmapstatus <> 0))) AND (((governmentlevel = 1) AND (governmentcurrentleadparent IS NULL)) OR ((governmentlevel > 1) AND (governmentcurrentleadparent IS NOT NULL) AND (governmentid <> governmentcurrentleadparent)))))
-);
-
-
-ALTER TABLE geohistory.government OWNER TO postgres;
-
---
--- Name: COLUMN government.governmentstyle; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.government.governmentstyle IS 'Signifies if the government uses a government type in its formal name that is different than its actual government type.';
-
-
---
--- Name: COLUMN government.governmentlevel; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.government.governmentlevel IS '1 = Nation; 2 = State/Province; 3 = County/Parish; 4 = Township/Municipality; 5 = Unincorporated Ward/Populated Place. Generally = floor((OSM admin_level + 1)/2) or GeoNames administrative division order + 1';
-
-
---
--- Name: COLUMN government.government1983stateplaneauthority; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.government.government1983stateplaneauthority IS 'Last checked January 29, 2017.';
-
-
---
--- Name: COLUMN government.governmentlead1983stateplane; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.government.governmentlead1983stateplane IS 'Last checked January 29, 2017.';
-
-
---
--- Name: COLUMN government.governmenthasmultiple1983stateplane; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.government.governmenthasmultiple1983stateplane IS 'Last checked January 29, 2017.';
-
-
---
--- Name: COLUMN government.governmentcharterstatus; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.government.governmentcharterstatus IS 'This field is used for internal tracking purposes, and is not included in open data.';
-
-
---
--- Name: COLUMN government.governmentbooknote; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.government.governmentbooknote IS 'This field is used for internal tracking purposes, and is not included in open data.';
-
-
---
--- Name: COLUMN government.governmentbookcomplete; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.government.governmentbookcomplete IS 'This field is used for internal tracking purposes, and is not included in open data.';
-
-
---
--- Name: COLUMN government.governmentmapstatus; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.government.governmentmapstatus IS 'The values have been simplified in open data to remove certain information used for internal tracking purposes.';
-
-
---
--- Name: governmentidentifier; Type: TABLE; Schema: geohistory; Owner: postgres
---
-
-CREATE TABLE geohistory.governmentidentifier (
-    governmentidentifierid integer NOT NULL,
-    government integer,
-    governmentidentifiertype integer NOT NULL,
-    governmentidentifierprefix character varying(20) DEFAULT ''::character varying NOT NULL,
-    governmentidentifier character varying(20) DEFAULT ''::character varying NOT NULL,
-    governmentidentifiernote text DEFAULT ''::text NOT NULL,
-    governmentidentifiermatchtype character varying(30) DEFAULT ''::character varying NOT NULL,
-    governmentidentifiermatchdate date,
-    governmentidentifierlead boolean GENERATED ALWAYS AS ((((governmentidentifiermatchtype)::text ~~ 'current%'::text) OR ((governmentidentifiermatchtype)::text = 'full'::text) OR ((governmentidentifiermatchtype)::text ~~ '%lead'::text))) STORED,
-    governmentidentifierstatus text GENERATED ALWAYS AS (
-CASE
-    WHEN (((governmentidentifiermatchtype)::text ~~ 'current%'::text) OR ((governmentidentifiermatchtype)::text = 'full'::text) OR ((governmentidentifiermatchtype)::text ~~ '%lead'::text)) THEN 'Lead'::text
-    WHEN ((governmentidentifiermatchtype)::text = ANY (ARRAY[('historic-successor'::character varying)::text, ('reference'::character varying)::text])) THEN 'Reference'::text
-    WHEN ((governmentidentifiermatchtype)::text ~~ 'historic%'::text) THEN 'Historic'::text
-    WHEN ((governmentidentifiermatchtype)::text = ''::text) THEN ''::text
-    ELSE 'Other'::text
-END) STORED
-);
-
-
-ALTER TABLE geohistory.governmentidentifier OWNER TO postgres;
-
---
--- Name: COLUMN governmentidentifier.governmentidentifiermatchtype; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.governmentidentifier.governmentidentifiermatchtype IS 'current-alternate: Current government with correct spelling shown as USGS alternate.
-current-obsolete: Current government with obsolete USGS spelling.
-current-spelling: Current government with USGS spelling mismatch.
-current-status: Current government with USGS historic flag.
-delete: Should be merged into another feature ID.
-full: Spelling and status match.
-historic-alternate: Historic government with correct spelling shown as USGS alternate.
-historic-county: Temporary historic government created after county division.
-historic-match: Secondary records with spelling match.
-historic-missing: Successor current government does not list as USGS alternate (name change).
-historic-obsolete: Historic government with USGS spelling match.
-historic-spelling: Historic government with USGS alternate spelling mismatch.
-historic-status: Historic government missing USGS historic flag.
-historic-successor: Successor current government does not list as USGS alternate (merger-consolidation).
-
-Entries other than current-* or full can also be combined with -lead flag.';
-
-
---
 -- Name: adjudication; Type: TABLE; Schema: geohistory; Owner: postgres
 --
 
@@ -7116,21 +6965,123 @@ CREATE VIEW extra.adjudicationextra AS
   ORDER BY adjudicationslugs.adjudicationid;
 
 
-ALTER TABLE extra.adjudicationextra OWNER TO postgres;
+ALTER VIEW extra.adjudicationextra OWNER TO postgres;
 
 --
 -- Name: adjudicationextracache; Type: MATERIALIZED VIEW; Schema: extra; Owner: postgres
 --
 
 CREATE MATERIALIZED VIEW extra.adjudicationextracache AS
- SELECT adjudicationextra.adjudicationid,
-    adjudicationextra.adjudicationslug,
-    adjudicationextra.adjudicationtitle
+ SELECT adjudicationid,
+    adjudicationslug,
+    adjudicationtitle
    FROM extra.adjudicationextra
   WITH NO DATA;
 
 
-ALTER TABLE extra.adjudicationextracache OWNER TO postgres;
+ALTER MATERIALIZED VIEW extra.adjudicationextracache OWNER TO postgres;
+
+--
+-- Name: government; Type: TABLE; Schema: geohistory; Owner: postgres
+--
+
+CREATE TABLE geohistory.government (
+    governmentid integer NOT NULL,
+    governmentname character varying(75) NOT NULL,
+    governmenttype character varying(30) NOT NULL,
+    governmentstatus character varying(35) DEFAULT ''::character varying NOT NULL,
+    governmentstatusdefacto boolean DEFAULT false NOT NULL,
+    governmentstyle character varying(20) DEFAULT ''::character varying NOT NULL,
+    governmentlevel smallint NOT NULL,
+    governmentcurrentleadparent integer,
+    governmentabbreviation character varying(10) DEFAULT ''::character varying NOT NULL,
+    government1983stateplaneauthority character varying(100) DEFAULT ''::character varying NOT NULL,
+    governmentlead1983stateplane character varying(2) DEFAULT ''::character varying NOT NULL,
+    governmenthasmultiple1983stateplane boolean,
+    governmentdefaultsrid integer,
+    governmentnotecreation character varying(5) DEFAULT ''::character varying NOT NULL,
+    governmentnotedissolution character varying(5) DEFAULT ''::character varying NOT NULL,
+    governmentnotecurrentleadparent boolean DEFAULT false NOT NULL,
+    governmentcharterstatus integer,
+    governmentbooknote text[],
+    governmentbookcomplete jsonb,
+    governmentmultilevel boolean DEFAULT false NOT NULL,
+    governmentindigobook character varying(20) DEFAULT ''::character varying NOT NULL,
+    governmentsubstitute integer,
+    governmentnumber character varying(3) DEFAULT ''::character varying NOT NULL,
+    governmentmapstatus integer DEFAULT 1 NOT NULL,
+    governmentlocale character varying(2) DEFAULT 'en'::character varying NOT NULL,
+    governmentarticle character varying(10) DEFAULT ''::character varying NOT NULL,
+    governmentconnectingarticle character varying(10) DEFAULT ''::character varying NOT NULL,
+    governmentcurrentform integer,
+    CONSTRAINT government_check CHECK (((((governmentstatus)::text = ANY (ARRAY['cadastral'::text, 'defunct'::text, 'nonfunctioning'::text, 'paper'::text, 'placeholder'::text, 'proposed'::text, 'unincorporated'::text, 'unknown'::text, ''::text])) OR (((governmentstatus)::text = ANY (ARRAY['alternate'::text, 'language'::text])) AND (governmentsubstitute IS NOT NULL))) AND (governmentlevel >= 1) AND (governmentlevel <= 5) AND ((governmentlevel = 2) OR ((governmentlevel <> 2) AND ((government1983stateplaneauthority)::text = ''::text))) AND ((governmentlevel = 3) OR ((governmentlevel <> 3) AND ((governmentlead1983stateplane)::text = ''::text))) AND ((governmentlevel = 3) OR ((governmentlevel <> 3) AND (governmenthasmultiple1983stateplane IS NULL))) AND (((governmentname)::text <> ''::text) OR ((governmentnumber)::text <> ''::text)) AND ((governmenttype)::text <> ''::text) AND ((governmentlocale)::text <> ''::text) AND (NOT (((governmentstatus)::text = ANY (ARRAY['placeholder'::text, 'proposed'::text, 'unincorporated'::text])) AND (governmentmapstatus <> 0))) AND (((governmentlevel = 1) AND (governmentcurrentleadparent IS NULL)) OR ((governmentlevel > 1) AND (governmentcurrentleadparent IS NOT NULL) AND (governmentid <> governmentcurrentleadparent)))))
+);
+
+
+ALTER TABLE geohistory.government OWNER TO postgres;
+
+--
+-- Name: COLUMN government.governmentstyle; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.government.governmentstyle IS 'Signifies if the government uses a government type in its formal name that is different than its actual government type.';
+
+
+--
+-- Name: COLUMN government.governmentlevel; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.government.governmentlevel IS '1 = Nation; 2 = State/Province; 3 = County/Parish; 4 = Township/Municipality; 5 = Unincorporated Ward/Populated Place. Generally = floor((OSM admin_level + 1)/2) or GeoNames administrative division order + 1';
+
+
+--
+-- Name: COLUMN government.government1983stateplaneauthority; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.government.government1983stateplaneauthority IS 'Last checked January 29, 2017.';
+
+
+--
+-- Name: COLUMN government.governmentlead1983stateplane; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.government.governmentlead1983stateplane IS 'Last checked January 29, 2017.';
+
+
+--
+-- Name: COLUMN government.governmenthasmultiple1983stateplane; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.government.governmenthasmultiple1983stateplane IS 'Last checked January 29, 2017.';
+
+
+--
+-- Name: COLUMN government.governmentcharterstatus; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.government.governmentcharterstatus IS 'This field is used for internal tracking purposes, and is not included in open data.';
+
+
+--
+-- Name: COLUMN government.governmentbooknote; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.government.governmentbooknote IS 'This field is used for internal tracking purposes, and is not included in open data.';
+
+
+--
+-- Name: COLUMN government.governmentbookcomplete; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.government.governmentbookcomplete IS 'This field is used for internal tracking purposes, and is not included in open data.';
+
+
+--
+-- Name: COLUMN government.governmentmapstatus; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.government.governmentmapstatus IS 'The values have been simplified in open data to remove certain information used for internal tracking purposes.';
+
 
 --
 -- Name: governmentsubstitute; Type: VIEW; Schema: extra; Owner: postgres
@@ -7178,7 +7129,7 @@ CREATE VIEW extra.governmentsubstitute AS
   ORDER BY governmentsubstitutecombine.governmentid, governmentsubstitutecombine.governmentsubstitute;
 
 
-ALTER TABLE extra.governmentsubstitute OWNER TO postgres;
+ALTER VIEW extra.governmentsubstitute OWNER TO postgres;
 
 --
 -- Name: adjudicationevent; Type: TABLE; Schema: geohistory; Owner: postgres
@@ -7800,7 +7751,7 @@ CREATE VIEW extra.eventgovernment AS
   ORDER BY event.eventid, governmentsubstitute.governmentsubstitute;
 
 
-ALTER TABLE extra.eventgovernment OWNER TO postgres;
+ALTER VIEW extra.eventgovernment OWNER TO postgres;
 
 --
 -- Name: affectedgovernmentlevel; Type: TABLE; Schema: geohistory; Owner: postgres
@@ -7963,7 +7914,7 @@ UNION (
   ORDER BY 1, 2, 3;
 
 
-ALTER TABLE extra.governmentparent OWNER TO postgres;
+ALTER VIEW extra.governmentparent OWNER TO postgres;
 
 --
 -- Name: governmentrelation; Type: VIEW; Schema: extra; Owner: postgres
@@ -8050,7 +8001,7 @@ UNION
   ORDER BY 1, 5, 6;
 
 
-ALTER TABLE extra.governmentrelation OWNER TO postgres;
+ALTER VIEW extra.governmentrelation OWNER TO postgres;
 
 --
 -- Name: adjudicationgovernment; Type: VIEW; Schema: extra; Owner: postgres
@@ -8083,20 +8034,20 @@ CREATE VIEW extra.adjudicationgovernment AS
   ORDER BY ag2.governmentrelationstate, adjudication.adjudicationid;
 
 
-ALTER TABLE extra.adjudicationgovernment OWNER TO postgres;
+ALTER VIEW extra.adjudicationgovernment OWNER TO postgres;
 
 --
 -- Name: adjudicationgovernmentcache; Type: MATERIALIZED VIEW; Schema: extra; Owner: postgres
 --
 
 CREATE MATERIALIZED VIEW extra.adjudicationgovernmentcache AS
- SELECT adjudicationgovernment.adjudicationid,
-    adjudicationgovernment.governmentrelationstate
+ SELECT adjudicationid,
+    governmentrelationstate
    FROM extra.adjudicationgovernment
   WITH NO DATA;
 
 
-ALTER TABLE extra.adjudicationgovernmentcache OWNER TO postgres;
+ALTER MATERIALIZED VIEW extra.adjudicationgovernmentcache OWNER TO postgres;
 
 --
 -- Name: tribunalgovernment; Type: VIEW; Schema: extra; Owner: postgres
@@ -8118,26 +8069,26 @@ CREATE VIEW extra.tribunalgovernment AS
   ORDER BY tribunal.tribunalid;
 
 
-ALTER TABLE extra.tribunalgovernment OWNER TO postgres;
+ALTER VIEW extra.tribunalgovernment OWNER TO postgres;
 
 --
 -- Name: tribunalgovernmentcache; Type: MATERIALIZED VIEW; Schema: extra; Owner: postgres
 --
 
 CREATE MATERIALIZED VIEW extra.tribunalgovernmentcache AS
- SELECT tribunalgovernment.tribunalid,
-    tribunalgovernment.governmentrelationstate,
-    tribunalgovernment.tribunalshort,
-    tribunalgovernment.tribunalshortstate,
-    tribunalgovernment.tribunallong,
-    tribunalgovernment.tribunalfilingoffice,
-    tribunalgovernment.adjudicationtypecount,
-    tribunalgovernment.adjudicationlocationtypecount
+ SELECT tribunalid,
+    governmentrelationstate,
+    tribunalshort,
+    tribunalshortstate,
+    tribunallong,
+    tribunalfilingoffice,
+    adjudicationtypecount,
+    adjudicationlocationtypecount
    FROM extra.tribunalgovernment
   WITH NO DATA;
 
 
-ALTER TABLE extra.tribunalgovernmentcache OWNER TO postgres;
+ALTER MATERIALIZED VIEW extra.tribunalgovernmentcache OWNER TO postgres;
 
 --
 -- Name: adjudicationsearch; Type: VIEW; Schema: extra; Owner: postgres
@@ -8198,41 +8149,41 @@ CREATE VIEW extra.adjudicationsearch AS
         END, (extra.nulltoempty((adjudicationlocationtype.adjudicationlocationtypeshort)::text)), (extra.nulltoempty((adjudicationlocation.adjudicationlocationvolume)::text)), (extra.nulltoempty((adjudicationlocation.adjudicationlocationpagefrom)::text));
 
 
-ALTER TABLE extra.adjudicationsearch OWNER TO postgres;
+ALTER VIEW extra.adjudicationsearch OWNER TO postgres;
 
 --
 -- Name: adjudicationsearchcache; Type: MATERIALIZED VIEW; Schema: extra; Owner: postgres
 --
 
 CREATE MATERIALIZED VIEW extra.adjudicationsearchcache AS
- SELECT adjudicationsearch.adjudicationlocationid,
-    adjudicationsearch.adjudicationid,
-    adjudicationsearch.adjudicationnumber,
-    adjudicationsearch.adjudicationterm,
-    adjudicationsearch.adjudicationsummary,
-    adjudicationsearch.adjudicationtribunal,
-    adjudicationsearch.adjudicationtypeshort,
-    adjudicationsearch.adjudicationtypeabbreviation,
-    adjudicationsearch.adjudicationtypeid,
-    adjudicationsearch.adjudicationlocationtypeid,
-    adjudicationsearch.adjudicationlocationvolume,
-    adjudicationsearch.adjudicationlocationpagefrom,
-    adjudicationsearch.adjudicationlocationpageto,
-    adjudicationsearch.adjudicationlocationtribunal,
-    adjudicationsearch.adjudicationlocationtypeshort,
-    adjudicationsearch.adjudicationlocationtypeabbreviation,
-    adjudicationsearch.governmentrelationstate,
-    adjudicationsearch.adjudicationlong,
-    adjudicationsearch.adjudicationshort,
-    adjudicationsearch.adjudicationnotes,
-    adjudicationsearch.adjudicationstatus,
-    adjudicationsearch.adjudicationtribunalid,
-    adjudicationsearch.adjudicationlocationtribunalid
+ SELECT adjudicationlocationid,
+    adjudicationid,
+    adjudicationnumber,
+    adjudicationterm,
+    adjudicationsummary,
+    adjudicationtribunal,
+    adjudicationtypeshort,
+    adjudicationtypeabbreviation,
+    adjudicationtypeid,
+    adjudicationlocationtypeid,
+    adjudicationlocationvolume,
+    adjudicationlocationpagefrom,
+    adjudicationlocationpageto,
+    adjudicationlocationtribunal,
+    adjudicationlocationtypeshort,
+    adjudicationlocationtypeabbreviation,
+    governmentrelationstate,
+    adjudicationlong,
+    adjudicationshort,
+    adjudicationnotes,
+    adjudicationstatus,
+    adjudicationtribunalid,
+    adjudicationlocationtribunalid
    FROM extra.adjudicationsearch
   WITH NO DATA;
 
 
-ALTER TABLE extra.adjudicationsearchcache OWNER TO postgres;
+ALTER MATERIALIZED VIEW extra.adjudicationsearchcache OWNER TO postgres;
 
 --
 -- Name: adjudicationsourcecitation; Type: TABLE; Schema: geohistory; Owner: postgres
@@ -8300,21 +8251,21 @@ CREATE VIEW extra.adjudicationsourcecitationextra AS
   ORDER BY adjudicationsourcecitationslugs.adjudicationsourcecitationid;
 
 
-ALTER TABLE extra.adjudicationsourcecitationextra OWNER TO postgres;
+ALTER VIEW extra.adjudicationsourcecitationextra OWNER TO postgres;
 
 --
 -- Name: adjudicationsourcecitationextracache; Type: MATERIALIZED VIEW; Schema: extra; Owner: postgres
 --
 
 CREATE MATERIALIZED VIEW extra.adjudicationsourcecitationextracache AS
- SELECT adjudicationsourcecitationextra.adjudicationsourcecitationid,
-    adjudicationsourcecitationextra.adjudicationsourcecitationslug
+ SELECT adjudicationsourcecitationid,
+    adjudicationsourcecitationslug
    FROM extra.adjudicationsourcecitationextra
-  ORDER BY adjudicationsourcecitationextra.adjudicationsourcecitationid
+  ORDER BY adjudicationsourcecitationid
   WITH NO DATA;
 
 
-ALTER TABLE extra.adjudicationsourcecitationextracache OWNER TO postgres;
+ALTER MATERIALIZED VIEW extra.adjudicationsourcecitationextracache OWNER TO postgres;
 
 --
 -- Name: adjudicationsourcecitationsourcegovernment; Type: VIEW; Schema: extra; Owner: postgres
@@ -8330,20 +8281,20 @@ CREATE VIEW extra.adjudicationsourcecitationsourcegovernment AS
   ORDER BY adjudicationgovernment.governmentrelationstate, source.sourceshort;
 
 
-ALTER TABLE extra.adjudicationsourcecitationsourcegovernment OWNER TO postgres;
+ALTER VIEW extra.adjudicationsourcecitationsourcegovernment OWNER TO postgres;
 
 --
 -- Name: adjudicationsourcecitationsourcegovernmentcache; Type: MATERIALIZED VIEW; Schema: extra; Owner: postgres
 --
 
 CREATE MATERIALIZED VIEW extra.adjudicationsourcecitationsourcegovernmentcache AS
- SELECT adjudicationsourcecitationsourcegovernment.sourceshort,
-    adjudicationsourcecitationsourcegovernment.governmentrelationstate
+ SELECT sourceshort,
+    governmentrelationstate
    FROM extra.adjudicationsourcecitationsourcegovernment
   WITH NO DATA;
 
 
-ALTER TABLE extra.adjudicationsourcecitationsourcegovernmentcache OWNER TO postgres;
+ALTER MATERIALIZED VIEW extra.adjudicationsourcecitationsourcegovernmentcache OWNER TO postgres;
 
 --
 -- Name: affectedgovernment_reconstructed; Type: MATERIALIZED VIEW; Schema: extra; Owner: postgres
@@ -8397,7 +8348,7 @@ CREATE MATERIALIZED VIEW extra.affectedgovernment_reconstructed AS
   WITH NO DATA;
 
 
-ALTER TABLE extra.affectedgovernment_reconstructed OWNER TO postgres;
+ALTER MATERIALIZED VIEW extra.affectedgovernment_reconstructed OWNER TO postgres;
 
 --
 -- Name: affectedgovernmentform; Type: VIEW; Schema: extra; Owner: postgres
@@ -8430,29 +8381,29 @@ CREATE VIEW extra.affectedgovernmentform AS
   ORDER BY (extra.governmentabbreviation(extra.governmentcurrentleadstateid(governmentforms.government))), governmentforms.government, (('J'::text || trunc(extra.eventsortdate(governmentforms.event), 0)))::date;
 
 
-ALTER TABLE extra.affectedgovernmentform OWNER TO postgres;
+ALTER VIEW extra.affectedgovernmentform OWNER TO postgres;
 
 --
 -- Name: affectedgovernmentformcache; Type: MATERIALIZED VIEW; Schema: extra; Owner: postgres
 --
 
 CREATE MATERIALIZED VIEW extra.affectedgovernmentformcache AS
- SELECT affectedgovernmentform."State",
-    affectedgovernmentform."ID",
-    affectedgovernmentform."Name",
-    affectedgovernmentform."Government Type",
-    affectedgovernmentform."Form",
-    affectedgovernmentform."Form Detailed",
-    affectedgovernmentform."Form ID",
-    affectedgovernmentform."Date",
-    affectedgovernmentform."Event",
-    affectedgovernmentform."Type-Form Match",
-    affectedgovernmentform."Recentness"
+ SELECT "State",
+    "ID",
+    "Name",
+    "Government Type",
+    "Form",
+    "Form Detailed",
+    "Form ID",
+    "Date",
+    "Event",
+    "Type-Form Match",
+    "Recentness"
    FROM extra.affectedgovernmentform
   WITH NO DATA;
 
 
-ALTER TABLE extra.affectedgovernmentformcache OWNER TO postgres;
+ALTER MATERIALIZED VIEW extra.affectedgovernmentformcache OWNER TO postgres;
 
 --
 -- Name: areagovernment; Type: VIEW; Schema: extra; Owner: postgres
@@ -8496,33 +8447,33 @@ CREATE VIEW extra.areagovernment AS
   ORDER BY ag2.governmentrelationstate, governmentshape.governmentshapeid;
 
 
-ALTER TABLE extra.areagovernment OWNER TO postgres;
+ALTER VIEW extra.areagovernment OWNER TO postgres;
 
 --
 -- Name: areagovernmentcache; Type: MATERIALIZED VIEW; Schema: extra; Owner: postgres
 --
 
 CREATE MATERIALIZED VIEW extra.areagovernmentcache AS
- SELECT areagovernment.governmentshapeid,
-    areagovernment.governmentrelationstate
+ SELECT governmentshapeid,
+    governmentrelationstate
    FROM extra.areagovernment
   WITH NO DATA;
 
 
-ALTER TABLE extra.areagovernmentcache OWNER TO postgres;
+ALTER MATERIALIZED VIEW extra.areagovernmentcache OWNER TO postgres;
 
 --
 -- Name: eventextra; Type: VIEW; Schema: extra; Owner: postgres
 --
 
 CREATE VIEW extra.eventextra AS
- SELECT event.eventid,
-    extra.eventslug(event.eventid) AS eventslug
+ SELECT eventid,
+    extra.eventslug(eventid) AS eventslug
    FROM geohistory.event
-  ORDER BY event.eventid;
+  ORDER BY eventid;
 
 
-ALTER TABLE extra.eventextra OWNER TO postgres;
+ALTER VIEW extra.eventextra OWNER TO postgres;
 
 --
 -- Name: eventslugretired; Type: TABLE; Schema: geohistory; Owner: postgres
@@ -8565,20 +8516,20 @@ UNION
   WITH NO DATA;
 
 
-ALTER TABLE extra.eventextracache OWNER TO postgres;
+ALTER MATERIALIZED VIEW extra.eventextracache OWNER TO postgres;
 
 --
 -- Name: eventgovernmentcache; Type: MATERIALIZED VIEW; Schema: extra; Owner: postgres
 --
 
 CREATE MATERIALIZED VIEW extra.eventgovernmentcache AS
- SELECT eventgovernment.eventid,
-    eventgovernment.government
+ SELECT eventid,
+    government
    FROM extra.eventgovernment
   WITH NO DATA;
 
 
-ALTER TABLE extra.eventgovernmentcache OWNER TO postgres;
+ALTER MATERIALIZED VIEW extra.eventgovernmentcache OWNER TO postgres;
 
 --
 -- Name: giscache; Type: MATERIALIZED VIEW; Schema: extra; Owner: postgres
@@ -8620,112 +8571,112 @@ CREATE MATERIALIZED VIEW extra.giscache AS
   WITH NO DATA;
 
 
-ALTER TABLE extra.giscache OWNER TO postgres;
+ALTER MATERIALIZED VIEW extra.giscache OWNER TO postgres;
 
 --
 -- Name: giscountycache; Type: VIEW; Schema: extra; Owner: postgres
 --
 
 CREATE VIEW extra.giscountycache AS
- SELECT giscache.government,
-    giscache.geometry
+ SELECT government,
+    geometry
    FROM extra.giscache
-  WHERE (giscache.government IN ( SELECT DISTINCT governmentshape.governmentcounty
+  WHERE (government IN ( SELECT DISTINCT governmentshape.governmentcounty
            FROM gis.governmentshape))
-  ORDER BY giscache.government;
+  ORDER BY government;
 
 
-ALTER TABLE extra.giscountycache OWNER TO postgres;
+ALTER VIEW extra.giscountycache OWNER TO postgres;
 
 --
 -- Name: gismunicipalitycache; Type: VIEW; Schema: extra; Owner: postgres
 --
 
 CREATE VIEW extra.gismunicipalitycache AS
- SELECT giscache.government,
-    giscache.geometry
+ SELECT government,
+    geometry
    FROM extra.giscache
-  WHERE (giscache.government IN ( SELECT DISTINCT governmentshape.governmentmunicipality
+  WHERE (government IN ( SELECT DISTINCT governmentshape.governmentmunicipality
            FROM gis.governmentshape))
-  ORDER BY giscache.government;
+  ORDER BY government;
 
 
-ALTER TABLE extra.gismunicipalitycache OWNER TO postgres;
+ALTER VIEW extra.gismunicipalitycache OWNER TO postgres;
 
 --
 -- Name: gisplsstownshipcache; Type: VIEW; Schema: extra; Owner: postgres
 --
 
 CREATE VIEW extra.gisplsstownshipcache AS
- SELECT giscache.government,
-    giscache.geometry
+ SELECT government,
+    geometry
    FROM extra.giscache
-  WHERE (giscache.government IN ( SELECT DISTINCT governmentshape.governmentshapeplsstownship
+  WHERE (government IN ( SELECT DISTINCT governmentshape.governmentshapeplsstownship
            FROM gis.governmentshape))
-  ORDER BY giscache.government;
+  ORDER BY government;
 
 
-ALTER TABLE extra.gisplsstownshipcache OWNER TO postgres;
+ALTER VIEW extra.gisplsstownshipcache OWNER TO postgres;
 
 --
 -- Name: gisschooldistrictcache; Type: VIEW; Schema: extra; Owner: postgres
 --
 
 CREATE VIEW extra.gisschooldistrictcache AS
- SELECT giscache.government,
-    giscache.geometry
+ SELECT government,
+    geometry
    FROM extra.giscache
-  WHERE (giscache.government IN ( SELECT DISTINCT governmentshape.governmentschooldistrict
+  WHERE (government IN ( SELECT DISTINCT governmentshape.governmentschooldistrict
            FROM gis.governmentshape))
-  ORDER BY giscache.government;
+  ORDER BY government;
 
 
-ALTER TABLE extra.gisschooldistrictcache OWNER TO postgres;
+ALTER VIEW extra.gisschooldistrictcache OWNER TO postgres;
 
 --
 -- Name: gissubmunicipalitycache; Type: VIEW; Schema: extra; Owner: postgres
 --
 
 CREATE VIEW extra.gissubmunicipalitycache AS
- SELECT giscache.government,
-    giscache.geometry
+ SELECT government,
+    geometry
    FROM extra.giscache
-  WHERE (giscache.government IN ( SELECT DISTINCT governmentshape.governmentsubmunicipality
+  WHERE (government IN ( SELECT DISTINCT governmentshape.governmentsubmunicipality
            FROM gis.governmentshape))
-  ORDER BY giscache.government;
+  ORDER BY government;
 
 
-ALTER TABLE extra.gissubmunicipalitycache OWNER TO postgres;
+ALTER VIEW extra.gissubmunicipalitycache OWNER TO postgres;
 
 --
 -- Name: giswardcache; Type: VIEW; Schema: extra; Owner: postgres
 --
 
 CREATE VIEW extra.giswardcache AS
- SELECT giscache.government,
-    giscache.geometry
+ SELECT government,
+    geometry
    FROM extra.giscache
-  WHERE (giscache.government IN ( SELECT DISTINCT governmentshape.governmentward
+  WHERE (government IN ( SELECT DISTINCT governmentshape.governmentward
            FROM gis.governmentshape))
-  ORDER BY giscache.government;
+  ORDER BY government;
 
 
-ALTER TABLE extra.giswardcache OWNER TO postgres;
+ALTER VIEW extra.giswardcache OWNER TO postgres;
 
 --
 -- Name: governmentbookcompleteorder; Type: VIEW; Schema: extra; Owner: postgres
 --
 
 CREATE VIEW extra.governmentbookcompleteorder AS
- SELECT extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentcurrentleadparent)) AS governmentabbreviation,
-    government.governmentid,
-    extra.governmentlong(government.governmentid) AS governmentlong,
-    row_number() OVER (ORDER BY (extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentcurrentleadparent))), government.governmentcurrentleadparent, (extra.governmentshort(government.governmentid))) AS roworder
+ SELECT extra.governmentabbreviation(extra.governmentcurrentleadstateid(governmentcurrentleadparent)) AS governmentabbreviation,
+    governmentid,
+    extra.governmentlong(governmentid) AS governmentlong,
+    row_number() OVER (ORDER BY (extra.governmentabbreviation(extra.governmentcurrentleadstateid(governmentcurrentleadparent))), governmentcurrentleadparent, (extra.governmentshort(governmentid))) AS roworder
    FROM geohistory.government
-  WHERE (government.governmentbookcomplete IS NOT NULL);
+  WHERE (governmentbookcomplete IS NOT NULL);
 
 
-ALTER TABLE extra.governmentbookcompleteorder OWNER TO postgres;
+ALTER VIEW extra.governmentbookcompleteorder OWNER TO postgres;
 
 --
 -- Name: affectedtype; Type: TABLE; Schema: geohistory; Owner: postgres
@@ -8983,45 +8934,45 @@ CREATE VIEW extra.governmentchangecount AS
         END, (extra.governmentlong(government.governmentid)), government.governmentid;
 
 
-ALTER TABLE extra.governmentchangecount OWNER TO postgres;
+ALTER VIEW extra.governmentchangecount OWNER TO postgres;
 
 --
 -- Name: governmentchangecountcache; Type: MATERIALIZED VIEW; Schema: extra; Owner: postgres
 --
 
 CREATE MATERIALIZED VIEW extra.governmentchangecountcache AS
- SELECT governmentchangecount.governmentstate,
-    governmentchangecount.governmentlevel,
-    governmentchangecount.governmenttype,
-    governmentchangecount.currentform,
-    governmentchangecount.currentformdetailed,
-    governmentchangecount.governmentleadparentcounty,
-    governmentchangecount.governmentid,
-    governmentchangecount.governmentlong,
-    governmentchangecount.creation,
-    governmentchangecount.creationevent,
-    governmentchangecount.creationtext,
-    governmentchangecount.creationprecision,
-    governmentchangecount.creationsort,
-    governmentchangecount.creationhow,
-    governmentchangecount.creationlawsection,
-    governmentchangecount.creationas,
-    governmentchangecount.alterfrom,
-    governmentchangecount.alterto,
-    governmentchangecount.altertotal,
-    governmentchangecount.dissolution,
-    governmentchangecount.dissolutionevent,
-    governmentchangecount.dissolutiontext,
-    governmentchangecount.dissolutionprecision,
-    governmentchangecount.dissolutionsort,
-    governmentchangecount.dissolutionhow,
-    governmentchangecount.dissolutionlawsection,
-    governmentchangecount.dissolutionas
+ SELECT governmentstate,
+    governmentlevel,
+    governmenttype,
+    currentform,
+    currentformdetailed,
+    governmentleadparentcounty,
+    governmentid,
+    governmentlong,
+    creation,
+    creationevent,
+    creationtext,
+    creationprecision,
+    creationsort,
+    creationhow,
+    creationlawsection,
+    creationas,
+    alterfrom,
+    alterto,
+    altertotal,
+    dissolution,
+    dissolutionevent,
+    dissolutiontext,
+    dissolutionprecision,
+    dissolutionsort,
+    dissolutionhow,
+    dissolutionlawsection,
+    dissolutionas
    FROM extra.governmentchangecount
   WITH NO DATA;
 
 
-ALTER TABLE extra.governmentchangecountcache OWNER TO postgres;
+ALTER MATERIALIZED VIEW extra.governmentchangecountcache OWNER TO postgres;
 
 --
 -- Name: governmentchangecountpart; Type: VIEW; Schema: extra; Owner: postgres
@@ -9183,45 +9134,45 @@ CREATE VIEW extra.governmentchangecountpart AS
         END, (extra.governmentlong(government.governmentid)), government.governmentid;
 
 
-ALTER TABLE extra.governmentchangecountpart OWNER TO postgres;
+ALTER VIEW extra.governmentchangecountpart OWNER TO postgres;
 
 --
 -- Name: governmentchangecountpartcache; Type: MATERIALIZED VIEW; Schema: extra; Owner: postgres
 --
 
 CREATE MATERIALIZED VIEW extra.governmentchangecountpartcache AS
- SELECT governmentchangecountpart.governmentstate,
-    governmentchangecountpart.governmentlevel,
-    governmentchangecountpart.governmenttype,
-    governmentchangecountpart.currentform,
-    governmentchangecountpart.currentformdetailed,
-    governmentchangecountpart.governmentleadparentcounty,
-    governmentchangecountpart.governmentid,
-    governmentchangecountpart.governmentlong,
-    governmentchangecountpart.creation,
-    governmentchangecountpart.creationevent,
-    governmentchangecountpart.creationtext,
-    governmentchangecountpart.creationprecision,
-    governmentchangecountpart.creationsort,
-    governmentchangecountpart.creationhow,
-    governmentchangecountpart.creationlawsection,
-    governmentchangecountpart.alterfrom,
-    governmentchangecountpart.alterto,
-    governmentchangecountpart.altertotal,
-    governmentchangecountpart.dissolution,
-    governmentchangecountpart.dissolutionevent,
-    governmentchangecountpart.dissolutiontext,
-    governmentchangecountpart.dissolutionprecision,
-    governmentchangecountpart.dissolutionsort,
-    governmentchangecountpart.dissolutionhow,
-    governmentchangecountpart.dissolutionlawsection,
-    governmentchangecountpart.governmentsubstituteid,
-    governmentchangecountpart.governmentsubstitutelong
+ SELECT governmentstate,
+    governmentlevel,
+    governmenttype,
+    currentform,
+    currentformdetailed,
+    governmentleadparentcounty,
+    governmentid,
+    governmentlong,
+    creation,
+    creationevent,
+    creationtext,
+    creationprecision,
+    creationsort,
+    creationhow,
+    creationlawsection,
+    alterfrom,
+    alterto,
+    altertotal,
+    dissolution,
+    dissolutionevent,
+    dissolutiontext,
+    dissolutionprecision,
+    dissolutionsort,
+    dissolutionhow,
+    dissolutionlawsection,
+    governmentsubstituteid,
+    governmentsubstitutelong
    FROM extra.governmentchangecountpart
   WITH NO DATA;
 
 
-ALTER TABLE extra.governmentchangecountpartcache OWNER TO postgres;
+ALTER MATERIALIZED VIEW extra.governmentchangecountpartcache OWNER TO postgres;
 
 --
 -- Name: governmentextra; Type: VIEW; Schema: extra; Owner: postgres
@@ -9239,25 +9190,25 @@ CREATE VIEW extra.governmentextra AS
   ORDER BY government.governmentid;
 
 
-ALTER TABLE extra.governmentextra OWNER TO postgres;
+ALTER VIEW extra.governmentextra OWNER TO postgres;
 
 --
 -- Name: governmentextracache; Type: MATERIALIZED VIEW; Schema: extra; Owner: postgres
 --
 
 CREATE MATERIALIZED VIEW extra.governmentextracache AS
- SELECT governmentextra.governmentid,
-    governmentextra.governmentslug,
-    governmentextra.governmentlong,
-    governmentextra.governmentshort,
-    governmentextra.governmentisplaceholder,
-    governmentextra.governmentsubstituteslug
+ SELECT governmentid,
+    governmentslug,
+    governmentlong,
+    governmentshort,
+    governmentisplaceholder,
+    governmentsubstituteslug
    FROM extra.governmentextra
-  ORDER BY governmentextra.governmentid
+  ORDER BY governmentid
   WITH NO DATA;
 
 
-ALTER TABLE extra.governmentextracache OWNER TO postgres;
+ALTER MATERIALIZED VIEW extra.governmentextracache OWNER TO postgres;
 
 --
 -- Name: governmenthasmappedevent; Type: VIEW; Schema: extra; Owner: postgres
@@ -9277,51 +9228,51 @@ UNION
      JOIN extra.governmentsubstitute ON ((affectedgovernmentpart.governmentto = governmentsubstitute.governmentid)));
 
 
-ALTER TABLE extra.governmenthasmappedevent OWNER TO postgres;
+ALTER VIEW extra.governmenthasmappedevent OWNER TO postgres;
 
 --
 -- Name: governmenthasmappedeventcache; Type: MATERIALIZED VIEW; Schema: extra; Owner: postgres
 --
 
 CREATE MATERIALIZED VIEW extra.governmenthasmappedeventcache AS
- SELECT governmenthasmappedevent.governmentsubstitute
+ SELECT governmentsubstitute
    FROM extra.governmenthasmappedevent
   WITH NO DATA;
 
 
-ALTER TABLE extra.governmenthasmappedeventcache OWNER TO postgres;
+ALTER MATERIALIZED VIEW extra.governmenthasmappedeventcache OWNER TO postgres;
 
 --
 -- Name: governmentparentcache; Type: MATERIALIZED VIEW; Schema: extra; Owner: postgres
 --
 
 CREATE MATERIALIZED VIEW extra.governmentparentcache AS
- SELECT governmentparent.governmentid,
-    governmentparent.governmentparent,
-    governmentparent.governmentparentstatus
+ SELECT governmentid,
+    governmentparent,
+    governmentparentstatus
    FROM extra.governmentparent
   WITH NO DATA;
 
 
-ALTER TABLE extra.governmentparentcache OWNER TO postgres;
+ALTER MATERIALIZED VIEW extra.governmentparentcache OWNER TO postgres;
 
 --
 -- Name: governmentrelationcache; Type: MATERIALIZED VIEW; Schema: extra; Owner: postgres
 --
 
 CREATE MATERIALIZED VIEW extra.governmentrelationcache AS
- SELECT governmentrelation.governmentid,
-    governmentrelation.governmentlevel,
-    governmentrelation.governmentshort,
-    governmentrelation.governmentlong,
-    governmentrelation.governmentrelationlevel,
-    governmentrelation.governmentrelation,
-    governmentrelation.governmentrelationstate
+ SELECT governmentid,
+    governmentlevel,
+    governmentshort,
+    governmentlong,
+    governmentrelationlevel,
+    governmentrelation,
+    governmentrelationstate
    FROM extra.governmentrelation
   WITH NO DATA;
 
 
-ALTER TABLE extra.governmentrelationcache OWNER TO postgres;
+ALTER MATERIALIZED VIEW extra.governmentrelationcache OWNER TO postgres;
 
 --
 -- Name: governmentshape_history; Type: VIEW; Schema: extra; Owner: postgres
@@ -9385,7 +9336,7 @@ UNION
   ORDER BY 1, 2;
 
 
-ALTER TABLE extra.governmentshape_history OWNER TO postgres;
+ALTER VIEW extra.governmentshape_history OWNER TO postgres;
 
 --
 -- Name: governmentshapeextra; Type: VIEW; Schema: extra; Owner: postgres
@@ -9417,21 +9368,21 @@ CREATE VIEW extra.governmentshapeextra AS
   ORDER BY areaslugs.governmentshapeid;
 
 
-ALTER TABLE extra.governmentshapeextra OWNER TO postgres;
+ALTER VIEW extra.governmentshapeextra OWNER TO postgres;
 
 --
 -- Name: governmentshapeextracache; Type: MATERIALIZED VIEW; Schema: extra; Owner: postgres
 --
 
 CREATE MATERIALIZED VIEW extra.governmentshapeextracache AS
- SELECT governmentshapeextra.governmentshapeid,
-    governmentshapeextra.governmentshapeslug
+ SELECT governmentshapeid,
+    governmentshapeslug
    FROM extra.governmentshapeextra
-  ORDER BY governmentshapeextra.governmentshapeid
+  ORDER BY governmentshapeid
   WITH NO DATA;
 
 
-ALTER TABLE extra.governmentshapeextracache OWNER TO postgres;
+ALTER MATERIALIZED VIEW extra.governmentshapeextracache OWNER TO postgres;
 
 --
 -- Name: governmentsourceextra; Type: VIEW; Schema: extra; Owner: postgres
@@ -9465,34 +9416,34 @@ CREATE VIEW extra.governmentsourceextra AS
   ORDER BY governmentsourceslugs.governmentsourceid;
 
 
-ALTER TABLE extra.governmentsourceextra OWNER TO postgres;
+ALTER VIEW extra.governmentsourceextra OWNER TO postgres;
 
 --
 -- Name: governmentsourceextracache; Type: MATERIALIZED VIEW; Schema: extra; Owner: postgres
 --
 
 CREATE MATERIALIZED VIEW extra.governmentsourceextracache AS
- SELECT governmentsourceextra.governmentsourceid,
-    governmentsourceextra.governmentsourceslug
+ SELECT governmentsourceid,
+    governmentsourceslug
    FROM extra.governmentsourceextra
   WITH NO DATA;
 
 
-ALTER TABLE extra.governmentsourceextracache OWNER TO postgres;
+ALTER MATERIALIZED VIEW extra.governmentsourceextracache OWNER TO postgres;
 
 --
 -- Name: governmentsubstitutecache; Type: MATERIALIZED VIEW; Schema: extra; Owner: postgres
 --
 
 CREATE MATERIALIZED VIEW extra.governmentsubstitutecache AS
- SELECT governmentsubstitute.governmentid,
-    governmentsubstitute.governmentsubstitute,
-    governmentsubstitute.governmentsubstitutemultiple
+ SELECT governmentid,
+    governmentsubstitute,
+    governmentsubstitutemultiple
    FROM extra.governmentsubstitute
   WITH NO DATA;
 
 
-ALTER TABLE extra.governmentsubstitutecache OWNER TO postgres;
+ALTER MATERIALIZED VIEW extra.governmentsubstitutecache OWNER TO postgres;
 
 --
 -- Name: lastrefresh; Type: MATERIALIZED VIEW; Schema: extra; Owner: postgres
@@ -9503,7 +9454,7 @@ CREATE MATERIALIZED VIEW extra.lastrefresh AS
   WITH NO DATA;
 
 
-ALTER TABLE extra.lastrefresh OWNER TO postgres;
+ALTER MATERIALIZED VIEW extra.lastrefresh OWNER TO postgres;
 
 --
 -- Name: lawalternatesection; Type: TABLE; Schema: geohistory; Owner: postgres
@@ -9525,29 +9476,29 @@ ALTER TABLE geohistory.lawalternatesection OWNER TO postgres;
 --
 
 CREATE VIEW extra.lawalternatesectionextra AS
- SELECT lawalternatesection.lawalternatesectionid AS lawsectionid,
-    extra.lawalternatesectioncitation(lawalternatesection.lawalternatesectionid) AS lawsectioncitation,
-    (extra.lawalternatesectionslug(lawalternatesection.lawalternatesectionid) || '-alternate'::text) AS lawsectionslug
+ SELECT lawalternatesectionid AS lawsectionid,
+    extra.lawalternatesectioncitation(lawalternatesectionid) AS lawsectioncitation,
+    (extra.lawalternatesectionslug(lawalternatesectionid) || '-alternate'::text) AS lawsectionslug
    FROM geohistory.lawalternatesection
-  ORDER BY lawalternatesection.lawalternatesectionid;
+  ORDER BY lawalternatesectionid;
 
 
-ALTER TABLE extra.lawalternatesectionextra OWNER TO postgres;
+ALTER VIEW extra.lawalternatesectionextra OWNER TO postgres;
 
 --
 -- Name: lawalternatesectionextracache; Type: MATERIALIZED VIEW; Schema: extra; Owner: postgres
 --
 
 CREATE MATERIALIZED VIEW extra.lawalternatesectionextracache AS
- SELECT lawalternatesectionextra.lawsectionid,
-    lawalternatesectionextra.lawsectioncitation,
-    lawalternatesectionextra.lawsectionslug
+ SELECT lawsectionid,
+    lawsectioncitation,
+    lawsectionslug
    FROM extra.lawalternatesectionextra
-  ORDER BY lawalternatesectionextra.lawsectionid
+  ORDER BY lawsectionid
   WITH NO DATA;
 
 
-ALTER TABLE extra.lawalternatesectionextracache OWNER TO postgres;
+ALTER MATERIALIZED VIEW extra.lawalternatesectionextracache OWNER TO postgres;
 
 --
 -- Name: lawsectionextra; Type: VIEW; Schema: extra; Owner: postgres
@@ -9561,33 +9512,33 @@ CREATE VIEW extra.lawsectionextra AS
             row_number() OVER (PARTITION BY (extra.lawsectionslug(lawsection.lawsectionid)) ORDER BY lawsection.lawsectionid) AS row_number
            FROM geohistory.lawsection
         )
- SELECT lawsections.lawsectionid,
-    lawsections.lawsectioncitation,
-    (lawsections.lawsectionslug ||
+ SELECT lawsectionid,
+    lawsectioncitation,
+    (lawsectionslug ||
         CASE
-            WHEN (lawsections.row_number > 1) THEN ('-pt'::text || lawsections.row_number)
+            WHEN (row_number > 1) THEN ('-pt'::text || row_number)
             ELSE ''::text
         END) AS lawsectionslug
    FROM lawsections
-  ORDER BY lawsections.lawsectionid;
+  ORDER BY lawsectionid;
 
 
-ALTER TABLE extra.lawsectionextra OWNER TO postgres;
+ALTER VIEW extra.lawsectionextra OWNER TO postgres;
 
 --
 -- Name: lawsectionextracache; Type: MATERIALIZED VIEW; Schema: extra; Owner: postgres
 --
 
 CREATE MATERIALIZED VIEW extra.lawsectionextracache AS
- SELECT lawsectionextra.lawsectionid,
-    lawsectionextra.lawsectioncitation,
-    lawsectionextra.lawsectionslug
+ SELECT lawsectionid,
+    lawsectioncitation,
+    lawsectionslug
    FROM extra.lawsectionextra
-  ORDER BY lawsectionextra.lawsectionid
+  ORDER BY lawsectionid
   WITH NO DATA;
 
 
-ALTER TABLE extra.lawsectionextracache OWNER TO postgres;
+ALTER MATERIALIZED VIEW extra.lawsectionextracache OWNER TO postgres;
 
 --
 -- Name: lawsectiongovernment; Type: VIEW; Schema: extra; Owner: postgres
@@ -9614,50 +9565,50 @@ CREATE VIEW extra.lawsectiongovernment AS
   ORDER BY ag2.governmentrelationstate, lawsection.lawsectionid;
 
 
-ALTER TABLE extra.lawsectiongovernment OWNER TO postgres;
+ALTER VIEW extra.lawsectiongovernment OWNER TO postgres;
 
 --
 -- Name: lawsectiongovernmentcache; Type: MATERIALIZED VIEW; Schema: extra; Owner: postgres
 --
 
 CREATE MATERIALIZED VIEW extra.lawsectiongovernmentcache AS
- SELECT lawsectiongovernment.lawsectionid,
-    lawsectiongovernment.governmentrelationstate,
-    lawsectiongovernment.lawsectioncitation
+ SELECT lawsectionid,
+    governmentrelationstate,
+    lawsectioncitation
    FROM extra.lawsectiongovernment
   WITH NO DATA;
 
 
-ALTER TABLE extra.lawsectiongovernmentcache OWNER TO postgres;
+ALTER MATERIALIZED VIEW extra.lawsectiongovernmentcache OWNER TO postgres;
 
 --
 -- Name: metesdescriptionextra; Type: VIEW; Schema: extra; Owner: postgres
 --
 
 CREATE VIEW extra.metesdescriptionextra AS
- SELECT metesdescription.metesdescriptionid,
-    extra.metesdescriptionlong(metesdescription.metesdescriptionid) AS metesdescriptionlong,
-    extra.metesdescriptionslug(metesdescription.metesdescriptionid) AS metesdescriptionslug
+ SELECT metesdescriptionid,
+    extra.metesdescriptionlong(metesdescriptionid) AS metesdescriptionlong,
+    extra.metesdescriptionslug(metesdescriptionid) AS metesdescriptionslug
    FROM geohistory.metesdescription
-  ORDER BY metesdescription.metesdescriptionid;
+  ORDER BY metesdescriptionid;
 
 
-ALTER TABLE extra.metesdescriptionextra OWNER TO postgres;
+ALTER VIEW extra.metesdescriptionextra OWNER TO postgres;
 
 --
 -- Name: metesdescriptionextracache; Type: MATERIALIZED VIEW; Schema: extra; Owner: postgres
 --
 
 CREATE MATERIALIZED VIEW extra.metesdescriptionextracache AS
- SELECT metesdescriptionextra.metesdescriptionid,
-    metesdescriptionextra.metesdescriptionlong,
-    metesdescriptionextra.metesdescriptionslug
+ SELECT metesdescriptionid,
+    metesdescriptionlong,
+    metesdescriptionslug
    FROM extra.metesdescriptionextra
-  ORDER BY metesdescriptionextra.metesdescriptionid
+  ORDER BY metesdescriptionid
   WITH NO DATA;
 
 
-ALTER TABLE extra.metesdescriptionextracache OWNER TO postgres;
+ALTER MATERIALIZED VIEW extra.metesdescriptionextracache OWNER TO postgres;
 
 --
 -- Name: sourcecitation; Type: TABLE; Schema: geohistory; Owner: postgres
@@ -9737,21 +9688,21 @@ CREATE VIEW extra.sourcecitationextra AS
   ORDER BY sourcecitationslugs.sourcecitationid;
 
 
-ALTER TABLE extra.sourcecitationextra OWNER TO postgres;
+ALTER VIEW extra.sourcecitationextra OWNER TO postgres;
 
 --
 -- Name: sourcecitationextracache; Type: MATERIALIZED VIEW; Schema: extra; Owner: postgres
 --
 
 CREATE MATERIALIZED VIEW extra.sourcecitationextracache AS
- SELECT sourcecitationextra.sourcecitationid,
-    sourcecitationextra.sourcecitationslug
+ SELECT sourcecitationid,
+    sourcecitationslug
    FROM extra.sourcecitationextra
-  ORDER BY sourcecitationextra.sourcecitationid
+  ORDER BY sourcecitationid
   WITH NO DATA;
 
 
-ALTER TABLE extra.sourcecitationextracache OWNER TO postgres;
+ALTER MATERIALIZED VIEW extra.sourcecitationextracache OWNER TO postgres;
 
 --
 -- Name: sourcecitationevent; Type: TABLE; Schema: geohistory; Owner: postgres
@@ -9790,90 +9741,139 @@ CREATE VIEW extra.sourcecitationgovernment AS
   ORDER BY ag2.governmentrelationstate, sourcecitation.sourcecitationid;
 
 
-ALTER TABLE extra.sourcecitationgovernment OWNER TO postgres;
+ALTER VIEW extra.sourcecitationgovernment OWNER TO postgres;
 
 --
 -- Name: sourcecitationgovernmentcache; Type: MATERIALIZED VIEW; Schema: extra; Owner: postgres
 --
 
 CREATE MATERIALIZED VIEW extra.sourcecitationgovernmentcache AS
- SELECT sourcecitationgovernment.sourcecitationid,
-    sourcecitationgovernment.governmentrelationstate
+ SELECT sourcecitationid,
+    governmentrelationstate
    FROM extra.sourcecitationgovernment
   WITH NO DATA;
 
 
-ALTER TABLE extra.sourcecitationgovernmentcache OWNER TO postgres;
+ALTER MATERIALIZED VIEW extra.sourcecitationgovernmentcache OWNER TO postgres;
 
 --
 -- Name: sourceextra; Type: VIEW; Schema: extra; Owner: postgres
 --
 
 CREATE VIEW extra.sourceextra AS
- SELECT source.sourceid,
-    ((source.sourceshort)::text ||
+ SELECT sourceid,
+    ((sourceshort)::text ||
         CASE
-            WHEN ((source.sourceshortpart)::text <> ''::text) THEN (' '::text || (source.sourceshortpart)::text)
+            WHEN ((sourceshortpart)::text <> ''::text) THEN (' '::text || (sourceshortpart)::text)
             ELSE ''::text
         END) AS sourceabbreviation,
     array_to_string(ARRAY[
         CASE
-            WHEN (source.sourceperson = ''::text) THEN NULL::text
-            ELSE (source.sourceperson ||
+            WHEN (sourceperson = ''::text) THEN NULL::text
+            ELSE (sourceperson ||
             CASE
-                WHEN ("right"(source.sourceperson, 1) = '.'::text) THEN ''::text
+                WHEN ("right"(sourceperson, 1) = '.'::text) THEN ''::text
                 ELSE '.'::text
             END)
         END,
         CASE
-            WHEN (source.sourcesectiontitle = ''::text) THEN NULL::text
-            ELSE (('&quot;'::text || source.sourcesectiontitle) || '.&quot;'::text)
+            WHEN (sourcesectiontitle = ''::text) THEN NULL::text
+            ELSE (('&quot;'::text || sourcesectiontitle) || '.&quot;'::text)
         END,
         CASE
-            WHEN (source.sourcetitle = ''::text) THEN NULL::text
-            ELSE (('<span style="font-style: italic;">'::text || source.sourcetitle) || '</span>.'::text)
+            WHEN (sourcetitle = ''::text) THEN NULL::text
+            ELSE (('<span style="font-style: italic;">'::text || sourcetitle) || '</span>.'::text)
         END,
         CASE
-            WHEN (source.sourceidentifier = ''::text) THEN NULL::text
-            ELSE (source.sourceidentifier || '.'::text)
+            WHEN (sourceidentifier = ''::text) THEN NULL::text
+            ELSE (sourceidentifier || '.'::text)
         END,
         CASE
-            WHEN ((source.sourcepublisherlocation = ''::text) AND (source.sourcepublisher <> ''::text)) THEN '?:'::text
-            WHEN (source.sourcepublisherlocation = ''::text) THEN NULL::text
+            WHEN ((sourcepublisherlocation = ''::text) AND (sourcepublisher <> ''::text)) THEN '?:'::text
+            WHEN (sourcepublisherlocation = ''::text) THEN NULL::text
             ELSE (((
             CASE
-                WHEN ((source.sourcetype)::text = 'newspapers'::text) THEN '('::text
+                WHEN ((sourcetype)::text = 'newspapers'::text) THEN '('::text
                 ELSE ''::text
-            END || source.sourcepublisherlocation) ||
+            END || sourcepublisherlocation) ||
             CASE
-                WHEN ((source.sourcetype)::text = 'newspapers'::text) THEN ')'::text
+                WHEN ((sourcetype)::text = 'newspapers'::text) THEN ')'::text
                 ELSE ''::text
             END) ||
             CASE
-                WHEN (source.sourcepublisher <> ''::text) THEN ':'::text
-                WHEN ((source.sourcepublisheryear)::text <> ''::text) THEN ','::text
-                WHEN (("right"(source.sourcepublisherlocation, 1) = '.'::text) AND ((source.sourcetype)::text <> 'newspapers'::text)) THEN ''::text
+                WHEN (sourcepublisher <> ''::text) THEN ':'::text
+                WHEN ((sourcepublisheryear)::text <> ''::text) THEN ','::text
+                WHEN (("right"(sourcepublisherlocation, 1) = '.'::text) AND ((sourcetype)::text <> 'newspapers'::text)) THEN ''::text
                 ELSE '.'::text
             END)
         END,
         CASE
-            WHEN (source.sourcepublisher = ''::text) THEN NULL::text
-            ELSE (source.sourcepublisher ||
+            WHEN (sourcepublisher = ''::text) THEN NULL::text
+            ELSE (sourcepublisher ||
             CASE
-                WHEN ((source.sourcepublisheryear)::text <> ''::text) THEN ','::text
-                WHEN ("right"(source.sourcepublisher, 1) = '.'::text) THEN ''::text
+                WHEN ((sourcepublisheryear)::text <> ''::text) THEN ','::text
+                WHEN ("right"(sourcepublisher, 1) = '.'::text) THEN ''::text
                 ELSE '.'::text
             END)
         END,
         CASE
-            WHEN ((source.sourcepublisheryear)::text = ''::text) THEN NULL::text
-            ELSE ((source.sourcepublisheryear)::text || '.'::text)
+            WHEN ((sourcepublisheryear)::text = ''::text) THEN NULL::text
+            ELSE ((sourcepublisheryear)::text || '.'::text)
         END], ' '::text) AS sourcefullcitation
    FROM geohistory.source
-  ORDER BY source.sourceid;
+  ORDER BY sourceid;
 
 
-ALTER TABLE extra.sourceextra OWNER TO postgres;
+ALTER VIEW extra.sourceextra OWNER TO postgres;
+
+--
+-- Name: governmentidentifier; Type: TABLE; Schema: geohistory; Owner: postgres
+--
+
+CREATE TABLE geohistory.governmentidentifier (
+    governmentidentifierid integer NOT NULL,
+    government integer,
+    governmentidentifiertype integer NOT NULL,
+    governmentidentifierprefix character varying(20) DEFAULT ''::character varying NOT NULL,
+    governmentidentifier character varying(20) DEFAULT ''::character varying NOT NULL,
+    governmentidentifiernote text DEFAULT ''::text NOT NULL,
+    governmentidentifiermatchtype character varying(30) DEFAULT ''::character varying NOT NULL,
+    governmentidentifiermatchdate date,
+    governmentidentifierlead boolean GENERATED ALWAYS AS ((((governmentidentifiermatchtype)::text ~~ 'current%'::text) OR ((governmentidentifiermatchtype)::text = 'full'::text) OR ((governmentidentifiermatchtype)::text ~~ '%lead'::text))) STORED,
+    governmentidentifierstatus text GENERATED ALWAYS AS (
+CASE
+    WHEN (((governmentidentifiermatchtype)::text ~~ 'current%'::text) OR ((governmentidentifiermatchtype)::text = 'full'::text) OR ((governmentidentifiermatchtype)::text ~~ '%lead'::text)) THEN 'Lead'::text
+    WHEN ((governmentidentifiermatchtype)::text = ANY (ARRAY[('historic-successor'::character varying)::text, ('reference'::character varying)::text])) THEN 'Reference'::text
+    WHEN ((governmentidentifiermatchtype)::text ~~ 'historic%'::text) THEN 'Historic'::text
+    WHEN ((governmentidentifiermatchtype)::text = ''::text) THEN ''::text
+    ELSE 'Other'::text
+END) STORED
+);
+
+
+ALTER TABLE geohistory.governmentidentifier OWNER TO postgres;
+
+--
+-- Name: COLUMN governmentidentifier.governmentidentifiermatchtype; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.governmentidentifier.governmentidentifiermatchtype IS 'current-alternate: Current government with correct spelling shown as USGS alternate.
+current-obsolete: Current government with obsolete USGS spelling.
+current-spelling: Current government with USGS spelling mismatch.
+current-status: Current government with USGS historic flag.
+delete: Should be merged into another feature ID.
+full: Spelling and status match.
+historic-alternate: Historic government with correct spelling shown as USGS alternate.
+historic-county: Temporary historic government created after county division.
+historic-match: Secondary records with spelling match.
+historic-missing: Successor current government does not list as USGS alternate (name change).
+historic-obsolete: Historic government with USGS spelling match.
+historic-spelling: Historic government with USGS alternate spelling mismatch.
+historic-status: Historic government missing USGS historic flag.
+historic-successor: Successor current government does not list as USGS alternate (merger-consolidation).
+
+Entries other than current-* or full can also be combined with -lead flag.';
+
 
 --
 -- Name: statistics_createddissolved; Type: MATERIALIZED VIEW; Schema: extra; Owner: postgres
@@ -10160,7 +10160,7 @@ CREATE MATERIALIZED VIEW extra.statistics_createddissolved AS
   WITH NO DATA;
 
 
-ALTER TABLE extra.statistics_createddissolved OWNER TO postgres;
+ALTER MATERIALIZED VIEW extra.statistics_createddissolved OWNER TO postgres;
 
 --
 -- Name: statistics_eventtype; Type: MATERIALIZED VIEW; Schema: extra; Owner: postgres
@@ -10312,7 +10312,7 @@ UNION
   WITH NO DATA;
 
 
-ALTER TABLE extra.statistics_eventtype OWNER TO postgres;
+ALTER MATERIALIZED VIEW extra.statistics_eventtype OWNER TO postgres;
 
 --
 -- Name: governmentmapstatus; Type: TABLE; Schema: geohistory; Owner: postgres
@@ -10594,7 +10594,7 @@ UNION
   WITH NO DATA;
 
 
-ALTER TABLE extra.statistics_mapped OWNER TO postgres;
+ALTER MATERIALIZED VIEW extra.statistics_mapped OWNER TO postgres;
 
 --
 -- Name: eventtype; Type: TABLE; Schema: geohistory; Owner: postgres
@@ -11085,7 +11085,7 @@ CREATE SEQUENCE geohistory.adjudication_adjudicationid_seq
     CACHE 1;
 
 
-ALTER TABLE geohistory.adjudication_adjudicationid_seq OWNER TO postgres;
+ALTER SEQUENCE geohistory.adjudication_adjudicationid_seq OWNER TO postgres;
 
 --
 -- Name: adjudication_adjudicationid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
@@ -11106,7 +11106,7 @@ CREATE SEQUENCE geohistory.adjudicationevent_adjudicationeventid_seq
     CACHE 1;
 
 
-ALTER TABLE geohistory.adjudicationevent_adjudicationeventid_seq OWNER TO postgres;
+ALTER SEQUENCE geohistory.adjudicationevent_adjudicationeventid_seq OWNER TO postgres;
 
 --
 -- Name: adjudicationevent_adjudicationeventid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
@@ -11127,7 +11127,7 @@ CREATE SEQUENCE geohistory.adjudicationlocation_adjudicationlocationid_seq
     CACHE 1;
 
 
-ALTER TABLE geohistory.adjudicationlocation_adjudicationlocationid_seq OWNER TO postgres;
+ALTER SEQUENCE geohistory.adjudicationlocation_adjudicationlocationid_seq OWNER TO postgres;
 
 --
 -- Name: adjudicationlocation_adjudicationlocationid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
@@ -11148,7 +11148,7 @@ CREATE SEQUENCE geohistory.adjudicationlocationtype_adjudicationlocationtypeid_s
     CACHE 1;
 
 
-ALTER TABLE geohistory.adjudicationlocationtype_adjudicationlocationtypeid_seq OWNER TO postgres;
+ALTER SEQUENCE geohistory.adjudicationlocationtype_adjudicationlocationtypeid_seq OWNER TO postgres;
 
 --
 -- Name: adjudicationlocationtype_adjudicationlocationtypeid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
@@ -11169,7 +11169,7 @@ CREATE SEQUENCE geohistory.adjudicationsourcecitation_adjudicationsourcecitation
     CACHE 1;
 
 
-ALTER TABLE geohistory.adjudicationsourcecitation_adjudicationsourcecitationid_seq OWNER TO postgres;
+ALTER SEQUENCE geohistory.adjudicationsourcecitation_adjudicationsourcecitationid_seq OWNER TO postgres;
 
 --
 -- Name: adjudicationsourcecitation_adjudicationsourcecitationid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
@@ -11190,7 +11190,7 @@ CREATE SEQUENCE geohistory.adjudicationtype_adjudicationtypeid_seq
     CACHE 1;
 
 
-ALTER TABLE geohistory.adjudicationtype_adjudicationtypeid_seq OWNER TO postgres;
+ALTER SEQUENCE geohistory.adjudicationtype_adjudicationtypeid_seq OWNER TO postgres;
 
 --
 -- Name: adjudicationtype_adjudicationtypeid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
@@ -11212,7 +11212,7 @@ CREATE SEQUENCE geohistory.affectedgovernmentgroup_affectedgovernmentgroupid_seq
     CACHE 1;
 
 
-ALTER TABLE geohistory.affectedgovernmentgroup_affectedgovernmentgroupid_seq OWNER TO postgres;
+ALTER SEQUENCE geohistory.affectedgovernmentgroup_affectedgovernmentgroupid_seq OWNER TO postgres;
 
 --
 -- Name: affectedgovernmentgroup_affectedgovernmentgroupid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
@@ -11234,7 +11234,7 @@ CREATE SEQUENCE geohistory.affectedgovernmentgrouppart_affectedgovernmentgrouppa
     CACHE 1;
 
 
-ALTER TABLE geohistory.affectedgovernmentgrouppart_affectedgovernmentgrouppartid_seq OWNER TO postgres;
+ALTER SEQUENCE geohistory.affectedgovernmentgrouppart_affectedgovernmentgrouppartid_seq OWNER TO postgres;
 
 --
 -- Name: affectedgovernmentgrouppart_affectedgovernmentgrouppartid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
@@ -11256,7 +11256,7 @@ CREATE SEQUENCE geohistory.affectedgovernmentlevel_affectedgovernmentlevelid_seq
     CACHE 1;
 
 
-ALTER TABLE geohistory.affectedgovernmentlevel_affectedgovernmentlevelid_seq OWNER TO postgres;
+ALTER SEQUENCE geohistory.affectedgovernmentlevel_affectedgovernmentlevelid_seq OWNER TO postgres;
 
 --
 -- Name: affectedgovernmentlevel_affectedgovernmentlevelid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
@@ -11278,7 +11278,7 @@ CREATE SEQUENCE geohistory.affectedgovernmentpart_affectedgovernmentpartid_seq
     CACHE 1;
 
 
-ALTER TABLE geohistory.affectedgovernmentpart_affectedgovernmentpartid_seq OWNER TO postgres;
+ALTER SEQUENCE geohistory.affectedgovernmentpart_affectedgovernmentpartid_seq OWNER TO postgres;
 
 --
 -- Name: affectedgovernmentpart_affectedgovernmentpartid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
@@ -11299,7 +11299,7 @@ CREATE SEQUENCE geohistory.affectedtype_affectedtypeid_seq
     CACHE 1;
 
 
-ALTER TABLE geohistory.affectedtype_affectedtypeid_seq OWNER TO postgres;
+ALTER SEQUENCE geohistory.affectedtype_affectedtypeid_seq OWNER TO postgres;
 
 --
 -- Name: affectedtype_affectedtypeid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
@@ -11368,7 +11368,7 @@ CREATE SEQUENCE geohistory.censusmap_censusmapid_seq
     CACHE 1;
 
 
-ALTER TABLE geohistory.censusmap_censusmapid_seq OWNER TO postgres;
+ALTER SEQUENCE geohistory.censusmap_censusmapid_seq OWNER TO postgres;
 
 --
 -- Name: censusmap_censusmapid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
@@ -11389,7 +11389,7 @@ CREATE SEQUENCE geohistory.currentgovernment_currentgovernmentid_seq
     CACHE 1;
 
 
-ALTER TABLE geohistory.currentgovernment_currentgovernmentid_seq OWNER TO postgres;
+ALTER SEQUENCE geohistory.currentgovernment_currentgovernmentid_seq OWNER TO postgres;
 
 --
 -- Name: currentgovernment_currentgovernmentid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
@@ -11428,7 +11428,7 @@ CREATE SEQUENCE geohistory.documentation_documentationid_seq
     CACHE 1;
 
 
-ALTER TABLE geohistory.documentation_documentationid_seq OWNER TO postgres;
+ALTER SEQUENCE geohistory.documentation_documentationid_seq OWNER TO postgres;
 
 --
 -- Name: documentation_documentationid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
@@ -11449,7 +11449,7 @@ CREATE SEQUENCE geohistory.event_eventid_seq
     CACHE 1;
 
 
-ALTER TABLE geohistory.event_eventid_seq OWNER TO postgres;
+ALTER SEQUENCE geohistory.event_eventid_seq OWNER TO postgres;
 
 --
 -- Name: event_eventid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
@@ -11470,7 +11470,7 @@ CREATE SEQUENCE geohistory.eventeffectivetype_eventeffectivetypeid_seq
     CACHE 1;
 
 
-ALTER TABLE geohistory.eventeffectivetype_eventeffectivetypeid_seq OWNER TO postgres;
+ALTER SEQUENCE geohistory.eventeffectivetype_eventeffectivetypeid_seq OWNER TO postgres;
 
 --
 -- Name: eventeffectivetype_eventeffectivetypeid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
@@ -11491,7 +11491,7 @@ CREATE SEQUENCE geohistory.eventgranted_eventgrantedid_seq
     CACHE 1;
 
 
-ALTER TABLE geohistory.eventgranted_eventgrantedid_seq OWNER TO postgres;
+ALTER SEQUENCE geohistory.eventgranted_eventgrantedid_seq OWNER TO postgres;
 
 --
 -- Name: eventgranted_eventgrantedid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
@@ -11525,7 +11525,7 @@ CREATE SEQUENCE geohistory.eventmethod_eventmethodid_seq
     CACHE 1;
 
 
-ALTER TABLE geohistory.eventmethod_eventmethodid_seq OWNER TO postgres;
+ALTER SEQUENCE geohistory.eventmethod_eventmethodid_seq OWNER TO postgres;
 
 --
 -- Name: eventmethod_eventmethodid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
@@ -11546,7 +11546,7 @@ CREATE SEQUENCE geohistory.eventrelationship_eventrelationshipid_seq
     CACHE 1;
 
 
-ALTER TABLE geohistory.eventrelationship_eventrelationshipid_seq OWNER TO postgres;
+ALTER SEQUENCE geohistory.eventrelationship_eventrelationshipid_seq OWNER TO postgres;
 
 --
 -- Name: eventrelationship_eventrelationshipid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
@@ -11568,7 +11568,7 @@ CREATE SEQUENCE geohistory.eventslugretired_eventslugretiredid_seq
     CACHE 1;
 
 
-ALTER TABLE geohistory.eventslugretired_eventslugretiredid_seq OWNER TO postgres;
+ALTER SEQUENCE geohistory.eventslugretired_eventslugretiredid_seq OWNER TO postgres;
 
 --
 -- Name: eventslugretired_eventslugretiredid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
@@ -11589,7 +11589,7 @@ CREATE SEQUENCE geohistory.eventtype_eventtypeid_seq
     CACHE 1;
 
 
-ALTER TABLE geohistory.eventtype_eventtypeid_seq OWNER TO postgres;
+ALTER SEQUENCE geohistory.eventtype_eventtypeid_seq OWNER TO postgres;
 
 --
 -- Name: eventtype_eventtypeid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
@@ -11637,7 +11637,7 @@ CREATE SEQUENCE geohistory.filing_filingid_seq
     CACHE 1;
 
 
-ALTER TABLE geohistory.filing_filingid_seq OWNER TO postgres;
+ALTER SEQUENCE geohistory.filing_filingid_seq OWNER TO postgres;
 
 --
 -- Name: filing_filingid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
@@ -11672,7 +11672,7 @@ CREATE SEQUENCE geohistory.filingtype_filingtypeid_seq
     CACHE 1;
 
 
-ALTER TABLE geohistory.filingtype_filingtypeid_seq OWNER TO postgres;
+ALTER SEQUENCE geohistory.filingtype_filingtypeid_seq OWNER TO postgres;
 
 --
 -- Name: filingtype_filingtypeid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
@@ -11693,7 +11693,7 @@ CREATE SEQUENCE geohistory.government_governmentid_seq
     CACHE 1;
 
 
-ALTER TABLE geohistory.government_governmentid_seq OWNER TO postgres;
+ALTER SEQUENCE geohistory.government_governmentid_seq OWNER TO postgres;
 
 --
 -- Name: government_governmentid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
@@ -11714,7 +11714,7 @@ CREATE SEQUENCE geohistory.governmentform_governmentformid_seq
     CACHE 1;
 
 
-ALTER TABLE geohistory.governmentform_governmentformid_seq OWNER TO postgres;
+ALTER SEQUENCE geohistory.governmentform_governmentformid_seq OWNER TO postgres;
 
 --
 -- Name: governmentform_governmentformid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
@@ -11759,7 +11759,7 @@ CREATE SEQUENCE geohistory.governmentformgovernment_governmentformgovernmentid_s
     CACHE 1;
 
 
-ALTER TABLE geohistory.governmentformgovernment_governmentformgovernmentid_seq OWNER TO postgres;
+ALTER SEQUENCE geohistory.governmentformgovernment_governmentformgovernmentid_seq OWNER TO postgres;
 
 --
 -- Name: governmentformgovernment_governmentformgovernmentid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
@@ -11781,7 +11781,7 @@ CREATE SEQUENCE geohistory.governmentidentifier_governmentidentifierid_seq
     CACHE 1;
 
 
-ALTER TABLE geohistory.governmentidentifier_governmentidentifierid_seq OWNER TO postgres;
+ALTER SEQUENCE geohistory.governmentidentifier_governmentidentifierid_seq OWNER TO postgres;
 
 --
 -- Name: governmentidentifier_governmentidentifierid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
@@ -11825,7 +11825,7 @@ CREATE SEQUENCE geohistory.governmentidentifiertype_governmentidentifiertypeid_s
     CACHE 1;
 
 
-ALTER TABLE geohistory.governmentidentifiertype_governmentidentifiertypeid_seq OWNER TO postgres;
+ALTER SEQUENCE geohistory.governmentidentifiertype_governmentidentifiertypeid_seq OWNER TO postgres;
 
 --
 -- Name: governmentidentifiertype_governmentidentifiertypeid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
@@ -11847,7 +11847,7 @@ CREATE SEQUENCE geohistory.governmentmapstatus_governmentmapstatusid_seq
     CACHE 1;
 
 
-ALTER TABLE geohistory.governmentmapstatus_governmentmapstatusid_seq OWNER TO postgres;
+ALTER SEQUENCE geohistory.governmentmapstatus_governmentmapstatusid_seq OWNER TO postgres;
 
 --
 -- Name: governmentmapstatus_governmentmapstatusid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
@@ -11868,7 +11868,7 @@ CREATE SEQUENCE geohistory.governmentothercurrentparent_governmentothercurrentpa
     CACHE 1;
 
 
-ALTER TABLE geohistory.governmentothercurrentparent_governmentothercurrentparentid_seq OWNER TO postgres;
+ALTER SEQUENCE geohistory.governmentothercurrentparent_governmentothercurrentparentid_seq OWNER TO postgres;
 
 --
 -- Name: governmentothercurrentparent_governmentothercurrentparentid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
@@ -11889,7 +11889,7 @@ CREATE SEQUENCE geohistory.governmentsource_governmentsourceid_seq
     CACHE 1;
 
 
-ALTER TABLE geohistory.governmentsource_governmentsourceid_seq OWNER TO postgres;
+ALTER SEQUENCE geohistory.governmentsource_governmentsourceid_seq OWNER TO postgres;
 
 --
 -- Name: governmentsource_governmentsourceid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
@@ -11910,7 +11910,7 @@ CREATE SEQUENCE geohistory.governmentsourceevent_governmentsourceeventid_seq
     CACHE 1;
 
 
-ALTER TABLE geohistory.governmentsourceevent_governmentsourceeventid_seq OWNER TO postgres;
+ALTER SEQUENCE geohistory.governmentsourceevent_governmentsourceeventid_seq OWNER TO postgres;
 
 --
 -- Name: governmentsourceevent_governmentsourceeventid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
@@ -11931,7 +11931,7 @@ CREATE SEQUENCE geohistory.law_lawid_seq
     CACHE 1;
 
 
-ALTER TABLE geohistory.law_lawid_seq OWNER TO postgres;
+ALTER SEQUENCE geohistory.law_lawid_seq OWNER TO postgres;
 
 --
 -- Name: law_lawid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
@@ -11970,7 +11970,7 @@ CREATE SEQUENCE geohistory.lawalternate_lawalternateid_seq
     CACHE 1;
 
 
-ALTER TABLE geohistory.lawalternate_lawalternateid_seq OWNER TO postgres;
+ALTER SEQUENCE geohistory.lawalternate_lawalternateid_seq OWNER TO postgres;
 
 --
 -- Name: lawalternate_lawalternateid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
@@ -11991,7 +11991,7 @@ CREATE SEQUENCE geohistory.lawalternatesection_lawalternatesectionid_seq
     CACHE 1;
 
 
-ALTER TABLE geohistory.lawalternatesection_lawalternatesectionid_seq OWNER TO postgres;
+ALTER SEQUENCE geohistory.lawalternatesection_lawalternatesectionid_seq OWNER TO postgres;
 
 --
 -- Name: lawalternatesection_lawalternatesectionid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
@@ -12012,7 +12012,7 @@ CREATE SEQUENCE geohistory.lawgroup_lawgroupid_seq
     CACHE 1;
 
 
-ALTER TABLE geohistory.lawgroup_lawgroupid_seq OWNER TO postgres;
+ALTER SEQUENCE geohistory.lawgroup_lawgroupid_seq OWNER TO postgres;
 
 --
 -- Name: lawgroup_lawgroupid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
@@ -12033,7 +12033,7 @@ CREATE SEQUENCE geohistory.lawgroupsection_lawgroupsectionid_seq
     CACHE 1;
 
 
-ALTER TABLE geohistory.lawgroupsection_lawgroupsectionid_seq OWNER TO postgres;
+ALTER SEQUENCE geohistory.lawgroupsection_lawgroupsectionid_seq OWNER TO postgres;
 
 --
 -- Name: lawgroupsection_lawgroupsectionid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
@@ -12054,7 +12054,7 @@ CREATE SEQUENCE geohistory.lawsection_lawsectionid_seq
     CACHE 1;
 
 
-ALTER TABLE geohistory.lawsection_lawsectionid_seq OWNER TO postgres;
+ALTER SEQUENCE geohistory.lawsection_lawsectionid_seq OWNER TO postgres;
 
 --
 -- Name: lawsection_lawsectionid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
@@ -12075,7 +12075,7 @@ CREATE SEQUENCE geohistory.lawsectionevent_lawsectioneventid_seq
     CACHE 1;
 
 
-ALTER TABLE geohistory.lawsectionevent_lawsectioneventid_seq OWNER TO postgres;
+ALTER SEQUENCE geohistory.lawsectionevent_lawsectioneventid_seq OWNER TO postgres;
 
 --
 -- Name: lawsectionevent_lawsectioneventid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
@@ -12096,7 +12096,7 @@ CREATE SEQUENCE geohistory.metesdescription_metesdescriptionid_seq
     CACHE 1;
 
 
-ALTER TABLE geohistory.metesdescription_metesdescriptionid_seq OWNER TO postgres;
+ALTER SEQUENCE geohistory.metesdescription_metesdescriptionid_seq OWNER TO postgres;
 
 --
 -- Name: metesdescription_metesdescriptionid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
@@ -12117,7 +12117,7 @@ CREATE SEQUENCE geohistory.metesdescriptionline_metesdescriptionlineid_seq
     CACHE 1;
 
 
-ALTER TABLE geohistory.metesdescriptionline_metesdescriptionlineid_seq OWNER TO postgres;
+ALTER SEQUENCE geohistory.metesdescriptionline_metesdescriptionlineid_seq OWNER TO postgres;
 
 --
 -- Name: metesdescriptionline_metesdescriptionlineid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
@@ -12158,7 +12158,7 @@ CREATE SEQUENCE geohistory.nationalarchives_nationalarchivesid_seq
     CACHE 1;
 
 
-ALTER TABLE geohistory.nationalarchives_nationalarchivesid_seq OWNER TO postgres;
+ALTER SEQUENCE geohistory.nationalarchives_nationalarchivesid_seq OWNER TO postgres;
 
 --
 -- Name: nationalarchives_nationalarchivesid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
@@ -12220,7 +12220,7 @@ CREATE SEQUENCE geohistory.plss_plssid_seq
     CACHE 1;
 
 
-ALTER TABLE geohistory.plss_plssid_seq OWNER TO postgres;
+ALTER SEQUENCE geohistory.plss_plssid_seq OWNER TO postgres;
 
 --
 -- Name: plss_plssid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
@@ -12264,7 +12264,7 @@ CREATE SEQUENCE geohistory.plssfirstdivision_plssfirstdivisionid_seq
     CACHE 1;
 
 
-ALTER TABLE geohistory.plssfirstdivision_plssfirstdivisionid_seq OWNER TO postgres;
+ALTER SEQUENCE geohistory.plssfirstdivision_plssfirstdivisionid_seq OWNER TO postgres;
 
 --
 -- Name: plssfirstdivision_plssfirstdivisionid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
@@ -12305,7 +12305,7 @@ CREATE SEQUENCE geohistory.plssfirstdivisionpart_plssfirstdivisionpartid_seq
     CACHE 1;
 
 
-ALTER TABLE geohistory.plssfirstdivisionpart_plssfirstdivisionpartid_seq OWNER TO postgres;
+ALTER SEQUENCE geohistory.plssfirstdivisionpart_plssfirstdivisionpartid_seq OWNER TO postgres;
 
 --
 -- Name: plssfirstdivisionpart_plssfirstdivisionpartid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
@@ -12349,7 +12349,7 @@ CREATE SEQUENCE geohistory.plssmeridian_plssmeridianid_seq
     CACHE 1;
 
 
-ALTER TABLE geohistory.plssmeridian_plssmeridianid_seq OWNER TO postgres;
+ALTER SEQUENCE geohistory.plssmeridian_plssmeridianid_seq OWNER TO postgres;
 
 --
 -- Name: plssmeridian_plssmeridianid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
@@ -12393,7 +12393,7 @@ CREATE SEQUENCE geohistory.plssseconddivision_plssseconddivisionid_seq
     CACHE 1;
 
 
-ALTER TABLE geohistory.plssseconddivision_plssseconddivisionid_seq OWNER TO postgres;
+ALTER SEQUENCE geohistory.plssseconddivision_plssseconddivisionid_seq OWNER TO postgres;
 
 --
 -- Name: plssseconddivision_plssseconddivisionid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
@@ -12436,7 +12436,7 @@ CREATE SEQUENCE geohistory.plssspecialsurvey_plssspecialsurveyid_seq
     CACHE 1;
 
 
-ALTER TABLE geohistory.plssspecialsurvey_plssspecialsurveyid_seq OWNER TO postgres;
+ALTER SEQUENCE geohistory.plssspecialsurvey_plssspecialsurveyid_seq OWNER TO postgres;
 
 --
 -- Name: plssspecialsurvey_plssspecialsurveyid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
@@ -12573,7 +12573,7 @@ CREATE SEQUENCE geohistory.plsstownship_plsstownshipid_seq
     CACHE 1;
 
 
-ALTER TABLE geohistory.plsstownship_plsstownshipid_seq OWNER TO postgres;
+ALTER SEQUENCE geohistory.plsstownship_plsstownshipid_seq OWNER TO postgres;
 
 --
 -- Name: plsstownship_plsstownshipid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
@@ -12594,7 +12594,7 @@ CREATE SEQUENCE geohistory.recording_recordingid_seq
     CACHE 1;
 
 
-ALTER TABLE geohistory.recording_recordingid_seq OWNER TO postgres;
+ALTER SEQUENCE geohistory.recording_recordingid_seq OWNER TO postgres;
 
 --
 -- Name: recording_recordingid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
@@ -12615,7 +12615,7 @@ CREATE SEQUENCE geohistory.recordingevent_recordingeventid_seq
     CACHE 1;
 
 
-ALTER TABLE geohistory.recordingevent_recordingeventid_seq OWNER TO postgres;
+ALTER SEQUENCE geohistory.recordingevent_recordingeventid_seq OWNER TO postgres;
 
 --
 -- Name: recordingevent_recordingeventid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
@@ -12636,7 +12636,7 @@ CREATE SEQUENCE geohistory.recordingoffice_recordingofficeid_seq
     CACHE 1;
 
 
-ALTER TABLE geohistory.recordingoffice_recordingofficeid_seq OWNER TO postgres;
+ALTER SEQUENCE geohistory.recordingoffice_recordingofficeid_seq OWNER TO postgres;
 
 --
 -- Name: recordingoffice_recordingofficeid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
@@ -12675,7 +12675,7 @@ CREATE SEQUENCE geohistory.recordingofficetype_recordingofficetypeid_seq
     CACHE 1;
 
 
-ALTER TABLE geohistory.recordingofficetype_recordingofficetypeid_seq OWNER TO postgres;
+ALTER SEQUENCE geohistory.recordingofficetype_recordingofficetypeid_seq OWNER TO postgres;
 
 --
 -- Name: recordingofficetype_recordingofficetypeid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
@@ -12696,7 +12696,7 @@ CREATE SEQUENCE geohistory.recordingtype_recordingtypeid_seq
     CACHE 1;
 
 
-ALTER TABLE geohistory.recordingtype_recordingtypeid_seq OWNER TO postgres;
+ALTER SEQUENCE geohistory.recordingtype_recordingtypeid_seq OWNER TO postgres;
 
 --
 -- Name: recordingtype_recordingtypeid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
@@ -12717,7 +12717,7 @@ CREATE SEQUENCE geohistory.researchlog_researchlogid_seq
     CACHE 1;
 
 
-ALTER TABLE geohistory.researchlog_researchlogid_seq OWNER TO postgres;
+ALTER SEQUENCE geohistory.researchlog_researchlogid_seq OWNER TO postgres;
 
 --
 -- Name: researchlog_researchlogid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
@@ -12738,7 +12738,7 @@ CREATE SEQUENCE geohistory.researchlogtype_researchlogtypeid_seq
     CACHE 1;
 
 
-ALTER TABLE geohistory.researchlogtype_researchlogtypeid_seq OWNER TO postgres;
+ALTER SEQUENCE geohistory.researchlogtype_researchlogtypeid_seq OWNER TO postgres;
 
 --
 -- Name: researchlogtype_researchlogtypeid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
@@ -12774,7 +12774,7 @@ CREATE SEQUENCE geohistory.shorttype_shorttypeid_seq
     CACHE 1;
 
 
-ALTER TABLE geohistory.shorttype_shorttypeid_seq OWNER TO postgres;
+ALTER SEQUENCE geohistory.shorttype_shorttypeid_seq OWNER TO postgres;
 
 --
 -- Name: shorttype_shorttypeid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
@@ -12796,7 +12796,7 @@ CREATE SEQUENCE geohistory.source_sourceid_seq
     CACHE 1;
 
 
-ALTER TABLE geohistory.source_sourceid_seq OWNER TO postgres;
+ALTER SEQUENCE geohistory.source_sourceid_seq OWNER TO postgres;
 
 --
 -- Name: source_sourceid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
@@ -12817,7 +12817,7 @@ CREATE SEQUENCE geohistory.sourcecitation_sourcecitationid_seq
     CACHE 1;
 
 
-ALTER TABLE geohistory.sourcecitation_sourcecitationid_seq OWNER TO postgres;
+ALTER SEQUENCE geohistory.sourcecitation_sourcecitationid_seq OWNER TO postgres;
 
 --
 -- Name: sourcecitation_sourcecitationid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
@@ -12838,7 +12838,7 @@ CREATE SEQUENCE geohistory.sourcecitationevent_sourcecitationeventid_seq
     CACHE 1;
 
 
-ALTER TABLE geohistory.sourcecitationevent_sourcecitationeventid_seq OWNER TO postgres;
+ALTER SEQUENCE geohistory.sourcecitationevent_sourcecitationeventid_seq OWNER TO postgres;
 
 --
 -- Name: sourcecitationevent_sourcecitationeventid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
@@ -12919,7 +12919,7 @@ CREATE SEQUENCE geohistory.sourceitem_sourceitemid_seq
     CACHE 1;
 
 
-ALTER TABLE geohistory.sourceitem_sourceitemid_seq OWNER TO postgres;
+ALTER SEQUENCE geohistory.sourceitem_sourceitemid_seq OWNER TO postgres;
 
 --
 -- Name: sourceitem_sourceitemid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
@@ -12954,7 +12954,7 @@ CREATE SEQUENCE geohistory.sourceitemcategory_sourceitemcategoryid_seq
     CACHE 1;
 
 
-ALTER TABLE geohistory.sourceitemcategory_sourceitemcategoryid_seq OWNER TO postgres;
+ALTER SEQUENCE geohistory.sourceitemcategory_sourceitemcategoryid_seq OWNER TO postgres;
 
 --
 -- Name: sourceitemcategory_sourceitemcategoryid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
@@ -12995,7 +12995,7 @@ CREATE SEQUENCE geohistory.sourceitempart_sourceitempartid_seq
     CACHE 1;
 
 
-ALTER TABLE geohistory.sourceitempart_sourceitempartid_seq OWNER TO postgres;
+ALTER SEQUENCE geohistory.sourceitempart_sourceitempartid_seq OWNER TO postgres;
 
 --
 -- Name: sourceitempart_sourceitempartid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
@@ -13030,7 +13030,7 @@ CREATE SEQUENCE geohistory.sourcetype_sourcetypeid_seq
     CACHE 1;
 
 
-ALTER TABLE geohistory.sourcetype_sourcetypeid_seq OWNER TO postgres;
+ALTER SEQUENCE geohistory.sourcetype_sourcetypeid_seq OWNER TO postgres;
 
 --
 -- Name: sourcetype_sourcetypeid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
@@ -13051,7 +13051,7 @@ CREATE SEQUENCE geohistory.tribunal_tribunalid_seq
     CACHE 1;
 
 
-ALTER TABLE geohistory.tribunal_tribunalid_seq OWNER TO postgres;
+ALTER SEQUENCE geohistory.tribunal_tribunalid_seq OWNER TO postgres;
 
 --
 -- Name: tribunal_tribunalid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
@@ -13072,7 +13072,7 @@ CREATE SEQUENCE geohistory.tribunaltype_tribunaltypeid_seq
     CACHE 1;
 
 
-ALTER TABLE geohistory.tribunaltype_tribunaltypeid_seq OWNER TO postgres;
+ALTER SEQUENCE geohistory.tribunaltype_tribunaltypeid_seq OWNER TO postgres;
 
 --
 -- Name: tribunaltype_tribunaltypeid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
@@ -13093,7 +13093,7 @@ CREATE SEQUENCE gis.affectedgovernmentgis_affectedgovernmentgisid_seq
     CACHE 1;
 
 
-ALTER TABLE gis.affectedgovernmentgis_affectedgovernmentgisid_seq OWNER TO postgres;
+ALTER SEQUENCE gis.affectedgovernmentgis_affectedgovernmentgisid_seq OWNER TO postgres;
 
 --
 -- Name: affectedgovernmentgis_affectedgovernmentgisid_seq; Type: SEQUENCE OWNED BY; Schema: gis; Owner: postgres
@@ -13136,7 +13136,7 @@ CREATE SEQUENCE gis.deleted_affectedgovernmentgis_deleted_affectedgovernmentgis_
     CACHE 1;
 
 
-ALTER TABLE gis.deleted_affectedgovernmentgis_deleted_affectedgovernmentgis_seq OWNER TO postgres;
+ALTER SEQUENCE gis.deleted_affectedgovernmentgis_deleted_affectedgovernmentgis_seq OWNER TO postgres;
 
 --
 -- Name: deleted_affectedgovernmentgis_deleted_affectedgovernmentgis_seq; Type: SEQUENCE OWNED BY; Schema: gis; Owner: postgres
@@ -13179,7 +13179,7 @@ CREATE SEQUENCE gis.deleted_metesdescriptiongis_deleted_metesdescriptiongisid_se
     CACHE 1;
 
 
-ALTER TABLE gis.deleted_metesdescriptiongis_deleted_metesdescriptiongisid_seq OWNER TO postgres;
+ALTER SEQUENCE gis.deleted_metesdescriptiongis_deleted_metesdescriptiongisid_seq OWNER TO postgres;
 
 --
 -- Name: deleted_metesdescriptiongis_deleted_metesdescriptiongisid_seq; Type: SEQUENCE OWNED BY; Schema: gis; Owner: postgres
@@ -13200,7 +13200,7 @@ CREATE SEQUENCE gis.governmentshape_governmentshapeid_seq
     CACHE 1;
 
 
-ALTER TABLE gis.governmentshape_governmentshapeid_seq OWNER TO postgres;
+ALTER SEQUENCE gis.governmentshape_governmentshapeid_seq OWNER TO postgres;
 
 --
 -- Name: governmentshape_governmentshapeid_seq; Type: SEQUENCE OWNED BY; Schema: gis; Owner: postgres
@@ -13221,7 +13221,7 @@ CREATE SEQUENCE gis.metesdescriptiongis_metesdescriptiongisid_seq
     CACHE 1;
 
 
-ALTER TABLE gis.metesdescriptiongis_metesdescriptiongisid_seq OWNER TO postgres;
+ALTER SEQUENCE gis.metesdescriptiongis_metesdescriptiongisid_seq OWNER TO postgres;
 
 --
 -- Name: metesdescriptiongis_metesdescriptiongisid_seq; Type: SEQUENCE OWNED BY; Schema: gis; Owner: postgres
