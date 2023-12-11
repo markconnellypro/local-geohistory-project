@@ -3724,21 +3724,21 @@ ALTER FUNCTION extra.ci_model_source_event(integer) OWNER TO postgres;
 -- Name: ci_model_source_note(integer); Type: FUNCTION; Schema: extra; Owner: postgres
 --
 
-CREATE FUNCTION extra.ci_model_source_note(integer) RETURNS TABLE(sourcecitationnoteorder bigint, sourcecitationnotekey text, sourcecitationnotevalue text)
+CREATE FUNCTION extra.ci_model_source_note(integer) RETURNS TABLE(sourcecitationnotegroup integer, sourcecitationnotetypetext text, sourcecitationnotetext text)
     LANGUAGE sql STABLE SECURITY DEFINER
     AS $_$
  SELECT
-    -2::bigint AS sourcecitationnoteorder,
-    'Government References' AS sourcecitationnotekey,
-    sourcecitation.sourcecitationgovernmentreferences AS sourcecitationnotevalue
+    -2::integer AS sourcecitationnotegroup,
+    'Government References' AS sourcecitationnotetypetext,
+    sourcecitation.sourcecitationgovernmentreferences AS sourcecitationnotetext
    FROM geohistory.sourcecitation
   WHERE sourcecitation.sourcecitationid = $1
     AND sourcecitation.sourcecitationgovernmentreferences <> ''
 UNION
  SELECT
-    sourcecitationnote.sourcecitationnotegroup AS sourcecitationnoteorder,
-    sourcecitationnotetype.sourcecitationnotetypetext AS sourcecitationnotekey,
-    sourcecitationnote.sourcecitationnotetext AS sourcecitationnotevalue
+    sourcecitationnote.sourcecitationnotegroup,
+    sourcecitationnotetype.sourcecitationnotetypetext,
+    sourcecitationnote.sourcecitationnotetext
    FROM geohistory.sourcecitationnote
    JOIN geohistory.sourcecitationnotetype
      ON sourcecitationnote.sourcecitationnotetype = sourcecitationnotetype.sourcecitationnotetypeid
@@ -9614,12 +9614,10 @@ CREATE TABLE geohistory.sourcecitation (
     sourcecitationurl text DEFAULT ''::text NOT NULL,
     sourcecitationtypetitle text DEFAULT ''::text NOT NULL,
     sourcecitationperson text DEFAULT ''::text NOT NULL,
-    sourcecitationnotes text DEFAULT ''::text NOT NULL,
     sourcecitationgovernmentreferences text DEFAULT ''::text NOT NULL,
     sourcecitationarchiveslotfilm character varying(25) DEFAULT ''::character varying NOT NULL,
     sourcecitationarchivecarton character varying(15) DEFAULT ''::character varying NOT NULL,
     sourcecitationstatus character varying(1) DEFAULT ''::character varying NOT NULL,
-    sourcecitationdetail jsonb,
     sourcecitationissue character varying(20) DEFAULT ''::character varying NOT NULL
 );
 
@@ -9627,24 +9625,10 @@ CREATE TABLE geohistory.sourcecitation (
 ALTER TABLE geohistory.sourcecitation OWNER TO postgres;
 
 --
--- Name: COLUMN sourcecitation.sourcecitationnotes; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.sourcecitation.sourcecitationnotes IS 'This field has been superseded by sourcecitationdetail.';
-
-
---
 -- Name: COLUMN sourcecitation.sourcecitationstatus; Type: COMMENT; Schema: geohistory; Owner: postgres
 --
 
 COMMENT ON COLUMN geohistory.sourcecitation.sourcecitationstatus IS 'This field is used for internal tracking purposes, and is not included in open data.';
-
-
---
--- Name: COLUMN sourcecitation.sourcecitationdetail; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.sourcecitation.sourcecitationdetail IS 'Data outside of the "notes" key is used for internal tracking purposes, and is not included in open data.';
 
 
 --
@@ -10705,20 +10689,6 @@ COMMENT ON COLUMN geohistory.governmentform.governmentformextended IS 'This fiel
 
 
 --
--- Name: sourcecitationnotetype; Type: TABLE; Schema: geohistory; Owner: postgres
---
-
-CREATE TABLE geohistory.sourcecitationnotetype (
-    sourcecitationnotetypeid integer NOT NULL,
-    source integer,
-    sourcecitationnotetypeisdetail boolean DEFAULT true NOT NULL,
-    sourcecitationnotetypetext text NOT NULL
-);
-
-
-ALTER TABLE geohistory.sourcecitationnotetype OWNER TO postgres;
-
---
 -- Name: metesdescriptionline; Type: TABLE; Schema: geohistory; Owner: postgres
 --
 
@@ -10983,6 +10953,20 @@ CREATE TABLE geohistory.sourcecitationnote (
 
 
 ALTER TABLE geohistory.sourcecitationnote OWNER TO postgres;
+
+--
+-- Name: sourcecitationnotetype; Type: TABLE; Schema: geohistory; Owner: postgres
+--
+
+CREATE TABLE geohistory.sourcecitationnotetype (
+    sourcecitationnotetypeid integer NOT NULL,
+    source integer,
+    sourcecitationnotetypeisdetail boolean DEFAULT true NOT NULL,
+    sourcecitationnotetypetext text NOT NULL
+);
+
+
+ALTER TABLE geohistory.sourcecitationnotetype OWNER TO postgres;
 
 --
 -- Name: lawgroup; Type: TABLE; Schema: geohistory; Owner: postgres
