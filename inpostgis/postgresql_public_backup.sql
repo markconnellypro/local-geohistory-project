@@ -3727,21 +3727,6 @@ ALTER FUNCTION extra.ci_model_source_event(integer) OWNER TO postgres;
 CREATE FUNCTION extra.ci_model_source_note(integer) RETURNS TABLE(sourcecitationnoteorder bigint, sourcecitationnotekey text, sourcecitationnotevalue text)
     LANGUAGE sql STABLE SECURITY DEFINER
     AS $_$
- WITH notes AS (
-         SELECT sourcecitation.sourcecitationdetail -> 'note' AS noterow,
-            0 AS noteorder
-           FROM geohistory.sourcecitation
-          WHERE sourcecitation.sourcecitationid = $1
-            AND sourcecitation.sourcecitationdetail ? 'note'
-            AND jsonb_typeof(sourcecitation.sourcecitationdetail -> 'note') = 'object'
-        UNION
-         SELECT notejson.*
-           FROM geohistory.sourcecitation,
-             jsonb_array_elements(sourcecitation.sourcecitationdetail -> 'note') WITH ORDINALITY AS notejson
-          WHERE sourcecitation.sourcecitationid = $1
-            AND sourcecitation.sourcecitationdetail ? 'note'
-            AND jsonb_typeof(sourcecitation.sourcecitationdetail -> 'note') = 'array'
-        )
  SELECT
     -2::bigint AS sourcecitationnoteorder,
     'Government References' AS sourcecitationnotekey,
@@ -3751,11 +3736,13 @@ CREATE FUNCTION extra.ci_model_source_note(integer) RETURNS TABLE(sourcecitation
     AND sourcecitation.sourcecitationgovernmentreferences <> ''
 UNION
  SELECT
-    notes.noteorder AS sourcecitationnoteorder,
-    noterows.key AS sourcecitationnotekey,
-    noterows.value AS sourcecitationnotevalue
-   FROM notes,
-    LATERAL jsonb_each_text(notes.noterow) noterows(key, value)
+    sourcecitationnote.sourcecitationnotegroup AS sourcecitationnoteorder,
+    sourcecitationnotetype.sourcecitationnotetypetext AS sourcecitationnotekey,
+    sourcecitationnote.sourcecitationnotetext AS sourcecitationnotevalue
+   FROM geohistory.sourcecitationnote
+   JOIN geohistory.sourcecitationnotetype
+     ON sourcecitationnote.sourcecitationnotetype = sourcecitationnotetype.sourcecitationnotetypeid
+  WHERE sourcecitationnote.sourcecitation = $1
  ORDER BY 1, 2;
 $_$;
 
@@ -9633,8 +9620,7 @@ CREATE TABLE geohistory.sourcecitation (
     sourcecitationarchivecarton character varying(15) DEFAULT ''::character varying NOT NULL,
     sourcecitationstatus character varying(1) DEFAULT ''::character varying NOT NULL,
     sourcecitationdetail jsonb,
-    sourcecitationissue character varying(20) DEFAULT ''::character varying NOT NULL,
-    CONSTRAINT sourcecitation_check CHECK ((sourcecitationnotes = ''::text))
+    sourcecitationissue character varying(20) DEFAULT ''::character varying NOT NULL
 );
 
 
@@ -10719,6 +10705,20 @@ COMMENT ON COLUMN geohistory.governmentform.governmentformextended IS 'This fiel
 
 
 --
+-- Name: sourcecitationnotetype; Type: TABLE; Schema: geohistory; Owner: postgres
+--
+
+CREATE TABLE geohistory.sourcecitationnotetype (
+    sourcecitationnotetypeid integer NOT NULL,
+    source integer,
+    sourcecitationnotetypeisdetail boolean DEFAULT true NOT NULL,
+    sourcecitationnotetypetext text NOT NULL
+);
+
+
+ALTER TABLE geohistory.sourcecitationnotetype OWNER TO postgres;
+
+--
 -- Name: metesdescriptionline; Type: TABLE; Schema: geohistory; Owner: postgres
 --
 
@@ -10968,6 +10968,21 @@ CREATE TABLE geohistory.recordingtype (
 
 
 ALTER TABLE geohistory.recordingtype OWNER TO postgres;
+
+--
+-- Name: sourcecitationnote; Type: TABLE; Schema: geohistory; Owner: postgres
+--
+
+CREATE TABLE geohistory.sourcecitationnote (
+    sourcecitationnoteid integer NOT NULL,
+    sourcecitation integer NOT NULL,
+    sourcecitationnotegroup integer,
+    sourcecitationnotetype integer NOT NULL,
+    sourcecitationnotetext text NOT NULL
+);
+
+
+ALTER TABLE geohistory.sourcecitationnote OWNER TO postgres;
 
 --
 -- Name: lawgroup; Type: TABLE; Schema: geohistory; Owner: postgres
@@ -12848,6 +12863,50 @@ ALTER SEQUENCE geohistory.sourcecitationevent_sourcecitationeventid_seq OWNED BY
 
 
 --
+-- Name: sourcecitationnote_sourcecitationnoteid_seq; Type: SEQUENCE; Schema: geohistory; Owner: postgres
+--
+
+CREATE SEQUENCE geohistory.sourcecitationnote_sourcecitationnoteid_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE geohistory.sourcecitationnote_sourcecitationnoteid_seq OWNER TO postgres;
+
+--
+-- Name: sourcecitationnote_sourcecitationnoteid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
+--
+
+ALTER SEQUENCE geohistory.sourcecitationnote_sourcecitationnoteid_seq OWNED BY geohistory.sourcecitationnote.sourcecitationnoteid;
+
+
+--
+-- Name: sourcecitationnotetype_sourcecitationnotetypeid_seq; Type: SEQUENCE; Schema: geohistory; Owner: postgres
+--
+
+CREATE SEQUENCE geohistory.sourcecitationnotetype_sourcecitationnotetypeid_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE geohistory.sourcecitationnotetype_sourcecitationnotetypeid_seq OWNER TO postgres;
+
+--
+-- Name: sourcecitationnotetype_sourcecitationnotetypeid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
+--
+
+ALTER SEQUENCE geohistory.sourcecitationnotetype_sourcecitationnotetypeid_seq OWNED BY geohistory.sourcecitationnotetype.sourcecitationnotetypeid;
+
+
+--
 -- Name: sourceitem; Type: TABLE; Schema: geohistory; Owner: postgres
 --
 
@@ -13651,6 +13710,20 @@ ALTER TABLE ONLY geohistory.sourcecitationevent ALTER COLUMN sourcecitationevent
 
 
 --
+-- Name: sourcecitationnote sourcecitationnoteid; Type: DEFAULT; Schema: geohistory; Owner: postgres
+--
+
+ALTER TABLE ONLY geohistory.sourcecitationnote ALTER COLUMN sourcecitationnoteid SET DEFAULT nextval('geohistory.sourcecitationnote_sourcecitationnoteid_seq'::regclass);
+
+
+--
+-- Name: sourcecitationnotetype sourcecitationnotetypeid; Type: DEFAULT; Schema: geohistory; Owner: postgres
+--
+
+ALTER TABLE ONLY geohistory.sourcecitationnotetype ALTER COLUMN sourcecitationnotetypeid SET DEFAULT nextval('geohistory.sourcecitationnotetype_sourcecitationnotetypeid_seq'::regclass);
+
+
+--
 -- Name: sourceitem sourceitemid; Type: DEFAULT; Schema: geohistory; Owner: postgres
 --
 
@@ -14392,6 +14465,38 @@ ALTER TABLE ONLY geohistory.sourcecitationevent
 
 
 --
+-- Name: sourcecitationnote sourcecitationnote_pk; Type: CONSTRAINT; Schema: geohistory; Owner: postgres
+--
+
+ALTER TABLE ONLY geohistory.sourcecitationnote
+    ADD CONSTRAINT sourcecitationnote_pk PRIMARY KEY (sourcecitationnoteid);
+
+
+--
+-- Name: sourcecitationnote sourcecitationnote_unique; Type: CONSTRAINT; Schema: geohistory; Owner: postgres
+--
+
+ALTER TABLE ONLY geohistory.sourcecitationnote
+    ADD CONSTRAINT sourcecitationnote_unique UNIQUE (sourcecitation, sourcecitationnotegroup, sourcecitationnotetype);
+
+
+--
+-- Name: sourcecitationnotetype sourcecitationnotetype_pk; Type: CONSTRAINT; Schema: geohistory; Owner: postgres
+--
+
+ALTER TABLE ONLY geohistory.sourcecitationnotetype
+    ADD CONSTRAINT sourcecitationnotetype_pk PRIMARY KEY (sourcecitationnotetypeid);
+
+
+--
+-- Name: sourcecitationnotetype sourcecitationnotetype_unique; Type: CONSTRAINT; Schema: geohistory; Owner: postgres
+--
+
+ALTER TABLE ONLY geohistory.sourcecitationnotetype
+    ADD CONSTRAINT sourcecitationnotetype_unique UNIQUE (source, sourcecitationnotetypeisdetail, sourcecitationnotetypetext);
+
+
+--
 -- Name: sourceitem sourceitem_pk; Type: CONSTRAINT; Schema: geohistory; Owner: postgres
 --
 
@@ -14990,6 +15095,13 @@ CREATE INDEX fki_government_governmentform_fk ON geohistory.government USING btr
 --
 
 CREATE INDEX fki_plss_plsstownship_fk ON geohistory.plss USING btree (plsstownship);
+
+
+--
+-- Name: fki_sourcecitationnote_sourcecitationnotetype_fk; Type: INDEX; Schema: geohistory; Owner: postgres
+--
+
+CREATE INDEX fki_sourcecitationnote_sourcecitationnotetype_fk ON geohistory.sourcecitationnote USING btree (sourcecitationnotetype);
 
 
 --
@@ -16201,6 +16313,30 @@ ALTER TABLE ONLY geohistory.sourcecitationevent
 
 ALTER TABLE ONLY geohistory.sourcecitationevent
     ADD CONSTRAINT sourcecitationevent_sourcecitation_fk FOREIGN KEY (sourcecitation) REFERENCES geohistory.sourcecitation(sourcecitationid) DEFERRABLE;
+
+
+--
+-- Name: sourcecitationnote sourcecitationnote_sourcecitation_fk; Type: FK CONSTRAINT; Schema: geohistory; Owner: postgres
+--
+
+ALTER TABLE ONLY geohistory.sourcecitationnote
+    ADD CONSTRAINT sourcecitationnote_sourcecitation_fk FOREIGN KEY (sourcecitation) REFERENCES geohistory.sourcecitation(sourcecitationid) DEFERRABLE;
+
+
+--
+-- Name: sourcecitationnote sourcecitationnote_sourcecitationnotetype_fk; Type: FK CONSTRAINT; Schema: geohistory; Owner: postgres
+--
+
+ALTER TABLE ONLY geohistory.sourcecitationnote
+    ADD CONSTRAINT sourcecitationnote_sourcecitationnotetype_fk FOREIGN KEY (sourcecitationnotetype) REFERENCES geohistory.sourcecitationnotetype(sourcecitationnotetypeid) DEFERRABLE;
+
+
+--
+-- Name: sourcecitationnotetype sourcecitationnotetype_source_fk; Type: FK CONSTRAINT; Schema: geohistory; Owner: postgres
+--
+
+ALTER TABLE ONLY geohistory.sourcecitationnotetype
+    ADD CONSTRAINT sourcecitationnotetype_source_fk FOREIGN KEY (source) REFERENCES geohistory.source(sourceid) DEFERRABLE;
 
 
 --
