@@ -1043,7 +1043,7 @@ CREATE FUNCTION extra.ci_model_event_plss(integer) RETURNS TABLE(plsstownship te
             WHEN plss.plssfirstdivisionduplicate = '0' THEN ''
             ELSE ' ' || plss.plssfirstdivisionduplicate
         END AS plssfirstdivision,
-    array_to_string(plss.plssfirstdivisionpart, ' ') AS plssfirstdivisionpart,
+    replace(plss.plssfirstdivisionpart, '|', ', ') AS plssfirstdivisionpart,
     plss.plssrelationship
    FROM geohistory.plss
      LEFT JOIN geohistory.plssfirstdivision
@@ -1831,7 +1831,7 @@ ALTER FUNCTION extra.ci_model_government_related(integer, character varying, cha
 -- Name: ci_model_government_researchlog(integer, character varying, boolean); Type: FUNCTION; Schema: extra; Owner: postgres
 --
 
-CREATE FUNCTION extra.ci_model_government_researchlog(integer, character varying, boolean) RETURNS TABLE(researchlogid integer, researchlogtypelong text, researchlogdate text, researchlogdatesort character varying, researchlogvolume text, researchlogrange text, researchlogismissing boolean, researchlognotes text, internetarchivehandle text[], governmentlong text)
+CREATE FUNCTION extra.ci_model_government_researchlog(integer, character varying, boolean) RETURNS TABLE(researchlogid integer, researchlogtypelong text, researchlogdate text, researchlogdatesort character varying, researchlogvolume text, researchlogrange text, researchlogismissing boolean, researchlognotes text, governmentlong text)
     LANGUAGE sql STABLE SECURITY DEFINER
     AS $_$
 
@@ -1841,7 +1841,7 @@ CREATE FUNCTION extra.ci_model_government_researchlog(integer, character varying
         ELSE ''
     END AS researchlogtypelong,
     CASE
-        WHEN ($3 OR researchlog.internetarchivehandle IS NOT NULL OR researchlogtype.researchlogtypeisspecificdate) THEN extra.shortdate(researchlog.researchlogdate)
+        WHEN ($3 OR researchlogtype.researchlogtypeisspecificdate) THEN extra.shortdate(researchlog.researchlogdate)
         ELSE ''
     END AS researchlogdate,
     researchlog.researchlogdate AS researchlogdatesort,
@@ -1849,10 +1849,9 @@ CREATE FUNCTION extra.ci_model_government_researchlog(integer, character varying
     extra.rangefix(researchlog.researchlogfrom, researchlog.researchlogto) AS researchlogrange,
     researchlog.researchlogismissing,
     CASE
-        WHEN ($3 OR researchlog.internetarchivehandle IS NOT NULL) THEN researchlog.researchlognotes
+        WHEN $3 THEN researchlog.researchlognotes
         ELSE ''
     END AS researchlognotes,
-    researchlog.internetarchivehandle,
 	extra.governmentlong(researchlog.government, upper($2)) AS governmentlong
    FROM geohistory.researchlog
    JOIN geohistory.researchlogtype
@@ -1862,7 +1861,6 @@ CREATE FUNCTION extra.ci_model_government_researchlog(integer, character varying
      AND governmentsubstitutecache.governmentsubstitute = $1
   WHERE (
     $3
-    OR researchlog.internetarchivehandle IS NOT NULL
     OR (researchlogtype.researchlogtypeisrecord AND NOT researchlog.researchlogismissing)
   )
   ORDER BY researchlogtype.researchlogtypelong, researchlog.researchlogfrom, researchlogdatesort;
@@ -10735,7 +10733,6 @@ CREATE TABLE geohistory.researchlog (
     researchlogismissing boolean DEFAULT false NOT NULL,
     researchlognotes text DEFAULT ''::text NOT NULL,
     researchlogdisposition character varying(2) DEFAULT ''::character varying NOT NULL,
-    internetarchivehandle text[],
     event integer,
     CONSTRAINT researchlog_check CHECK (((((researchlogfrom)::text = ''::text) AND ((researchlogto)::text = ''::text)) OR (((researchlogfrom)::text <> ''::text) AND ((researchlogto)::text <> ''::text) AND ((researchlogvolumefrom)::text = ''::text) AND ((researchlogvolumeto)::text = ''::text)) OR (((researchlogvolumefrom)::text <> ''::text) AND ((researchlogvolumeto)::text <> ''::text))))
 );
@@ -11800,11 +11797,13 @@ CREATE TABLE geohistory.governmentidentifiertype (
     source integer,
     isinteger boolean DEFAULT true NOT NULL,
     governmentidentifiertypeurl text DEFAULT ''::text NOT NULL,
-    governmentidentifiertypeprefixlength int4range,
-    governmentidentifiertypelength int4range,
     governmentidentifiertypeslug text,
     governmentidentifiertypeprefixdelimiter character varying(1) DEFAULT ''::character varying NOT NULL,
     governmentidentifiertypenote text DEFAULT ''::text NOT NULL,
+    governmentidentifiertypeprefixlengthfrom integer,
+    governmentidentifiertypeprefixlengthto integer,
+    governmentidentifiertypelengthfrom integer,
+    governmentidentifiertypelengthto integer,
     CONSTRAINT governmentidentifiertype_check CHECK (((governmentidentifiertypeshort)::text <> ''::text))
 );
 
@@ -12176,7 +12175,7 @@ CREATE TABLE geohistory.plss (
     plssfirstdivision integer,
     plssfirstdivisionnumber character varying(10) DEFAULT ''::character varying NOT NULL,
     plssfirstdivisionduplicate character varying(1) DEFAULT '0'::character varying NOT NULL,
-    plssfirstdivisionpart text[],
+    plssfirstdivisionpart text DEFAULT ''::text NOT NULL,
     plssseconddivision integer,
     plssseconddivisionnumber character varying(50) DEFAULT ''::character varying NOT NULL,
     plssseconddivisionsuffix character varying(10) DEFAULT ''::character varying NOT NULL,
@@ -12192,20 +12191,6 @@ CREATE TABLE geohistory.plss (
 
 
 ALTER TABLE geohistory.plss OWNER TO postgres;
-
---
--- Name: COLUMN plss.plssfirstdivision; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.plss.plssfirstdivision IS 'These fields are typically used to indicate Sections.';
-
-
---
--- Name: COLUMN plss.plssseconddivision; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.plss.plssseconddivision IS 'These fields are typically used to indicate Quarter Sections.';
-
 
 --
 -- Name: plss_plssid_seq; Type: SEQUENCE; Schema: geohistory; Owner: postgres
@@ -16152,7 +16137,7 @@ ALTER TABLE ONLY geohistory.plss
 --
 
 ALTER TABLE ONLY geohistory.plss
-    ADD CONSTRAINT plss_plsstownship_fk FOREIGN KEY (plsstownship) REFERENCES geohistory.government(governmentid) DEFERRABLE NOT VALID;
+    ADD CONSTRAINT plss_plsstownship_fk FOREIGN KEY (plsstownship) REFERENCES geohistory.government(governmentid) DEFERRABLE;
 
 
 --
