@@ -10,8 +10,8 @@
         <tbody>
             <?php foreach ($query as $row) { ?>
                 <tr>
-                    <td><?= (($row->sourcecitationnoteorder < 1) ? '' : '(#' . $row->sourcecitationnoteorder . ') ') . $row->sourcecitationnotekey ?></td>
-                    <td><?= $row->sourcecitationnotevalue ?></td>
+                    <td><?= (($row->sourcecitationnotegroup < 1) ? '' : '(#' . $row->sourcecitationnotegroup . ') ') . $row->sourcecitationnotetypetext ?></td>
+                    <td><?= $row->sourcecitationnotetext ?></td>
                 </tr>
             <?php } ?>
         </tbody>
