@@ -10966,6 +10966,13 @@ CREATE TABLE geohistory.sourcecitationnotetype (
 ALTER TABLE geohistory.sourcecitationnotetype OWNER TO postgres;
 
 --
+-- Name: COLUMN sourcecitationnotetype.sourcecitationnotetypeisdetail; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.sourcecitationnotetype.sourcecitationnotetypeisdetail IS 'Rows with FALSE values are used for internal tracking purposes, and are not included in open data.';
+
+
+--
 -- Name: lawgroup; Type: TABLE; Schema: geohistory; Owner: postgres
 --
 
@@ -11068,6 +11075,20 @@ ALTER TABLE geohistory.lawgroupsection OWNER TO postgres;
 
 COMMENT ON COLUMN geohistory.lawgroupsection.lawsectionrelationship IS 'This should eventually be renamed to eventrelationship converted to a proper foreign key referencing eventrelationshipid.';
 
+
+--
+-- Name: lawgroupgovernmenttype; Type: TABLE; Schema: geohistory; Owner: postgres
+--
+
+CREATE TABLE geohistory.lawgroupgovernmenttype (
+    lawgroupgovernmenttypeid integer NOT NULL,
+    lawgroup integer NOT NULL,
+    governmenttype character varying(30) NOT NULL,
+    CONSTRAINT lawgroupgovernmenttype_check CHECK (((governmenttype)::text = ANY ('{All,Borough,City,County,Plantation,Town,Township,Village}'::text[])))
+);
+
+
+ALTER TABLE geohistory.lawgroupgovernmenttype OWNER TO postgres;
 
 --
 -- Name: adjudication_adjudicationid_seq; Type: SEQUENCE; Schema: geohistory; Owner: postgres
@@ -12020,6 +12041,63 @@ ALTER SEQUENCE geohistory.lawgroup_lawgroupid_seq OWNED BY geohistory.lawgroup.l
 
 
 --
+-- Name: lawgroupeventtype; Type: TABLE; Schema: geohistory; Owner: postgres
+--
+
+CREATE TABLE geohistory.lawgroupeventtype (
+    lawgroupeventtypeid integer NOT NULL,
+    lawgroup integer NOT NULL,
+    eventtype integer NOT NULL
+);
+
+
+ALTER TABLE geohistory.lawgroupeventtype OWNER TO postgres;
+
+--
+-- Name: lawgroupeventtype_lawgroupeventtypeid_seq; Type: SEQUENCE; Schema: geohistory; Owner: postgres
+--
+
+CREATE SEQUENCE geohistory.lawgroupeventtype_lawgroupeventtypeid_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE geohistory.lawgroupeventtype_lawgroupeventtypeid_seq OWNER TO postgres;
+
+--
+-- Name: lawgroupeventtype_lawgroupeventtypeid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
+--
+
+ALTER SEQUENCE geohistory.lawgroupeventtype_lawgroupeventtypeid_seq OWNED BY geohistory.lawgroupeventtype.lawgroupeventtypeid;
+
+
+--
+-- Name: lawgroupgovernmenttype_lawgroupgovernmenttypeid_seq; Type: SEQUENCE; Schema: geohistory; Owner: postgres
+--
+
+CREATE SEQUENCE geohistory.lawgroupgovernmenttype_lawgroupgovernmenttypeid_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE geohistory.lawgroupgovernmenttype_lawgroupgovernmenttypeid_seq OWNER TO postgres;
+
+--
+-- Name: lawgroupgovernmenttype_lawgroupgovernmenttypeid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
+--
+
+ALTER SEQUENCE geohistory.lawgroupgovernmenttype_lawgroupgovernmenttypeid_seq OWNED BY geohistory.lawgroupgovernmenttype.lawgroupgovernmenttypeid;
+
+
+--
 -- Name: lawgroupsection_lawgroupsectionid_seq; Type: SEQUENCE; Schema: geohistory; Owner: postgres
 --
 
@@ -12191,6 +12269,20 @@ CREATE TABLE geohistory.plss (
 
 
 ALTER TABLE geohistory.plss OWNER TO postgres;
+
+--
+-- Name: COLUMN plss.plssfirstdivision; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.plss.plssfirstdivision IS 'These fields are typically used to indicate Sections.';
+
+
+--
+-- Name: COLUMN plss.plssseconddivision; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.plss.plssseconddivision IS 'These fields are typically used to indicate Quarter Sections.';
+
 
 --
 -- Name: plss_plssid_seq; Type: SEQUENCE; Schema: geohistory; Owner: postgres
@@ -13511,6 +13603,20 @@ ALTER TABLE ONLY geohistory.lawgroup ALTER COLUMN lawgroupid SET DEFAULT nextval
 
 
 --
+-- Name: lawgroupeventtype lawgroupeventtypeid; Type: DEFAULT; Schema: geohistory; Owner: postgres
+--
+
+ALTER TABLE ONLY geohistory.lawgroupeventtype ALTER COLUMN lawgroupeventtypeid SET DEFAULT nextval('geohistory.lawgroupeventtype_lawgroupeventtypeid_seq'::regclass);
+
+
+--
+-- Name: lawgroupgovernmenttype lawgroupgovernmenttypeid; Type: DEFAULT; Schema: geohistory; Owner: postgres
+--
+
+ALTER TABLE ONLY geohistory.lawgroupgovernmenttype ALTER COLUMN lawgroupgovernmenttypeid SET DEFAULT nextval('geohistory.lawgroupgovernmenttype_lawgroupgovernmenttypeid_seq'::regclass);
+
+
+--
 -- Name: lawgroupsection lawgroupsectionid; Type: DEFAULT; Schema: geohistory; Owner: postgres
 --
 
@@ -14167,6 +14273,22 @@ ALTER TABLE ONLY geohistory.lawgroup
 
 ALTER TABLE ONLY geohistory.lawgroup
     ADD CONSTRAINT lawgroup_unique UNIQUE (lawgrouplong);
+
+
+--
+-- Name: lawgroupeventtype lawgroupeventtype_pk; Type: CONSTRAINT; Schema: geohistory; Owner: postgres
+--
+
+ALTER TABLE ONLY geohistory.lawgroupeventtype
+    ADD CONSTRAINT lawgroupeventtype_pk PRIMARY KEY (lawgroupeventtypeid);
+
+
+--
+-- Name: lawgroupgovernmenttype lawgroupgovernmenttype_pk; Type: CONSTRAINT; Schema: geohistory; Owner: postgres
+--
+
+ALTER TABLE ONLY geohistory.lawgroupgovernmenttype
+    ADD CONSTRAINT lawgroupgovernmenttype_pk PRIMARY KEY (lawgroupgovernmenttypeid);
 
 
 --
@@ -15978,6 +16100,30 @@ ALTER TABLE ONLY geohistory.lawalternatesection
 
 ALTER TABLE ONLY geohistory.lawgroup
     ADD CONSTRAINT lawgroup_eventeffectivetype_fk FOREIGN KEY (eventeffectivetype) REFERENCES geohistory.eventeffectivetype(eventeffectivetypeid) DEFERRABLE;
+
+
+--
+-- Name: lawgroupeventtype lawgroupeventtype_eventtype_fk; Type: FK CONSTRAINT; Schema: geohistory; Owner: postgres
+--
+
+ALTER TABLE ONLY geohistory.lawgroupeventtype
+    ADD CONSTRAINT lawgroupeventtype_eventtype_fk FOREIGN KEY (eventtype) REFERENCES geohistory.eventtype(eventtypeid) DEFERRABLE;
+
+
+--
+-- Name: lawgroupeventtype lawgroupeventtype_lawgroup_fk; Type: FK CONSTRAINT; Schema: geohistory; Owner: postgres
+--
+
+ALTER TABLE ONLY geohistory.lawgroupeventtype
+    ADD CONSTRAINT lawgroupeventtype_lawgroup_fk FOREIGN KEY (lawgroup) REFERENCES geohistory.lawgroup(lawgroupid) DEFERRABLE;
+
+
+--
+-- Name: lawgroupgovernmenttype lawgroupgovernmenttype_lawgroup_fk; Type: FK CONSTRAINT; Schema: geohistory; Owner: postgres
+--
+
+ALTER TABLE ONLY geohistory.lawgroupgovernmenttype
+    ADD CONSTRAINT lawgroupgovernmenttype_lawgroup_fk FOREIGN KEY (lawgroup) REFERENCES geohistory.lawgroup(lawgroupid) DEFERRABLE;
 
 
 --
