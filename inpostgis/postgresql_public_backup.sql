@@ -3520,28 +3520,37 @@ CREATE FUNCTION extra.ci_model_search_law_dateevent(character varying, text, cha
     LANGUAGE sql STABLE SECURITY DEFINER
     AS $_$
     
- SELECT lawsectionextracache.lawsectionslug,
-    lawsectionextracache.lawsectioncitation,
-    lawapproved,
-    eventtypeshort
-   FROM geohistory.lawsection
-     JOIN extra.lawsectionextracache
-       ON lawsection.lawsectionid = lawsectionextracache.lawsectionid
-     JOIN geohistory.eventtype
-       ON lawsection.eventtype = eventtype.eventtypeid
-       AND ($2 = ''::text 
-      OR $2 = 'Any Type'::text
-      OR ($2 = 'Only Border Changes'::text AND eventtype.eventtypeborders ~~ 'yes%')
-      OR eventtype.eventtypeshort = $2)
-     JOIN geohistory.law
-       ON lawsection.law = law.lawid
-       AND law.lawapproved = $1
-     JOIN geohistory.source
-       ON law.source = source.sourceid
-       AND (extra.governmentabbreviation(source.sourcegovernment[1]) = upper($3)
-         OR source.sourcegovernment[1] = extra.governmentcurrentleadparent(extra.governmentabbreviationid(upper($3)))
-         OR source.sourcegovernment[1] IS NULL)
-       AND source.sourcetype = 'session laws';
+WITH source AS (
+     SELECT source.sourceid,
+       sourcegovernment.government
+     FROM geohistory.source
+     LEFT JOIN geohistory.sourcegovernment
+       ON source.sourceid = sourcegovernment.source
+       AND sourcegovernment.sourceorder = 1
+     WHERE source.sourcetype = 'session laws'
+)
+     SELECT lawsectionextracache.lawsectionslug,
+        lawsectionextracache.lawsectioncitation,
+        lawapproved,
+        eventtypeshort
+       FROM geohistory.lawsection
+         JOIN extra.lawsectionextracache
+           ON lawsection.lawsectionid = lawsectionextracache.lawsectionid
+         JOIN geohistory.eventtype
+           ON lawsection.eventtype = eventtype.eventtypeid
+           AND ($2 = ''::text 
+          OR $2 = 'Any Type'::text
+          OR ($2 = 'Only Border Changes'::text AND eventtype.eventtypeborders ~~ 'yes%')
+          OR eventtype.eventtypeshort = $2)
+         JOIN geohistory.law
+           ON lawsection.law = law.lawid
+           AND law.lawapproved = $1
+         JOIN source
+           ON law.source = source.sourceid
+           AND (extra.governmentabbreviation(source.government) = upper($3)
+         OR source.government = extra.governmentcurrentleadparent(extra.governmentabbreviationid(upper($3)))
+         OR source.government IS NULL);
+
 $_$;
 
 
@@ -3554,27 +3563,36 @@ ALTER FUNCTION extra.ci_model_search_law_dateevent(character varying, text, char
 CREATE FUNCTION extra.ci_model_search_law_reference(character varying, integer, integer, character varying) RETURNS TABLE(lawsectionslug text, lawsectioncitation text, lawapproved character varying, eventtypeshort character varying)
     LANGUAGE sql STABLE SECURITY DEFINER
     AS $_$
-    
- SELECT lawsectionextracache.lawsectionslug,
-    lawsectionextracache.lawsectioncitation,
-    lawapproved,
-    eventtypeshort
-   FROM geohistory.lawsection
-     JOIN extra.lawsectionextracache
-       ON lawsection.lawsectionid = lawsectionextracache.lawsectionid   
-     JOIN geohistory.eventtype
-       ON lawsection.eventtype = eventtype.eventtypeid
-     JOIN geohistory.law
-       ON lawsection.law = law.lawid
-       AND (law.lawvolume = $1 OR left(law.lawapproved, 4) = $1)
-     JOIN geohistory.source
-       ON law.source = source.sourceid
-       AND (extra.governmentabbreviation(source.sourcegovernment[1]) = upper($4)
-         OR source.sourcegovernment[1] = extra.governmentcurrentleadparent(extra.governmentabbreviationid(upper($4)))
-         OR source.sourcegovernment[1] IS NULL)
-       AND source.sourcetype = 'session laws'
-  WHERE (0 = $2 OR law.lawpage = $2 OR (lawsection.lawsectionpagefrom >= $2 AND lawsection.lawsectionpageto <= $2))
-    AND (0 = $3 OR law.lawnumberchapter = $3);
+
+WITH source AS (
+     SELECT source.sourceid,
+       sourcegovernment.government
+     FROM geohistory.source
+     LEFT JOIN geohistory.sourcegovernment
+       ON source.sourceid = sourcegovernment.source
+       AND sourcegovernment.sourceorder = 1
+     WHERE source.sourcetype = 'session laws'
+)
+     SELECT lawsectionextracache.lawsectionslug,
+        lawsectionextracache.lawsectioncitation,
+        lawapproved,
+        eventtypeshort
+       FROM geohistory.lawsection
+         JOIN extra.lawsectionextracache
+           ON lawsection.lawsectionid = lawsectionextracache.lawsectionid   
+         JOIN geohistory.eventtype
+           ON lawsection.eventtype = eventtype.eventtypeid
+         JOIN geohistory.law
+           ON lawsection.law = law.lawid
+           AND (law.lawvolume = $1 OR left(law.lawapproved, 4) = $1)
+         JOIN source
+           ON law.source = source.sourceid
+           AND (extra.governmentabbreviation(source.government) = upper($4)
+         OR source.government = extra.governmentcurrentleadparent(extra.governmentabbreviationid(upper($4)))
+         OR source.government IS NULL)
+      WHERE (0 = $2 OR law.lawpage = $2 OR (lawsection.lawsectionpagefrom >= $2 AND lawsection.lawsectionpageto <= $2))
+        AND (0 = $3 OR law.lawnumberchapter = $3);
+
 $_$;
 
 
@@ -7502,40 +7520,18 @@ CREATE TABLE geohistory.metesdescription (
 ALTER TABLE geohistory.metesdescription OWNER TO postgres;
 
 --
--- Name: source; Type: TABLE; Schema: geohistory; Owner: postgres
+-- Name: sourcegovernment; Type: TABLE; Schema: geohistory; Owner: postgres
 --
 
-CREATE TABLE geohistory.source (
-    sourceid integer NOT NULL,
-    sourcetype character varying(25) NOT NULL,
-    sourceshort character varying(50) DEFAULT ''::character varying NOT NULL,
-    sourceshortpart character varying(50) DEFAULT ''::character varying NOT NULL,
-    sourcebookshort character varying(20) DEFAULT ''::character varying NOT NULL,
-    sourceurlsubstitute integer NOT NULL,
-    sourcegovernment integer[],
-    sourcelawtype character varying(50) DEFAULT ''::character varying NOT NULL,
-    sourceperson text DEFAULT ''::text NOT NULL,
-    sourcesectiontitle text DEFAULT ''::text NOT NULL,
-    sourcetitle text DEFAULT ''::text NOT NULL,
-    sourceidentifier text DEFAULT ''::text NOT NULL,
-    sourcepublisherlocation text DEFAULT ''::text NOT NULL,
-    sourcepublisher text DEFAULT ''::text NOT NULL,
-    sourcepublisheryear character varying(20) DEFAULT ''::text NOT NULL,
-    sourcelawisbynumber boolean DEFAULT false NOT NULL,
-    sourcelawhasspecialsession boolean DEFAULT false NOT NULL,
-    sourceabbreviationverified boolean DEFAULT false NOT NULL,
-    sourcetemporarynote text DEFAULT ''::text NOT NULL
+CREATE TABLE geohistory.sourcegovernment (
+    sourcegovernmentid integer NOT NULL,
+    source integer NOT NULL,
+    sourceorder integer DEFAULT 1 NOT NULL,
+    government integer NOT NULL
 );
 
 
-ALTER TABLE geohistory.source OWNER TO postgres;
-
---
--- Name: COLUMN source.sourcetemporarynote; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.source.sourcetemporarynote IS 'This field is used for internal tracking purposes, and is not included in open data.';
-
+ALTER TABLE geohistory.sourcegovernment OWNER TO postgres;
 
 --
 -- Name: affectedgovernmentgis; Type: TABLE; Schema: gis; Owner: postgres
@@ -7636,12 +7632,12 @@ CREATE VIEW extra.eventgovernment AS
              JOIN geohistory.affectedgovernmentpart ON (((affectedgovernmentgrouppart.affectedgovernmentpart = affectedgovernmentpart.affectedgovernmentpartid) AND (affectedgovernmentpart.governmentto IS NOT NULL))))
         UNION
          SELECT DISTINCT lawsectionevent.event,
-            source.sourcegovernment[1] AS government
+            sourcegovernment.government
            FROM geohistory.lawsectionevent,
             geohistory.lawsection,
             geohistory.law,
-            geohistory.source
-          WHERE ((lawsectionevent.lawsection = lawsection.lawsectionid) AND (lawsection.law = law.lawid) AND (law.source = source.sourceid) AND (source.sourcegovernment[1] IS NOT NULL))
+            geohistory.sourcegovernment
+          WHERE ((lawsectionevent.lawsection = lawsection.lawsectionid) AND (lawsection.law = law.lawid) AND (law.source = sourcegovernment.source) AND (sourcegovernment.sourceorder = 1))
         UNION
          SELECT DISTINCT governmentsourceevent.event,
             governmentsource.government
@@ -8194,6 +8190,41 @@ CREATE TABLE geohistory.adjudicationsourcecitation (
 ALTER TABLE geohistory.adjudicationsourcecitation OWNER TO postgres;
 
 --
+-- Name: source; Type: TABLE; Schema: geohistory; Owner: postgres
+--
+
+CREATE TABLE geohistory.source (
+    sourceid integer NOT NULL,
+    sourcetype character varying(25) NOT NULL,
+    sourceshort character varying(50) DEFAULT ''::character varying NOT NULL,
+    sourceshortpart character varying(50) DEFAULT ''::character varying NOT NULL,
+    sourcebookshort character varying(20) DEFAULT ''::character varying NOT NULL,
+    sourceurlsubstitute integer NOT NULL,
+    sourcelawtype character varying(50) DEFAULT ''::character varying NOT NULL,
+    sourceperson text DEFAULT ''::text NOT NULL,
+    sourcesectiontitle text DEFAULT ''::text NOT NULL,
+    sourcetitle text DEFAULT ''::text NOT NULL,
+    sourceidentifier text DEFAULT ''::text NOT NULL,
+    sourcepublisherlocation text DEFAULT ''::text NOT NULL,
+    sourcepublisher text DEFAULT ''::text NOT NULL,
+    sourcepublisheryear character varying(20) DEFAULT ''::text NOT NULL,
+    sourcelawisbynumber boolean DEFAULT false NOT NULL,
+    sourcelawhasspecialsession boolean DEFAULT false NOT NULL,
+    sourceabbreviationverified boolean DEFAULT false NOT NULL,
+    sourcetemporarynote text DEFAULT ''::text NOT NULL
+);
+
+
+ALTER TABLE geohistory.source OWNER TO postgres;
+
+--
+-- Name: COLUMN source.sourcetemporarynote; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.source.sourcetemporarynote IS 'This field is used for internal tracking purposes, and is not included in open data.';
+
+
+--
 -- Name: adjudicationsourcecitationextra; Type: VIEW; Schema: extra; Owner: postgres
 --
 
@@ -8647,21 +8678,6 @@ CREATE VIEW extra.giswardcache AS
 
 
 ALTER VIEW extra.giswardcache OWNER TO postgres;
-
---
--- Name: governmentbookcompleteorder; Type: VIEW; Schema: extra; Owner: postgres
---
-
-CREATE VIEW extra.governmentbookcompleteorder AS
- SELECT extra.governmentabbreviation(extra.governmentcurrentleadstateid(governmentcurrentleadparent)) AS governmentabbreviation,
-    governmentid,
-    extra.governmentlong(governmentid) AS governmentlong,
-    row_number() OVER (ORDER BY (extra.governmentabbreviation(extra.governmentcurrentleadstateid(governmentcurrentleadparent))), governmentcurrentleadparent, (extra.governmentshort(governmentid))) AS roworder
-   FROM geohistory.government
-  WHERE (governmentbookcomplete IS NOT NULL);
-
-
-ALTER VIEW extra.governmentbookcompleteorder OWNER TO postgres;
 
 --
 -- Name: affectedtype; Type: TABLE; Schema: geohistory; Owner: postgres
@@ -9535,10 +9551,11 @@ CREATE VIEW extra.lawsectiongovernment AS
     extra.lawsectioncitation(lawsection.lawsectionid) AS lawsectioncitation
    FROM (geohistory.lawsection
      LEFT JOIN (( SELECT DISTINCT lawsection_1.lawsectionid AS lawsection,
-            source.sourcegovernment[1] AS government
-           FROM ((geohistory.source
-             JOIN geohistory.law ON ((source.sourceid = law.source)))
+            sourcegovernment.government
+           FROM ((geohistory.sourcegovernment
+             JOIN geohistory.law ON ((sourcegovernment.source = law.source)))
              JOIN geohistory.lawsection lawsection_1 ON ((law.lawid = lawsection_1.law)))
+          WHERE (sourcegovernment.sourceorder = 1)
         UNION
          SELECT DISTINCT lawsectionevent.lawsection,
             eventgovernment.government
@@ -9695,10 +9712,10 @@ CREATE VIEW extra.sourcecitationgovernment AS
     ag2.governmentrelationstate
    FROM (geohistory.sourcecitation
      LEFT JOIN (( SELECT DISTINCT sourcecitation_1.sourcecitationid AS sourcecitation,
-            source.sourcegovernment[1] AS government
-           FROM geohistory.source,
+            sourcegovernment.government
+           FROM geohistory.sourcegovernment,
             geohistory.sourcecitation sourcecitation_1
-          WHERE (source.sourceid = sourcecitation_1.source)
+          WHERE ((sourcegovernment.source = sourcecitation_1.source) AND (sourcegovernment.sourceorder = 1))
         UNION
          SELECT DISTINCT sourcecitationevent.sourcecitation,
             eventgovernment.government
@@ -12966,6 +12983,28 @@ ALTER SEQUENCE geohistory.sourcecitationnotetype_sourcecitationnotetypeid_seq OW
 
 
 --
+-- Name: sourcegovernment_sourcegovernmentid_seq; Type: SEQUENCE; Schema: geohistory; Owner: postgres
+--
+
+CREATE SEQUENCE geohistory.sourcegovernment_sourcegovernmentid_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE geohistory.sourcegovernment_sourcegovernmentid_seq OWNER TO postgres;
+
+--
+-- Name: sourcegovernment_sourcegovernmentid_seq; Type: SEQUENCE OWNED BY; Schema: geohistory; Owner: postgres
+--
+
+ALTER SEQUENCE geohistory.sourcegovernment_sourcegovernmentid_seq OWNED BY geohistory.sourcegovernment.sourcegovernmentid;
+
+
+--
 -- Name: sourceitem; Type: TABLE; Schema: geohistory; Owner: postgres
 --
 
@@ -13797,6 +13836,13 @@ ALTER TABLE ONLY geohistory.sourcecitationnotetype ALTER COLUMN sourcecitationno
 
 
 --
+-- Name: sourcegovernment sourcegovernmentid; Type: DEFAULT; Schema: geohistory; Owner: postgres
+--
+
+ALTER TABLE ONLY geohistory.sourcegovernment ALTER COLUMN sourcegovernmentid SET DEFAULT nextval('geohistory.sourcegovernment_sourcegovernmentid_seq'::regclass);
+
+
+--
 -- Name: sourceitem sourceitemid; Type: DEFAULT; Schema: geohistory; Owner: postgres
 --
 
@@ -14282,11 +14328,27 @@ ALTER TABLE ONLY geohistory.lawgroupeventtype
 
 
 --
+-- Name: lawgroupeventtype lawgroupeventtype_unique; Type: CONSTRAINT; Schema: geohistory; Owner: postgres
+--
+
+ALTER TABLE ONLY geohistory.lawgroupeventtype
+    ADD CONSTRAINT lawgroupeventtype_unique UNIQUE (lawgroup, eventtype);
+
+
+--
 -- Name: lawgroupgovernmenttype lawgroupgovernmenttype_pk; Type: CONSTRAINT; Schema: geohistory; Owner: postgres
 --
 
 ALTER TABLE ONLY geohistory.lawgroupgovernmenttype
     ADD CONSTRAINT lawgroupgovernmenttype_pk PRIMARY KEY (lawgroupgovernmenttypeid);
+
+
+--
+-- Name: lawgroupgovernmenttype lawgroupgovernmenttype_unique; Type: CONSTRAINT; Schema: geohistory; Owner: postgres
+--
+
+ALTER TABLE ONLY geohistory.lawgroupgovernmenttype
+    ADD CONSTRAINT lawgroupgovernmenttype_unique UNIQUE (lawgroup, governmenttype);
 
 
 --
@@ -14583,6 +14645,30 @@ ALTER TABLE ONLY geohistory.sourcecitationnotetype
 
 ALTER TABLE ONLY geohistory.sourcecitationnotetype
     ADD CONSTRAINT sourcecitationnotetype_unique UNIQUE (source, sourcecitationnotetypeisdetail, sourcecitationnotetypetext);
+
+
+--
+-- Name: sourcegovernment sourcegovernment_government_unique; Type: CONSTRAINT; Schema: geohistory; Owner: postgres
+--
+
+ALTER TABLE ONLY geohistory.sourcegovernment
+    ADD CONSTRAINT sourcegovernment_government_unique UNIQUE (source, government);
+
+
+--
+-- Name: sourcegovernment sourcegovernment_pk; Type: CONSTRAINT; Schema: geohistory; Owner: postgres
+--
+
+ALTER TABLE ONLY geohistory.sourcegovernment
+    ADD CONSTRAINT sourcegovernment_pk PRIMARY KEY (sourcegovernmentid);
+
+
+--
+-- Name: sourcegovernment sourcegovernment_sourceorder_unique; Type: CONSTRAINT; Schema: geohistory; Owner: postgres
+--
+
+ALTER TABLE ONLY geohistory.sourcegovernment
+    ADD CONSTRAINT sourcegovernment_sourceorder_unique UNIQUE (source, sourceorder);
 
 
 --
@@ -16450,6 +16536,22 @@ ALTER TABLE ONLY geohistory.sourcecitationnote
 
 ALTER TABLE ONLY geohistory.sourcecitationnotetype
     ADD CONSTRAINT sourcecitationnotetype_source_fk FOREIGN KEY (source) REFERENCES geohistory.source(sourceid) DEFERRABLE;
+
+
+--
+-- Name: sourcegovernment sourcegovernment_government_fk; Type: FK CONSTRAINT; Schema: geohistory; Owner: postgres
+--
+
+ALTER TABLE ONLY geohistory.sourcegovernment
+    ADD CONSTRAINT sourcegovernment_government_fk FOREIGN KEY (government) REFERENCES geohistory.government(governmentid) DEFERRABLE;
+
+
+--
+-- Name: sourcegovernment sourcegovernment_source_fk; Type: FK CONSTRAINT; Schema: geohistory; Owner: postgres
+--
+
+ALTER TABLE ONLY geohistory.sourcegovernment
+    ADD CONSTRAINT sourcegovernment_source_fk FOREIGN KEY (source) REFERENCES geohistory.source(sourceid) DEFERRABLE;
 
 
 --
