@@ -10988,8 +10988,6 @@ CREATE TABLE geohistory.lawgroup (
     lawgroupsecretaryofstate boolean,
     lawgroupplanningagency boolean,
     lawgroupprocedure text DEFAULT ''::text NOT NULL,
-    lawgroupgovernmenttype text[],
-    eventtype integer[],
     lawgroupgroup text DEFAULT ''::text NOT NULL,
     lawgroupsectionlead text DEFAULT ''::text NOT NULL
 );
