@@ -196,11 +196,13 @@ SELECT DISTINCT eventextracache.eventslug,
     eventtype.eventtypeshort,
     event.eventlong,
     extra.rangefix(event.eventfrom::text, event.eventto::text) AS eventrange,
-    event.eventgranted,
+    eventgranted.eventgrantedshort AS eventgranted,
     extra.shortdate(event.eventeffective) AS eventeffective,
     extra.eventsortdate(event.eventid) AS eventsortdate,
-    adjudicationevent.adjudicationeventrelationship AS eventrelationship
+    eventrelationship.eventrelationshipshort AS eventrelationship
    FROM geohistory.event
+   JOIN geohistory.eventgranted
+     ON event.eventgranted = eventgranted.eventgrantedid
    JOIN geohistory.eventtype
      ON event.eventtype = eventtype.eventtypeid
    JOIN extra.eventextracache
@@ -208,7 +210,9 @@ SELECT DISTINCT eventextracache.eventslug,
      AND eventextracache.eventslugnew IS NULL
    JOIN geohistory.adjudicationevent
      ON event.eventid = adjudicationevent.event 
-    AND adjudicationevent.adjudication = $1   
+     AND adjudicationevent.adjudication = $1
+   JOIN geohistory.eventrelationship
+     ON adjudicationevent.eventrelationship = eventrelationship.eventrelationshipid
   ORDER BY (extra.eventsortdate(event.eventid)), event.eventlong;
 $_$;
 
@@ -367,7 +371,7 @@ WITH foundaffectedgovernment AS (
     (ROW_NUMBER () OVER (ORDER BY extra.eventsortdate(event.eventid) DESC, event.eventid DESC))::integer AS eventorderreverse
    FROM geohistory.event
    JOIN geohistory.eventgranted
-   ON event.eventgranted = eventgranted.eventgrantedshort
+   ON event.eventgranted = eventgranted.eventgrantedid
    AND eventgranted.eventgrantedsuccess
    JOIN extra.eventextracache
    ON event.eventid = eventextracache.eventid
@@ -536,10 +540,12 @@ SELECT DISTINCT eventextracache.eventslug,
     eventtype.eventtypeshort,
     event.eventlong,
     extra.rangefix(event.eventfrom::text, event.eventto::text) AS eventrange,
-    event.eventgranted,
+    eventgranted.eventgrantedshort AS eventgranted,
     extra.shortdate(event.eventeffective) AS eventeffective,
     extra.eventsortdate(event.eventid) AS eventsortdate
    FROM geohistory.event
+   JOIN geohistory.eventgranted
+     ON event.eventgranted = eventgranted.eventgrantedid
    JOIN geohistory.eventtype
      ON event.eventtype = eventtype.eventtypeid
    JOIN extra.eventextracache
@@ -631,8 +637,10 @@ CREATE FUNCTION extra.ci_model_event_adjudication(integer) RETURNS TABLE(adjudic
         ELSE ''
     END) AS adjudicationterm,
     adjudication.adjudicationterm AS adjudicationtermsort,
-    adjudicationevent.adjudicationeventrelationship AS eventrelationship
+    eventrelationship.eventrelationshipshort AS eventrelationship
    FROM geohistory.adjudicationevent
+   JOIN geohistory.eventrelationship
+     ON adjudicationevent.eventrelationship = eventrelationship.eventrelationshipid
    JOIN geohistory.adjudication
      ON adjudicationevent.adjudication = adjudication.adjudicationid
    JOIN extra.adjudicationextracache
@@ -814,9 +822,9 @@ CREATE FUNCTION extra.ci_model_event_detail(integer, character varying) RETURNS 
     eventtype.eventtypeshort,
     eventmethod.eventmethodlong,
     event.eventlong,
-    event.eventgranted,
+    eventgranted.eventgrantedshort AS eventgranted,
         CASE
-            WHEN event.eventgranted = 'government' OR (event.eventfrom = 0 AND event.eventto = 0 AND event.eventeffective::text = ''::text AND event.eventeffectivetypepresumedsource IS NULL AND other.otherdatetype IS NULL) THEN false
+            WHEN eventgranted.eventgrantedshort = 'government' OR (event.eventfrom = 0 AND event.eventto = 0 AND event.eventeffective::text = ''::text AND event.eventeffectivetypepresumedsource IS NULL AND other.otherdatetype IS NULL) THEN false
             ELSE true
         END AS textflag,
     extra.rangefix(event.eventfrom::text, event.eventto::text) AS eventrange,
@@ -830,7 +838,9 @@ CREATE FUNCTION extra.ci_model_event_detail(integer, character varying) RETURNS 
     other.otherdatetype,
     event.eventismapped,
     extra.governmentstatelink(event.government, $2, 'en') AS government
-   FROM geohistory.event 
+   FROM geohistory.event
+     JOIN geohistory.eventgranted
+       ON event.eventgranted = eventgranted.eventgrantedid
      JOIN geohistory.eventmethod
        ON event.eventmethod = eventmethod.eventmethodid 
      JOIN geohistory.eventtype
@@ -979,7 +989,7 @@ CREATE FUNCTION extra.ci_model_event_law(integer) RETURNS TABLE(lawsectionslug t
  SELECT DISTINCT lawsectionextracache.lawsectionslug,
     law.lawapproved,
     lawsectionextracache.lawsectioncitation,
-    lawsectionevent.lawsectioneventrelationship,
+    eventrelationship.eventrelationshipshort AS lawsectioneventrelationship,
     lawsection.lawsectionfrom,
     law.lawnumberchapter,
     lawgroup.lawgrouplong
@@ -991,6 +1001,8 @@ CREATE FUNCTION extra.ci_model_event_law(integer) RETURNS TABLE(lawsectionslug t
    JOIN geohistory.lawsectionevent
      ON lawsection.lawsectionid = lawsectionevent.lawsection 
      AND lawsectionevent.event = $1
+   JOIN geohistory.eventrelationship
+     ON lawsectionevent.eventrelationship = eventrelationship.eventrelationshipid
    LEFT JOIN geohistory.lawgroup
      ON lawsectionevent.lawgroup = lawgroup.lawgroupid
   ORDER BY 4, 2, 1;
@@ -1101,7 +1113,7 @@ SELECT extra.governmentstatelink(recordingoffice.government, $2, $3) AS governme
     recordingtype.recordingtypeid IS NOT NULL AND recordingnumbertype.recordingtypeid IS NOT NULL AS hasbothtype,
     extra.shortdate(recording.recordingdate) AS recordingdate,
     recording.recordingdate AS recordingdatesort,
-    recordingevent.recordingeventrelationship,
+    eventrelationship.eventrelationshipshort AS recordingeventrelationship,
     recording.recordingrepositoryshort,
     recording.recordingrepositoryitemnumber,
     extra.rangefix(recording.recordingrepositoryitemfrom::text, recording.recordingrepositoryitemto::text) AS recordingrepositoryitemrange,
@@ -1112,6 +1124,8 @@ SELECT extra.governmentstatelink(recordingoffice.government, $2, $3) AS governme
    JOIN geohistory.recordingevent
     ON recording.recordingid = recordingevent.recording
     AND recordingevent.event = $1
+   JOIN geohistory.eventrelationship
+    ON recordingevent.eventrelationship = eventrelationship.eventrelationshipid
    JOIN geohistory.recordingoffice
     ON recording.recordingoffice = recordingoffice.recordingofficeid
    LEFT JOIN geohistory.recordingtype
@@ -1189,7 +1203,7 @@ SELECT DISTINCT extra.eventsortdate(event.eventid) AS eventsortdate,
     extra.rangefix(event.eventfrom::text, event.eventto::text) AS eventrange,
     extra.shortdate(event.eventeffective) AS eventeffective,
     event.eventeffective AS eventeffectivesort,
-    NOT eventgrantedcertainty AS eventreconstructed,
+    NOT eventgranted.eventgrantedcertainty AS eventreconstructed,
     extra.governmentlong(affectedgovernment.governmentaffected, upper($2)) AS governmentaffectedlong
    FROM (
     -- To-From
@@ -1288,7 +1302,7 @@ SELECT DISTINCT extra.eventsortdate(event.eventid) AS eventsortdate,
       ON event.eventid = eventextracache.eventid
       AND eventextracache.eventslugnew IS NULL
     JOIN geohistory.eventgranted
-      ON event.eventgranted = eventgranted.eventgrantedshort
+      ON event.eventgranted = eventgranted.eventgrantedid
       AND eventgranted.eventgrantedsuccess
     JOIN geohistory.affectedtype affectedtypesame
       ON affectedgovernment.affectedtypesame = affectedtypesame.affectedtypeid
@@ -1329,14 +1343,14 @@ SELECT DISTINCT extra.eventsortdate(event.eventid) AS eventsortdate,
     extra.rangefix(event.eventfrom::text, event.eventto::text) AS eventrange,
     extra.shortdate(event.eventeffective) AS eventeffective,
     event.eventeffective AS eventeffectivesort,
-    NOT eventgrantedcertainty AS eventreconstructed,
+    NOT eventgranted.eventgrantedcertainty AS eventreconstructed,
     extra.governmentlong(affectedgovernmentpart.governmentto, upper($2)) AS governmentaffectedlong
    FROM geohistory.event
     JOIN extra.eventextracache
       ON event.eventid = eventextracache.eventid
       AND eventextracache.eventslugnew IS NULL
     JOIN geohistory.eventgranted
-      ON event.eventgranted = eventgranted.eventgrantedshort
+      ON event.eventgranted = eventgranted.eventgrantedid
       AND eventgranted.eventgrantedsuccess
     JOIN geohistory.affectedgovernmentgroup
       ON event.eventid = affectedgovernmentgroup.event
@@ -1487,12 +1501,12 @@ SELECT DISTINCT eventextracache.eventslug,
     eventtype.eventtypeshort,
     event.eventlong,
     extra.rangefix(event.eventfrom::text, event.eventto::text) AS eventrange,
-    event.eventgranted,
+    eventgranted.eventgrantedshort AS eventgranted,
     extra.shortdate(event.eventeffective) AS eventeffective,
     extra.eventsortdate(event.eventid) AS eventsortdate
    FROM geohistory.event
    JOIN geohistory.eventgranted
-     ON event.eventgranted = eventgranted.eventgrantedshort
+     ON event.eventgranted = eventgranted.eventgrantedid
      AND NOT eventgranted.eventgrantedsuccess
      AND NOT eventgranted.eventgrantedplaceholder
    JOIN geohistory.eventtype
@@ -1523,12 +1537,12 @@ SELECT DISTINCT eventextracache.eventslug,
     eventtype.eventtypeshort,
     event.eventlong,
     extra.rangefix(event.eventfrom::text, event.eventto::text) AS eventrange,
-    event.eventgranted,
+    eventgranted.eventgrantedshort AS eventgranted,
     extra.shortdate(event.eventeffective) AS eventeffective,
     extra.eventsortdate(event.eventid) AS eventsortdate
    FROM geohistory.event
    JOIN geohistory.eventgranted
-     ON event.eventgranted = eventgranted.eventgrantedshort
+     ON event.eventgranted = eventgranted.eventgrantedid
      AND eventgranted.eventgrantedsuccess   
    JOIN geohistory.eventtype
      ON event.eventtype = eventtype.eventtypeid
@@ -1939,7 +1953,7 @@ WITH affectedgovernmentsummary AS (
              ON event.eventid = eventextracache.eventid
              AND eventextracache.eventslugnew IS NULL
            JOIN geohistory.eventgranted
-             ON event.eventgranted = eventgranted.eventgrantedshort
+             ON event.eventgranted = eventgranted.eventgrantedid
            GROUP BY 1, 2, 3, 4, 5
 ), governmentshapeeventparts AS (
          SELECT governmentshapeeventpartparts.governmentshapeid,
@@ -2172,7 +2186,7 @@ CREATE FUNCTION extra.ci_model_governmentrecording_detail(integer, character var
 	END AS recordinglocation,
     recordingrepositoryitemfrom AS recordinglocationstart,
         CASE
-            WHEN event.eventlong IS NOT NULL AND event.eventlong <> '*Dummy Record*' AND recordingevent.recordingeventrelationship = 'direct' THEN event.eventlong
+            WHEN event.eventlong IS NOT NULL AND event.eventlong <> '*Dummy Record*' AND eventrelationship.eventrelationshipshort = 'direct' THEN event.eventlong
             WHEN event.eventlong IS NOT NULL AND event.eventlong <> '*Dummy Record*' THEN '^' || event.eventlong
             ELSE '~' || recording.recordingdescription
         END AS recordingsummary,
@@ -2191,6 +2205,8 @@ CREATE FUNCTION extra.ci_model_governmentrecording_detail(integer, character var
        ON recording.recordingnumbertype = numbertype.recordingtypeid
      LEFT JOIN geohistory.recordingevent
        ON recording.recordingid = recordingevent.recording
+     LEFT JOIN geohistory.eventrelationship
+       ON recordingevent.eventrelationship = eventrelationship.eventrelationshipid
      LEFT JOIN geohistory.event
        ON recordingevent.event = event.eventid
   WHERE recordingoffice.government = $1
@@ -2306,10 +2322,12 @@ CREATE FUNCTION extra.ci_model_governmentsource_event(integer) RETURNS TABLE(eve
     eventtype.eventtypeshort,
     event.eventlong,
     extra.rangefix(event.eventfrom::text, event.eventto::text) AS eventrange,
-    event.eventgranted,
+    eventgranted.eventgrantedshort AS eventgranted,
     extra.shortdate(event.eventeffective) AS eventeffective,
     extra.eventsortdate(event.eventid) AS eventsortdate
    FROM geohistory.event
+   JOIN geohistory.eventgranted
+     ON event.eventgranted = eventgranted.eventgrantedid
    JOIN geohistory.eventtype
      ON event.eventtype = eventtype.eventtypeid
    JOIN extra.eventextracache
@@ -2596,12 +2614,14 @@ SELECT DISTINCT eventextracache.eventslug,
     eventtype.eventtypeshort,
     event.eventlong,
     extra.rangefix(event.eventfrom::text, event.eventto::text) AS eventrange,
-    event.eventgranted,
+    eventgranted.eventgrantedshort AS eventgranted,
     extra.shortdate(event.eventeffective) AS eventeffective,
     extra.eventsortdate(event.eventid) AS eventsortdate,
-    lawsectionevent.lawsectioneventrelationship AS eventrelationship,
+    eventrelationship.eventrelationshipshort AS eventrelationship,
     lawgroup.lawgrouplong
    FROM geohistory.event
+   JOIN geohistory.eventgranted
+     ON event.eventgranted = eventgranted.eventgrantedid
    JOIN geohistory.eventtype
      ON event.eventtype = eventtype.eventtypeid
    JOIN extra.eventextracache
@@ -2610,6 +2630,8 @@ SELECT DISTINCT eventextracache.eventslug,
    JOIN geohistory.lawsectionevent
      ON event.eventid = lawsectionevent.event
      AND lawsectionevent.lawsection = $1
+   JOIN geohistory.eventrelationship
+     ON lawsectionevent.eventrelationship = eventrelationship.eventrelationshipid
    LEFT JOIN geohistory.lawgroup
      ON lawsectionevent.lawgroup = lawgroup.lawgroupid
   ORDER BY (extra.eventsortdate(event.eventid)), event.eventlong;
@@ -2807,12 +2829,14 @@ SELECT DISTINCT eventextracache.eventslug,
     eventtype.eventtypeshort,
     event.eventlong,
     extra.rangefix(event.eventfrom::text, event.eventto::text) AS eventrange,
-    event.eventgranted,
+    eventgranted.eventgrantedshort AS eventgranted,
     extra.shortdate(event.eventeffective) AS eventeffective,
     extra.eventsortdate(event.eventid) AS eventsortdate,
-    lawsectionevent.lawsectioneventrelationship AS eventrelationship,
+    eventrelationship.eventrelationshipshort AS eventrelationship,
     lawgroup.lawgrouplong
    FROM geohistory.event
+   JOIN geohistory.eventgranted
+     ON event.eventgranted = eventgranted.eventgrantedid
    JOIN geohistory.eventtype
      ON event.eventtype = eventtype.eventtypeid
    JOIN extra.eventextracache
@@ -2820,6 +2844,8 @@ SELECT DISTINCT eventextracache.eventslug,
      AND eventextracache.eventslugnew IS NULL
    JOIN geohistory.lawsectionevent
      ON event.eventid = lawsectionevent.event
+   JOIN geohistory.eventrelationship
+     ON lawsectionevent.eventrelationship = eventrelationship.eventrelationshipid
    JOIN geohistory.lawalternatesection
      ON lawsectionevent.lawsection = lawalternatesection.lawsection
      AND lawalternatesection.lawalternatesectionid = $1
@@ -3033,7 +3059,7 @@ WITH metesdescriptionpart AS (
         eventtype.eventtypeshort,
         event.eventlong,
         extra.rangefix(event.eventfrom::text, event.eventto::text) AS eventrange,
-        event.eventgranted,
+        eventgranted.eventgrantedshort AS eventgranted,
         extra.shortdate(event.eventeffective) AS eventeffective,
         extra.eventsortdate(event.eventid) AS eventsortdate
        FROM geohistory.metesdescription
@@ -3041,6 +3067,8 @@ WITH metesdescriptionpart AS (
          ON metesdescription.metesdescriptionid = metesdescriptionextracache.metesdescriptionid
          JOIN geohistory.event
          ON metesdescription.event = event.eventid
+         JOIN geohistory.eventgranted
+         ON event.eventgranted = eventgranted.eventgrantedid
          LEFT JOIN extra.eventextracache
          ON event.eventid = eventextracache.eventid
          AND eventextracache.eventslugnew IS NULL
@@ -3198,10 +3226,12 @@ SELECT DISTINCT eventextracache.eventslug,
     eventtype.eventtypeshort,
     event.eventlong,
     extra.rangefix(event.eventfrom::text, event.eventto::text) AS eventrange,
-    event.eventgranted,
+    eventgranted.eventgrantedshort AS eventgranted,
     extra.shortdate(event.eventeffective) AS eventeffective,
     extra.eventsortdate(event.eventid) AS eventsortdate
    FROM geohistory.event
+   JOIN geohistory.eventgranted
+     ON event.eventgranted = eventgranted.eventgrantedid
    JOIN geohistory.eventtype
      ON event.eventtype = eventtype.eventtypeid
    JOIN extra.eventextracache
@@ -3275,7 +3305,7 @@ SELECT DISTINCT eventextracache.eventslug,
     eventtype.eventtypeshort,
     event.eventlong,
     extra.rangefix(event.eventfrom::text, event.eventto::text) AS eventrange,
-    event.eventgranted,
+    eventgranted.eventgrantedshort AS eventgranted,
     extra.shortdate(event.eventeffective) AS eventeffective,
     extra.eventsortdate(event.eventid) AS eventsortdate
    FROM alternategovernment
@@ -3284,7 +3314,7 @@ SELECT DISTINCT eventextracache.eventslug,
      JOIN geohistory.event
        ON eventgovernmentcache.eventid = event.eventid
      JOIN geohistory.eventgranted
-       ON event.eventgranted = eventgranted.eventgrantedshort
+       ON event.eventgranted = eventgranted.eventgrantedid
        AND NOT eventgranted.eventgrantedplaceholder
      JOIN geohistory.eventtype
        ON event.eventtype = eventtype.eventtypeid  
@@ -3718,10 +3748,12 @@ CREATE FUNCTION extra.ci_model_source_event(integer) RETURNS TABLE(eventslug tex
     eventtype.eventtypeshort,
     event.eventlong,
     extra.rangefix(event.eventfrom::text, event.eventto::text) AS eventrange,
-    event.eventgranted,
+    eventgranted.eventgrantedshort AS eventgranted,
     extra.shortdate(event.eventeffective) AS eventeffective,
     extra.eventsortdate(event.eventid) AS eventsortdate
    FROM geohistory.event
+   JOIN geohistory.eventgranted
+     ON event.eventgranted = eventgranted.eventgrantedid
    JOIN geohistory.eventtype
      ON event.eventtype = eventtype.eventtypeid
    JOIN extra.eventextracache
@@ -6524,11 +6556,11 @@ BEGIN
       AND lawsectionevent.lawsection = OLD.lawsection
       AND (
         (
-          OLD.lawsectionrelationship IN ('indirect', 'reinstated', 'validation')
-            AND lawsectionevent.lawsectioneventrelationship = 'indirect'
+          OLD.eventrelationship IN (4, 6, 9)
+            AND lawsectionevent.eventrelationship = 4
         ) OR (
-          OLD.lawsectionrelationship <> 'repealed'
-          AND lawsectionevent.lawsectioneventrelationship = 'reference'
+          OLD.eventrelationship <> 7
+          AND lawsectionevent.eventrelationship = 5
         )
       );
 
@@ -6585,11 +6617,11 @@ BEGIN
           AND lawgroupsection.lawsection = NEW.lawsection
           AND (
             (
-              lawgroupsection.lawsectionrelationship IN ('indirect', 'reinstated', 'validation')
-                AND NEW.lawsectioneventrelationship = 'indirect'
+              lawgroupsection.eventrelationship IN (4, 6, 9)
+                AND NEW.eventrelationship = 4
             ) OR (
-              lawgroupsection.lawsectionrelationship <> 'repealed'
-              AND NEW.lawsectioneventrelationship = 'reference'
+              lawgroupsection.eventrelationship <> 7
+              AND NEW.eventrelationship = 5
             )
           );
     
@@ -7142,19 +7174,12 @@ CREATE TABLE geohistory.adjudicationevent (
     adjudicationeventid integer NOT NULL,
     adjudication integer NOT NULL,
     event integer NOT NULL,
-    adjudicationeventrelationship character varying(10) NOT NULL,
-    CONSTRAINT adjudicationevent_check CHECK (((adjudicationeventrelationship)::text <> ALL (ARRAY[('enabling'::character varying)::text, ('indirect'::character varying)::text, ('reinstated'::character varying)::text, ('repealer'::character varying)::text, ('validation'::character varying)::text])))
+    eventrelationship integer NOT NULL,
+    CONSTRAINT adjudicationevent_check CHECK ((eventrelationship <> ALL (ARRAY[2, 4, 6, 7, 9])))
 );
 
 
 ALTER TABLE geohistory.adjudicationevent OWNER TO postgres;
-
---
--- Name: COLUMN adjudicationevent.adjudicationeventrelationship; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.adjudicationevent.adjudicationeventrelationship IS 'This should eventually be renamed to eventrelationship converted to a proper foreign key referencing eventrelationshipid.';
-
 
 --
 -- Name: adjudicationlocation; Type: TABLE; Schema: geohistory; Owner: postgres
@@ -7280,7 +7305,6 @@ CREATE TABLE geohistory.event (
     eventlong character varying(500) NOT NULL,
     eventfrom smallint NOT NULL,
     eventto smallint NOT NULL,
-    eventgranted character varying(15) DEFAULT ''::character varying NOT NULL,
     eventeffective calendar.historicdatetext DEFAULT (''::text)::calendar.historicdatetext NOT NULL,
     eventeffectivetypestatutory integer,
     eventeffectivetypepresumedsource integer,
@@ -7289,7 +7313,8 @@ CREATE TABLE geohistory.event (
     eventismapped boolean DEFAULT false NOT NULL,
     eventismappedtype character varying(100) DEFAULT ''::character varying NOT NULL,
     government integer,
-    CONSTRAINT event_check CHECK (((eventfrom <= eventto) AND ((eventlong)::text <> ''::text) AND ((((eventgranted)::text = 'government'::text) AND (government IS NOT NULL)) OR (((eventgranted)::text <> 'government'::text) AND (government IS NULL)))))
+    eventgranted integer NOT NULL,
+    CONSTRAINT event_check CHECK (((eventfrom <= eventto) AND ((eventlong)::text <> ''::text) AND (((eventgranted = 17) AND (government IS NOT NULL)) OR ((eventgranted <> 17) AND (government IS NULL)))))
 );
 
 
@@ -7300,13 +7325,6 @@ ALTER TABLE geohistory.event OWNER TO postgres;
 --
 
 COMMENT ON COLUMN geohistory.event.eventtype IS 'Rows with foreign key field eventtypegroup "Placeholder" are omitted from open data.';
-
-
---
--- Name: COLUMN event.eventgranted; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.event.eventgranted IS 'This should eventually be converted to a proper foreign key referencing eventgrantedid.';
 
 
 --
@@ -7387,18 +7405,11 @@ CREATE TABLE geohistory.governmentsourceevent (
     governmentsource integer NOT NULL,
     event integer NOT NULL,
     governmentsourceeventinclude boolean,
-    governmentsourceeventrelationship character varying(10) NOT NULL
+    eventrelationship integer NOT NULL
 );
 
 
 ALTER TABLE geohistory.governmentsourceevent OWNER TO postgres;
-
---
--- Name: COLUMN governmentsourceevent.governmentsourceeventrelationship; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.governmentsourceevent.governmentsourceeventrelationship IS '-- This should eventually be renamed to eventrelationship converted to a proper foreign key referencing eventrelationshipid.';
-
 
 --
 -- Name: law; Type: TABLE; Schema: geohistory; Owner: postgres
@@ -7472,21 +7483,14 @@ CREATE TABLE geohistory.lawsectionevent (
     lawsectioneventid integer NOT NULL,
     lawsection integer NOT NULL,
     event integer NOT NULL,
-    lawsectioneventrelationship character varying(10) NOT NULL,
     lawsectioneventnotes text DEFAULT ''::text NOT NULL,
     lawgroup integer,
-    CONSTRAINT lawsectionevent_check CHECK (((lawsectioneventrelationship)::text <> ALL (ARRAY[('reinstated'::character varying)::text, ('repealer'::character varying)::text, ('validation'::character varying)::text])))
+    eventrelationship integer NOT NULL,
+    CONSTRAINT lawsectionevent_check CHECK ((eventrelationship <> ALL (ARRAY[6, 7, 9])))
 );
 
 
 ALTER TABLE geohistory.lawsectionevent OWNER TO postgres;
-
---
--- Name: COLUMN lawsectionevent.lawsectioneventrelationship; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.lawsectionevent.lawsectioneventrelationship IS 'This should eventually be renamed to eventrelationship converted to a proper foreign key referencing eventrelationshipid.';
-
 
 --
 -- Name: COLUMN lawsectionevent.lawsectioneventnotes; Type: COMMENT; Schema: geohistory; Owner: postgres
@@ -7824,7 +7828,7 @@ UNION (
                     eventgranted.eventgrantedsuccess
                    FROM ((((((((geohistory.affectedgovernmentgroup
                      JOIN geohistory.event ON ((affectedgovernmentgroup.event = event.eventid)))
-                     JOIN geohistory.eventgranted ON (((event.eventgranted)::text = (eventgranted.eventgrantedshort)::text)))
+                     JOIN geohistory.eventgranted ON ((event.eventgranted = eventgranted.eventgrantedid)))
                      JOIN geohistory.affectedgovernmentgrouppart ON ((affectedgovernmentgroup.affectedgovernmentgroupid = affectedgovernmentgrouppart.affectedgovernmentgroup)))
                      JOIN geohistory.affectedgovernmentlevel ON ((affectedgovernmentgrouppart.affectedgovernmentlevel = affectedgovernmentlevel.affectedgovernmentlevelid)))
                      JOIN geohistory.affectedgovernmentgrouppart parentgrouppart ON ((affectedgovernmentgroup.affectedgovernmentgroupid = parentgrouppart.affectedgovernmentgroup)))
@@ -7837,7 +7841,7 @@ UNION (
                     eventgranted.eventgrantedsuccess
                    FROM ((((((((geohistory.affectedgovernmentgroup
                      JOIN geohistory.event ON ((affectedgovernmentgroup.event = event.eventid)))
-                     JOIN geohistory.eventgranted ON (((event.eventgranted)::text = (eventgranted.eventgrantedshort)::text)))
+                     JOIN geohistory.eventgranted ON ((event.eventgranted = eventgranted.eventgrantedid)))
                      JOIN geohistory.affectedgovernmentgrouppart ON ((affectedgovernmentgroup.affectedgovernmentgroupid = affectedgovernmentgrouppart.affectedgovernmentgroup)))
                      JOIN geohistory.affectedgovernmentlevel ON ((affectedgovernmentgrouppart.affectedgovernmentlevel = affectedgovernmentlevel.affectedgovernmentlevelid)))
                      JOIN geohistory.affectedgovernmentgrouppart parentgrouppart ON ((affectedgovernmentgroup.affectedgovernmentgroupid = parentgrouppart.affectedgovernmentgroup)))
@@ -7850,7 +7854,7 @@ UNION (
                     eventgranted.eventgrantedsuccess
                    FROM ((geohistory.currentgovernment
                      JOIN geohistory.event ON ((currentgovernment.event = event.eventid)))
-                     JOIN geohistory.eventgranted ON (((event.eventgranted)::text = (eventgranted.eventgrantedshort)::text)))
+                     JOIN geohistory.eventgranted ON ((event.eventgranted = eventgranted.eventgrantedid)))
                   WHERE (currentgovernment.governmentsubmunicipality IS NOT NULL)
                 UNION
                  SELECT currentgovernment.governmentmunicipality AS governmentid,
@@ -7858,14 +7862,14 @@ UNION (
                     eventgranted.eventgrantedsuccess
                    FROM ((geohistory.currentgovernment
                      JOIN geohistory.event ON ((currentgovernment.event = event.eventid)))
-                     JOIN geohistory.eventgranted ON (((event.eventgranted)::text = (eventgranted.eventgrantedshort)::text)))
+                     JOIN geohistory.eventgranted ON ((event.eventgranted = eventgranted.eventgrantedid)))
                 UNION
                  SELECT currentgovernment.governmentcounty AS governmentid,
                     currentgovernment.governmentstate AS governmentparent,
                     eventgranted.eventgrantedsuccess
                    FROM ((geohistory.currentgovernment
                      JOIN geohistory.event ON ((currentgovernment.event = event.eventid)))
-                     JOIN geohistory.eventgranted ON (((event.eventgranted)::text = (eventgranted.eventgrantedshort)::text)))) totalgovernment
+                     JOIN geohistory.eventgranted ON ((event.eventgranted = eventgranted.eventgrantedid)))) totalgovernment
           WHERE (NOT (totalgovernment.governmentid IN ( SELECT government.governmentid
                    FROM geohistory.government
                   WHERE ((government.governmentstatus)::text = 'placeholder'::text))))
@@ -8392,7 +8396,7 @@ CREATE VIEW extra.affectedgovernmentform AS
     row_number() OVER (PARTITION BY governmentforms.government ORDER BY (('J'::text || trunc(extra.eventsortdate(governmentforms.event), 0)))::date DESC) AS "Recentness"
    FROM ((governmentforms
      JOIN geohistory.event ON ((governmentforms.event = event.eventid)))
-     JOIN geohistory.eventgranted ON ((((event.eventgranted)::text = (eventgranted.eventgrantedshort)::text) AND eventgranted.eventgrantedsuccess)))
+     JOIN geohistory.eventgranted ON (((event.eventgranted = eventgranted.eventgrantedid) AND eventgranted.eventgrantedsuccess)))
   WHERE ((extra.governmentstatus(governmentforms.government) <> ALL (ARRAY['placeholder'::text, 'proposed'::text, 'unincorporated'::text])) AND (extra.governmenttype(governmentforms.government) <> 'Ward'::text))
   ORDER BY (extra.governmentabbreviation(extra.governmentcurrentleadstateid(governmentforms.government))), governmentforms.government, (('J'::text || trunc(extra.eventsortdate(governmentforms.event), 0)))::date;
 
@@ -8790,10 +8794,10 @@ CREATE VIEW extra.governmentchangecount AS
              JOIN geohistory.event ON ((affectedgovernmentsummary.eventid = event.eventid)))
              JOIN extra.governmentsubstitute ON ((affectedgovernmentsummary.governmentid = governmentsubstitute.governmentid)))
              LEFT JOIN geohistory.eventeffectivetype ON ((event.eventeffectivetypepresumedsource = eventeffectivetype.eventeffectivetypeid)))
-             JOIN geohistory.eventgranted ON ((((event.eventgranted)::text = (eventgranted.eventgrantedshort)::text) AND eventgranted.eventgrantedsuccess)))
+             JOIN geohistory.eventgranted ON (((event.eventgranted = eventgranted.eventgrantedid) AND eventgranted.eventgrantedsuccess)))
              JOIN geohistory.affectedtype ON ((affectedgovernmentsummary.affectedtypeid = affectedtype.affectedtypeid)))
              LEFT JOIN geohistory.lawsectionevent ON ((event.eventid = lawsectionevent.event)))
-             LEFT JOIN geohistory.eventrelationship ON ((((lawsectionevent.lawsectioneventrelationship)::text = (eventrelationship.eventrelationshipshort)::text) AND eventrelationship.eventrelationshipsufficient)))
+             LEFT JOIN geohistory.eventrelationship ON (((lawsectionevent.eventrelationship = eventrelationship.eventrelationshipid) AND eventrelationship.eventrelationshipsufficient)))
           GROUP BY affectedgovernmentsummary.eventid, governmentsubstitute.governmentsubstitute, affectedgovernmentsummary.affectedtypeid, affectedgovernmentsummary.affectedside, affectedtype.affectedtypecreationdissolution, (extra.eventsortdatedate((event.eventeffective)::character varying, event.eventfrom, event.eventto)), (extra.eventtextshortdate((event.eventeffective)::character varying, event.eventfrom, event.eventto)), (extra.eventeffectivetype(eventeffectivetype.eventeffectivetypegroup, eventeffectivetype.eventeffectivetypequalifier)), event.eventeffective, event.eventfrom, event.eventto
         ), creationdissolution AS (
          SELECT DISTINCT creationaffectedgovernmentsummaryeventpart.governmentid,
@@ -9014,10 +9018,10 @@ CREATE VIEW extra.governmentchangecountpart AS
            FROM ((((((affectedgovernmentsummary
              JOIN geohistory.event ON ((affectedgovernmentsummary.eventid = event.eventid)))
              LEFT JOIN geohistory.eventeffectivetype ON ((event.eventeffectivetypepresumedsource = eventeffectivetype.eventeffectivetypeid)))
-             JOIN geohistory.eventgranted ON ((((event.eventgranted)::text = (eventgranted.eventgrantedshort)::text) AND eventgranted.eventgrantedsuccess)))
+             JOIN geohistory.eventgranted ON (((event.eventgranted = eventgranted.eventgrantedid) AND eventgranted.eventgrantedsuccess)))
              JOIN geohistory.affectedtype ON ((affectedgovernmentsummary.affectedtypeid = affectedtype.affectedtypeid)))
              LEFT JOIN geohistory.lawsectionevent ON ((event.eventid = lawsectionevent.event)))
-             LEFT JOIN geohistory.eventrelationship ON ((((lawsectionevent.lawsectioneventrelationship)::text = (eventrelationship.eventrelationshipshort)::text) AND eventrelationship.eventrelationshipsufficient)))
+             LEFT JOIN geohistory.eventrelationship ON (((lawsectionevent.eventrelationship = eventrelationship.eventrelationshipid) AND eventrelationship.eventrelationshipsufficient)))
           GROUP BY affectedgovernmentsummary.eventid, affectedgovernmentsummary.governmentid, affectedgovernmentsummary.affectedtypeid, affectedgovernmentsummary.affectedside, affectedtype.affectedtypecreationdissolution, (extra.eventsortdatedate((event.eventeffective)::character varying, event.eventfrom, event.eventto)), (extra.eventtextshortdate((event.eventeffective)::character varying, event.eventfrom, event.eventto)), (extra.eventeffectivetype(eventeffectivetype.eventeffectivetypegroup, eventeffectivetype.eventeffectivetypequalifier)), event.eventeffective, event.eventfrom, event.eventto
         ), alterfrom AS (
          SELECT affectedgovernmentsummaryevent.governmentid,
@@ -9299,7 +9303,7 @@ CREATE VIEW extra.governmentshape_history AS
              JOIN extra.affectedgovernment_reconstructed ON ((affectedgovernmentgis.affectedgovernment = affectedgovernment_reconstructed.affectedgovernmentid)))
              JOIN geohistory.event ON ((affectedgovernment_reconstructed.event = event.eventid)))
              JOIN extra.eventextracache ON ((event.eventid = eventextracache.eventid)))
-             JOIN geohistory.eventgranted ON ((((event.eventgranted)::text = (eventgranted.eventgrantedshort)::text) AND eventgranted.eventgrantedsuccess)))
+             JOIN geohistory.eventgranted ON (((event.eventgranted = eventgranted.eventgrantedid) AND eventgranted.eventgrantedsuccess)))
         )
  SELECT currentorder.governmentshapeid,
     currentorder.eventsortdate AS startdate,
@@ -9562,7 +9566,7 @@ CREATE VIEW extra.lawsectiongovernment AS
            FROM (geohistory.lawsectionevent
              JOIN extra.eventgovernment ON (((lawsectionevent.event = eventgovernment.eventid) AND (NOT (eventgovernment.eventid IN ( SELECT event.eventid
                    FROM (geohistory.event
-                     JOIN geohistory.eventgranted ON ((((event.eventgranted)::text = (eventgranted.eventgrantedshort)::text) AND eventgranted.eventgrantedplaceholder)))))))))) ag
+                     JOIN geohistory.eventgranted ON (((event.eventgranted = eventgranted.eventgrantedid) AND eventgranted.eventgrantedplaceholder)))))))))) ag
      JOIN extra.governmentrelation ON (((ag.government = governmentrelation.governmentid) AND (governmentrelation.governmentrelationstate IS NOT NULL) AND (governmentrelation.governmentrelationstate <> ''::text)))) ag2 ON (((ag2.government IS NOT NULL) AND (extra.governmentlevel(ag2.government) <> 1) AND (ag2.lawsection = lawsection.lawsectionid))))
   ORDER BY ag2.governmentrelationstate, lawsection.lawsectionid;
 
@@ -10086,7 +10090,7 @@ CREATE MATERIALIZED VIEW extra.statistics_createddissolved AS
             (count(DISTINCT countyevents.governmentid))::integer AS governmentcount
            FROM ((geohistory.event
              JOIN countyevents ON ((event.eventid = countyevents.event)))
-             JOIN geohistory.eventgranted ON ((((event.eventgranted)::text = (eventgranted.eventgrantedshort)::text) AND eventgranted.eventgrantedsuccess)))
+             JOIN geohistory.eventgranted ON (((event.eventgranted = eventgranted.eventgrantedid) AND eventgranted.eventgrantedsuccess)))
           GROUP BY 'historic'::text, 'county'::text, countyevents.governmentstate, countyevents.governmentcounty, (extra.eventsortdateyear(event.eventid)), countyevents.affectedtypecreationdissolution
         UNION
          SELECT 'historic'::text AS grouptype,
@@ -10098,7 +10102,7 @@ CREATE MATERIALIZED VIEW extra.statistics_createddissolved AS
             count(DISTINCT stateevents.governmentid) AS governmentcount
            FROM ((geohistory.event
              JOIN stateevents ON ((event.eventid = stateevents.event)))
-             JOIN geohistory.eventgranted ON ((((event.eventgranted)::text = (eventgranted.eventgrantedshort)::text) AND eventgranted.eventgrantedsuccess)))
+             JOIN geohistory.eventgranted ON (((event.eventgranted = eventgranted.eventgrantedid) AND eventgranted.eventgrantedsuccess)))
           GROUP BY 'historic'::text, 'state'::text, stateevents.governmentstate, NULL::integer, (extra.eventsortdateyear(event.eventid)), stateevents.affectedtypecreationdissolution
         UNION
          SELECT 'historic'::text AS grouptype,
@@ -10110,7 +10114,7 @@ CREATE MATERIALIZED VIEW extra.statistics_createddissolved AS
             count(DISTINCT eventstates.governmentid) AS governmentcount
            FROM ((geohistory.event
              JOIN eventstates ON (((event.eventid = eventstates.event) AND (eventstates.governmentstates && ARRAY['NJ'::text, 'PA'::text]))))
-             JOIN geohistory.eventgranted ON ((((event.eventgranted)::text = (eventgranted.eventgrantedshort)::text) AND eventgranted.eventgrantedsuccess)))
+             JOIN geohistory.eventgranted ON (((event.eventgranted = eventgranted.eventgrantedid) AND eventgranted.eventgrantedsuccess)))
           GROUP BY 'historic'::text, 'nation'::text, 'production'::text, NULL::integer, (extra.eventsortdateyear(event.eventid)), eventstates.affectedtypecreationdissolution
         UNION
          SELECT 'historic'::text AS grouptype,
@@ -10122,7 +10126,7 @@ CREATE MATERIALIZED VIEW extra.statistics_createddissolved AS
             count(DISTINCT eventstates.governmentid) AS governmentcount
            FROM ((geohistory.event
              JOIN eventstates ON (((event.eventid = eventstates.event) AND (eventstates.governmentstates && ARRAY['DE'::text, 'ME'::text, 'MA'::text, 'MD'::text, 'MI'::text, 'MN'::text, 'NJ'::text, 'NY'::text, 'OH'::text, 'PA'::text]))))
-             JOIN geohistory.eventgranted ON ((((event.eventgranted)::text = (eventgranted.eventgrantedshort)::text) AND eventgranted.eventgrantedsuccess)))
+             JOIN geohistory.eventgranted ON (((event.eventgranted = eventgranted.eventgrantedid) AND eventgranted.eventgrantedsuccess)))
           GROUP BY 'historic'::text, 'nation'::text, 'development'::text, NULL::integer, (extra.eventsortdateyear(event.eventid)), eventstates.affectedtypecreationdissolution
         )
  SELECT DISTINCT summary.grouptype,
@@ -10252,7 +10256,7 @@ CREATE MATERIALIZED VIEW extra.statistics_eventtype AS
     array_agg(DISTINCT event.eventid ORDER BY event.eventid) AS eventlist
    FROM ((geohistory.event
      JOIN countyevents ON ((event.eventid = countyevents.event)))
-     JOIN geohistory.eventgranted ON ((((event.eventgranted)::text = (eventgranted.eventgrantedshort)::text) AND eventgranted.eventgrantedsuccess)))
+     JOIN geohistory.eventgranted ON (((event.eventgranted = eventgranted.eventgrantedid) AND eventgranted.eventgrantedsuccess)))
   GROUP BY 'county'::text, countyevents.governmentstate, countyevents.governmentcounty, event.eventtype, (extra.eventsortdateyear(event.eventid))
 UNION
  SELECT 'historic'::text AS grouptype,
@@ -10265,7 +10269,7 @@ UNION
     array_agg(DISTINCT event.eventid ORDER BY event.eventid) AS eventlist
    FROM ((geohistory.event
      JOIN stateevents ON ((event.eventid = stateevents.event)))
-     JOIN geohistory.eventgranted ON ((((event.eventgranted)::text = (eventgranted.eventgrantedshort)::text) AND eventgranted.eventgrantedsuccess)))
+     JOIN geohistory.eventgranted ON (((event.eventgranted = eventgranted.eventgrantedid) AND eventgranted.eventgrantedsuccess)))
   GROUP BY 'state'::text, stateevents.governmentstate, NULL::integer, event.eventtype, (extra.eventsortdateyear(event.eventid))
 UNION
  SELECT 'historic'::text AS grouptype,
@@ -10278,7 +10282,7 @@ UNION
     array_agg(DISTINCT event.eventid ORDER BY event.eventid) AS eventlist
    FROM ((geohistory.event
      JOIN eventstates ON (((event.eventid = eventstates.event) AND (eventstates.governmentstates && ARRAY['NJ'::text, 'PA'::text]))))
-     JOIN geohistory.eventgranted ON ((((event.eventgranted)::text = (eventgranted.eventgrantedshort)::text) AND eventgranted.eventgrantedsuccess)))
+     JOIN geohistory.eventgranted ON (((event.eventgranted = eventgranted.eventgrantedid) AND eventgranted.eventgrantedsuccess)))
   GROUP BY 'state'::text, 'production'::text, NULL::integer, event.eventtype, (extra.eventsortdateyear(event.eventid))
 UNION
  SELECT 'historic'::text AS grouptype,
@@ -10291,7 +10295,7 @@ UNION
     array_agg(DISTINCT event.eventid ORDER BY event.eventid) AS eventlist
    FROM ((geohistory.event
      JOIN eventstates ON (((event.eventid = eventstates.event) AND (eventstates.governmentstates && ARRAY['DE'::text, 'ME'::text, 'MA'::text, 'MD'::text, 'MI'::text, 'MN'::text, 'NJ'::text, 'NY'::text, 'OH'::text, 'PA'::text]))))
-     JOIN geohistory.eventgranted ON ((((event.eventgranted)::text = (eventgranted.eventgrantedshort)::text) AND eventgranted.eventgrantedsuccess)))
+     JOIN geohistory.eventgranted ON (((event.eventgranted = eventgranted.eventgrantedid) AND eventgranted.eventgrantedsuccess)))
   GROUP BY 'state'::text, 'development'::text, NULL::integer, event.eventtype, (extra.eventsortdateyear(event.eventid))
   ORDER BY 1, 2, 3, 4, 5
   WITH NO DATA;
@@ -10905,20 +10909,13 @@ CREATE TABLE geohistory.recordingevent (
     recordingeventid integer NOT NULL,
     event integer NOT NULL,
     recording integer NOT NULL,
-    recordingeventrelationship character varying(10) NOT NULL,
     recordingeventinclude boolean,
-    CONSTRAINT recordingevent_check CHECK (((recordingeventrelationship)::text <> ALL (ARRAY[('reinstated'::character varying)::text, ('repealer'::character varying)::text, ('validation'::character varying)::text])))
+    eventrelationship integer NOT NULL,
+    CONSTRAINT recordingevent_check CHECK ((eventrelationship <> ALL (ARRAY[6, 7, 9])))
 );
 
 
 ALTER TABLE geohistory.recordingevent OWNER TO postgres;
-
---
--- Name: COLUMN recordingevent.recordingeventrelationship; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.recordingevent.recordingeventrelationship IS 'This should eventually be renamed to eventrelationship converted to a proper foreign key referencing eventrelationshipid.';
-
 
 --
 -- Name: recordingoffice; Type: TABLE; Schema: geohistory; Owner: postgres
@@ -11077,19 +11074,12 @@ CREATE TABLE geohistory.lawgroupsection (
     lawgroupsectionorder integer NOT NULL,
     lawgroup integer NOT NULL,
     lawsection integer NOT NULL,
-    lawsectionrelationship character varying(10) NOT NULL,
-    CONSTRAINT lawgroupsection_check CHECK (((lawsectionrelationship)::text <> ALL (ARRAY['direct'::text, 'enabling'::text, 'include'::text])))
+    eventrelationship integer NOT NULL,
+    CONSTRAINT lawgroupsection_check CHECK ((eventrelationship <> ALL (ARRAY[1, 2, 3])))
 );
 
 
 ALTER TABLE geohistory.lawgroupsection OWNER TO postgres;
-
---
--- Name: COLUMN lawgroupsection.lawsectionrelationship; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.lawgroupsection.lawsectionrelationship IS 'This should eventually be renamed to eventrelationship converted to a proper foreign key referencing eventrelationshipid.';
-
 
 --
 -- Name: lawgroupgovernmenttype; Type: TABLE; Schema: geohistory; Owner: postgres
@@ -14396,7 +14386,7 @@ ALTER TABLE ONLY geohistory.lawsectionevent
 --
 
 ALTER TABLE ONLY geohistory.lawsectionevent
-    ADD CONSTRAINT lawsectionevent_unique UNIQUE (lawsection, event, lawsectioneventrelationship);
+    ADD CONSTRAINT lawsectionevent_unique UNIQUE (lawsection, event, eventrelationship);
 
 
 --
@@ -15703,7 +15693,7 @@ CREATE TRIGGER lawalternatesection_insertupdate_trigger BEFORE INSERT OR UPDATE 
 -- Name: lawgroupsection lawgroupsection_deleteupdate_trigger; Type: TRIGGER; Schema: geohistory; Owner: postgres
 --
 
-CREATE TRIGGER lawgroupsection_deleteupdate_trigger BEFORE DELETE OR UPDATE OF lawsection, lawsectionrelationship, lawgroup ON geohistory.lawgroupsection FOR EACH ROW EXECUTE FUNCTION geohistory.lawgroupsection_deleteupdate();
+CREATE TRIGGER lawgroupsection_deleteupdate_trigger BEFORE DELETE OR UPDATE OF lawgroup, lawsection, eventrelationship ON geohistory.lawgroupsection FOR EACH ROW EXECUTE FUNCTION geohistory.lawgroupsection_deleteupdate();
 
 
 --
@@ -15717,7 +15707,7 @@ CREATE TRIGGER lawsection_update_trigger BEFORE UPDATE OF law ON geohistory.laws
 -- Name: lawsectionevent lawsectionevent_insertupdate_trigger; Type: TRIGGER; Schema: geohistory; Owner: postgres
 --
 
-CREATE TRIGGER lawsectionevent_insertupdate_trigger BEFORE INSERT OR UPDATE OF lawgroup, lawsection, lawsectioneventrelationship ON geohistory.lawsectionevent FOR EACH ROW EXECUTE FUNCTION geohistory.lawsectionevent_insertupdate();
+CREATE TRIGGER lawsectionevent_insertupdate_trigger BEFORE INSERT OR UPDATE OF lawsection, eventrelationship, lawgroup ON geohistory.lawsectionevent FOR EACH ROW EXECUTE FUNCTION geohistory.lawsectionevent_insertupdate();
 
 
 --
@@ -15779,19 +15769,19 @@ ALTER TABLE ONLY geohistory.adjudicationevent
 
 
 --
--- Name: adjudicationevent adjudicationevent_adjudicationeventrelationship_fk; Type: FK CONSTRAINT; Schema: geohistory; Owner: postgres
---
-
-ALTER TABLE ONLY geohistory.adjudicationevent
-    ADD CONSTRAINT adjudicationevent_adjudicationeventrelationship_fk FOREIGN KEY (adjudicationeventrelationship) REFERENCES geohistory.eventrelationship(eventrelationshipshort) DEFERRABLE;
-
-
---
 -- Name: adjudicationevent adjudicationevent_event_fk; Type: FK CONSTRAINT; Schema: geohistory; Owner: postgres
 --
 
 ALTER TABLE ONLY geohistory.adjudicationevent
     ADD CONSTRAINT adjudicationevent_event_fk FOREIGN KEY (event) REFERENCES geohistory.event(eventid) DEFERRABLE;
+
+
+--
+-- Name: adjudicationevent adjudicationevent_eventrelationship_fk; Type: FK CONSTRAINT; Schema: geohistory; Owner: postgres
+--
+
+ALTER TABLE ONLY geohistory.adjudicationevent
+    ADD CONSTRAINT adjudicationevent_eventrelationship_fk FOREIGN KEY (eventrelationship) REFERENCES geohistory.eventrelationship(eventrelationshipid) DEFERRABLE;
 
 
 --
@@ -15983,7 +15973,7 @@ ALTER TABLE ONLY geohistory.event
 --
 
 ALTER TABLE ONLY geohistory.event
-    ADD CONSTRAINT event_eventgranted_fk FOREIGN KEY (eventgranted) REFERENCES geohistory.eventgranted(eventgrantedshort) DEFERRABLE;
+    ADD CONSTRAINT event_eventgranted_fk FOREIGN KEY (eventgranted) REFERENCES geohistory.eventgranted(eventgrantedid) DEFERRABLE;
 
 
 --
@@ -16123,19 +16113,19 @@ ALTER TABLE ONLY geohistory.governmentsourceevent
 
 
 --
+-- Name: governmentsourceevent governmentsourceevent_eventrelationship_fk; Type: FK CONSTRAINT; Schema: geohistory; Owner: postgres
+--
+
+ALTER TABLE ONLY geohistory.governmentsourceevent
+    ADD CONSTRAINT governmentsourceevent_eventrelationship_fk FOREIGN KEY (eventrelationship) REFERENCES geohistory.eventrelationship(eventrelationshipid) DEFERRABLE;
+
+
+--
 -- Name: governmentsourceevent governmentsourceevent_governmentsource_fk; Type: FK CONSTRAINT; Schema: geohistory; Owner: postgres
 --
 
 ALTER TABLE ONLY geohistory.governmentsourceevent
     ADD CONSTRAINT governmentsourceevent_governmentsource_fk FOREIGN KEY (governmentsource) REFERENCES geohistory.governmentsource(governmentsourceid) DEFERRABLE;
-
-
---
--- Name: governmentsourceevent governmentsourceevent_governmentsourceeventrelationship_fk; Type: FK CONSTRAINT; Schema: geohistory; Owner: postgres
---
-
-ALTER TABLE ONLY geohistory.governmentsourceevent
-    ADD CONSTRAINT governmentsourceevent_governmentsourceeventrelationship_fk FOREIGN KEY (governmentsourceeventrelationship) REFERENCES geohistory.eventrelationship(eventrelationshipshort) DEFERRABLE;
 
 
 --
@@ -16211,6 +16201,14 @@ ALTER TABLE ONLY geohistory.lawgroupgovernmenttype
 
 
 --
+-- Name: lawgroupsection lawgroupsection_eventrelationship_fk; Type: FK CONSTRAINT; Schema: geohistory; Owner: postgres
+--
+
+ALTER TABLE ONLY geohistory.lawgroupsection
+    ADD CONSTRAINT lawgroupsection_eventrelationship_fk FOREIGN KEY (eventrelationship) REFERENCES geohistory.eventrelationship(eventrelationshipid) DEFERRABLE;
+
+
+--
 -- Name: lawgroupsection lawgroupsection_lawgroup_fk; Type: FK CONSTRAINT; Schema: geohistory; Owner: postgres
 --
 
@@ -16224,14 +16222,6 @@ ALTER TABLE ONLY geohistory.lawgroupsection
 
 ALTER TABLE ONLY geohistory.lawgroupsection
     ADD CONSTRAINT lawgroupsection_lawsection_fk FOREIGN KEY (lawsection) REFERENCES geohistory.lawsection(lawsectionid) DEFERRABLE;
-
-
---
--- Name: lawgroupsection lawgroupsection_lawsectionrelationship_fk; Type: FK CONSTRAINT; Schema: geohistory; Owner: postgres
---
-
-ALTER TABLE ONLY geohistory.lawgroupsection
-    ADD CONSTRAINT lawgroupsection_lawsectionrelationship_fk FOREIGN KEY (lawsectionrelationship) REFERENCES geohistory.eventrelationship(eventrelationshipshort) DEFERRABLE;
 
 
 --
@@ -16275,6 +16265,14 @@ ALTER TABLE ONLY geohistory.lawsectionevent
 
 
 --
+-- Name: lawsectionevent lawsectionevent_eventrelationship_fk; Type: FK CONSTRAINT; Schema: geohistory; Owner: postgres
+--
+
+ALTER TABLE ONLY geohistory.lawsectionevent
+    ADD CONSTRAINT lawsectionevent_eventrelationship_fk FOREIGN KEY (eventrelationship) REFERENCES geohistory.eventrelationship(eventrelationshipid) DEFERRABLE;
+
+
+--
 -- Name: lawsectionevent lawsectionevent_lawgroup_fk; Type: FK CONSTRAINT; Schema: geohistory; Owner: postgres
 --
 
@@ -16288,14 +16286,6 @@ ALTER TABLE ONLY geohistory.lawsectionevent
 
 ALTER TABLE ONLY geohistory.lawsectionevent
     ADD CONSTRAINT lawsectionevent_lawsection_fk FOREIGN KEY (lawsection) REFERENCES geohistory.lawsection(lawsectionid) DEFERRABLE;
-
-
---
--- Name: lawsectionevent lawsectionevent_lawsectioneventrelationship_fk; Type: FK CONSTRAINT; Schema: geohistory; Owner: postgres
---
-
-ALTER TABLE ONLY geohistory.lawsectionevent
-    ADD CONSTRAINT lawsectionevent_lawsectioneventrelationship_fk FOREIGN KEY (lawsectioneventrelationship) REFERENCES geohistory.eventrelationship(eventrelationshipshort) DEFERRABLE;
 
 
 --
@@ -16419,19 +16409,19 @@ ALTER TABLE ONLY geohistory.recordingevent
 
 
 --
+-- Name: recordingevent recordingevent_eventrelationship_fk; Type: FK CONSTRAINT; Schema: geohistory; Owner: postgres
+--
+
+ALTER TABLE ONLY geohistory.recordingevent
+    ADD CONSTRAINT recordingevent_eventrelationship_fk FOREIGN KEY (eventrelationship) REFERENCES geohistory.eventrelationship(eventrelationshipid) DEFERRABLE;
+
+
+--
 -- Name: recordingevent recordingevent_recording_fk; Type: FK CONSTRAINT; Schema: geohistory; Owner: postgres
 --
 
 ALTER TABLE ONLY geohistory.recordingevent
     ADD CONSTRAINT recordingevent_recording_fk FOREIGN KEY (recording) REFERENCES geohistory.recording(recordingid) DEFERRABLE;
-
-
---
--- Name: recordingevent recordingevent_recordingeventrelationship_fk; Type: FK CONSTRAINT; Schema: geohistory; Owner: postgres
---
-
-ALTER TABLE ONLY geohistory.recordingevent
-    ADD CONSTRAINT recordingevent_recordingeventrelationship_fk FOREIGN KEY (recordingeventrelationship) REFERENCES geohistory.eventrelationship(eventrelationshipshort) DEFERRABLE;
 
 
 --
