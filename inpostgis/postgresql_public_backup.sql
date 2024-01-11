@@ -4955,8 +4955,8 @@ CREATE FUNCTION extra.governmentlong(integer) RETURNS text
             THEN ', ' || CASE WHEN governmentstyle <> ''
                 THEN governmentstyle ELSE governmenttype END || CASE
                     WHEN governmentconnectingarticle <> '' THEN ' ' || governmentconnectingarticle
-                    WHEN governmentlocale IN ('de', 'nl') THEN ''
-                    WHEN governmentlocale = 'fr' THEN ' de'
+                    WHEN locale IN ('de', 'nl') THEN ''
+                    WHEN locale = 'fr' THEN ' de'
                     ELSE ' of'
                 END ELSE '' END ||
             CASE WHEN governmentstatus <> '' OR governmentnotecurrentleadparent OR governmentnotecreation <> '' OR governmentnotedissolution <> ''
@@ -7045,11 +7045,11 @@ CREATE TABLE geohistory.government (
     governmentsubstitute integer,
     governmentnumber character varying(3) DEFAULT ''::character varying NOT NULL,
     governmentmapstatus integer DEFAULT 1 NOT NULL,
-    governmentlocale character varying(2) DEFAULT 'en'::character varying NOT NULL,
+    locale character varying(2) DEFAULT 'en'::character varying NOT NULL,
     governmentarticle character varying(10) DEFAULT ''::character varying NOT NULL,
     governmentconnectingarticle character varying(10) DEFAULT ''::character varying NOT NULL,
     governmentcurrentform integer,
-    CONSTRAINT government_check CHECK (((((governmentstatus)::text = ANY (ARRAY['cadastral'::text, 'defunct'::text, 'nonfunctioning'::text, 'paper'::text, 'placeholder'::text, 'proposed'::text, 'unincorporated'::text, 'unknown'::text, ''::text])) OR (((governmentstatus)::text = ANY (ARRAY['alternate'::text, 'language'::text])) AND (governmentsubstitute IS NOT NULL))) AND (governmentlevel >= 1) AND (governmentlevel <= 5) AND ((governmentlevel = 2) OR ((governmentlevel <> 2) AND ((government1983stateplaneauthority)::text = ''::text))) AND ((governmentlevel = 3) OR ((governmentlevel <> 3) AND ((governmentlead1983stateplane)::text = ''::text))) AND ((governmentlevel = 3) OR ((governmentlevel <> 3) AND (governmenthasmultiple1983stateplane IS NULL))) AND (((governmentname)::text <> ''::text) OR ((governmentnumber)::text <> ''::text)) AND ((governmenttype)::text <> ''::text) AND ((governmentlocale)::text <> ''::text) AND (NOT (((governmentstatus)::text = ANY (ARRAY['placeholder'::text, 'proposed'::text, 'unincorporated'::text])) AND (governmentmapstatus <> 0))) AND (((governmentlevel = 1) AND (governmentcurrentleadparent IS NULL)) OR ((governmentlevel > 1) AND (governmentcurrentleadparent IS NOT NULL) AND (governmentid <> governmentcurrentleadparent)))))
+    CONSTRAINT government_check CHECK (((((governmentstatus)::text = ANY (ARRAY['cadastral'::text, 'defunct'::text, 'nonfunctioning'::text, 'paper'::text, 'placeholder'::text, 'proposed'::text, 'unincorporated'::text, 'unknown'::text, ''::text])) OR (((governmentstatus)::text = ANY (ARRAY['alternate'::text, 'language'::text])) AND (governmentsubstitute IS NOT NULL))) AND (governmentlevel >= 1) AND (governmentlevel <= 5) AND ((governmentlevel = 2) OR ((governmentlevel <> 2) AND ((government1983stateplaneauthority)::text = ''::text))) AND ((governmentlevel = 3) OR ((governmentlevel <> 3) AND ((governmentlead1983stateplane)::text = ''::text))) AND ((governmentlevel = 3) OR ((governmentlevel <> 3) AND (governmenthasmultiple1983stateplane IS NULL))) AND (((governmentname)::text <> ''::text) OR ((governmentnumber)::text <> ''::text)) AND ((governmenttype)::text <> ''::text) AND ((locale)::text <> ''::text) AND (NOT (((governmentstatus)::text = ANY (ARRAY['placeholder'::text, 'proposed'::text, 'unincorporated'::text])) AND (governmentmapstatus <> 0))) AND (((governmentlevel = 1) AND (governmentcurrentleadparent IS NULL)) OR ((governmentlevel > 1) AND (governmentcurrentleadparent IS NOT NULL) AND (governmentid <> governmentcurrentleadparent)))))
 );
 
 
@@ -12166,6 +12166,20 @@ ALTER SEQUENCE geohistory.lawsectionevent_lawsectioneventid_seq OWNED BY geohist
 
 
 --
+-- Name: locale; Type: TABLE; Schema: geohistory; Owner: postgres
+--
+
+CREATE TABLE geohistory.locale (
+    localeid character varying(2) NOT NULL,
+    localename text NOT NULL,
+    localenameenglish text NOT NULL,
+    localesupported boolean DEFAULT false NOT NULL
+);
+
+
+ALTER TABLE geohistory.locale OWNER TO postgres;
+
+--
 -- Name: metesdescription_metesdescriptionid_seq; Type: SEQUENCE; Schema: geohistory; Owner: postgres
 --
 
@@ -14390,6 +14404,14 @@ ALTER TABLE ONLY geohistory.lawsectionevent
 
 
 --
+-- Name: locale locale_pk; Type: CONSTRAINT; Schema: geohistory; Owner: postgres
+--
+
+ALTER TABLE ONLY geohistory.locale
+    ADD CONSTRAINT locale_pk PRIMARY KEY (localeid);
+
+
+--
 -- Name: metesdescription metesdescription_pk; Type: CONSTRAINT; Schema: geohistory; Owner: postgres
 --
 
@@ -15256,6 +15278,13 @@ CREATE INDEX fki_government_governmentform_fk ON geohistory.government USING btr
 
 
 --
+-- Name: fki_government_locale_fk; Type: INDEX; Schema: geohistory; Owner: postgres
+--
+
+CREATE INDEX fki_government_locale_fk ON geohistory.government USING btree (locale);
+
+
+--
 -- Name: fki_plss_plsstownship_fk; Type: INDEX; Schema: geohistory; Owner: postgres
 --
 
@@ -16030,6 +16059,14 @@ ALTER TABLE ONLY geohistory.government
 
 ALTER TABLE ONLY geohistory.government
     ADD CONSTRAINT government_governmentmapstatus_fk FOREIGN KEY (governmentmapstatus) REFERENCES geohistory.governmentmapstatus(governmentmapstatusid) DEFERRABLE;
+
+
+--
+-- Name: government government_locale_fk; Type: FK CONSTRAINT; Schema: geohistory; Owner: postgres
+--
+
+ALTER TABLE ONLY geohistory.government
+    ADD CONSTRAINT government_locale_fk FOREIGN KEY (locale) REFERENCES geohistory.locale(localeid) NOT VALID;
 
 
 --
