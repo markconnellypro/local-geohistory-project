@@ -17,7 +17,6 @@ User-agent: ia_archiver
 User-agent: InternetArchiveBot
 User-agent: msnbot
 User-agent: Slurp
-User-agent: Twitterbot
 Disallow:
 
 # Block bots not whitelisted
