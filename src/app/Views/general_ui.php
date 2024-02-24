@@ -1,2 +1,2 @@
-<script src="/<?= ($online ? '/' . getenv('dependency_selectize') : 'asset/dependency') ?>/standalone/selectize.min.js"></script>
+<script src="/<?= ($online ? '/' . getenv('dependency_selectize') : 'asset/dependency') ?>/js/standalone/selectize.min.js"></script>
 <link rel="stylesheet" href="/<?= ($online ? '/' . getenv('dependency_selectize') : 'asset/dependency') ?>/css/selectize.min.css">
