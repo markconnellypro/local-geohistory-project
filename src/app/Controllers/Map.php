@@ -27,7 +27,7 @@ class Map extends BaseController
         $response->setHeader('Cache-Control', 'max-age=86400');
         $response->setHeader('Content-Type', 'application/json');
         $json = json_decode(file_get_contents(__DIR__ . '/../../html/asset/map/map_style_base.json'), true);
-        if (strpos(getenv('map_tile'), '.json') !== FALSE OR strpos(getenv('map_tile'), '.pmtiles') !== FALSE) {
+        if (strpos(getenv('map_tile'), '.json') !== FALSE or strpos(getenv('map_tile'), '.pmtiles') !== FALSE) {
             $json['sources']['street-tile']['url'] = getenv('map_tile');
             unset($json['sources']['street-tile']['tiles']);
         } else {
@@ -35,7 +35,7 @@ class Map extends BaseController
             unset($json['sources']['street-tile']['url']);
         }
         $json['glyphs'] = getenv('map_glyph');
-        if (!empty(getenv('map_elevation')) AND $maxZoom == 14) {
+        if (!empty(getenv('map_elevation')) and $maxZoom == 14 and !($this->data['live'] and !$this->data['online'])) {
             $json['sources']['elevation-tile']['tiles'][] = getenv('map_elevation');
         } else {
             unset($json['sources']['elevation-tile']);
@@ -46,8 +46,8 @@ class Map extends BaseController
                 }
             }
         }
-        foreach ($json['layers'] AS $layerNumber => $layerContent) {
-            if (!empty($layerContent['layout']['text-field']) AND $layerContent['layout']['text-field'] == '{name}') {
+        foreach ($json['layers'] as $layerNumber => $layerContent) {
+            if (!empty($layerContent['layout']['text-field']) and $layerContent['layout']['text-field'] == '{name}') {
                 $json['layers'][$layerNumber]['layout']['text-field'] = [
                     'coalesce',
                     ['get', 'name_' . \Config\Services::request()->getLocale()],
