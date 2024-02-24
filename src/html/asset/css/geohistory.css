@@ -214,11 +214,11 @@ header A:hover {
         color: white;
     }
 
-    table.dataTable tr.odd {
+    table.dataTable.stripe > tbody > tr:nth-child(2n+1) > *, table.dataTable.display > tbody > tr:nth-child(2n+1) > * {
         background-color: #EFEFEE !important;
     }
 
-    table.dataTable tr.even {
+    table.dataTable.stripe > tbody > tr:nth-child(2n) > *, table.dataTable.display > tbody > tr:nth-child(2n) > * {
         background-color: #E0DFDD !important;
     }
 

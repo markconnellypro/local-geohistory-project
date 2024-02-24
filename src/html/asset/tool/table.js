@@ -52,7 +52,7 @@ $(function () {
         'info': false,
         'paging': false,
         'searching': false,
-        'aaSorting': [],
+        'order': [],
         "language": {
             "emptyTable": "Sorry, no records found!"
         },
@@ -68,7 +68,7 @@ $(function () {
         'info': false,
         'paging': false,
         'searching': false,
-        'aaSorting': [[0, 'asc']],
+        'order': [[0, 'asc']],
         "language": {
             "emptyTable": "Sorry, no records found!"
         },
@@ -83,7 +83,7 @@ $(function () {
     $('.search').DataTable({
         'info': false,
         'paging': false,
-        'aaSorting': [],
+        'order': [],
         "language": {
             "emptyTable": "Sorry, no records found!"
         },
@@ -99,7 +99,7 @@ $(function () {
         'info': false,
         'paging': false,
         'searching': false,
-        'bSort': false,
+        'ordering': false,
         "language": {
             "emptyTable": "Sorry, no records found!"
         },

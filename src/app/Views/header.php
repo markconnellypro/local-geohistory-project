@@ -16,8 +16,8 @@
     <?php } ?>
     <link rel="icon" href="/asset/image/favicon.png" type="image/png">
     <script src="/<?= ($online ? '/' . getenv('dependency_jquery') : 'asset/dependency') ?>/jquery.min.js"></script>
-    <script src="/<?= ($online ? '/' . getenv('dependency_datatables') : 'asset/dependency') ?>/js/jquery.dataTables.min.js"></script>
-    <link rel="stylesheet" href="/<?= ($online ? '/' . getenv('dependency_datatables') : 'asset/dependency') ?>/css/jquery.dataTables.min.css" crossorigin="anonymous">
+    <script src="/<?= ($online ? '/' . getenv('dependency_datatables') : 'asset/dependency') ?>/js/dataTables.min.js"></script>
+    <link rel="stylesheet" href="/<?= ($online ? '/' . getenv('dependency_datatables') : 'asset/dependency') ?>/css/dataTables.dataTables.min.css" crossorigin="anonymous">
     <script src="/asset/tool/table.js"></script>
 </head>
 
