@@ -7,6 +7,8 @@ services:
             args:
                 CI_ENVIRONMENT: ${CI_ENVIRONMENT}
         restart: always
+        command:
+            - ./docker/php/import_dependency.sh
         environment:
             TZ: ${TZ}
         ports:
