@@ -25,7 +25,7 @@ license/dependency/**
 !license/dependency/.gitkeep
 outpostgis/**
 !outpostgis/.gitkeep
-src/html/asset/dependency/**
+src/html/asset/dependency/
 !src/html/asset/dependency/.gitkeep
 !src/html/asset/dependency/css/.gitkeep
 !src/html/asset/dependency/images/.gitkeep
