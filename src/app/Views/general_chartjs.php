@@ -1,6 +1,6 @@
-<link rel="stylesheet" href="/<?= ($online ? '/unpkg.com/c3@0.7.20' : 'asset/tool/css') ?>/c3.min.css" crossorigin="anonymous">
-<script src="/<?= ($online ? '/unpkg.com/d3@5.16.0/dist' : 'asset/tool/js') ?>/d3.min.js"></script>
-<script src="/<?= ($online ? '/unpkg.com/c3@0.7.20' : 'asset/tool/js') ?>/c3.min.js"></script>
+<link rel="stylesheet" href="/<?= ($online ? '/' . getenv('dependency_c3') : 'asset/dependency') ?>/c3.min.css" crossorigin="anonymous">
+<script src="/<?= ($online ? '/' . getenv('dependency_d3') : 'asset/dependency') ?>/d3.min.js"></script>
+<script src="/<?= ($online ? '/' . getenv('dependency_c3') : 'asset/dependency') ?>/c3.min.js"></script>
 <script>
     var columnData = [<?php
                         foreach ($query as $row) {

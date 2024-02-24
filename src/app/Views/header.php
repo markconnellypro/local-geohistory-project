@@ -15,10 +15,10 @@
         <link rel="stylesheet" href="/asset/development/css/development.css" media="all">
     <?php } ?>
     <link rel="icon" href="/asset/image/favicon.png" type="image/png">
-    <script src="/<?= ($online ? '/unpkg.com/jquery@3.7.1/dist' : 'asset/tool/jquery') ?>/jquery.min.js"></script>
-    <script src="/<?= ($online ? '/cdn.datatables.net/1.13.6/js' : 'asset/tool/datatables') ?>/jquery.dataTables.min.js"></script>
-    <link rel="stylesheet" href="/<?= ($online ? '/cdn.datatables.net/1.13.6/css' : 'asset/tool/datatables') ?>/jquery.dataTables.min.css" crossorigin="anonymous">
-    <script src="/asset/tool/datatables/table.js"></script>
+    <script src="/<?= ($online ? '/' . getenv('dependency_jquery') : 'asset/dependency') ?>/jquery.min.js"></script>
+    <script src="/<?= ($online ? '/' . getenv('dependency_datatables') : 'asset/dependency') ?>/js/jquery.dataTables.min.js"></script>
+    <link rel="stylesheet" href="/<?= ($online ? '/' . getenv('dependency_datatables') : 'asset/dependency') ?>/css/jquery.dataTables.min.css" crossorigin="anonymous">
+    <script src="/asset/tool/table.js"></script>
 </head>
 
 <body>
