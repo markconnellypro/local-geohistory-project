@@ -36,8 +36,7 @@
             background-color: rgba(255, 0, 0, 0.0);
         }
     </style>
-    <!-- https://github.com/tannerjt/classybrew/blob/master/src/classybrew.js -->
-    <script src="/asset/map/classybrew.js"></script>
+    <script src="/<?= ($online ? '/' . getenv('dependency_classybrew') : 'asset/dependency') ?>/classybrew.js"></script>
     <script src="/asset/map/statistics.js"></script>
 <?php } else { ?>
     <br>No results found!
