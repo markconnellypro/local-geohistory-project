@@ -11,5 +11,5 @@ fi
 if [[ -e "/usr/src/docker/import_production_php.sh" ]]; then
   /usr/src/docker/import_production_php.sh
 fi
-# Modify entrypoint to run composer install
-sed -i "s/#!\/bin\/sh/#!\/bin\/sh\ncomposer install --no-dev --working-dir=\/var\/www\n/" /usr/local/bin/docker-php-entrypoint
+# Modify entrypoint to run composer install and retrieve dependencies
+sed -i "s/#!\/bin\/sh/#!\/bin\/sh\ncomposer install --no-dev --working-dir=\/var\/www\n\/usr\/src\/docker\/import_dependency.sh\n/" /usr/local/bin/docker-php-entrypoint

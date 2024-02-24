@@ -7,8 +7,6 @@ services:
             args:
                 CI_ENVIRONMENT: ${CI_ENVIRONMENT}
         restart: always
-        command:
-            - ./docker/php/import_dependency.sh
         environment:
             TZ: ${TZ}
         ports:
@@ -22,6 +20,7 @@ services:
             - ${INPHP_P}:/inphp/p:ro
             - ${INPHP_PROJECT}:/inphp/project:ro
             - ${INPHP_S}:/inphp/s:ro
+            - ./license:/license
             - ./src:/var/www
         depends_on:
             - postgis
