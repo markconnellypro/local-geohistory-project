@@ -16066,7 +16066,7 @@ ALTER TABLE ONLY geohistory.government
 --
 
 ALTER TABLE ONLY geohistory.government
-    ADD CONSTRAINT government_locale_fk FOREIGN KEY (locale) REFERENCES geohistory.locale(localeid) NOT VALID;
+    ADD CONSTRAINT government_locale_fk FOREIGN KEY (locale) REFERENCES geohistory.locale(localeid) DEFERRABLE;
 
 
 --
@@ -16506,7 +16506,7 @@ ALTER TABLE ONLY geohistory.researchlog
 --
 
 ALTER TABLE ONLY geohistory.source
-    ADD CONSTRAINT source_sourcetype_fk FOREIGN KEY (sourcetype) REFERENCES geohistory.sourcetype(sourcetypeshort) DEFERRABLE NOT VALID;
+    ADD CONSTRAINT source_sourcetype_fk FOREIGN KEY (sourcetype) REFERENCES geohistory.sourcetype(sourcetypeshort) DEFERRABLE;
 
 
 --
