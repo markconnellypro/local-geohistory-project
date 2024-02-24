@@ -1,50 +1,50 @@
 #!/bin/bash
-asset_folder=./src/html/asset/dependency
-license_folder=./license/dependency
+asset_folder=/var/www/html/asset/dependency
+license_folder=/license/dependency
 
-wget "/${dependency_c3}/c3.min.css" -P "${asset_folder}"
-wget "/${dependency_c3}/c3.min.js" -P "${asset_folder}"
-wget "/${dependency_c3}/LICENSE" -O "${license_folder}/c3.txt"
+curl --create-dirs --output-dir "${asset_folder}" -O "/${dependency_c3}/c3.min.css"
+curl --create-dirs --output-dir "${asset_folder}" -O "/${dependency_c3}/c3.min.js"
+curl --create-dirs -o "${license_folder}/c3.txt" "/${dependency_c3}/LICENSE"
 
-wget "/${dependency_classybrew}/classybrew.js" -P "${asset_folder}"
-wget "/${dependency_classybrew}/../LICENSE.txt" -O "${license_folder}/classybrew.txt"
+curl --create-dirs --output-dir "${asset_folder}" -O "/${dependency_classybrew}/classybrew.js"
+curl --create-dirs -o "${license_folder}/classybrew.txt" "/${dependency_classybrew}/../LICENSE.txt"
 
-wget "/${dependency_d3}/d3.min.js" -P "${asset_folder}"
-wget "/${dependency_d3}/../LICENSE" -O "${license_folder}/D3.txt"
+curl --create-dirs --output-dir "${asset_folder}" -O "/${dependency_d3}/d3.min.js"
+curl --create-dirs -o "${license_folder}/D3.txt" "/${dependency_d3}/../LICENSE"
 
-wget "/${dependency_datatables}/css/dataTables.dataTables.min.css" -P "${asset_folder}/css"
-wget "/${dependency_datatables}/js/dataTables.min.js" -P "${asset_folder}/js"
-wget "https://datatables.net/license/" -O "${license_folder}/DataTables.html"
-wget "https://datatables.net/license/mit" -O "${license_folder}/DataTables-MIT.html"
+curl --create-dirs --output-dir "${asset_folder}/css" "/${dependency_datatables}/css/dataTables.dataTables.min.css"
+curl --create-dirs --output-dir "${asset_folder}/js" "/${dependency_datatables}/js/dataTables.min.js"
+curl --create-dirs -o "${license_folder}/DataTables.html" "https://datatables.net/license/"
+curl --create-dirs -o "${license_folder}/DataTables-MIT.html" "https://datatables.net/license/mit"
 
-wget "/${dependency_html-to-image}/html-to-image.js" -P "${asset_folder}"
-wget "/${dependency_html-to-image}/../LICENSE" -O "${license_folder}/Html to Image.txt"
+curl --create-dirs --output-dir "${asset_folder}" -O "/${dependency_html-to-image}/html-to-image.js"
+curl --create-dirs -o "${license_folder}/Html to Image.txt" "/${dependency_html-to-image}/../LICENSE"
 
-wget "/${dependency_jquery}/jquery.min.js" -P "${asset_folder}"
-wget "/${dependency_jquery}/../LICENSE.txt" -O "${license_folder}/JQuery.txt"
+curl --create-dirs --output-dir "${asset_folder}" -O "/${dependency_jquery}/jquery.min.js"
+curl --create-dirs -o "${license_folder}/JQuery.txt" "/${dependency_jquery}/../LICENSE.txt"
 
-wget "/${dependency_leaflet}/images/layers.png" -P "${asset_folder}/images"
-wget "/${dependency_leaflet}/images/marker-icon.png" -P "${asset_folder}/images"
-wget "/${dependency_leaflet}/images/marker-shadow.png" -P "${asset_folder}/images"
-wget "/${dependency_leaflet}/leaflet.css" -P "${asset_folder}"
-wget "/${dependency_leaflet}/leaflet.js" -P "${asset_folder}"
-wget "/${dependency_leaflet}/../LICENSE" -O "${license_folder}/Leaflet.txt"
+curl --create-dirs --output-dir "${asset_folder}/images" "/${dependency_leaflet}/images/layers.png"
+curl --create-dirs --output-dir "${asset_folder}/images" "/${dependency_leaflet}/images/marker-icon.png"
+curl --create-dirs --output-dir "${asset_folder}/images" "/${dependency_leaflet}/images/marker-shadow.png"
+curl --create-dirs --output-dir "${asset_folder}" -O "/${dependency_leaflet}/leaflet.css"
+curl --create-dirs --output-dir "${asset_folder}" -O "/${dependency_leaflet}/leaflet.js"
+curl --create-dirs -o "${license_folder}/Leaflet.txt" "/${dependency_leaflet}/../LICENSE"
 
-wget "/${dependency_leaflet-fullscreen}/fullscreen.png" -P "${asset_folder}"
-wget "/${dependency_leaflet-fullscreen}/leaflet.fullscreen.css" -P "${asset_folder}"
-wget "/${dependency_leaflet-fullscreen}/Leaflet.fullscreen.min.js" -P "${asset_folder}"
-wget "/${dependency_leaflet-fullscreen}/../LICENSE" -O "${license_folder}/Leaflet.fullscreen.txt"
+curl --create-dirs --output-dir "${asset_folder}" -O "/${dependency_leaflet-fullscreen}/fullscreen.png"
+curl --create-dirs --output-dir "${asset_folder}" -O "/${dependency_leaflet-fullscreen}/leaflet.fullscreen.css"
+curl --create-dirs --output-dir "${asset_folder}" -O "/${dependency_leaflet-fullscreen}/Leaflet.fullscreen.min.js"
+curl --create-dirs -o "${license_folder}/Leaflet.fullscreen.txt" "/${dependency_leaflet-fullscreen}/../LICENSE"
 
-wget "/${dependency_maplibre-gl}/maplibre-gl.css" -P "${asset_folder}"
-wget "/${dependency_maplibre-gl}/maplibre-gl.js" -P "${asset_folder}"
-wget "/${dependency_maplibre-gl}/../LICENSE.txt" -O "${license_folder}/MapLibre GL JS.txt"
+curl --create-dirs --output-dir "${asset_folder}" -O "/${dependency_maplibre-gl}/maplibre-gl.css"
+curl --create-dirs --output-dir "${asset_folder}" -O "/${dependency_maplibre-gl}/maplibre-gl.js"
+curl --create-dirs -o "${license_folder}/MapLibre GL JS.txt" "/${dependency_maplibre-gl}/../LICENSE.txt"
 
-wget "/${dependency_maplibre-gl-leaflet}/leaflet-maplibre-gl.js" -P "${asset_folder}"
-wget "/${dependency_maplibre-gl}/LICENSE" -O "${license_folder}/Leaflet MapLibre GL.txt"
+curl --create-dirs --output-dir "${asset_folder}" -O "/${dependency_maplibre-gl-leaflet}/leaflet-maplibre-gl.js"
+curl --create-dirs -o "${license_folder}/Leaflet MapLibre GL.txt" "/${dependency_maplibre-gl}/LICENSE"
 
-wget "/${dependency_pmtiles}/pmtiles.js" -P "${asset_folder}"
-wget "https://raw.githubusercontent.com/protomaps/PMTiles/main/LICENSE" -O "${license_folder}/PMTiles.txt"
+curl --create-dirs --output-dir "${asset_folder}" -O "/${dependency_pmtiles}/pmtiles.js"
+curl --create-dirs -o "${license_folder}/PMTiles.txt" "https://raw.githubusercontent.com/protomaps/PMTiles/main/LICENSE"
 
-wget "/${dependency_selectize}/css/selectize.css" -P "${asset_folder}/css"
-wget "/${dependency_selectize}/js/standalone/selectize.min.js" -P "${asset_folder}/js/standalone"
-wget "/${dependency_selectize}/../LICENSE" -O "${license_folder}/Selectize.txt"
+curl --create-dirs --output-dir "${asset_folder}/css" "/${dependency_selectize}/css/selectize.css"
+curl --create-dirs --output-dir "${asset_folder}/js/standalone" "/${dependency_selectize}/js/standalone/selectize.min.js"
+curl --create-dirs -o "${license_folder}/Selectize.txt" "/${dependency_selectize}/../LICENSE"
