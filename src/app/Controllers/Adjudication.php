@@ -2,6 +2,12 @@
 
 namespace App\Controllers;
 
+use App\Models\AdjudicationLocationModel;
+use App\Models\AdjudicationModel;
+use App\Models\AdjudicationSourceCitationModel;
+use App\Models\EventModel;
+use App\Models\FilingModel;
+
 class Adjudication extends BaseController
 {
 
@@ -32,7 +38,8 @@ class Adjudication extends BaseController
 		if ($this->data['live'] AND preg_match('/^\d{1,9}$/', $id)) {
 			$id = intval($id);
 		}
-		$query = $this->db->query('SELECT * FROM extra.ci_model_adjudication_detail(?, ?)', [$id, $state])->getResult();
+        $AdjudicationModel = new AdjudicationModel();
+        $query = $AdjudicationModel->getDetail($id, $state);
 		if (count($query) != 1) {
 			$this->noRecord($state);
 		} else {
@@ -40,19 +47,23 @@ class Adjudication extends BaseController
 			$this->data['pageTitle'] = $query[0]->adjudicationtitle;
 			echo view('header', $this->data);
 			echo view('adjudication_detail', ['row' => $query[0]]);
-			$query = $this->db->query('SELECT * FROM extra.ci_model_adjudication_location(?)', [$id])->getResult();
+            $AdjudicationLocationModel = new AdjudicationLocationModel();
+			$query = $AdjudicationLocationModel->getByAdjudication($id);
 			if (count($query) > 0) {
 				echo view('adjudication_location', ['query' => $query]);
 			}
-			$query = $this->db->query('SELECT * FROM extra.ci_model_adjudication_filing(?, ?)', [$id, $this->data['live']])->getResult();
+            $FilingModel = new FilingModel();
+			$query = $FilingModel->getByAdjudication($id, $this->data['live']);
 			if (count($query) > 0) {
 				echo view('adjudication_filing', ['query' => $query]);
 			}
-			$query = $this->db->query('SELECT * FROM extra.ci_model_adjudication_source(?)', [$id])->getResult();
+            $AdjudicationSourceCitationModel = new AdjudicationSourceCitationModel();
+			$query = $AdjudicationSourceCitationModel->getByAdjudication($id);
 			if (count($query) > 0) {
 				echo view('general_reporter', ['query' => $query, 'state' => $state, 'hasLink' => true, 'title' => 'Reporter Links']);
 			}
-			$query = $this->db->query('SELECT * FROM extra.ci_model_adjudication_event(?)', [$id])->getResult();
+            $EventModel = new EventModel();
+			$query = $EventModel->getByAdjudication($id);
 			if (count($query) > 0) {
 				echo view('general_event', ['query' => $query, 'state' => $state, 'title' => 'Event Links', 'eventRelationship' => true]);
 			}
