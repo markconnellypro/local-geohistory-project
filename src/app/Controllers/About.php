@@ -2,6 +2,8 @@
 
 namespace App\Controllers;
 
+use App\Models\DocumentationModel;
+
 class About extends BaseController
 {
 
@@ -22,7 +24,8 @@ class About extends BaseController
     {
         $this->data['state'] = $state;
         echo view('header', $this->data);
-        $query = $this->db->query('SELECT * FROM extra.ci_model_about(?)', [$state])->getResult();
+        $DocumentationModel = new DocumentationModel();
+        $query = $DocumentationModel->getDetail($state);
         echo view('about', ['query' => $query]);
         echo view('footer');
     }
