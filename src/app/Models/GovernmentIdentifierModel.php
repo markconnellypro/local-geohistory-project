@@ -6,6 +6,38 @@ use CodeIgniter\Model;
 
 class GovernmentIdentifierModel extends Model
 {
+    // extra.ci_model_government_identifier(integer, character varying, character varying)
+
+    // FUNCTION: extra.governmentlong
+    // VIEW: extra.governmentsubstitutecache
+
+    public function getByGovernment($id, $state, $locale)
+    {
+        $query = <<<QUERY
+            SELECT DISTINCT governmentidentifiertype.governmentidentifiertypetype,
+                governmentidentifiertype.governmentidentifiertypeslug,
+                governmentidentifiertype.governmentidentifiertypeshort,
+                governmentidentifier.governmentidentifierprefix || governmentidentifiertype.governmentidentifiertypeprefixdelimiter || governmentidentifier.governmentidentifier AS governmentidentifier,
+                governmentidentifier.governmentidentifierstatus,
+                replace(replace(governmentidentifiertype.governmentidentifiertypeurl, '<Identifier>', governmentidentifier.governmentidentifierprefix || governmentidentifiertype.governmentidentifiertypeprefixdelimiter || governmentidentifier.governmentidentifier), '<Language>', ?) AS governmentidentifiertypeurl,
+                extra.governmentlong(governmentidentifier.government, ?) AS governmentlong
+            FROM geohistory.governmentidentifier
+                JOIN geohistory.governmentidentifiertype
+                ON governmentidentifier.governmentidentifiertype = governmentidentifiertype.governmentidentifiertypeid
+                JOIN extra.governmentsubstitutecache
+                ON governmentidentifier.government = governmentsubstitutecache.governmentid
+                AND governmentsubstitutecache.governmentsubstitute = ?
+        QUERY;
+
+        $query = $this->db->query($query, [
+            $locale,
+            strtoupper($state),
+            $id,
+        ])->getResult();
+
+        return $query ?? [];
+    }
+
     // extra.ci_model_search_governmentidentifier_identifier(character varying, character varying, character varying)
 
     // VIEW: extra.governmentrelationcache

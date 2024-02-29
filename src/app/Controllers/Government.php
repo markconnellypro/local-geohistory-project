@@ -2,6 +2,14 @@
 
 namespace App\Controllers;
 
+use App\Models\AffectedGovernmentGroupModel;
+use App\Models\EventModel;
+use App\Models\GovernmentIdentifierModel;
+use App\Models\GovernmentShapeModel;
+use App\Models\GovernmentSourceModel;
+use App\Models\NationalArchivesModel;
+use App\Models\ResearchLogModel;
+
 class Government extends BaseController
 {
 
@@ -31,7 +39,24 @@ class Government extends BaseController
     {
         $this->data['state'] = $state;
         $id = $this->getIdInt($id);
-        $query = $this->db->query('SELECT * FROM extra' . ($this->data['live'] ? '_development' : '') . '.ci_model_government_detail(?, ?, ?)', [$id, $state, $this->data['live']])->getResult();
+        if ($this->data['live']) {
+            $GovernmentFormGovernmentModel = new \App\Models\Development\GovernmentFormGovernmentModel;
+            $GovernmentMapStatusModel = new \App\Models\Development\GovernmentMapStatusModel;
+            $GovernmentModel = new \App\Models\Development\GovernmentModel;
+            $GovernmentPopulationModel = new \App\Models\Development\GovernmentPopulationModel;
+            $MetesDescriptionLineModel = new \App\Models\Development\MetesDescriptionLineModel;
+            $SourceModel = new \App\Models\Development\SourceModel;
+            $SourceCitationModel = new \App\Models\Development\SourceCitationModel;
+        } else {
+            $GovernmentFormGovernmentModel = new \App\Models\GovernmentFormGovernmentModel;
+            $GovernmentMapStatusModel = new \App\Models\GovernmentMapStatusModel;
+            $GovernmentModel = new \App\Models\GovernmentModel;
+            $GovernmentPopulationModel = new \App\Models\GovernmentPopulationModel;
+            $MetesDescriptionLineModel = new \App\Models\MetesDescriptionLineModel;
+            $SourceModel = new \App\Models\SourceModel;
+            $SourceCitationModel = new \App\Models\SourceCitationModel;
+        }
+        $query = $GovernmentModel->getDetail($id, $state);
         if (count($query) != 1 or $query[0]->governmentlevel == 'placeholder') {
             $this->noRecord($state);
         } elseif (!empty($query[0]->governmentsubstituteslug)) {
@@ -50,19 +75,10 @@ class Government extends BaseController
             $isStateOrHigher = (($query[0]->governmentlevel == 'state' or $query[0]->governmentlevel == 'country'));
             $hasMap = ($isCountyOrLower ? ($query[0]->hasmap == 't') : false);
             $showTimeline = ($query[0]->governmentmapstatustimelapse == 't');
-            if ($this->data['live']) {
-                $statusQuery = $this->db->query('SELECT * FROM extra_development.ci_model_government_mapstatus()')->getResult();
-            } else {
-                $statusQuery = [];
-            }
+            $statusQuery = $GovernmentMapStatusModel->getDetails();
             echo view('government_detail', ['live' => $this->data['live'], 'row' => $query[0], 'state' => $state, 'statuses' => $statusQuery]);
-
-            if (!$isHistory and file_exists(APPPATH . 'Views/' . ENVIRONMENT . '/government_' . $state . '.php')) {
-                if ($state == 'ny') {
-                    $query = $this->db->query('SELECT * FROM reference_usa_state.ci_model_ny_lawgovernment(?)', [$id])->getResult();
-                } else {
-                    $query = $this->db->query('SELECT * FROM extra_development.ci_model_government_' . $state . '(?)', [$id])->getResult();
-                }
+            if (!$isHistory) {
+                $query = $SourceCitationModel->getByGovernment($id, $state);
                 if (count($query) > 0) {
                     echo view(ENVIRONMENT . '/government_' . $state, ['query' => $query]);
                 }
@@ -71,22 +87,22 @@ class Government extends BaseController
                 echo view('general_map', ['live' => $this->data['live'], 'includeBase' => true]);
             }
             if (!$isHistory) {
-                if ($this->data['live']) {
-                    $populationquery = $this->db->query('SELECT * FROM extra_development.ci_model_government_population(?, ?)', [$id, $state])->getResult();
-                    if (count($populationquery) > 0) {
-                        echo view('general_chart');
-                    }
+                $populationQuery = $GovernmentPopulationModel->getByGovernment($id, $state);
+                if (count($populationQuery) > 0) {
+                    echo view('general_chart');
                 }
-                $query = $this->db->query('SELECT * FROM extra.ci_model_government_related(?, ?, ?)', [$id, $state, $this->request->getLocale()])->getResult();
+                $query = $GovernmentModel->getRelated($id, $state, $this->request->getLocale());
                 if (count($query) > 0) {
                     echo view('government_related', ['query' => $query]);
                 }
-                $query = $this->db->query('SELECT * FROM extra.ci_model_government_identifier(?, ?, ?)', [$id, $state, $this->request->getLocale()])->getResult();
+                $GovernmentIdentifierModel = new GovernmentIdentifierModel;
+                $query = $GovernmentIdentifierModel->getByGovernment($id, $state, $this->request->getLocale());
                 if (count($query) > 0) {
                     echo view('general_governmentidentifier', ['query' => $query, 'title' => 'Identifier', 'isMultiple' => $this->data['isMultiple']]);
                 }
             }
-            $query = $this->db->query('SELECT * FROM extra.ci_model_government_affectedgovernment(?, ?, ?)', [$id, $state, $this->request->getLocale()])->getResult();
+            $AffectedGovernmentGroupModel = new AffectedGovernmentGroupModel;
+            $query = $AffectedGovernmentGroupModel->getByGovernmentGovernment($id, $state, $this->request->getLocale());
             $events = [];
             if (count($query) > 0) {
                 echo view('government_affectedgovernment', ['query' => $query, 'isMultiple' => $this->data['isMultiple']]);
@@ -94,7 +110,7 @@ class Government extends BaseController
                     $events[] = $row->event;
                 }
             }
-            $query = $this->db->query('SELECT * FROM extra.ci_model_government_affectedgovernmentform(?, ?, ?)', [$id, $state, $this->data['live']])->getResult();
+            $query = $AffectedGovernmentGroupModel->getByGovernmentForm($id, $state, $this->data['live']);
             if (count($query) > 0) {
                 echo view('general_affectedgovernmentform', ['includeGovernment' => false, 'query' => $query]);
                 foreach ($query as $row) {
@@ -103,87 +119,80 @@ class Government extends BaseController
             }
             $events = array_unique($events);
             $events = '{' . implode(',', $events) . '}';
+            $EventModel = new EventModel;
             if (!$isHistory) {
                 if ($isCountyOrLower) {
-                    $query = $this->db->query('SELECT * FROM extra.ci_model_government_event_success(?, ?)', [$id, $events])->getResult();
+                    $query = $EventModel->getByGovernmentSuccess($id, $events);
                     if (count($query) > 0) {
                         echo view('general_event', ['query' => $query, 'state' => $state, 'title' => 'Other Successful Event Links', 'tableId' => 'successfulevent']);
                     }
                 }
-                $query = $this->db->query('SELECT * FROM extra.ci_model_government_governmentsource(?, ?, ?)', [$id, $state, $this->data['live']])->getResult();
+                $GovernmentSourceModel = new GovernmentSourceModel;
+                $query = $GovernmentSourceModel->getByGovernment($id, $state, $this->data['live']);
                 if (count($query) > 0) {
                     echo view('general_governmentsource', ['query' => $query, 'state' => $state, 'type' => 'government', 'isMultiple' => $this->data['isMultiple']]);
                 }
-                if (file_exists(APPPATH . 'Views/' . ENVIRONMENT . '/government_note.php')) {
-                    $query = $this->db->query('SELECT * FROM extra_development.ci_model_government_note(?, ?, ?)', [$id, $state, $this->request->getLocale()])->getResult();
-                    if (count($query) > 0) {
-                        echo view(ENVIRONMENT . '/government_note', ['query' => $query, 'isMultiple' => $this->data['isMultiple']]);
-                    }
+                $query = $GovernmentModel->getNote($id, $state, $this->request->getLocale());
+                if (count($query) > 0) {
+                    echo view(ENVIRONMENT . '/government_note', ['query' => $query, 'isMultiple' => $this->data['isMultiple']]);
                 }
-                if (file_exists(APPPATH . 'Views/' . ENVIRONMENT . '/government_governmentform.php')) {
-                    $query = $this->db->query('SELECT * FROM extra_development.ci_model_government_governmentform(?, ?)', [$id, $state])->getResult();
-                    if (count($query) > 0) {
-                        echo view(ENVIRONMENT . '/government_governmentform', ['query' => $query, 'isMultiple' => $this->data['isMultiple']]);
-                    }
+                $query = $GovernmentFormGovernmentModel->getByGovernment($id, $state);
+                if (count($query) > 0) {
+                    echo view(ENVIRONMENT . '/government_governmentform', ['query' => $query, 'isMultiple' => $this->data['isMultiple']]);
                 }
-                if (file_exists(APPPATH . 'Views/' . ENVIRONMENT . '/government_schooldistrict.php')) {
-                    $query = $this->db->query('SELECT * FROM extra_development.ci_model_government_schooldistrict(?, ?)', [$id, $state])->getResult();
-                    if (count($query) > 0) {
-                        echo view(ENVIRONMENT . '/government_schooldistrict', ['query' => $query, 'isMultiple' => $this->data['isMultiple']]);
-                    }
+                $query = $GovernmentModel->getSchoolDistrict($id, $state);
+                if (count($query) > 0) {
+                    echo view(ENVIRONMENT . '/government_schooldistrict', ['query' => $query, 'isMultiple' => $this->data['isMultiple']]);
                 }
-                if ($this->data['live']) {
-                    $query = $this->db->query('SELECT * FROM extra_development.ci_model_government_source(?)', [$id])->getResult();
-                    if (count($query) > 0) {
-                        echo view('general_source', ['query' => $query, 'hasLink' => true]);
-                    }
+                $query = $SourceModel->getByGovernment($id);
+                if (count($query) > 0) {
+                    echo view('general_source', ['query' => $query, 'hasLink' => true]);
                 }
-                $query = $this->db->query('SELECT * FROM extra.ci_model_government_researchlog(?, ?, ?)', [$id, $state, $this->data['live']])->getResult();
+                $ResearchLogModel = new ResearchLogModel;
+                $query = $ResearchLogModel->getByGovernment($id, $state, $this->data['live']);
                 if (count($query) > 0) {
                     echo view('government_researchlog', ['query' => $query, 'isMultiple' => $this->data['isMultiple']]);
                 }
-                $query = $this->db->query('SELECT * FROM extra.ci_model_government_nationalarchives(?, ?)', [$id, $state])->getResult();
+                $NationalArchivesModel = new NationalArchivesModel;
+                $query = $NationalArchivesModel->getByGovernment($id, $state);
                 if (count($query) > 0) {
                     echo view('government_nationalarchives', ['query' => $query, 'live' => $this->data['live'], 'isMultiple' => $this->data['isMultiple']]);
                 }
                 if ($isCountyOrLower) {
-                    $query = $this->db->query('SELECT * FROM extra.ci_model_government_event_failure(?, ?)', [$id, $events])->getResult();
+                    $query = $EventModel->getByGovernmentFailure($id, $events);
                     if (count($query) > 0) {
                         echo view('general_event', ['query' => $query, 'state' => $state, 'title' => 'Other Event Links', 'tableId' => 'otherevent']);
                     }
                 }
-                if (file_exists(APPPATH . 'Views/' . ENVIRONMENT . '/government_office.php')) {
-                    $query = $this->db->query('SELECT * FROM extra_development.ci_model_government_office(?, ?)', [$id, $state])->getResult();
-                    if (count($query) > 0) {
-                        echo view(ENVIRONMENT . '/government_office', ['query' => $query, 'isMultiple' => $this->data['isMultiple']]);
-                    }
+                $query = $GovernmentModel->getOffice($id, $state);
+                if (count($query) > 0) {
+                    echo view(ENVIRONMENT . '/government_office', ['query' => $query, 'isMultiple' => $this->data['isMultiple']]);
                 }
                 if (file_exists(APPPATH . 'Views/' . ENVIRONMENT . '/government_live.php')) {
                     echo view(ENVIRONMENT . '/government_live', ['id' => $id, 'state' => $state, 'isMunicipalityOrLower' => $isMunicipalityOrLower, 'isCountyOrLower' => $isCountyOrLower, 'isCountyOrState' => $isCountyOrState, 'isState' => $isStateOrHigher, 'includeGovernment' => false]);
                 }
-                if (isset($populationquery) and count($populationquery) > 0) {
-                    echo view('general_chartjs', ['query' => $populationquery, 'online' => $this->data['online'], 'xLabel' => 'Year', 'yLabel' => 'Population']);
+                if (isset($populationQuery) and count($populationQuery) > 0) {
+                    echo view('general_chartjs', ['query' => $populationQuery, 'online' => $this->data['online'], 'xLabel' => 'Year', 'yLabel' => 'Population']);
                 }
             }
             if ($hasMap) {
                 echo view('leaflet_start', ['type' => 'government', 'includeBase' => true, 'needRotation' => false, 'online' => $this->data['online']]);
-                if ($this->data['live']) {
-                    $query = $this->db->query('SELECT * FROM extra_development.ci_model_government_metesdescription(?)', [$id])->getResult();
-                    if (count($query) > 0) {
-                        echo view('general_gis', [
-                            'query' => $query,
-                            'element' => 'metesdescription',
-                            'onEachFeature' => true,
-                            'onEachFeature2' => false,
-                            'weight' => 1.25,
-                            'color' => 'D5103F',
-                            'fillOpacity' => 0
-                        ]);
-                        $layers['metesdescription'] = 'Descriptions';
-                        $primaryLayer = 'metesdescription';
-                    }
+                $query = $MetesDescriptionLineModel->getGeometryByGovernment($id);
+                if (count($query) > 0) {
+                    echo view('general_gis', [
+                        'query' => $query,
+                        'element' => 'metesdescription',
+                        'onEachFeature' => true,
+                        'onEachFeature2' => false,
+                        'weight' => 1.25,
+                        'color' => 'D5103F',
+                        'fillOpacity' => 0
+                    ]);
+                    $layers['metesdescription'] = 'Descriptions';
+                    $primaryLayer = 'metesdescription';
                 }
-                $query = $this->db->query('SELECT * FROM extra.ci_model_government_current(?)', [$id])->getResult();
+                $GovernmentShapeModel = new GovernmentShapeModel;
+                $query = $GovernmentShapeModel->getCurrentByGovernment($id);
                 if (count($query) > 0) {
                     echo view('general_gis', [
                         'query' => $query,
@@ -196,7 +205,7 @@ class Government extends BaseController
                     ]);
                     $layers['current'] = 'Approximate Current Boundary';
                 }
-                $query = $this->db->query('SELECT * FROM extra.ci_model_government_shape(?, ?, ?)', [$id, $state, $this->request->getLocale()])->getResult();
+                $query = $GovernmentShapeModel->getPartByGovernment($id, $state, $this->request->getLocale());
                 if (count($query) > 0) {
                     echo view('general_gis', [
                         'query' => $query,

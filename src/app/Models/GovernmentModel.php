@@ -6,6 +6,113 @@ use CodeIgniter\Model;
 
 class GovernmentModel extends Model
 {
+    // extra.ci_model_government_detail(integer, character varying, boolean)
+    // extra.ci_model_government_detail(text, character varying, boolean)
+
+    // FUNCTION: extra.eventslug
+    // FUNCTION: extra.governmentlevel
+    // FUNCTION: extra.governmentlong
+    // FUNCTION: extra.governmentsubstitutedcache
+    // VIEW: extra.giscache
+    // VIEW: extra.governmentchangecountcache
+    // VIEW: extra.governmentextracache
+    // VIEW: extra.governmenthasmappedeventcache
+    // VIEW: extra.governmentrelationcache
+    // VIEW: extra.governmentsubstitutecache
+
+    public function getDetail($id, $state)
+    {
+        if (!is_int($id)) {
+            $id = $this->getSlugId($id);
+        }
+
+        $query = <<<QUERY
+            SELECT government.governmentid,
+                extra.governmentlong(government.governmentid, ?) AS governmentlong,
+                    CASE
+                        WHEN government.governmentcurrentform IS NULL THEN government.governmenttype
+                        ELSE governmentform.governmentformlongextended
+                    END AS governmenttype,
+                    CASE
+                        WHEN government.governmentstatus IN ('placeholder') THEN 'placeholder'::text
+                        WHEN government.governmentlevel = 1 THEN 'country'::text
+                        WHEN government.governmentlevel = 2 THEN 'state'::text
+                        WHEN government.governmentlevel = 3 THEN 'county'::text
+                        ELSE 'municipality or lower'::text
+                    END AS governmentlevel,
+                    NOT (governmentchangecountcache.creationevent IS NULL
+                    AND governmentchangecountcache.altertotal = 0
+                    AND governmentchangecountcache.dissolutionevent IS NULL
+                    ) AS textflag,
+                    CASE
+                        WHEN governmentchangecountcache.creationevent IS NOT NULL THEN extra.eventslug(governmentchangecountcache.creationevent[1])
+                        ELSE NULL::text
+                    END AS governmentcreationevent,
+                governmentchangecountcache.creationtext AS governmentcreationtext,
+                    CASE
+                        WHEN governmentchangecountcache.creation = 1
+                            AND array_length(governmentchangecountcache.creationas, 1) = 1
+                            AND government.governmentid <> governmentchangecountcache.creationas[1]
+                            THEN extra.governmentlong(governmentchangecountcache.creationas[1], ?)
+                        ELSE ''
+                    END AS governmentcreationlong,
+                governmentchangecountcache.altertotal AS governmentaltercount,
+                    CASE
+                        WHEN governmentchangecountcache.dissolutionevent IS NOT NULL THEN extra.eventslug(governmentchangecountcache.dissolutionevent[1])
+                        ELSE NULL::text
+                    END AS governmentdissolutionevent,
+                governmentchangecountcache.dissolutiontext AS governmentdissolutiontext,
+                    CASE
+                        WHEN hasmaptable.hasmap IS NULL THEN false
+                        ELSE true
+                    END AS hasmap,
+                government.governmentmapstatus,
+                governmentmapstatus.governmentmapstatustimelapse,
+                governmentsubstitutecache.governmentsubstitutemultiple,
+                governmentextracache.governmentsubstituteslug
+            FROM geohistory.government
+            JOIN extra.governmentextracache
+                ON government.governmentid = governmentextracache.governmentid
+            JOIN geohistory.governmentmapstatus
+                ON government.governmentmapstatus = governmentmapstatus.governmentmapstatusid
+            JOIN extra.governmentsubstitutecache
+                ON government.governmentid = governmentsubstitutecache.governmentid
+            LEFT JOIN geohistory.governmentform
+                ON government.governmentcurrentform = governmentform.governmentformid
+            LEFT JOIN extra.governmentchangecountcache
+                ON government.governmentid = governmentchangecountcache.governmentid
+            JOIN extra.governmentrelationcache
+                ON government.governmentid = governmentrelationcache.governmentid
+                AND (governmentrelationcache.governmentrelationstate = ?
+                OR (governmentrelationcache.governmentlevel = 1 AND governmentrelationcache.governmentrelationstate = '' AND governmentrelationcache.governmentid = ?))
+            LEFT OUTER JOIN
+                (
+                SELECT DISTINCT true AS hasmap
+                    FROM extra.giscache
+                    WHERE extra.governmentlevel(giscache.government) > 2
+                        AND giscache.government = ANY (extra.governmentsubstitutedcache(?))
+                    UNION
+                    SELECT DISTINCT true AS hasmap
+                    FROM extra.governmenthasmappedeventcache
+                    WHERE governmentsubstitute = ?
+                ) AS hasmaptable
+                ON 0 = 0
+            WHERE government.governmentid = ?
+        QUERY;
+
+        $query = $this->db->query($query, [
+            strtoupper($state),
+            strtoupper($state),
+            strtoupper($state),
+            $id,
+            $id,
+            $id,
+            $id,
+        ])->getResult();
+
+        return $query ?? [];
+    }
+
     // extra.governmentabbreviationid(text)
     // NOT REMOVED
 
@@ -96,6 +203,160 @@ class GovernmentModel extends Model
             strtoupper($state),
             rawurldecode($government),
         ])->getResultArray();
+
+        return $query ?? [];
+    }
+
+    public function getNote($id, $state, $locale)
+    {
+        return [];
+    }
+
+    public function getOffice($id, $state)
+    {
+        return [];
+    }
+
+    // extra.ci_model_government_related(integer, character varying, character varying)
+
+    // FUNCTION: extra.governmentlong
+    // FUNCTION: extra.governmentstatelink
+    // VIEW: extra.eventextracache
+    // VIEW: extra.governmentparentcache
+    // VIEW: extra.governmentsubstitutecache
+
+    public function getRelated($id, $state, $locale)
+    {
+        $query = <<<QUERY
+            WITH relationpart AS (
+                SELECT DISTINCT extra.governmentstatelink(
+                    CASE
+                        WHEN government.governmentstatus = ANY (ARRAY['alternate', 'language']) THEN government.governmentsubstitute
+                        ELSE government.governmentid
+                    END, ?, ?) AS governmentstatelink,
+                extra.governmentlong(governmentparentcache.governmentparent, ?) AS governmentlong,
+                'Parent' AS governmentrelationship,
+                    CASE
+                        WHEN government.governmentstatus = ANY (ARRAY['alternate', 'language']) THEN 'variant'
+                        WHEN governmentparentcache.governmentid <> ? AND governmentparentcache.governmentparentstatus = ANY (ARRAY['current', 'most recent']) THEN 'former'
+                        ELSE governmentparentcache.governmentparentstatus
+                    END AS governmentparentstatus,
+                    CASE
+                        WHEN governmentmapstatus.governmentmapstatusid IS NOT NULL AND governmentmapstatus.governmentmapstatustimelapse AND NOT governmentmapstatus.governmentmapstatusfurtherresearch THEN 'complete'
+                        WHEN governmentmapstatus.governmentmapstatusid IS NOT NULL AND governmentmapstatus.governmentmapstatustimelapse THEN 'research'
+                        WHEN governmentmapstatus.governmentmapstatusid IS NOT NULL AND governmentmapstatus.governmentmapstatusfurtherresearch THEN 'incomplete'
+                        ELSE 'none'
+                    END AS governmentcolor,
+                governmentparentcache.governmentid = ? AS isgovernmentsubstitute
+                FROM extra.governmentparentcache
+                    JOIN geohistory.government
+                    ON governmentparentcache.governmentparent = government.governmentid
+                    JOIN extra.governmentsubstitutecache
+                    ON governmentparentcache.governmentid = governmentsubstitutecache.governmentid
+                    AND governmentsubstitutecache.governmentsubstitute = ?
+                    LEFT JOIN geohistory.governmentmapstatus ON government.governmentmapstatus = governmentmapstatus.governmentmapstatusid AND governmentmapstatus.governmentmapstatusreviewed AND (government.governmentstatus <> ALL (ARRAY['proposed', 'unincorporated']))
+                WHERE governmentparentcache.governmentparentstatus <> 'placeholder' AND governmentparentcache.governmentparent IS NOT NULL
+                UNION
+                SELECT DISTINCT extra.governmentstatelink(
+                    CASE
+                        WHEN government.governmentstatus = ANY (ARRAY['alternate', 'language']) THEN government.governmentsubstitute
+                        ELSE government.governmentid
+                    END, ?, ?) AS governmentstatelink,
+                extra.governmentlong(governmentparentcache.governmentid, ?) AS governmentlong,
+                'Child' AS governmentrelationship,
+                    CASE
+                        WHEN government.governmentstatus = ANY (ARRAY['alternate', 'language']) THEN 'variant'
+                        WHEN governmentparentcache.governmentparent <> ? AND governmentparentcache.governmentparentstatus = ANY (ARRAY['current', 'most recent']) THEN 'former'
+                        ELSE governmentparentcache.governmentparentstatus
+                    END AS governmentparentstatus,
+                    CASE
+                        WHEN governmentmapstatus.governmentmapstatusid IS NOT NULL AND governmentmapstatus.governmentmapstatustimelapse AND NOT governmentmapstatus.governmentmapstatusfurtherresearch THEN 'complete'
+                        WHEN governmentmapstatus.governmentmapstatusid IS NOT NULL AND governmentmapstatus.governmentmapstatustimelapse THEN 'research'
+                        WHEN governmentmapstatus.governmentmapstatusid IS NOT NULL AND governmentmapstatus.governmentmapstatusfurtherresearch THEN 'incomplete'
+                        ELSE 'none'
+                    END AS governmentcolor,
+                governmentparentcache.governmentparent = ? AS isgovernmentsubstitute
+                FROM extra.governmentparentcache
+                    JOIN geohistory.government leadgovernment
+                    ON governmentparentcache.governmentparent = leadgovernment.governmentid
+                    JOIN geohistory.government
+                    ON governmentparentcache.governmentid = government.governmentid
+                    AND NOT (leadgovernment.governmentlevel < 3 AND (government.governmentlevel - leadgovernment.governmentlevel) > 1)
+                    JOIN extra.governmentsubstitutecache
+                    ON governmentparentcache.governmentparent = governmentsubstitutecache.governmentid
+                    AND governmentsubstitutecache.governmentsubstitute = ?
+                    LEFT JOIN geohistory.governmentmapstatus
+                    ON government.governmentmapstatus = governmentmapstatus.governmentmapstatusid
+                    AND governmentmapstatus.governmentmapstatusreviewed
+                    AND (government.governmentstatus <> ALL (ARRAY['proposed', 'unincorporated']))
+                WHERE governmentparentcache.governmentparentstatus <> 'placeholder'
+                UNION
+                SELECT DISTINCT '/en/' || ? || '/event/' || eventextracache.eventslug || '/' AS governmentstatelink,
+                extra.governmentlong(government.governmentid, ?) AS governmentlong,
+                    CASE
+                        WHEN government.governmentstatus = ANY (ARRAY['alternate', 'language']) THEN 'Variant'
+                        ELSE 'Historic'
+                    END AS governmentrelationship,
+                    CASE
+                        WHEN government.governmentstatus = ANY (ARRAY['alternate', 'language']) THEN 'variant'
+                        ELSE 'former'
+                    END AS governmentparentstatus,
+                'none' AS governmentcolor,
+                government.governmentid = ? AS isgovernmentsubstitute
+                FROM geohistory.government
+                    JOIN extra.governmentsubstitutecache
+                    ON government.governmentid = governmentsubstitutecache.governmentid
+                    AND governmentsubstitutecache.governmentsubstitute = ?
+                    AND government.governmentid <> governmentsubstitutecache.governmentsubstitute
+                    LEFT JOIN geohistory.event
+                    ON government.governmentid = event.government
+                    LEFT JOIN extra.eventextracache
+                    ON event.eventid = eventextracache.eventid
+                    AND eventextracache.eventslugnew IS NULL
+                ), relationrank AS (
+                    SELECT relationpart.governmentstatelink,
+                    relationpart.governmentlong,
+                    relationpart.governmentrelationship,
+                    relationpart.governmentparentstatus,
+                    relationpart.governmentcolor,
+                    row_number() OVER (PARTITION BY relationpart.governmentstatelink, relationpart.governmentlong, relationpart.governmentrelationship ORDER BY relationpart.isgovernmentsubstitute DESC, (
+                        CASE
+                            WHEN relationpart.governmentparentstatus = 'current' THEN 1
+                            WHEN relationpart.governmentparentstatus = 'most recent' THEN 2
+                            WHEN relationpart.governmentparentstatus = 'former' THEN 3
+                            WHEN relationpart.governmentparentstatus = 'variant' THEN 4
+                            ELSE 5
+                        END)) AS roworder
+                    FROM relationpart
+                )
+            SELECT relationrank.governmentstatelink,
+            relationrank.governmentlong,
+            relationrank.governmentrelationship,
+            relationrank.governmentparentstatus,
+            relationrank.governmentcolor
+            FROM relationrank
+            WHERE relationrank.roworder = 1
+            ORDER BY 3 DESC, 2, 4, 1
+        QUERY;
+
+        $query = $this->db->query($query, [
+            $state,
+            $locale,
+            strtoupper($state),
+            $id,
+            $id,
+            $id,
+            $state,
+            $locale,
+            strtoupper($state),
+            $id,
+            $id,
+            $id,
+            strtolower($state),
+            strtoupper($state),
+            $id,
+            $id,
+        ])->getResult();
 
         return $query ?? [];
     }
@@ -215,6 +476,11 @@ class GovernmentModel extends Model
         return $query ?? [];
     }
 
+    public function getSchoolDistrict($id, $state)
+    {
+        return [];
+    }
+
     // extra.ci_model_search_form_detail(character varying)
     // REMOVED
     // extra.governmentslug(integer)
@@ -238,6 +504,32 @@ class GovernmentModel extends Model
         ])->getResult();
 
         $id = '';
+
+        if (count($query) == 1) {
+            $id = $query[0]->id;
+        }
+        
+        return $id;
+    }
+
+    // extra.governmentslugid(text)
+    // NOT REMOVED
+
+    // VIEW: extra.governmentextracache
+
+    protected function getSlugId($id)
+    {
+        $query = <<<QUERY
+            SELECT governmentextracache.governmentid AS id
+                FROM extra.governmentextracache
+            WHERE governmentextracache.governmentslug = ?
+        QUERY;
+
+        $query = $this->db->query($query, [
+            $id,
+        ])->getResult();
+
+        $id = -1;
 
         if (count($query) == 1) {
             $id = $query[0]->id;

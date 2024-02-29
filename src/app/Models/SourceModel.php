@@ -6,6 +6,11 @@ use CodeIgniter\Model;
 
 class SourceModel extends Model
 {
+    public function getByGovernment($id)
+    {
+        return [];
+    }
+
     // extra.ci_model_search_form_reporter(character varying)
 
     // VIEW: extra.adjudicationsourcecitationsourcegovernmentcache

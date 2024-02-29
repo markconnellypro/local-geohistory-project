@@ -6,6 +6,11 @@ use CodeIgniter\Model;
 
 class MetesDescriptionLineModel extends Model
 {
+    public function getGeometryByGovernment($id)
+    {
+        return [];
+    }
+
     // extra.ci_model_metes_row(integer)
 
     public function getByMetesDescription($id)

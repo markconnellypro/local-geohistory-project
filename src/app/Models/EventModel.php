@@ -87,6 +87,97 @@ class EventModel extends Model
         return $query ?? [];
     }
 
+    // extra.ci_model_government_event_failure(integer, integer[])
+
+    // FUNCTION: extra.eventsortdate
+    // FUNCTION: extra.rangefix
+    // FUNCTION: extra.shortdate
+    // VIEW: extra.eventextracache
+    // VIEW: extra.eventgovernmentcache
+    // VIEW: extra.governmentsubstitutecache
+
+    public function getByGovernmentFailure($id, $events)
+    {
+        $query = <<<QUERY
+            SELECT DISTINCT eventextracache.eventslug,
+                eventtype.eventtypeshort,
+                event.eventlong,
+                extra.rangefix(event.eventfrom::text, event.eventto::text) AS eventrange,
+                eventgranted.eventgrantedshort AS eventgranted,
+                extra.shortdate(event.eventeffective) AS eventeffective,
+                extra.eventsortdate(event.eventid) AS eventsortdate
+            FROM geohistory.event
+            JOIN geohistory.eventgranted
+                ON event.eventgranted = eventgranted.eventgrantedid
+                AND NOT eventgranted.eventgrantedsuccess
+                AND NOT eventgranted.eventgrantedplaceholder
+            JOIN geohistory.eventtype
+                ON event.eventtype = eventtype.eventtypeid
+            JOIN extra.eventextracache
+                ON event.eventid = eventextracache.eventid
+                AND eventextracache.eventslugnew IS NULL
+            JOIN extra.eventgovernmentcache
+                ON event.eventid = eventgovernmentcache.eventid
+            JOIN extra.governmentsubstitutecache
+                ON eventgovernmentcache.government = governmentsubstitutecache.governmentid
+            WHERE event.eventid <> ALL (?)
+                AND governmentsubstitutecache.governmentsubstitute = ?
+            ORDER BY (extra.eventsortdate(event.eventid)), event.eventlong
+        QUERY;
+
+        $query = $this->db->query($query, [
+            $events,
+            $id,
+        ])->getResult();
+
+        return $query ?? [];
+    }
+
+    // extra.ci_model_government_event_success(integer, integer[])
+
+    // FUNCTION: extra.eventsortdate
+    // FUNCTION: extra.rangefix
+    // FUNCTION: extra.shortdate
+    // VIEW: extra.eventextracache
+    // VIEW: extra.eventgovernmentcache
+    // VIEW: extra.governmentsubstitutecache
+
+    public function getByGovernmentSuccess($id, $events)
+    {
+        $query = <<<QUERY
+            SELECT DISTINCT eventextracache.eventslug,
+                eventtype.eventtypeshort,
+                event.eventlong,
+                extra.rangefix(event.eventfrom::text, event.eventto::text) AS eventrange,
+                eventgranted.eventgrantedshort AS eventgranted,
+                extra.shortdate(event.eventeffective) AS eventeffective,
+                extra.eventsortdate(event.eventid) AS eventsortdate
+            FROM geohistory.event
+            JOIN geohistory.eventgranted
+                ON event.eventgranted = eventgranted.eventgrantedid
+                AND eventgranted.eventgrantedsuccess   
+            JOIN geohistory.eventtype
+                ON event.eventtype = eventtype.eventtypeid
+            JOIN extra.eventextracache
+                ON event.eventid = eventextracache.eventid
+                AND eventextracache.eventslugnew IS NULL
+            JOIN extra.eventgovernmentcache
+                ON event.eventid = eventgovernmentcache.eventid
+            JOIN extra.governmentsubstitutecache
+                ON eventgovernmentcache.government = governmentsubstitutecache.governmentid
+            WHERE event.eventid <> ALL (?)
+                AND governmentsubstitutecache.governmentsubstitute = ?
+            ORDER BY (extra.eventsortdate(event.eventid)), event.eventlong;
+        QUERY;
+
+        $query = $this->db->query($query, [
+            $events,
+            $id,
+        ])->getResult();
+
+        return $query ?? [];
+    }
+
     // extra.ci_model_source_event(integer)
 
     // FUNCTION: extra.eventsortdate

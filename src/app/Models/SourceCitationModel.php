@@ -60,6 +60,11 @@ class SourceCitationModel extends Model
         return $query ?? [];
     }
 
+    public function getByGovernment($integer, $state)
+    {
+        return [];
+    }
+
     // extra.sourcecitationslugid(text)
 
     // VIEW: extra.sourcecitationextracache
