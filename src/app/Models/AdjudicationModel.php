@@ -105,7 +105,7 @@ class AdjudicationModel extends Model
     private function getSlugId($id)
     {
         $query = <<<QUERY
-            SELECT adjudicationextracache.adjudicationid
+            SELECT adjudicationextracache.adjudicationid AS id
                 FROM extra.adjudicationextracache
             WHERE adjudicationextracache.adjudicationslug = ?
         QUERY;
@@ -117,7 +117,7 @@ class AdjudicationModel extends Model
         $id = -1;
 
         if (count($query) == 1) {
-            $id = $query[0]->adjudicationid;
+            $id = $query[0]->id;
         }
         
         return $id;

@@ -91,7 +91,7 @@ class AdjudicationSourceCitationModel extends Model
     private function getSlugId($id)
     {
         $query = <<<QUERY
-            SELECT adjudicationsourcecitationextracache.adjudicationsourcecitationid
+            SELECT adjudicationsourcecitationextracache.adjudicationsourcecitationid AS id
                 FROM extra.adjudicationsourcecitationextracache
             WHERE adjudicationsourcecitationextracache.adjudicationsourcecitationslug = ?
         QUERY;
@@ -103,7 +103,7 @@ class AdjudicationSourceCitationModel extends Model
         $id = -1;
 
         if (count($query) == 1) {
-            $id = $query[0]->adjudicationsourcecitationid;
+            $id = $query[0]->id;
         }
         
         return $id;
