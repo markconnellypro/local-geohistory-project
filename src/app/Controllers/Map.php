@@ -2,6 +2,8 @@
 
 namespace App\Controllers;
 
+use App\Models\GovernmentShapeModel;
+
 class Map extends BaseController
 {
 
@@ -97,7 +99,8 @@ class Map extends BaseController
     public function tile($z, $x, $y, $state = '')
     {
         $this->response->setHeader('Content-Type', 'application/x-protobuf');
-        $query = $this->db->query('SELECT * FROM extra.ci_model_map_tile(?, ?, ?, ?)', [$state, $z, $x, $y])->getResult();
+        $GovernmentShapeModel = new GovernmentShapeModel;
+        $query = $GovernmentShapeModel->getTile($state, $z, $x, $y);
         foreach ($query as $row) {
             echo pg_unescape_bytea($row->mvt);
         }
