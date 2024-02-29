@@ -58,6 +58,7 @@ class AffectedGovernmentGroupModel extends Model
     }
 
     // extra.ci_model_government_affectedgovernment(integer, character varying, character varying)
+    // NOT REMOVED
 
     // FUNCTION: extra.eventsortdate
     // FUNCTION: extra.governmentlong
