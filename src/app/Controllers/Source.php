@@ -2,6 +2,11 @@
 
 namespace App\Controllers;
 
+use App\Models\EventModel;
+use App\Models\SourceCitationModel;
+use App\Models\SourceCitationNoteModel;
+use App\Models\SourceItemPartModel;
+
 class Source extends BaseController
 {
 
@@ -30,7 +35,8 @@ class Source extends BaseController
     {
         $this->data['state'] = $state;
         $id = $this->getIdInt($id);
-        $query = $this->db->query('SELECT * FROM extra.ci_model_source_detail(?, ?)', [$id, $state])->getResult();
+        $SourceCitationModel = new SourceCitationModel;
+        $query = $SourceCitationModel->getDetail($id, $state);
         if (count($query) != 1) {
             $this->noRecord($state);
         } else {
@@ -42,15 +48,18 @@ class Source extends BaseController
             if ($query[0]->url != '') {
                 echo view('general_url', ['query' => $query, 'title' => 'Actual URL']);
             }
-            $query = $this->db->query('SELECT * FROM extra.ci_model_source_note(?)', [$id])->getResult();
+            $SourceCitationNoteModel = new SourceCitationNoteModel;
+            $query = $SourceCitationNoteModel->getBySourceCitation($id);
             if (count($query) > 0) {
                 echo view('source_note', ['query' => $query, 'state' => $state]);
             }
-            $query = $this->db->query('SELECT * FROM extra.ci_model_source_url(?)', [$id])->getResult();
+            $SourceItemPartModel = new SourceItemPartModel;
+            $query = $SourceItemPartModel->getBySourceCitation($id);
             if (count($query) > 0) {
                 echo view('general_url', ['query' => $query, 'state' => $state, 'title' => 'Calculated URL']);
             }
-            $query = $this->db->query('SELECT * FROM extra.ci_model_source_event(?)', [$id])->getResult();
+            $EventModel = new EventModel;
+            $query = $EventModel->getBySourceCitation($id);
             if (count($query) > 0) {
                 echo view('general_event', ['query' => $query, 'state' => $state, 'title' => 'Event Links']);
             }
