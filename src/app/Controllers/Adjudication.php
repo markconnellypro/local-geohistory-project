@@ -35,9 +35,7 @@ class Adjudication extends BaseController
 	public function view($state, $id)
 	{
 		$this->data['state'] = $state;
-		if ($this->data['live'] AND preg_match('/^\d{1,9}$/', $id)) {
-			$id = intval($id);
-		}
+        $id = $this->getIdInt($id);
         $AdjudicationModel = new AdjudicationModel;
         $query = $AdjudicationModel->getDetail($id, $state);
 		if (count($query) != 1) {

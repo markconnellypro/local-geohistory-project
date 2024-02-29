@@ -29,9 +29,7 @@ class Reporter extends BaseController
     public function view($state, $id)
     {
         $this->data['state'] = $state;
-        if ($this->data['live'] and preg_match('/^\d{1,9}$/', $id)) {
-            $id = intval($id);
-        }
+        $id = $this->getIdInt($id);
         $query = $this->db->query('SELECT * FROM extra.ci_model_reporter_detail(?, ?)', [$id, $state])->getResult();
         if (count($query) != 1) {
             $this->noRecord($state);

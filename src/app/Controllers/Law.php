@@ -30,11 +30,10 @@ class Law extends BaseController
     {
         $this->data['state'] = $state;
         $queryType = '';
-        if ($this->data['live'] and preg_match('/^\d{1,9}$/', $id)) {
-            $id = intval($id);
-        } elseif (substr($id, -10) == '-alternate') {
+        if (substr($id, -10) == '-alternate') {
             $queryType = 'alternate';
         }
+        $id = $this->getIdInt($id);
         $query = $this->db->query('SELECT * FROM extra.ci_model_law' . $queryType . '_detail(?, ?, ?)', [$id, $state, $this->data['live']])->getResult();
 
         if (count($query) != 1) {

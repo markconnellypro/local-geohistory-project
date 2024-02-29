@@ -126,6 +126,14 @@ abstract class BaseController extends Controller
         }
     }
 
+    protected function getIdInt($id)
+    {
+        if ($this->isLive() AND preg_match('/^\d{1,9}$/', $id)) {
+			$id = intval($id);
+		}
+        return $id;
+    }
+
     protected function getJurisdictions()
     {
         $jurisdictions = trim(($_ENV['app_jurisdiction'] ?? '') . '|' . ($_ENV['app_jurisdiction_development'] ?? ''), '|');

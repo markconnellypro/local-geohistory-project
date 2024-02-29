@@ -29,9 +29,7 @@ class Metes extends BaseController
     public function view($state, $id)
     {
         $this->data['state'] = $state;
-        if ($this->data['live'] and preg_match('/^\d{1,9}$/', $id)) {
-            $id = intval($id);
-        }
+        $id = $this->getIdInt($id);
         $areaQuery = $this->db->query('SELECT * FROM extra.ci_model_metes_detail(?, ?)', [$id, $state])->getResult();
         if (count($areaQuery) != 1) {
             $this->noRecord($state);

@@ -29,9 +29,7 @@ class Event extends BaseController
     public function view($state, $id)
     {
         $this->data['state'] = $state;
-        if ($this->data['live'] and preg_match('/^\d{1,9}$/', $id)) {
-            $id = intval($id);
-        }
+        $id = $this->getIdInt($id);
         $query = $this->db->query('SELECT * FROM extra.ci_model_event_detail(?, ?)', [$id, $state])->getResult();
 
         if (count($query) != 1 or ($query[0]->eventgranted == 'placeholder' and !$this->data['live'])) {

@@ -30,9 +30,7 @@ class Government extends BaseController
     public function view($state, $id, $isHistory = false)
     {
         $this->data['state'] = $state;
-        if ($this->data['live'] and preg_match('/^\d{1,9}$/', $id)) {
-            $id = intval($id);
-        }
+        $id = $this->getIdInt($id);
         $query = $this->db->query('SELECT * FROM extra' . ($this->data['live'] ? '_development' : '') . '.ci_model_government_detail(?, ?, ?)', [$id, $state, $this->data['live']])->getResult();
         if (count($query) != 1 or $query[0]->governmentlevel == 'placeholder') {
             $this->noRecord($state);
