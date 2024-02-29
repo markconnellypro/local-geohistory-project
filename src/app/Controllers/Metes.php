@@ -2,6 +2,8 @@
 
 namespace App\Controllers;
 
+use App\Models\MetesDescriptionModel;
+
 class Metes extends BaseController
 {
 
@@ -30,7 +32,8 @@ class Metes extends BaseController
     {
         $this->data['state'] = $state;
         $id = $this->getIdInt($id);
-        $areaQuery = $this->db->query('SELECT * FROM extra.ci_model_metes_detail(?, ?)', [$id, $state])->getResult();
+        $MetesDescriptionModel = new MetesDescriptionModel;
+        $areaQuery = $MetesDescriptionModel->getDetail($id, $state);
         if (count($areaQuery) != 1) {
             $this->noRecord($state);
         } else {
@@ -43,14 +46,17 @@ class Metes extends BaseController
             $hasArea = (!is_null($areaQuery[0]->geometry));
             $hasBegin = ($areaQuery[0]->hasbeginpoint == 't' or $hasArea);
             if ($this->data['live']) {
-                $geometryQuery = $this->db->query('SELECT * FROM extra_development.ci_model_metes_line(?)', [$id])->getResult();
-                $hasMetes = (count($geometryQuery) > 1);
+                $MetesDescriptionLineModel = new \App\Models\Development\MetesDescriptionLineModel;
+            } else {
+                $MetesDescriptionLineModel = new \App\Models\MetesDescriptionLineModel;
             }
+            $geometryQuery = $MetesDescriptionLineModel->getGeometryByMetesDescription($id);
+            $hasMetes = (count($geometryQuery) > 1);
             if ($hasArea or $hasMetes) {
                 $hasMap = true;
                 echo view('general_map', ['live' => $this->data['live'], 'includeBase' => $hasBegin, 'includeDisclaimer' => true]);
             }
-            $query = $this->db->query('SELECT * FROM extra.ci_model_metes_row(?)', [$id])->getResult();
+            $query = $MetesDescriptionLineModel->getByMetesDescription($id);
             if (count($query) > 0) {
                 echo view('metes_row', ['query' => $query]);
             }
