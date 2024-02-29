@@ -9,17 +9,17 @@ class AdjudicationModel extends Model
     // extra.ci_model_adjudication_detail(character varying, character varying)
     // extra.ci_model_adjudication_detail(integer, character varying)
 
+    // FUNCTION: extra.shortdate
+    // FUNCTION: extra.tribunalfilingoffice
+    // FUNCTION: extra.tribunallong
+    // VIEW: extra.adjudicationextracache
+    // VIEW: extra.adjudicationgovernmentcache
+
     public function getDetail($id, $state)
     {
         if (!is_int($id)) {
             $id = $this->getSlugId($id);
         }
-
-        // FUNCTION: extra.shortdate
-        // FUNCTION: extra.tribunalfilingoffice
-        // FUNCTION: extra.tribunallong
-        // VIEW: extra.adjudicationextracache
-        // VIEW: extra.adjudicationgovernmentcache
 
         $query = <<<QUERY
             SELECT DISTINCT adjudication.adjudicationid,
