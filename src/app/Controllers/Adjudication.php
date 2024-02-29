@@ -38,7 +38,7 @@ class Adjudication extends BaseController
 		if ($this->data['live'] AND preg_match('/^\d{1,9}$/', $id)) {
 			$id = intval($id);
 		}
-        $AdjudicationModel = new AdjudicationModel();
+        $AdjudicationModel = new AdjudicationModel;
         $query = $AdjudicationModel->getDetail($id, $state);
 		if (count($query) != 1) {
 			$this->noRecord($state);
@@ -47,22 +47,22 @@ class Adjudication extends BaseController
 			$this->data['pageTitle'] = $query[0]->adjudicationtitle;
 			echo view('header', $this->data);
 			echo view('adjudication_detail', ['row' => $query[0]]);
-            $AdjudicationLocationModel = new AdjudicationLocationModel();
+            $AdjudicationLocationModel = new AdjudicationLocationModel;
 			$query = $AdjudicationLocationModel->getByAdjudication($id);
 			if (count($query) > 0) {
 				echo view('adjudication_location', ['query' => $query]);
 			}
-            $FilingModel = new FilingModel();
+            $FilingModel = new FilingModel;
 			$query = $FilingModel->getByAdjudication($id, $this->data['live']);
 			if (count($query) > 0) {
 				echo view('adjudication_filing', ['query' => $query]);
 			}
-            $AdjudicationSourceCitationModel = new AdjudicationSourceCitationModel();
+            $AdjudicationSourceCitationModel = new AdjudicationSourceCitationModel;
 			$query = $AdjudicationSourceCitationModel->getByAdjudication($id);
 			if (count($query) > 0) {
 				echo view('general_reporter', ['query' => $query, 'state' => $state, 'hasLink' => true, 'title' => 'Reporter Links']);
 			}
-            $EventModel = new EventModel();
+            $EventModel = new EventModel;
 			$query = $EventModel->getByAdjudication($id);
 			if (count($query) > 0) {
 				echo view('general_event', ['query' => $query, 'state' => $state, 'title' => 'Event Links', 'eventRelationship' => true]);
