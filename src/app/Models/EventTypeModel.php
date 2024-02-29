@@ -29,4 +29,36 @@ class EventTypeModel extends Model
 
         return $query ?? [];
     }
+
+    // extra.ci_model_search_form_eventtype(character varying)
+
+    // FUNCTION: extra.governmentabbreviationid
+    // VIEW: extra.eventgovernmentcache
+
+    public function getSearch($state)
+    {
+        $query = <<<QUERY
+            SELECT DISTINCT eventtype.eventtypeshort,
+                eventtype.eventtypeid,
+                eventtype.eventtypeborders = 'documentation' AS isdocumentation
+            FROM geohistory.eventtype
+            LEFT JOIN geohistory.event
+                ON eventtype.eventtypeid = event.eventtype
+            LEFT JOIN extra.eventgovernmentcache
+                ON event.eventid = eventgovernmentcache.eventid
+                AND eventgovernmentcache.government = extra.governmentabbreviationid(?)
+            WHERE (
+                eventtype.eventtypeborders <> 'ignore'
+                AND eventgovernmentcache.eventid IS NOT NULL
+            )
+            OR eventtype.eventtypeborders = 'documentation'
+            ORDER BY 3 DESC, 1, 2
+        QUERY;
+
+        $query = $this->db->query($query, [
+            strtoupper($state),
+        ])->getResultArray();
+
+        return $query ?? [];
+    }
 }

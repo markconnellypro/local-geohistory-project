@@ -2,6 +2,11 @@
 
 namespace App\Controllers;
 
+use App\Models\EventTypeModel;
+use App\Models\GovernmentIdentifierTypeModel;
+use App\Models\GovernmentModel;
+use App\Models\SourceModel;
+
 class Search extends BaseController
 {
 
@@ -30,7 +35,7 @@ class Search extends BaseController
     ];
 
     private $typeType = [
-        'dateevent' => 'Date and Event Type',
+        'dateEvent' => 'Date and Event Type',
         'government' => 'Government',
         'identifier' => 'Identifier',
         'reference' => 'Reference',
@@ -88,13 +93,9 @@ class Search extends BaseController
     public function governmentlookup($state, $government = '', $type = '')
     {
         $this->data['state'] = $state;
-        if ($type == 'governmentparent') {
-            $this->data['query'] = $this->db->query('SELECT * FROM extra.ci_model_search_lookup_governmentparent(?, ?)', [$state, rawurldecode($government)])->getResultArray();
-        } elseif (strlen($government) < 3) {
-            $this->data['query'] = [];
-        } else {
-            $this->data['query'] = $this->db->query('SELECT * FROM extra.ci_model_search_lookup_government(?, ?)', [$state, rawurldecode($government) . '%'])->getResultArray();
-        }
+        $GovernmentModel = new GovernmentModel;
+        $type = 'getLookupBy' . ucwords(str_replace('parent', 'Parent', $type));
+        $this->data['query'] = $GovernmentModel->$type($state, $government);
         $this->response->setHeader('Content-Type', 'application/json');
         echo json_encode($this->data['query']);
     }
@@ -107,8 +108,10 @@ class Search extends BaseController
         if (!$this->data['live'] and !in_array($state, $stateArray)) {
             echo view('search_unavailable');
         } else {
-            $this->data['id'] = $this->db->query('SELECT * FROM extra.ci_model_search_form_detail(?)', [$state])->getResult()[0]->governmentslug;
-            $this->data['eventTypeQuery'] = $this->db->query('SELECT * FROM extra.ci_model_search_form_eventtype(?)', [$state])->getResultArray();
+            $GovernmentModel = new GovernmentModel;
+            $this->data['id'] = $GovernmentModel->getSlug($GovernmentModel->getAbbreviationId($state));
+            $EventTypeModel = new EventTypeModel;
+            $this->data['eventTypeQuery'] = $EventTypeModel->getSearch($state);
             $this->data['months'] = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
             foreach ($this->data['months'] as $k => $m) {
                 $this->data['months'][$k] = [
@@ -116,9 +119,11 @@ class Search extends BaseController
                     'monthName' => $m
                 ];
             }
-            $this->data['tribunalgovernmentshortQuery'] = $this->db->query('SELECT * FROM extra.ci_model_search_form_tribunalgovernmentshort(?)', [$state])->getResultArray();
-            $this->data['governmentIdentifierTypeQuery'] = $this->db->query('SELECT * FROM extra.ci_model_search_form_governmentidentifiertype(?)', [$state])->getResultArray();
-            $this->data['reporterQuery'] = $this->db->query('SELECT * FROM extra.ci_model_search_form_reporter(?)', [$state])->getResultArray();
+            $this->data['tribunalgovernmentshortQuery'] = $GovernmentModel->getSearch($state);
+            $GovernmentIdentifierTypeModel = new GovernmentIdentifierTypeModel;
+            $this->data['governmentIdentifierTypeQuery'] = $GovernmentIdentifierTypeModel->getSearch($state);
+            $SourceModel = new SourceModel;
+            $this->data['reporterQuery'] = $SourceModel->getSearch($state);
             echo view('general_ui', $this->data);
             echo view('search', $this->data);
             if (file_exists(APPPATH . 'Views/' . ENVIRONMENT . '/government_live.php')) {
@@ -144,6 +149,7 @@ class Search extends BaseController
                     $this->emptyToZero($this->request->getPost('year', FILTER_SANITIZE_NUMBER_INT)),
                     $this->emptyToZero($this->request->getPost('plusminus', FILTER_SANITIZE_NUMBER_INT)),
                 ];
+                $model = 'EventModel';
                 break;
             case 'government':
                 switch ($type) {
@@ -157,6 +163,7 @@ class Search extends BaseController
                             $type,
                             $this->request->getLocale(),
                         ];
+                        $model = 'GovernmentModel';
                         $type = 'government';
                         break;
                     case 'identifier':
@@ -165,6 +172,7 @@ class Search extends BaseController
                             $this->request->getPost('identifier'),
                             $state,
                         ];
+                        $model = 'GovernmentIdentifierModel';
                         $category = 'governmentidentifier';
                         break;
                     default:
@@ -172,6 +180,7 @@ class Search extends BaseController
                 }
                 break;
             case 'law':
+                $model = 'LawSectionModel';
                 switch ($type) {
                     case 'reference':
                         $fields = [
@@ -181,7 +190,7 @@ class Search extends BaseController
                             $state,
                         ];
                         break;
-                    case 'dateevent':
+                    case 'dateEvent':
                         $fields = [
                             $this->request->getPost('date'),
                             $this->request->getPost('eventtype'),
@@ -198,11 +207,10 @@ class Search extends BaseController
 
         if (count($fields) > 0) {
             echo view('header', $this->data);
-            $fieldEmpty = [];
-            foreach ($fields as $f) {
-                $fieldEmpty[] = '?';
-            }
-            $query = $this->db->query('SELECT * FROM extra.ci_model_search_' . $category . '_' . $type . '(' . implode(', ', $fieldEmpty) . ')', $fields)->getResult();
+            $model = "App\\Models\\" . $model;
+            $model = new $model;
+            $modelType = 'getSearchBy'. ucwords($type);
+            $query = $model->$modelType($fields);
             $searchParameter = [
                 'Search For' => $this->categoryType[$category],
                 'Search By' => $this->typeType[$this->request->getPost('type')],

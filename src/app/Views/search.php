@@ -111,7 +111,7 @@
             ?>
             <br>
             <?php
-            echo view('search_submit', ['type' => 'dateevent']);
+            echo view('search_submit', ['type' => 'dateEvent']);
             ?>
         </form>
     </div>
