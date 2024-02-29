@@ -2,6 +2,12 @@
 
 namespace App\Controllers;
 
+use App\Models\AffectedTypeModel;
+use App\Models\DocumentationModel;
+use App\Models\EventGrantedModel;
+use App\Models\EventRelationshipModel;
+use App\Models\EventTypeModel;
+
 class Key extends BaseController
 {
 
@@ -22,20 +28,28 @@ class Key extends BaseController
     {
         $this->data['state'] = $state;
         echo view('header', $this->data);
+
         $keys = [
-            'eventtype' => 'Event Type',
-            'governmentlevel' => 'Government Level',
-            'governmentmapstatus' => 'Government Map Status',
-            'governmenttimelapsemapcolor' => 'Government Timelapse Map Color',
-            'affectedtype' => 'How Affected',
-            'law' => 'Law',
-            'eventrelationship' => 'Relationship',
-            'eventgranted' => 'Successful?',
+            'EventType' => ['Event Type', 'table'],
+            'governmentlevel' => ['Government Level', 'documentation'],
+            'governmentmapstatus' => ['Government Map Status', 'documentation'],
+            'governmenttimelapsemapcolor' => ['Government Timelapse Map Color', 'documentation'],
+            'AffectedType' => ['How Affected', 'table'],
+            'law' => ['Law', 'documentation'],
+            'EventRelationship' => ['Relationship', 'table'],
+            'EventGranted' => ['Successful?', 'table'],
         ];
         echo view('key_start', ['keys' => $keys]);
+        $DocumentationModel = new DocumentationModel();
         foreach ($keys as $k => $v) {
-            $query = $this->db->query('SELECT * FROM extra.ci_model_key_' . $k . '()', [])->getResult();
-            echo view('general_key', ['query' => $query, 'type' => $k, 'title' => $v]);
+            if ($v[1] == 'table') {
+                $model = "App\\Models\\" . $k . 'Model';
+                $model = new $model;
+                $query = $model->getKey();
+            } else {
+                $query = $DocumentationModel->getKey($k);
+            }
+            echo view('general_key', ['query' => $query, 'type' => strtolower($k), 'title' => $v[0]]);
         }
         echo view('footer');
     }

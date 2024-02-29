@@ -8,7 +8,7 @@
             <tr>
                 <th>Term</th>
                 <th>Description</th>
-                <?php if ($type == 'eventtype') { ?>
+                <?php if ($type == 'EventType') { ?>
                     <th>Only<br>Border<br>Changes?</th>
                 <?php } ?>
             </tr>
@@ -18,7 +18,7 @@
                 <tr>
                     <td data-sort="<?= $row->keysort ?>" <?= (isset($row->keycolor) ? ' style="background-color: ' . $row->keycolor . '"' : '') ?>><?= $row->keyshort ?></td>
                     <td><?= $row->keylong ?></td>
-                    <?php if ($type == 'eventtype') { ?>
+                    <?php if ($type == 'EventType') { ?>
                         <td><?= $row->keyincluded ?></td>
                     <?php } ?>
                 </tr>

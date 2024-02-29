@@ -1,0 +1,25 @@
+<?php
+
+namespace App\Models;
+
+use CodeIgniter\Model;
+
+class EventGrantedModel extends Model
+{
+    // extra.ci_model_key_eventgranted()
+
+    public function getKey()
+    {
+        $query = <<<QUERY
+            SELECT eventgranted.eventgrantedshort AS keyshort,
+                eventgranted.eventgrantedshort AS keysort,
+                eventgranted.eventgrantedlong AS keylong
+            FROM geohistory.eventgranted
+            ORDER BY 2, 1
+        QUERY;
+
+        $query = $this->db->query($query)->getResult();
+
+        return $query ?? [];
+    }
+}
