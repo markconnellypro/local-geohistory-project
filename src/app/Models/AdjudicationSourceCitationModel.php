@@ -6,7 +6,55 @@ use CodeIgniter\Model;
 
 class AdjudicationSourceCitationModel extends Model
 {
-    // 
+    // extra.ci_model_reporter_detail(integer, character varying)
+    // extra.ci_model_reporter_detail(text, character varying)
+
+    // FUNCTION: extra.rangefix
+    // FUNCTION: extra.shortdate
+    // VIEW: extra.sourceextra
+    // VIEW: extra.adjudicationgovernmentcache
+
+    public function getDetail($id, $state)
+    {
+        if (!is_int($id)) {
+            $id = $this->getSlugId($id);
+        }
+
+        $query = <<<QUERY
+            SELECT DISTINCT adjudicationsourcecitation.adjudicationsourcecitationid,
+                source.sourceshort,
+                sourceextra.sourceabbreviation,
+                adjudicationsourcecitation.adjudicationsourcecitationvolume,
+                extra.rangefix(adjudicationsourcecitation.adjudicationsourcecitationpagefrom::text, adjudicationsourcecitation.adjudicationsourcecitationpageto::text) AS adjudicationsourcecitationpage,
+                adjudicationsourcecitation.adjudicationsourcecitationyear,
+                extra.shortdate(adjudicationsourcecitation.adjudicationsourcecitationdate) AS adjudicationsourcecitationdate,
+                adjudicationsourcecitation.adjudicationsourcecitationdate AS adjudicationsourcecitationdatesort,
+                adjudicationsourcecitation.adjudicationsourcecitationtitle,
+                adjudicationsourcecitation.adjudicationsourcecitationauthor,
+                adjudicationsourcecitation.adjudicationsourcecitationjudge,
+                adjudicationsourcecitation.adjudicationsourcecitationdissentjudge,
+                adjudicationsourcecitation.adjudicationsourcecitationurl AS url,
+                source.sourcetype,
+                sourceextra.sourcefullcitation
+            FROM geohistory.source
+            JOIN extra.sourceextra
+                ON source.sourceid = sourceextra.sourceid
+            JOIN geohistory.adjudicationsourcecitation
+                ON source.sourceid = adjudicationsourcecitation.source
+                AND adjudicationsourcecitation.adjudicationsourcecitationid = ?
+            LEFT JOIN extra.adjudicationgovernmentcache
+                ON adjudicationsourcecitation.adjudication = adjudicationgovernmentcache.adjudicationid
+            WHERE governmentrelationstate = ?
+                OR governmentrelationstate IS NULL
+        QUERY;
+
+        $query = $this->db->query($query, [
+            $id,
+            strtoupper($state),
+        ])->getResult();
+
+        return $query ?? [];
+    }
 
     public function getByAdjudication($id)
     {
@@ -38,5 +86,26 @@ class AdjudicationSourceCitationModel extends Model
         ])->getResult();
 
         return $query ?? [];
+    }
+
+    private function getSlugId($id)
+    {
+        $query = <<<QUERY
+            SELECT adjudicationsourcecitationextracache.adjudicationsourcecitationid
+                FROM extra.adjudicationsourcecitationextracache
+            WHERE adjudicationsourcecitationextracache.adjudicationsourcecitationslug = ?
+        QUERY;
+
+        $query = $this->db->query($query, [
+            $id,
+        ])->getResult();
+
+        $id = -1;
+
+        if (count($query) == 1) {
+            $id = $query[0]->adjudicationsourcecitationid;
+        }
+        
+        return $id;
     }
 }

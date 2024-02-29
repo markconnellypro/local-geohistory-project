@@ -2,6 +2,11 @@
 
 namespace App\Controllers;
 
+use App\Models\AdjudicationModel;
+use App\Models\AdjudicationSourceCitationModel;
+use App\Models\EventModel;
+use App\Models\SourceItemPartModel;
+
 class Reporter extends BaseController
 {
 
@@ -30,7 +35,8 @@ class Reporter extends BaseController
     {
         $this->data['state'] = $state;
         $id = $this->getIdInt($id);
-        $query = $this->db->query('SELECT * FROM extra.ci_model_reporter_detail(?, ?)', [$id, $state])->getResult();
+        $AdjudicationSourceCitationModel = new AdjudicationSourceCitationModel;
+        $query = $AdjudicationSourceCitationModel->getDetail($id, $state);
         if (count($query) != 1) {
             $this->noRecord($state);
         } else {
@@ -42,15 +48,18 @@ class Reporter extends BaseController
             if ($query[0]->url != '') {
                 echo view('general_url', ['query' => $query, 'title' => 'Actual URL']);
             }
-            $query = $this->db->query('SELECT * FROM extra.ci_model_reporter_url(?)', [$id])->getResult();
+            $SourceItemPartModel = new SourceItemPartModel;
+            $query = $SourceItemPartModel->getByAdjudicationSourceCitation($id);
             if (count($query) > 0) {
                 echo view('general_url', ['query' => $query, 'state' => $state, 'title' => 'Calculated URL']);
             }
-            $query = $this->db->query('SELECT * FROM extra.ci_model_reporter_adjudication(?)', [$id])->getResult();
+            $AdjudicationModel = new AdjudicationModel;
+            $query = $AdjudicationModel->getByAdjudicationSourceCitation($id);
             if (count($query) > 0) {
                 echo view('general_adjudication', ['query' => $query, 'state' => $state]);
             }
-            $query = $this->db->query('SELECT * FROM extra.ci_model_reporter_event(?)', [$id])->getResult();
+            $EventModel = new EventModel;
+            $query = $EventModel->getByAdjudicationSourceCitation($id);
             if (count($query) > 0) {
                 echo view('general_event', ['query' => $query, 'state' => $state, 'title' => 'Event Links']);
             }

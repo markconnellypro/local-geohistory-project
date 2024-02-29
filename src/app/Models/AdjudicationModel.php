@@ -62,6 +62,42 @@ class AdjudicationModel extends Model
         return $query ?? [];
     }
 
+    // extra.ci_model_reporter_adjudication(integer)
+
+    // FUNCTION: extra.shortdate
+    // FUNCTION: extra.tribunallong
+    // VIEW: extra.adjudicationextracache
+
+    public function getByAdjudicationSourceCitation($id)
+    {
+        $query = <<<QUERY
+            SELECT adjudicationextracache.adjudicationslug,
+                adjudicationtype.adjudicationtypelong,
+                extra.tribunallong(adjudicationtype.tribunal) AS tribunallong,
+                adjudication.adjudicationnumber,
+                extra.shortdate(adjudication.adjudicationterm || CASE
+                    WHEN length(adjudication.adjudicationterm) = 4 THEN '-~07-~28'
+                    WHEN length(adjudication.adjudicationterm) = 7 THEN '-~28'
+                    ELSE ''
+                END) AS adjudicationterm,
+                adjudication.adjudicationterm AS adjudicationtermsort
+            FROM geohistory.adjudication
+            JOIN extra.adjudicationextracache
+                ON adjudication.adjudicationid = adjudicationextracache.adjudicationid
+            JOIN geohistory.adjudicationtype
+                ON adjudication.adjudicationtype = adjudicationtype.adjudicationtypeid
+            JOIN geohistory.adjudicationsourcecitation
+                ON adjudication.adjudicationid = adjudicationsourcecitation.adjudication
+                AND adjudicationsourcecitation.adjudicationsourcecitationid = ?
+        QUERY;
+
+        $query = $this->db->query($query, [
+            $id,
+        ])->getResult();
+
+        return $query ?? [];
+    }
+
     // extra.adjudicationslugid(text)
 
     // VIEW: extra.adjudicationextracache
@@ -71,7 +107,7 @@ class AdjudicationModel extends Model
         $query = <<<QUERY
             SELECT adjudicationextracache.adjudicationid
                 FROM extra.adjudicationextracache
-            WHERE adjudicationextracache.adjudicationslug = ?;
+            WHERE adjudicationextracache.adjudicationslug = ?
         QUERY;
 
         $query = $this->db->query($query, [
