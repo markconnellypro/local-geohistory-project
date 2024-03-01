@@ -104,7 +104,17 @@ class SourceCitationModel extends Model
         return $query ?? [];
     }
 
-    public function getByGovernment($integer, $state)
+    public function getByGovernment($id, $state)
+    {
+        return [];
+    }
+
+    public function getByLawNation($id)
+    {
+        return [];
+    }
+
+    public function getByLawState($id, $state)
     {
         return [];
     }

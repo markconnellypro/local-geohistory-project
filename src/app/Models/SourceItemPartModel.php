@@ -83,6 +83,122 @@ class SourceItemPartModel extends Model
         return $query ?? [];
     }
 
+    // extra.ci_model_lawalternate_url(integer, boolean)
+
+    // FUNCTION: extra.sourceurlid
+    // FUNCTION: extra.zeropad
+
+    public function getByLawAlternateSection($id)
+    {
+        $query = <<<QUERY
+            SELECT sourceitem.sourceitemurl ||
+                CASE
+                    WHEN sourceitem.sourceitemurlcomplete THEN ''
+                    ELSE (sourceitempart.sourceitempartsequencecharacter || extra.zeropad(sourceitempart.sourceitempartsequence +
+                    CASE
+                        WHEN sourceitempart.sourceitempartisbypage THEN lawalternatesection.lawalternatesectionpagefrom
+                        ELSE lawalternate.lawalternatenumberchapter
+                    END, sourceitempart.sourceitempartzeropad)) || sourceitempart.sourceitempartsequencecharacterafter
+                END AS url
+        FROM geohistory.lawalternatesection
+        JOIN geohistory.lawalternate
+            ON lawalternatesection.lawalternate = lawalternate.lawalternateid
+        JOIN geohistory.law
+            ON lawalternate.law = law.lawid
+        JOIN geohistory.sourceitem
+            ON sourceitem.source = ANY (extra.sourceurlid(lawalternate.source))
+        JOIN geohistory.sourceitempart
+            ON sourceitem.sourceitemid = sourceitempart.sourceitem
+        WHERE (
+            (
+                sourceitem.sourceitemvolume <> ''
+                AND sourceitem.sourceitemyear IS NULL
+                AND (sourceitem.sourceitemvolume = lawalternate.lawalternatevolume OR (lawalternate.lawalternatevolume = '' AND sourceitem.sourceitemvolume = substring(law.lawapproved FOR 4)))
+            ) OR (
+                sourceitem.sourceitemvolume <> ''
+                AND sourceitem.sourceitemyear IS NOT NULL
+                AND sourceitem.sourceitemvolume = lawalternate.lawalternatevolume
+                AND sourceitem.sourceitemyear::character varying = substring(law.lawapproved FOR 4)
+            ) OR (
+                sourceitem.sourceitemvolume = ''
+                AND sourceitem.sourceitemyear IS NOT NULL
+                AND ((sourceitem.sourceitemyear::character varying = lawalternate.lawalternatevolume) OR (lawalternate.lawalternatevolume = '' AND sourceitem.sourceitemyear::character varying = substring(law.lawapproved FOR 4)))
+            ) OR (
+                sourceitem.sourceitemvolume = '' AND sourceitem.sourceitemyear IS NULL
+            )
+        ) AND (
+            (sourceitempartfrom IS NULL AND sourceitempartto IS NULL) OR
+            (sourceitempartisbypage AND sourceitempartfrom <= lawalternatesectionpagefrom AND sourceitempartto >= lawalternatesectionpagefrom) OR
+            (NOT sourceitempartisbypage AND sourceitempartfrom <= lawnumberchapter AND sourceitempartto >= lawnumberchapter)
+            ) AND lawalternatesection.lawalternatesectionid = ?
+            AND (? OR NOT sourceitem.sourceitemlocal)
+        QUERY;
+
+        $query = $this->db->query($query, [
+            $id,
+            \App\Controllers\BaseController::isLive(),
+        ])->getResult();
+
+        return $query ?? [];
+    }
+
+    // extra.ci_model_law_url(integer, boolean)
+
+    // FUNCTION: extra.sourceurlid
+    // FUNCTION: extra.zeropad
+
+    public function getByLawSection($id)
+    {
+        $query = <<<QUERY
+            SELECT sourceitem.sourceitemurl ||
+                CASE
+                    WHEN sourceitem.sourceitemurlcomplete THEN ''
+                    ELSE (sourceitempart.sourceitempartsequencecharacter || extra.zeropad(sourceitempart.sourceitempartsequence +
+                    CASE
+                        WHEN sourceitempart.sourceitempartisbypage THEN lawsection.lawsectionpagefrom
+                        ELSE law.lawnumberchapter
+                    END, sourceitempart.sourceitempartzeropad)) || sourceitempart.sourceitempartsequencecharacterafter
+                END AS url
+        FROM geohistory.lawsection
+        JOIN geohistory.law
+            ON lawsection.law = law.lawid
+        JOIN geohistory.sourceitem
+            ON sourceitem.source = ANY (extra.sourceurlid(law.source))
+        JOIN geohistory.sourceitempart
+            ON sourceitem.sourceitemid = sourceitempart.sourceitem
+        WHERE (
+            (
+                sourceitem.sourceitemvolume <> ''
+                AND sourceitem.sourceitemyear IS NULL
+                AND (sourceitem.sourceitemvolume = law.lawvolume OR (law.lawvolume = '' AND sourceitem.sourceitemvolume = substring(law.lawapproved FOR 4)))
+            ) OR (
+                sourceitem.sourceitemvolume <> ''
+                AND sourceitem.sourceitemyear IS NOT NULL
+                AND sourceitem.sourceitemvolume = law.lawvolume
+                AND sourceitem.sourceitemyear::character varying = substring(law.lawapproved FOR 4)
+            ) OR (
+                sourceitem.sourceitemvolume = ''
+                AND sourceitem.sourceitemyear IS NOT NULL
+                AND ((sourceitem.sourceitemyear::character varying = law.lawvolume) OR (law.lawvolume = '' AND sourceitem.sourceitemyear::character varying = substring(law.lawapproved FOR 4)))
+            ) OR (
+                sourceitem.sourceitemvolume = '' AND sourceitem.sourceitemyear IS NULL
+            )
+        ) AND (
+            (sourceitempartfrom IS NULL AND sourceitempartto IS NULL) OR
+            (sourceitempartisbypage AND sourceitempartfrom <= lawsectionpagefrom AND sourceitempartto >= lawsectionpagefrom) OR
+            (NOT sourceitempartisbypage AND sourceitempartfrom <= lawnumberchapter AND sourceitempartto >= lawnumberchapter)
+            ) AND lawsection.lawsectionid = ?
+            AND (? OR NOT sourceitem.sourceitemlocal)
+        QUERY;
+
+        $query = $this->db->query($query, [
+            $id,
+            \App\Controllers\BaseController::isLive(),
+        ])->getResult();
+
+        return $query ?? [];
+    }
+
     // extra.ci_model_source_url(integer)
 
     // FUNCTION: extra.sourceurlid

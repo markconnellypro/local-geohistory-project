@@ -6,6 +6,54 @@ use CodeIgniter\Model;
 
 class LawSectionModel extends Model
 {
+    // extra.ci_model_law_detail(integer, character varying, boolean)
+    // extra.ci_model_law_detail(text, character varying, boolean)
+
+    // FUNCTION: extra.lawsectioncitation
+    // VIEW: extra.lawsectiongovernmentcache
+    // VIEW: extra.sourceextra
+
+    public function getDetail($id, $state)
+    {
+        if (!is_int($id)) {
+            $id = $this->getSlugId($id);
+        }
+
+        $query = <<<QUERY
+            SELECT DISTINCT lawsection.lawsectionid,
+                lawsection.lawsectionpagefrom,
+                extra.lawsectioncitation(lawsection.lawsectionid) AS lawsectioncitation,
+                CASE
+                    WHEN (NOT ?) AND left(law.lawtitle, 1) = '~' THEN ''
+                    ELSE law.lawtitle
+                END AS lawtitle,
+                law.lawurl AS url,
+                source.sourcetype,
+                sourceextra.sourceabbreviation,
+                sourceextra.sourcefullcitation
+            FROM geohistory.source
+            JOIN extra.sourceextra
+                ON source.sourceid = sourceextra.sourceid
+            JOIN geohistory.law
+                ON source.sourceid = law.source
+            JOIN geohistory.lawsection
+                ON law.lawid = lawsection.law
+                AND lawsection.lawsectionid = ?
+            LEFT JOIN extra.lawsectiongovernmentcache 
+                ON lawsection.lawsectionid = lawsectiongovernmentcache.lawsectionid
+            WHERE governmentrelationstate = ?
+                OR governmentrelationstate IS NULL
+        QUERY;
+
+        $query = $this->db->query($query, [
+            \App\Controllers\BaseController::isLive(),
+            $id,
+            strtoupper($state),
+        ])->getResult();
+
+        return $query ?? [];
+    }
+
     // extra.ci_model_event_law(integer)
 
     // VIEW: extra.lawsectionextracache
@@ -40,6 +88,85 @@ class LawSectionModel extends Model
         ])->getResult();
 
         return $query ?? [];
+    }
+
+    // extra.ci_model_law_related(integer)
+
+    // FUNCTION: extra.lawcitation
+    // FUNCTION: extra.rangefix
+    // VIEW: extra.lawalternatesectionextracache
+    // VIEW: extra.lawsectionextracache
+
+    public function getRelated($id)
+    {
+        $query = <<<QUERY
+            SELECT DISTINCT lawsectionextracache.lawsectionslug,
+                law.lawapproved,
+                lawsectionextracache.lawsectioncitation,
+                'Amends'::text AS lawsectioneventrelationship,
+                lawsection.lawsectionfrom,
+                law.lawnumberchapter
+            FROM geohistory.law
+            JOIN geohistory.lawsection
+                ON law.lawid = lawsection.law
+            JOIN extra.lawsectionextracache
+                ON lawsection.lawsectionid = lawsectionextracache.lawsectionid     
+            JOIN geohistory.lawsection currentlawsection
+                ON lawsection.lawsectionid = currentlawsection.lawsectionamend
+                AND currentlawsection.lawsectionid = ?
+            UNION
+            SELECT DISTINCT lawsectionextracache.lawsectionslug,
+                law.lawapproved,
+                lawsectionextracache.lawsectioncitation,
+                'Amended By'::text AS lawsectioneventrelationship,
+                lawsection.lawsectionfrom,
+                law.lawnumberchapter
+            FROM geohistory.law
+            JOIN geohistory.lawsection
+                ON law.lawid = lawsection.law
+                AND lawsection.lawsectionamend = ?
+            JOIN extra.lawsectionextracache
+                ON lawsection.lawsectionid = lawsectionextracache.lawsectionid
+            UNION
+            SELECT DISTINCT lawalternatesectionextracache.lawsectionslug,
+                law.lawapproved,
+                lawalternatesectionextracache.lawsectioncitation,
+                'Alternate'::text AS lawsectioneventrelationship,
+                lawsection.lawsectionfrom,
+                law.lawnumberchapter
+            FROM geohistory.law
+            JOIN geohistory.lawsection
+                ON law.lawid = lawsection.law
+            JOIN geohistory.lawalternatesection
+                ON lawsection.lawsectionid = lawalternatesection.lawsection
+                AND lawalternatesection.lawsection = ?
+            JOIN extra.lawalternatesectionextracache
+                ON lawalternatesection.lawalternatesectionid = lawalternatesectionextracache.lawsectionid
+            UNION
+            SELECT DISTINCT NULL AS lawsectionslug,
+                law.lawapproved,
+                extra.lawcitation(law.lawid) AS lawsectioncitation,
+                'Amended To Add ' || lawsection.lawsectionnewsymbol || CASE
+                    WHEN lawsection.lawsectionnewfrom <> lawsection.lawsectionnewto THEN lawsection.lawsectionnewsymbol
+                    ELSE ''
+                END || ' ' || extra.rangefix(lawsection.lawsectionnewfrom, lawsection.lawsectionnewto) AS lawsectioneventrelationship,
+                lawsection.lawsectionnewfrom AS lawsectionfrom,
+                law.lawnumberchapter
+            FROM geohistory.law
+            JOIN geohistory.lawsection
+                ON law.lawid = lawsection.lawsectionnewlaw
+                AND lawsection.lawsectionid = ?
+            ORDER BY 4, 3
+        QUERY;
+
+        $query = $this->db->query($query, [
+            $id,
+            $id,
+            $id,
+            $id,
+        ])->getResult();
+
+        return $query ?? []; 
     }
 
     // extra.ci_model_search_law_dateevent(character varying, text, character varying)
@@ -160,5 +287,30 @@ class LawSectionModel extends Model
         ])->getResult();
 
         return $query ?? [];
+    }
+
+    // extra.lawsectionslugid(text)
+
+    // VIEW: extra.lawsectionextracache
+
+    private function getSlugId($id)
+    {
+        $query = <<<QUERY
+            SELECT lawsectionextracache.lawsectionid AS id
+                FROM extra.lawsectionextracache
+            WHERE lawsectionextracache.lawsectionslug = ?
+        QUERY;
+
+        $query = $this->db->query($query, [
+            $id,
+        ])->getResult();
+
+        $id = -1;
+
+        if (count($query) == 1) {
+            $id = $query[0]->id;
+        }
+        
+        return $id;
     }
 }

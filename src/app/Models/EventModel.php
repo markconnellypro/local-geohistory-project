@@ -364,6 +364,96 @@ class EventModel extends Model
 
         return $query ?? [];
     }
+    
+    // extra.ci_model_lawalternate_event(integer)
+
+    // FUNCTION: extra.eventsortdate
+    // FUNCTION: extra.rangefix
+    // FUNCTION: extra.shortdate
+    // VIEW: extra.eventextracache
+
+    public function getByLawAlternateSection($id)
+    {
+        $query = <<<QUERY
+            SELECT DISTINCT eventextracache.eventslug,
+                eventtype.eventtypeshort,
+                event.eventlong,
+                extra.rangefix(event.eventfrom::text, event.eventto::text) AS eventrange,
+                eventgranted.eventgrantedshort AS eventgranted,
+                extra.shortdate(event.eventeffective) AS eventeffective,
+                extra.eventsortdate(event.eventid) AS eventsortdate,
+                eventrelationship.eventrelationshipshort AS eventrelationship,
+                lawgroup.lawgrouplong
+            FROM geohistory.event
+            JOIN geohistory.eventgranted
+                ON event.eventgranted = eventgranted.eventgrantedid
+            JOIN geohistory.eventtype
+                ON event.eventtype = eventtype.eventtypeid
+            JOIN extra.eventextracache
+                ON event.eventid = eventextracache.eventid
+                AND eventextracache.eventslugnew IS NULL
+            JOIN geohistory.lawsectionevent
+                ON event.eventid = lawsectionevent.event
+            JOIN geohistory.eventrelationship
+                ON lawsectionevent.eventrelationship = eventrelationship.eventrelationshipid
+            JOIN geohistory.lawalternatesection
+                ON lawsectionevent.lawsection = lawalternatesection.lawsection
+                AND lawalternatesection.lawalternatesectionid = ?
+            LEFT JOIN geohistory.lawgroup
+                ON lawsectionevent.lawgroup = lawgroup.lawgroupid
+            ORDER BY (extra.eventsortdate(event.eventid)), event.eventlong
+        QUERY;
+
+        $query = $this->db->query($query, [
+            $id,
+        ])->getResult();
+
+        return $query ?? []; 
+    }
+
+    // extra.ci_model_law_event(integer)
+
+    // FUNCTION: extra.eventsortdate
+    // FUNCTION: extra.rangefix
+    // FUNCTION: extra.shortdate
+    // VIEW: extra.eventextracache
+
+    public function getByLawSection($id)
+    {
+        $query = <<<QUERY
+            SELECT DISTINCT eventextracache.eventslug,
+                eventtype.eventtypeshort,
+                event.eventlong,
+                extra.rangefix(event.eventfrom::text, event.eventto::text) AS eventrange,
+                eventgranted.eventgrantedshort AS eventgranted,
+                extra.shortdate(event.eventeffective) AS eventeffective,
+                extra.eventsortdate(event.eventid) AS eventsortdate,
+                eventrelationship.eventrelationshipshort AS eventrelationship,
+                lawgroup.lawgrouplong
+            FROM geohistory.event
+            JOIN geohistory.eventgranted
+                ON event.eventgranted = eventgranted.eventgrantedid
+            JOIN geohistory.eventtype
+                ON event.eventtype = eventtype.eventtypeid
+            JOIN extra.eventextracache
+                ON event.eventid = eventextracache.eventid
+                AND eventextracache.eventslugnew IS NULL
+            JOIN geohistory.lawsectionevent
+                ON event.eventid = lawsectionevent.event
+                AND lawsectionevent.lawsection = ?
+            JOIN geohistory.eventrelationship
+                ON lawsectionevent.eventrelationship = eventrelationship.eventrelationshipid
+            LEFT JOIN geohistory.lawgroup
+                ON lawsectionevent.lawgroup = lawgroup.lawgroupid
+            ORDER BY (extra.eventsortdate(event.eventid)), event.eventlong;
+        QUERY;
+
+        $query = $this->db->query($query, [
+            $id,
+        ])->getResult();
+
+        return $query ?? [];
+    }
 
     // extra.ci_model_source_event(integer)
 
