@@ -6,6 +6,34 @@ use CodeIgniter\Model;
 
 class GovernmentIdentifierModel extends Model
 {
+    // extra.ci_model_governmentidentifier_detail(text, text, text)
+
+    public function getDetail($type, $id)
+    {
+        $query = <<<QUERY
+            SELECT governmentidentifiertype.governmentidentifiertypetype,
+                governmentidentifiertype.governmentidentifiertypeshort,
+                governmentidentifier.governmentidentifierprefix || governmentidentifiertype.governmentidentifiertypeprefixdelimiter || governmentidentifier.governmentidentifier AS governmentidentifier,
+                replace(replace(governmentidentifiertype.governmentidentifiertypeurl, '<Identifier>', governmentidentifier.governmentidentifierprefix || governmentidentifiertype.governmentidentifiertypeprefixdelimiter || governmentidentifier.governmentidentifier), '<Language>', ?) AS governmentidentifiertypeurl,
+                array_agg(DISTINCT governmentidentifier.governmentidentifierid ORDER BY governmentidentifier.governmentidentifierid) AS governmentidentifierids,
+                string_to_array(array_to_string(array_agg(DISTINCT governmentidentifier.government ORDER BY governmentidentifier.government), '|'), '|') AS governments
+            FROM geohistory.governmentidentifier
+                JOIN geohistory.governmentidentifiertype
+                ON governmentidentifier.governmentidentifiertype = governmentidentifiertype.governmentidentifiertypeid
+                AND governmentidentifiertype.governmentidentifiertypeslug = ?
+            WHERE lower(governmentidentifier.governmentidentifierprefix || governmentidentifiertype.governmentidentifiertypeprefixdelimiter || governmentidentifier.governmentidentifier) = ?
+            GROUP BY 1, 2, 3, 4;
+        QUERY;
+
+        $query = $this->db->query($query, [
+            \Config\Services::request()->getLocale(),
+            $type,
+            strtolower($id),
+        ])->getResult();
+
+        return $query ?? [];
+    }
+
     // extra.ci_model_government_identifier(integer, character varying, character varying)
 
     // FUNCTION: extra.governmentlong
@@ -33,6 +61,42 @@ class GovernmentIdentifierModel extends Model
             \Config\Services::request()->getLocale(),
             strtoupper($state),
             $id,
+        ])->getResult();
+
+        return $query ?? [];
+    }
+
+    public function getCensus($ids)
+    {
+        return [];
+    }
+
+    public function getUsgs($ids)
+    {
+        return [];
+    }
+
+    // extra.ci_model_governmentidentifier_related(integer[], integer[], text)
+
+    public function getRelated($governments, $governmentidentifierids)
+    {
+        $query = <<<QUERY
+            SELECT DISTINCT governmentidentifiertype.governmentidentifiertypetype,
+                governmentidentifiertype.governmentidentifiertypeslug,
+                governmentidentifiertype.governmentidentifiertypeshort,
+                governmentidentifier.governmentidentifierprefix || governmentidentifiertype.governmentidentifiertypeprefixdelimiter || governmentidentifier.governmentidentifier AS governmentidentifier,
+                replace(replace(governmentidentifiertype.governmentidentifiertypeurl, '<Identifier>', governmentidentifier.governmentidentifierprefix || governmentidentifiertype.governmentidentifiertypeprefixdelimiter || governmentidentifier.governmentidentifier), '<Language>', ?) AS governmentidentifiertypeurl
+            FROM geohistory.governmentidentifier
+                JOIN geohistory.governmentidentifiertype
+                ON governmentidentifier.governmentidentifiertype = governmentidentifiertype.governmentidentifiertypeid
+            WHERE governmentidentifier.government = ANY (?)
+                AND governmentidentifier.governmentidentifierid <> ALL (?);
+        QUERY;
+
+        $query = $this->db->query($query, [
+            \Config\Services::request()->getLocale(),
+            $governments,
+            $governmentidentifierids,
         ])->getResult();
 
         return $query ?? [];

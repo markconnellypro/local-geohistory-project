@@ -137,6 +137,29 @@ class GovernmentModel extends Model
         return $id;
     }
 
+    // extra.ci_model_governmentidentifier_government(integer[], character varying)
+
+    // FUNCTION: extra.governmentlong
+    // FUNCTION: extra.governmentstatelink
+
+    public function getByGovernmentIdentifier($ids)
+    {
+        $query = <<<QUERY
+            SELECT extra.governmentstatelink(governmentidentifier.government, '--', ?) governmentstatelink,
+                extra.governmentlong(governmentidentifier.government, '--') AS governmentlong,
+                governmentidentifier.governmentidentifierstatus AS governmentparentstatus
+            FROM geohistory.governmentidentifier
+            WHERE governmentidentifier.governmentidentifierid = ANY (?);
+        QUERY;
+
+        $query = $this->db->query($query, [
+            \Config\Services::request()->getLocale(),
+            $ids
+        ])->getResult();
+
+        return $query ?? [];
+    }
+
     // extra.ci_model_statistics_createddissolved_nation_part(character varying, integer, integer, character varying, boolean)
 
     // FUNCTION: extra.governmentabbreviation

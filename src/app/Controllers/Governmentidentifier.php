@@ -2,6 +2,8 @@
 
 namespace App\Controllers;
 
+use App\Models\GovernmentModel;
+
 class Governmentidentifier extends BaseController
 {
 
@@ -31,7 +33,12 @@ class Governmentidentifier extends BaseController
             $this->response->setStatusCode(301);
             return redirect()->to("/" . $this->request->getLocale() . '/governmentidentifier/' . $type . '/' . strtolower($id) . '/');
         }
-        $query = $this->db->query('SELECT * FROM extra.ci_model_governmentidentifier_detail(?, ?, ?)', [$type, $id, \Config\Services::request()->getLocale()])->getResult();
+        if ($this->data['live']) {
+            $GovernmentIdentifierModel = new \App\Models\Development\GovernmentIdentifierModel;
+        } else {
+            $GovernmentIdentifierModel = new \App\Models\GovernmentIdentifierModel;
+        }
+        $query = $GovernmentIdentifierModel->getDetail($type, $id);
         if (count($query) != 1) {
             $this->noRecord();
         } else {
@@ -39,24 +46,23 @@ class Governmentidentifier extends BaseController
             $governments = $query[0]->governments;
             echo view('header', $this->data);
             echo view('general_governmentidentifier', ['query' => $query, 'title' => 'Detail']);
-            $query = $this->db->query('SELECT * FROM extra.ci_model_governmentidentifier_government(?, ?)', [$governmentidentifierids, $this->request->getLocale()])->getResult();
+            $GovernmentModel = new GovernmentModel;
+            $query = $GovernmentModel->getByGovernmentIdentifier($governmentidentifierids);
             if (count($query) > 0) {
                 echo view('general_government', ['query' => $query, 'title' => 'Government', 'type' => 'identifier']);
             }
-            $query = $this->db->query('SELECT * FROM extra.ci_model_governmentidentifier_related(?, ?, ?)', [$governments, $governmentidentifierids, \Config\Services::request()->getLocale()])->getResult();
+            $query = $GovernmentIdentifierModel->getRelated($governments, $governmentidentifierids);
             if (count($query) > 0) {
                 echo view('general_governmentidentifier', ['query' => $query, 'title' => 'Related']);
             }
-            if ($this->data['live'] and $type == 'usgs') {
-                $query = $this->db->query('SELECT * FROM reference_usa.ci_model_governmentidentifier_usgs(?)', [$governmentidentifierids])->getResult();
-                if (count($query) > 0) {
-                    echo view('governmentidentifier_census', ['query' => $query, 'type' => 'usgs']);
+            if ($type == 'us-census' or $type == 'usgs') {
+                if ($type == 'us-census') {
+                    $query = $GovernmentIdentifierModel->getCensus($governmentidentifierids);
+                } else {
+                    $query = $GovernmentIdentifierModel->getUsgs($governmentidentifierids);
                 }
-            }
-            if ($this->data['live'] and $type == 'us-census') {
-                $query = $this->db->query('SELECT * FROM reference_usa.ci_model_governmentidentifier_census(?)', [$governmentidentifierids])->getResult();
                 if (count($query) > 0) {
-                    echo view('governmentidentifier_census', ['query' => $query, 'type' => 'census']);
+                    echo view('governmentidentifier_census', ['query' => $query, 'type' => $type]);
                 }
             }
             echo view('footer');
