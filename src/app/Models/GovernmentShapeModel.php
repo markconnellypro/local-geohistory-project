@@ -84,10 +84,10 @@ class GovernmentShapeModel extends Model
     // FUNCTION: extra.governmentabbreviation
     // VIEW: extra.statistics_mapped
 
-    public function getByStatisticsNationPart($fields)
+    public function getByStatisticsNationPart($parameters)
     {
-        $by = $fields[3];
-        $state = $fields[4];
+        $by = $parameters[3];
+        $state = $parameters[4];
         if (empty($state)) {
             $state = implode(',', \App\Controllers\BaseController::getJurisdictions());
         }
@@ -141,9 +141,9 @@ class GovernmentShapeModel extends Model
 
     // VIEW: extra.statistics_mapped
 
-    public function getByStatisticsNationWhole($fields)
+    public function getByStatisticsNationWhole($parameters)
     {
-        $by = $fields[3];
+        $by = $parameters[3];
 
         $query = <<<QUERY
             WITH eventdata AS (
@@ -182,10 +182,10 @@ class GovernmentShapeModel extends Model
 
     // VIEW: extra.statistics_mapped
 
-    public function getByStatisticsStatePart($fields)
+    public function getByStatisticsStatePart($parameters)
     {
-        $by = $fields[3];
-        $state = strtoupper($fields[4]);
+        $by = $parameters[3];
+        $state = strtoupper($parameters[4]);
 
         $query = <<<QUERY
             WITH eventdata AS (
@@ -230,10 +230,10 @@ class GovernmentShapeModel extends Model
 
     // VIEW: extra.statistics_mapped
 
-    public function getByStatisticsStateWhole($fields)
+    public function getByStatisticsStateWhole($parameters)
     {
-        $by = $fields[3];
-        $state = strtoupper($fields[4]);
+        $by = $parameters[3];
+        $state = strtoupper($parameters[4]);
 
         $query = <<<QUERY
             WITH eventdata AS (

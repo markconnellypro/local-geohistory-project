@@ -408,13 +408,13 @@ class EventModel extends Model
     // FUNCTION: extra.governmentabbreviation
     // VIEW: extra.statistics_eventtype
 
-    public function getByStatisticsNationPart($fields)
+    public function getByStatisticsNationPart($parameters)
     {
-        $for = $fields[0];
-        $from = $fields[1];
-        $to = $fields[2];
-        $by = $fields[3];
-        $state = $fields[4];
+        $for = $parameters[0];
+        $from = $parameters[1];
+        $to = $parameters[2];
+        $by = $parameters[3];
+        $state = $parameters[4];
         if (empty($state)) {
             $state = implode(',', \App\Controllers\BaseController::getJurisdictions());
         }
@@ -476,12 +476,12 @@ class EventModel extends Model
 
     // VIEW: extra.statistics_eventtype
 
-    public function getByStatisticsNationWhole($fields)
+    public function getByStatisticsNationWhole($parameters)
     {
-        $for = $fields[0];
-        $from = $fields[1];
-        $to = $fields[2];
-        $by = $fields[3];
+        $for = $parameters[0];
+        $from = $parameters[1];
+        $to = $parameters[2];
+        $by = $parameters[3];
 
         $query = <<<QUERY
             WITH eventdata AS (
@@ -528,13 +528,13 @@ class EventModel extends Model
 
     // VIEW: extra.statistics_eventtype
 
-    public function getByStatisticsStatePart($fields)
+    public function getByStatisticsStatePart($parameters)
     {
-        $for = $fields[0];
-        $from = $fields[1];
-        $to = $fields[2];
-        $by = $fields[3];
-        $state = strtoupper($fields[4]);
+        $for = $parameters[0];
+        $from = $parameters[1];
+        $to = $parameters[2];
+        $by = $parameters[3];
+        $state = strtoupper($parameters[4]);
 
         $query = <<<QUERY
             WITH eventdata AS (
@@ -587,13 +587,13 @@ class EventModel extends Model
 
     // VIEW: extra.statistics_eventtype
 
-    public function getByStatisticsStateWhole($fields)
+    public function getByStatisticsStateWhole($parameters)
     {
-        $for = $fields[0];
-        $from = $fields[1];
-        $to = $fields[2];
-        $by = $fields[3];
-        $state = strtoupper($fields[4]);
+        $for = $parameters[0];
+        $from = $parameters[1];
+        $to = $parameters[2];
+        $by = $parameters[3];
+        $state = strtoupper($parameters[4]);
 
         $query = <<<QUERY
             WITH eventdata AS (
