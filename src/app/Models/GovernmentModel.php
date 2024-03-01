@@ -137,6 +137,284 @@ class GovernmentModel extends Model
         return $id;
     }
 
+    // extra.ci_model_statistics_createddissolved_nation_part(character varying, integer, integer, character varying, boolean)
+
+    // FUNCTION: extra.governmentabbreviation
+    // VIEW: extra.statistics_createddissolved
+
+    public function getByStatisticsNationPart($fields)
+    {
+        $for = $fields[0];
+        $from = $fields[1];
+        $to = $fields[2];
+        $by = $fields[3];
+        $state = $fields[4];
+        if (empty($state)) {
+            $state = implode(',', \App\Controllers\BaseController::getJurisdictions());
+        }
+        $state = '{' . strtoupper($state) . '}';
+
+        $query = <<<QUERY
+            WITH eventdata AS (
+                    SELECT DISTINCT min(governmentidentifier.governmentidentifier) AS series,
+                    statistics_createddissolved.governmentstate AS actualseries,
+                    statistics_createddissolved.eventyear AS x,
+                    CASE
+                        WHEN ? = 'created' THEN statistics_createddissolved.created::integer
+                        WHEN ? = 'dissolved' THEN statistics_createddissolved.dissolved::integer
+                        WHEN ? = 'net' THEN (statistics_createddissolved.created - statistics_createddissolved.dissolved)::integer
+                        ELSE 0::integer
+                    END AS y
+                    FROM extra.statistics_createddissolved
+                    JOIN geohistory.governmentidentifier
+                        ON statistics_createddissolved.governmentstate = extra.governmentabbreviation(governmentidentifier.government)
+                        AND governmentidentifier.governmentidentifiertype = 1
+                    WHERE statistics_createddissolved.governmenttype = 'state'
+                    AND statistics_createddissolved.grouptype = ?
+                    AND statistics_createddissolved.governmentstate = ANY (?)
+                    AND statistics_createddissolved.eventyear >= ?
+                    AND statistics_createddissolved.eventyear <= ?
+                    AND CASE
+                        WHEN ? = 'created' THEN statistics_createddissolved.created > 0
+                        WHEN ? = 'dissolved' THEN statistics_createddissolved.dissolved > 0
+                        ELSE 0 = 0
+                    END
+                    GROUP BY 2, 3, 4
+                ), xvalue AS (
+                    SELECT DISTINCT eventdata.series,
+                    generate_series(min(eventdata.x),max(eventdata.x)) AS x
+                    FROM eventdata
+                    GROUP BY 1
+                )
+            SELECT xvalue.series,
+            array_to_json(array_agg(DISTINCT xvalue.x::text ORDER BY xvalue.x::text)) AS xrow,
+            array_to_json(array_agg(
+                CASE
+                    WHEN eventdata.y IS NULL THEN 0
+                    ELSE eventdata.y
+                END ORDER BY xvalue.x)) AS yrow,
+            sum(eventdata.y) AS ysum
+            FROM xvalue
+            LEFT JOIN eventdata
+                ON xvalue.x = eventdata.x
+                AND xvalue.series = eventdata.series
+            GROUP BY 1
+            ORDER BY 1
+        QUERY;
+
+        $query = $this->db->query($query, [
+            $for,
+            $for,
+            $for,
+            $by,
+            $state,
+            $from,
+            $to,
+            $for,
+            $for,
+        ])->getResult();
+
+        return $query ?? [];
+    }
+
+    // extra.ci_model_statistics_createddissolved_nation_whole(character varying, integer, integer, character varying, boolean)
+
+    // VIEW: extra.statistics_createddissolved
+
+    public function getByStatisticsNationWhole($fields)
+    {
+        $for = $fields[0];
+        $from = $fields[1];
+        $to = $fields[2];
+        $by = $fields[3];
+
+        $query = <<<QUERY
+            WITH eventdata AS (
+                SELECT DISTINCT statistics_createddissolved.eventyear AS x,
+                (CASE
+                    WHEN ? = 'created' THEN statistics_createddissolved.created::integer
+                    WHEN ? = 'dissolved' THEN statistics_createddissolved.dissolved::integer
+                    WHEN ? = 'net' THEN (statistics_createddissolved.created - statistics_createddissolved.dissolved)::integer
+                    ELSE 0::integer
+                END)::text AS y
+                FROM extra.statistics_createddissolved
+                WHERE statistics_createddissolved.governmenttype = 'nation'
+                AND statistics_createddissolved.grouptype = ?
+                AND statistics_createddissolved.governmentstate = ?
+                AND statistics_createddissolved.eventyear >= ?
+                AND statistics_createddissolved.eventyear <= ?
+                AND CASE
+                    WHEN ? = 'created' THEN statistics_createddissolved.created > 0
+                    WHEN ? = 'dissolved' THEN statistics_createddissolved.dissolved > 0
+                    ELSE 0 = 0
+                END
+            ), xvalue AS (
+                SELECT DISTINCT generate_series(min(eventdata.x),max(eventdata.x)) AS x
+                FROM eventdata
+            )
+            SELECT array_to_json(ARRAY['x'::text] || array_agg(DISTINCT xvalue.x::text ORDER BY xvalue.x::text)) AS datarow
+            FROM xvalue
+            UNION ALL
+            SELECT array_to_json(ARRAY['Whole'] || array_agg(
+                CASE
+                    WHEN eventdata.y IS NULL THEN '0'::text
+                    ELSE eventdata.y
+                END ORDER BY xvalue.x)) AS datarow
+            FROM xvalue
+            LEFT JOIN eventdata
+                ON xvalue.x = eventdata.x
+        QUERY;
+
+        $query = $this->db->query($query, [
+            $for,
+            $for,
+            $for,
+            $by,
+            ENVIRONMENT,
+            $from,
+            $to,
+            $for,
+            $for,
+        ])->getResult();
+
+        return $query ?? [];
+    }
+
+    // extra.ci_model_statistics_createddissolved_state_part(character varying, integer, integer, character varying, character varying)
+
+    // VIEW: extra.statistics_createddissolved
+
+    public function getByStatisticsStatePart($fields)
+    {
+        $for = $fields[0];
+        $from = $fields[1];
+        $to = $fields[2];
+        $by = $fields[3];
+        $state = strtoupper($fields[4]);
+
+        $query = <<<QUERY
+            WITH eventdata AS (
+                SELECT DISTINCT statistics_createddissolved.governmentcounty AS series,
+                statistics_createddissolved.eventyear AS x,
+                CASE
+                    WHEN ? = 'created' THEN statistics_createddissolved.created::integer
+                    WHEN ? = 'dissolved' THEN statistics_createddissolved.dissolved::integer
+                    WHEN ? = 'net' THEN (statistics_createddissolved.created - statistics_createddissolved.dissolved)::integer
+                    ELSE 0::integer
+                END AS y
+                FROM extra.statistics_createddissolved
+                WHERE statistics_createddissolved.governmenttype = 'county'
+                AND statistics_createddissolved.grouptype = ?
+                AND statistics_createddissolved.governmentstate = ?
+                AND statistics_createddissolved.eventyear >= ?
+                AND statistics_createddissolved.eventyear <= ?
+                AND CASE
+                    WHEN ? = 'created' THEN statistics_createddissolved.created > 0
+                    WHEN ? = 'dissolved' THEN statistics_createddissolved.dissolved > 0
+                    ELSE 0 = 0
+                END
+            ), xvalue AS (
+                SELECT DISTINCT eventdata.series,
+                generate_series(min(eventdata.x),max(eventdata.x)) AS x
+                FROM eventdata
+                GROUP BY 1
+            )
+            SELECT xvalue.series,
+            array_to_json(array_agg(DISTINCT xvalue.x::text ORDER BY xvalue.x::text)) AS xrow,
+            array_to_json(array_agg(
+                CASE
+                    WHEN eventdata.y IS NULL THEN 0
+                    ELSE eventdata.y
+                END ORDER BY xvalue.x)) AS yrow,
+            sum(eventdata.y) AS ysum
+            FROM xvalue
+            LEFT JOIN eventdata
+                ON xvalue.x = eventdata.x
+                AND xvalue.series = eventdata.series
+            GROUP BY 1
+            ORDER BY 1
+        QUERY;
+
+        $query = $this->db->query($query, [
+            $for,
+            $for,
+            $for,
+            $by,
+            $state,
+            $from,
+            $to,
+            $for,
+            $for,
+        ])->getResult();
+
+        return $query ?? [];
+    }
+
+    // extra.ci_model_statistics_createddissolved_state_whole(character varying, integer, integer, character varying, character varying)
+
+    // VIEW: extra.statistics_createddissolved
+
+    public function getByStatisticsStateWhole($fields)
+    {
+        $for = $fields[0];
+        $from = $fields[1];
+        $to = $fields[2];
+        $by = $fields[3];
+        $state = strtoupper($fields[4]);
+
+        $query = <<<QUERY
+            WITH eventdata AS (
+                SELECT DISTINCT statistics_createddissolved.eventyear AS x,
+                (CASE
+                    WHEN ? = 'created' THEN statistics_createddissolved.created::integer
+                    WHEN ? = 'dissolved' THEN statistics_createddissolved.dissolved::integer
+                    WHEN ? = 'net' THEN (statistics_createddissolved.created - statistics_createddissolved.dissolved)::integer
+                    ELSE 0::integer
+                END)::text AS y
+                FROM extra.statistics_createddissolved
+                WHERE statistics_createddissolved.governmenttype = 'state'
+                AND statistics_createddissolved.grouptype = ?
+                AND statistics_createddissolved.governmentstate = ?
+                AND statistics_createddissolved.eventyear >= ?
+                AND statistics_createddissolved.eventyear <= ?
+                AND CASE
+                    WHEN ? = 'created' THEN statistics_createddissolved.created > 0
+                    WHEN ? = 'dissolved' THEN statistics_createddissolved.dissolved > 0
+                    ELSE 0 = 0
+                END
+            ), xvalue AS (
+                SELECT DISTINCT generate_series(min(eventdata.x),max(eventdata.x)) AS x
+                FROM eventdata
+            )
+            SELECT array_to_json(ARRAY['x'::text] || array_agg(DISTINCT xvalue.x::text ORDER BY xvalue.x::text)) AS datarow
+            FROM xvalue
+            UNION ALL
+            SELECT array_to_json(ARRAY[?] || array_agg(
+                CASE
+                    WHEN eventdata.y IS NULL THEN '0'::text
+                    ELSE eventdata.y
+                END ORDER BY xvalue.x)) AS datarow
+            FROM xvalue
+            LEFT JOIN eventdata
+                ON xvalue.x = eventdata.x
+        QUERY;
+
+        $query = $this->db->query($query, [
+            $for,
+            $for,
+            $for,
+            $by,
+            $state,
+            $from,
+            $to,
+            $for,
+            $for,
+            $state,
+        ])->getResult();
+
+        return $query ?? [];
+    }
+
     // extra.ci_model_search_lookup_government(character varying, character varying)
 
     // FUNCTION: extra.punctuationnone

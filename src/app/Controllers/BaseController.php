@@ -134,7 +134,7 @@ abstract class BaseController extends Controller
         return $id;
     }
 
-    protected function getJurisdictions()
+    public static function getJurisdictions()
     {
         $jurisdictions = trim(($_ENV['app_jurisdiction'] ?? '') . '|' . ($_ENV['app_jurisdiction_development'] ?? ''), '|');
         $jurisdictions = explode('|', $jurisdictions);

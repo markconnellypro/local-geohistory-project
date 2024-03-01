@@ -6,6 +6,196 @@ use CodeIgniter\Model;
 
 class GovernmentShapeModel extends Model
 {
+    // extra.ci_model_statistics_mapped_nation_part(character varying, integer, integer, character varying, boolean)
+
+    // FUNCTION: extra.governmentabbreviation
+    // VIEW: extra.statistics_mapped
+
+    public function getByStatisticsNationPart($fields)
+    {
+        $by = $fields[3];
+        $state = $fields[4];
+        if (empty($state)) {
+            $state = implode(',', \App\Controllers\BaseController::getJurisdictions());
+        }
+        $state = '{' . strtoupper($state) . '}';
+
+        $query = <<<QUERY
+            WITH eventdata AS (
+                SELECT DISTINCT min(governmentidentifier.governmentidentifier) AS series,
+                statistics_mapped.governmentstate AS actualseries,
+                0 AS x,
+                statistics_mapped.percentmapped::numeric AS y
+                FROM extra.statistics_mapped
+                JOIN geohistory.governmentidentifier
+                    ON statistics_mapped.governmentstate = extra.governmentabbreviation(governmentidentifier.government)
+                    AND governmentidentifier.governmentidentifiertype = 1
+                WHERE statistics_mapped.governmenttype = 'state'
+                AND statistics_mapped.grouptype = ?
+                AND statistics_mapped.governmentstate = ANY (?)
+                GROUP BY 2, 3, 4
+            ), xvalue AS (
+                SELECT DISTINCT eventdata.series,
+                generate_series(min(eventdata.x),max(eventdata.x)) AS x
+                FROM eventdata
+                GROUP BY 1
+            )
+            SELECT xvalue.series,
+            array_to_json(array_agg(DISTINCT xvalue.x::text ORDER BY xvalue.x::text)) AS xrow,
+            array_to_json(array_agg(
+                CASE
+                    WHEN eventdata.y IS NULL THEN 0
+                    ELSE eventdata.y
+                END ORDER BY xvalue.x)) AS yrow,
+            sum(eventdata.y) AS ysum
+            FROM xvalue
+            LEFT JOIN eventdata
+                ON xvalue.x = eventdata.x
+                AND xvalue.series = eventdata.series
+            GROUP BY 1
+            ORDER BY 1
+        QUERY;
+
+        $query = $this->db->query($query, [
+            $by,
+            $state,
+        ])->getResult();
+
+        return $query ?? [];
+    }
+
+    // extra.ci_model_statistics_mapped_nation_whole(character varying, integer, integer, character varying, boolean)
+
+    // VIEW: extra.statistics_mapped
+
+    public function getByStatisticsNationWhole($fields)
+    {
+        $by = $fields[3];
+
+        $query = <<<QUERY
+            WITH eventdata AS (
+                SELECT DISTINCT 0 AS x,
+                statistics_mapped.percentmapped::text AS y
+                FROM extra.statistics_mapped
+                WHERE statistics_mapped.governmenttype = 'nation'
+                AND statistics_mapped.grouptype = ?
+                AND statistics_mapped.governmentstate = ?
+            ), xvalue AS (
+                SELECT DISTINCT generate_series(min(eventdata.x),max(eventdata.x)) AS x
+                FROM eventdata
+            )
+            SELECT array_to_json(ARRAY['x'::text] || array_agg(DISTINCT xvalue.x::text ORDER BY xvalue.x::text)) AS datarow
+            FROM xvalue
+            UNION ALL
+            SELECT array_to_json(ARRAY['Whole'] || array_agg(
+                CASE
+                    WHEN eventdata.y IS NULL THEN '0'::text
+                    ELSE eventdata.y
+                END ORDER BY xvalue.x)) AS datarow
+            FROM xvalue
+            LEFT JOIN eventdata
+                ON xvalue.x = eventdata.x
+        QUERY;
+
+        $query = $this->db->query($query, [
+            $by,
+            ENVIRONMENT,
+        ])->getResult();
+
+        return $query ?? [];
+    }
+
+    // extra.ci_model_statistics_mapped_state_part(character varying, integer, integer, character varying, character varying)
+
+    // VIEW: extra.statistics_mapped
+
+    public function getByStatisticsStatePart($fields)
+    {
+        $by = $fields[3];
+        $state = strtoupper($fields[4]);
+
+        $query = <<<QUERY
+            WITH eventdata AS (
+                SELECT DISTINCT statistics_mapped.governmentcounty AS series,
+                0 AS x,
+                statistics_mapped.percentmapped::numeric AS y
+                FROM extra.statistics_mapped
+                WHERE statistics_mapped.governmenttype = 'county'
+                AND statistics_mapped.grouptype = ?
+                AND statistics_mapped.governmentstate = ?
+            ), xvalue AS (
+                SELECT DISTINCT eventdata.series,
+                generate_series(min(eventdata.x),max(eventdata.x)) AS x
+                FROM eventdata
+                GROUP BY 1
+            )
+            SELECT xvalue.series,
+            array_to_json(array_agg(DISTINCT xvalue.x::text ORDER BY xvalue.x::text)) AS xrow,
+            array_to_json(array_agg(
+                CASE
+                    WHEN eventdata.y IS NULL THEN 0
+                    ELSE eventdata.y
+                END ORDER BY xvalue.x)) AS yrow,
+            sum(eventdata.y) AS ysum
+            FROM xvalue
+            LEFT JOIN eventdata
+                ON xvalue.x = eventdata.x
+                AND xvalue.series = eventdata.series
+            GROUP BY 1
+            ORDER BY 1
+        QUERY;
+
+        $query = $this->db->query($query, [
+            $by,
+            $state,
+        ])->getResult();
+
+        return $query ?? [];
+    }
+    
+    // extra.ci_model_statistics_mapped_state_whole(character varying, integer, integer, character varying, character varying)
+
+    // VIEW: extra.statistics_mapped
+
+    public function getByStatisticsStateWhole($fields)
+    {
+        $by = $fields[3];
+        $state = strtoupper($fields[4]);
+
+        $query = <<<QUERY
+            WITH eventdata AS (
+                SELECT DISTINCT 0 AS x,
+                statistics_mapped.percentmapped::text AS y
+                FROM extra.statistics_mapped
+                WHERE statistics_mapped.governmenttype = 'state'
+                AND statistics_mapped.grouptype = ?
+                AND statistics_mapped.governmentstate = ?
+            ), xvalue AS (
+                SELECT DISTINCT generate_series(min(eventdata.x),max(eventdata.x)) AS x
+                FROM eventdata
+            )
+            SELECT array_to_json(ARRAY['x'::text] || array_agg(DISTINCT xvalue.x::text ORDER BY xvalue.x::text)) AS datarow
+            FROM xvalue
+            UNION ALL
+            SELECT array_to_json(ARRAY[?] || array_agg(
+                CASE
+                    WHEN eventdata.y IS NULL THEN '0'::text
+                    ELSE eventdata.y
+                END ORDER BY xvalue.x)) AS datarow
+            FROM xvalue
+            LEFT JOIN eventdata
+                ON xvalue.x = eventdata.x
+        QUERY;
+
+        $query = $this->db->query($query, [
+            $by,
+            $state,
+            $state,
+        ])->getResult();
+
+        return $query ?? [];
+    }
+
     // extra.ci_model_government_current(integer)
 
     // VIEW: extra.giscache

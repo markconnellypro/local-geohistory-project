@@ -2,6 +2,8 @@
 
 namespace App\Controllers;
 
+use App\Models\EventTypeModel;
+
 class Statistics extends BaseController
 {
 
@@ -39,7 +41,8 @@ class Statistics extends BaseController
         $this->data['state'] = $state;
         echo view('header', $this->data);
         echo view('general_ui', $this->data);
-        $this->data['eventTypeQuery'] = $this->db->query('SELECT * FROM extra.ci_model_statistics_eventtype_list(?)', [(empty($state) ? $this->data['live'] : $state)])->getResultArray();
+        $EventTypeModel = new EventTypeModel;
+        $this->data['eventTypeQuery'] = $EventTypeModel->getManyByStatistics($state);
         echo view('statistics_index', $this->data);
         echo view('footer');
     }
@@ -117,7 +120,8 @@ class Statistics extends BaseController
             if (empty($eventType)) {
                 $eventType = '';
             }
-            $query = $this->db->query('SELECT * FROM extra.ci_model_statistics_eventtype(?)', [$eventType])->getResult();
+            $EventTypeModel = new EventTypeModel;
+            $query = $EventTypeModel->getOneByStatistics($eventType);
             if (count($query) !== 1) {
                 echo view('error');
                 echo view('footer');
@@ -137,17 +141,23 @@ class Statistics extends BaseController
             $searchParameter['Year' . $dateRangePlural] = $dateRange;
         }
 
-        if (empty($state)) {
-            $fields[] = $this->data['live'];
-        } else {
-            $fields[] = $state;
-        }
+        $fields[] = $state;
 
-        $this->data['wholeQuery'] = $this->db->query('SELECT * FROM extra.ci_model_statistics_' . $for . '_' . (empty($state) ? 'nation' : 'state') . '_whole(?, ?, ?, ?, ?)', $fields)->getResult();
+        $types = [
+            'createddissolved' => 'Government',
+            'eventtype' => 'Event',
+            'mapped' => 'GovernmentShape',
+        ];
+        $model = "App\\Models\\" . $types[$for] . 'Model';
+        $model = new $model;
+        $type = 'getByStatistics' . (empty($state) ? 'Nation' : 'State') . 'Whole';
+
+        $this->data['wholeQuery'] = $model->$type($fields);
         if ($this->data['wholeQuery'][0]->datarow == '["x"]') {
             $this->data['wholeQuery'] = [];
         } else {
-            $this->data['query'] = $this->db->query('SELECT * FROM extra.ci_model_statistics_' . $for . '_' . (empty($state) ? 'nation' : 'state') . '_part(?, ?, ?, ?, ?)', $fields)->getResult();
+            $type = str_replace('Whole', 'Part', $type);
+            $this->data['query'] = $model->$type($fields);
             foreach ($this->data['query'] as $key => $row) {
                 $this->data['query'][$key] = '"' . $row->series . '":{"xrow":' . $row->xrow . ',"yrow":' . $row->yrow . ',"ysum":' . $row->ysum . '}';
             }

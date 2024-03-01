@@ -61,4 +61,54 @@ class EventTypeModel extends Model
 
         return $query ?? [];
     }
+
+    // extra.ci_model_statistics_eventtype_list(boolean)
+    // extra.ci_model_statistics_eventtype_list(character varying)
+
+    // VIEW: extra.statistics_eventtype
+
+    public function getManyByStatistics($state)
+    {
+        if (empty($state)) {
+            $state = str_replace('|', ',', getenv('app_jurisdiction'));
+        }
+        $state = '{' . strtoupper($state) . '}';
+
+        $query = <<<QUERY
+            SELECT DISTINCT eventtype.eventtypeshort,
+                eventtype.eventtypeid
+            FROM geohistory.eventtype
+                JOIN extra.statistics_eventtype
+                ON eventtype.eventtypeid = statistics_eventtype.eventtype
+                AND statistics_eventtype.governmentstate = ANY (?)
+            WHERE eventtype.eventtypeborders NOT IN ('documentation', 'ignore')
+            ORDER BY 1, 2
+        QUERY;
+
+        $query = $this->db->query($query, [
+            $state,
+        ])->getResultArray();
+
+        return $query ?? [];
+    }
+
+    // extra_removed.ci_model_statistics_eventtype(text)
+
+    public function getOneByStatistics($eventType)
+    {
+        $query = <<<QUERY
+            SELECT DISTINCT eventtype.eventtypeshort,
+                eventtype.eventtypeid
+            FROM geohistory.eventtype
+            WHERE eventtype.eventtypeshort = ?
+                AND eventtype.eventtypeborders NOT IN ('documentation', 'ignore')
+            ORDER BY 1, 2
+        QUERY;
+
+        $query = $this->db->query($query, [
+            $eventType,
+        ])->getResult();
+
+        return $query ?? [];
+    }
 }

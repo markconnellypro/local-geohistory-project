@@ -216,6 +216,240 @@ class EventModel extends Model
         return $query ?? [];
     }
 
+    // extra.ci_model_statistics_eventtype_nation_part(text, integer, integer, character varying, boolean)
+
+    // FUNCTION: extra.governmentabbreviation
+    // VIEW: extra.statistics_eventtype
+
+    public function getByStatisticsNationPart($fields)
+    {
+        $for = $fields[0];
+        $from = $fields[1];
+        $to = $fields[2];
+        $by = $fields[3];
+        $state = $fields[4];
+        if (empty($state)) {
+            $state = implode(',', \App\Controllers\BaseController::getJurisdictions());
+        }
+        $state = '{' . strtoupper($state) . '}';
+
+        $query = <<<QUERY
+            WITH eventdata AS (
+                SELECT DISTINCT min(governmentidentifier.governmentidentifier) AS series,
+                statistics_eventtype.governmentstate AS actualseries,
+                statistics_eventtype.eventyear AS x,
+                statistics_eventtype.eventcount::integer AS y
+                FROM extra.statistics_eventtype
+                JOIN geohistory.eventtype
+                    ON statistics_eventtype.eventtype = eventtype.eventtypeid
+                    AND eventtype.eventtypeshort = ?
+                JOIN geohistory.governmentidentifier
+                    ON statistics_eventtype.governmentstate = extra.governmentabbreviation(governmentidentifier.government)
+                    AND governmentidentifier.governmentidentifiertype = 1
+                WHERE statistics_eventtype.governmenttype = 'state'
+                AND statistics_eventtype.grouptype = ?
+                AND statistics_eventtype.governmentstate = ANY (?)
+                AND statistics_eventtype.eventyear >= ?
+                AND statistics_eventtype.eventyear <= ?
+                GROUP BY 2, 3, 4
+            ), xvalue AS (
+                SELECT DISTINCT eventdata.series,
+                generate_series(min(eventdata.x),max(eventdata.x)) AS x
+                FROM eventdata
+                GROUP BY 1
+            )
+            SELECT xvalue.series,
+            array_to_json(array_agg(DISTINCT xvalue.x::text ORDER BY xvalue.x::text)) AS xrow,
+            array_to_json(array_agg(
+                CASE
+                    WHEN eventdata.y IS NULL THEN 0
+                    ELSE eventdata.y
+                END ORDER BY xvalue.x)) AS yrow,
+            sum(eventdata.y) AS ysum
+            FROM xvalue
+            LEFT JOIN eventdata
+                ON xvalue.x = eventdata.x
+                AND xvalue.series = eventdata.series
+            GROUP BY 1
+            ORDER BY 1
+        QUERY;
+
+        $query = $this->db->query($query, [
+            $for,
+            $by,
+            $state,
+            $from,
+            $to,
+        ])->getResult();
+
+        return $query ?? [];
+    }
+
+    // extra.ci_model_statistics_eventtype_nation_whole(text, integer, integer, character varying, boolean)
+
+    // VIEW: extra.statistics_eventtype
+
+    public function getByStatisticsNationWhole($fields)
+    {
+        $for = $fields[0];
+        $from = $fields[1];
+        $to = $fields[2];
+        $by = $fields[3];
+
+        $query = <<<QUERY
+            WITH eventdata AS (
+                SELECT DISTINCT statistics_eventtype.eventyear AS x,
+                statistics_eventtype.eventcount::text AS y
+                FROM extra.statistics_eventtype
+                JOIN geohistory.eventtype
+                    ON statistics_eventtype.eventtype = eventtype.eventtypeid
+                    AND eventtype.eventtypeshort = ?
+                WHERE statistics_eventtype.governmenttype = 'nation'
+                AND statistics_eventtype.grouptype = ?
+                AND statistics_eventtype.governmentstate = ?
+                AND statistics_eventtype.eventyear >= ?
+                AND statistics_eventtype.eventyear <= ?
+            ), xvalue AS (
+                SELECT DISTINCT generate_series(min(eventdata.x),max(eventdata.x)) AS x
+                FROM eventdata
+            )
+            SELECT array_to_json(ARRAY['x'::text] || array_agg(DISTINCT xvalue.x::text ORDER BY xvalue.x::text)) AS datarow
+            FROM xvalue
+            UNION ALL
+            SELECT array_to_json(ARRAY['Whole'] || array_agg(
+                CASE
+                    WHEN eventdata.y IS NULL THEN '0'::text
+                    ELSE eventdata.y
+                END ORDER BY xvalue.x)) AS datarow
+            FROM xvalue
+            LEFT JOIN eventdata
+                ON xvalue.x = eventdata.x
+            QUERY;
+
+        $query = $this->db->query($query, [
+            $for,
+            $by,
+            ENVIRONMENT,
+            $from,
+            $to,
+        ])->getResult();
+
+        return $query ?? [];
+    }
+
+    // extra.ci_model_statistics_eventtype_state_part(text, integer, integer, character varying, character varying)
+
+    // VIEW: extra.statistics_eventtype
+
+    public function getByStatisticsStatePart($fields)
+    {
+        $for = $fields[0];
+        $from = $fields[1];
+        $to = $fields[2];
+        $by = $fields[3];
+        $state = strtoupper($fields[4]);
+
+        $query = <<<QUERY
+            WITH eventdata AS (
+                SELECT DISTINCT statistics_eventtype.governmentcounty AS series,
+                statistics_eventtype.eventyear AS x,
+                statistics_eventtype.eventcount::integer AS y
+                FROM extra.statistics_eventtype
+                JOIN geohistory.eventtype
+                    ON statistics_eventtype.eventtype = eventtype.eventtypeid
+                    AND eventtype.eventtypeshort = ?
+                WHERE statistics_eventtype.governmenttype = 'county'
+                AND statistics_eventtype.grouptype = ?
+                AND statistics_eventtype.governmentstate = ?
+                AND statistics_eventtype.eventyear >= ?
+                AND statistics_eventtype.eventyear <= ?
+            ), xvalue AS (
+                SELECT DISTINCT eventdata.series,
+                generate_series(min(eventdata.x),max(eventdata.x)) AS x
+                FROM eventdata
+                GROUP BY 1
+            )
+            SELECT xvalue.series,
+            array_to_json(array_agg(DISTINCT xvalue.x::text ORDER BY xvalue.x::text)) AS xrow,
+            array_to_json(array_agg(
+                CASE
+                    WHEN eventdata.y IS NULL THEN 0
+                    ELSE eventdata.y
+                END ORDER BY xvalue.x)) AS yrow,
+            sum(eventdata.y) AS ysum
+            FROM xvalue
+            LEFT JOIN eventdata
+                ON xvalue.x = eventdata.x
+                AND xvalue.series = eventdata.series
+            GROUP BY 1
+            ORDER BY 1
+        QUERY;
+
+        $query = $this->db->query($query, [
+            $for,
+            $by,
+            $state,
+            $from,
+            $to,
+        ])->getResult();
+
+        return $query ?? [];
+    }
+
+    // extra.ci_model_statistics_eventtype_state_whole(text, integer, integer, character varying, character varying)
+
+    // VIEW: extra.statistics_eventtype
+
+    public function getByStatisticsStateWhole($fields)
+    {
+        $for = $fields[0];
+        $from = $fields[1];
+        $to = $fields[2];
+        $by = $fields[3];
+        $state = strtoupper($fields[4]);
+
+        $query = <<<QUERY
+            WITH eventdata AS (
+                SELECT DISTINCT statistics_eventtype.eventyear AS x,
+                statistics_eventtype.eventcount::text AS y
+                FROM extra.statistics_eventtype
+                JOIN geohistory.eventtype
+                    ON statistics_eventtype.eventtype = eventtype.eventtypeid
+                    AND eventtype.eventtypeshort = ?
+                WHERE statistics_eventtype.governmenttype = 'state'
+                AND statistics_eventtype.grouptype = ?
+                AND statistics_eventtype.governmentstate = ?
+                AND statistics_eventtype.eventyear >= ?
+                AND statistics_eventtype.eventyear <= ?
+            ), xvalue AS (
+                SELECT DISTINCT generate_series(min(eventdata.x),max(eventdata.x)) AS x
+                FROM eventdata
+            )
+            SELECT array_to_json(ARRAY['x'::text] || array_agg(DISTINCT xvalue.x::text ORDER BY xvalue.x::text)) AS datarow
+            FROM xvalue
+            UNION ALL
+            SELECT array_to_json(ARRAY[?] || array_agg(
+                CASE
+                    WHEN eventdata.y IS NULL THEN '0'::text
+                    ELSE eventdata.y
+                END ORDER BY xvalue.x)) AS datarow
+            FROM xvalue
+            LEFT JOIN eventdata
+                ON xvalue.x = eventdata.x
+        QUERY;
+
+        $query = $this->db->query($query, [
+            $for,
+            $by,
+            $state,
+            $from,
+            $to,
+            $state,
+        ])->getResult();
+
+        return $query ?? [];
+    }
+
     // extra.ci_model_search_event_government(text, text, text, text, integer, integer)
 
     // FUNCTION: extra.eventsortdate
