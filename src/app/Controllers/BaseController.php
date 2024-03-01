@@ -8,6 +8,7 @@ use App\Libraries\IncomingRequest;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 use Psr\Log\LoggerInterface;
+use App\Models\AppModel;
 
 /**
  * Class BaseController
@@ -167,7 +168,7 @@ abstract class BaseController extends Controller
     protected function lastUpdated()
     {
         date_default_timezone_set('America/New_York');
-        $this->db = db_connect();
-        return $this->db->query('SELECT * FROM extra.ci_model_lastrefresh()')->getResult()[0];
+        $AppModel = new AppModel;
+        return $AppModel->getLastUpdated();
     }
 }
