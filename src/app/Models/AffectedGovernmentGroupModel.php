@@ -16,7 +16,7 @@ class AffectedGovernmentGroupModel extends Model
     // VIEW: extra.eventextracache
     // VIEW: extra.governmentsubstitute
 
-    public function getByGovernmentForm($id, $state, $isLive)
+    public function getByGovernmentForm($id, $state)
     {
         $query = <<<QUERY
             SELECT DISTINCT extra.eventsortdate(event.eventid) AS eventsortdate,
@@ -49,7 +49,7 @@ class AffectedGovernmentGroupModel extends Model
         QUERY;
 
         $query = $this->db->query($query, [
-            $isLive,
+            \App\Controllers\BaseController::isLive(),
             strtoupper($state),
             $id,
         ])->getResult();
@@ -69,7 +69,7 @@ class AffectedGovernmentGroupModel extends Model
     // VIEW: extra.eventextracache
     // VIEW: extra.governmentsubstitutecache
 
-    public function getByGovernmentGovernment($id, $state, $locale)
+    public function getByGovernmentGovernment($id, $state)
     {
         $query = <<<QUERY
             SELECT DISTINCT extra.eventsortdate(event.eventid) AS eventsortdate,
@@ -218,7 +218,7 @@ class AffectedGovernmentGroupModel extends Model
             strtoupper($state),
             $id,
             $state,
-            $locale,
+            \Config\Services::request()->getLocale(),
             strtoupper($state),
             $id,
             $id,

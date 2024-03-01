@@ -51,7 +51,7 @@ class Adjudication extends BaseController
 				echo view('adjudication_location', ['query' => $query]);
 			}
             $FilingModel = new FilingModel;
-			$query = $FilingModel->getByAdjudication($id, $this->data['live']);
+			$query = $FilingModel->getByAdjudication($id);
 			if (count($query) > 0) {
 				echo view('adjudication_filing', ['query' => $query]);
 			}

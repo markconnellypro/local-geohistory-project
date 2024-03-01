@@ -11,7 +11,7 @@ class GovernmentIdentifierModel extends Model
     // FUNCTION: extra.governmentlong
     // VIEW: extra.governmentsubstitutecache
 
-    public function getByGovernment($id, $state, $locale)
+    public function getByGovernment($id, $state)
     {
         $query = <<<QUERY
             SELECT DISTINCT governmentidentifiertype.governmentidentifiertypetype,
@@ -30,7 +30,7 @@ class GovernmentIdentifierModel extends Model
         QUERY;
 
         $query = $this->db->query($query, [
-            $locale,
+            \Config\Services::request()->getLocale(),
             strtoupper($state),
             $id,
         ])->getResult();

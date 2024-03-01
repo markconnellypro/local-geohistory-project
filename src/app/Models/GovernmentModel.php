@@ -485,7 +485,7 @@ class GovernmentModel extends Model
         return $query ?? [];
     }
 
-    public function getNote($id, $state, $locale)
+    public function getNote($id, $state)
     {
         return [];
     }
@@ -503,7 +503,7 @@ class GovernmentModel extends Model
     // VIEW: extra.governmentparentcache
     // VIEW: extra.governmentsubstitutecache
 
-    public function getRelated($id, $state, $locale)
+    public function getRelated($id, $state)
     {
         $query = <<<QUERY
             WITH relationpart AS (
@@ -619,13 +619,13 @@ class GovernmentModel extends Model
 
         $query = $this->db->query($query, [
             $state,
-            $locale,
+            \Config\Services::request()->getLocale(),
             strtoupper($state),
             $id,
             $id,
             $id,
             $state,
-            $locale,
+            \Config\Services::request()->getLocale(),
             strtoupper($state),
             $id,
             $id,
@@ -685,7 +685,6 @@ class GovernmentModel extends Model
         $parent = $parameters[2];
         $level = $parameters[3];
         $type = $parameters[4];
-        $locale = $parameters[5];
 
         $query = <<<QUERY
             WITH selectedgovernment AS (
@@ -740,12 +739,12 @@ class GovernmentModel extends Model
             $government,
             $type,
             $state,
-            $locale,
+            \Config\Services::request()->getLocale(),
             strtoupper($state),
             $level,
             $type,
             $state,
-            $locale,
+            \Config\Services::request()->getLocale(),
             strtoupper($state),
             $level,
             $type

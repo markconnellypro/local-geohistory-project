@@ -150,7 +150,7 @@ abstract class BaseController extends Controller
         return $jurisdictions;
     }
 
-    protected function isLive(): bool
+    public static function isLive(): bool
     {
         return (ENVIRONMENT == 'development');
     }

@@ -161,7 +161,6 @@ class Search extends BaseController
                             $this->emptyToEmpty($this->request->getPost('governmentparent')),
                             $this->governmentLevel($this->request->getPost('governmentlevel')),
                             $type,
-                            $this->request->getLocale(),
                         ];
                         $model = 'GovernmentModel';
                         $type = 'government';

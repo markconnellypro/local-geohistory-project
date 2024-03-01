@@ -10,7 +10,7 @@ class FilingModel extends Model
 
     // FUNCTION: extra.shortdate
 
-    public function getByAdjudication($id, $isLive)
+    public function getByAdjudication($id)
     {
         $query = <<<QUERY
             SELECT filingtype.filingtypelong,
@@ -33,7 +33,7 @@ class FilingModel extends Model
         QUERY;
 
         $query = $this->db->query($query, [
-            $isLive,
+            \App\Controllers\BaseController::isLive(),
             $id,
         ])->getResult();
 

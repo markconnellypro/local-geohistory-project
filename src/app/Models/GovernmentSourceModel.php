@@ -16,7 +16,7 @@ class GovernmentSourceModel extends Model
     // FUNCTION: extra.zeropad
     // VIEW: extra.sourceextra
 
-    public function getDetail($id, $state, $isLive, $locale)
+    public function getDetail($id, $state)
     {
         if (!is_int($id)) {
             $id = $this->getSlugId($id);
@@ -95,9 +95,9 @@ class GovernmentSourceModel extends Model
 
         $query = $this->db->query($query, [
             $state,
-            $locale,
+            \Config\Services::request()->getLocale(),
             strtoupper($state),
-            $isLive,
+            \App\Controllers\BaseController::isLive(),
             $id
         ])->getResult();
 
@@ -113,7 +113,7 @@ class GovernmentSourceModel extends Model
     // VIEW: extra.eventextracache
     // VIEW: extra.governmentsubstitutecache
 
-    public function getByGovernment($id, $state, $locale)
+    public function getByGovernment($id, $state)
     {
         $query = <<<QUERY
             SELECT DISTINCT array_agg(eventextracache.eventslug) AS eventslug,
@@ -186,7 +186,7 @@ class GovernmentSourceModel extends Model
         QUERY;
 
         $query = $this->db->query($query, [
-            $locale,
+            \App\Controllers\BaseController::isLive(),
             strtoupper($state),
             $id,
         ])->getResult();

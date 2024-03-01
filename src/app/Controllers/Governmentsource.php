@@ -35,7 +35,7 @@ class Governmentsource extends BaseController
         $this->data['state'] = $state;
         $id = $this->getIdInt($id);
         $GovernmentSourceModel = new GovernmentSourceModel;
-        $query = $GovernmentSourceModel->getDetail($id, $state, $this->data['live'], $this->request->getLocale());
+        $query = $GovernmentSourceModel->getDetail($id, $state);
         if (count($query) != 1) {
             $this->noRecord($state);
         } else {

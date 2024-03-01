@@ -91,18 +91,18 @@ class Government extends BaseController
                 if (count($populationQuery) > 0) {
                     echo view('general_chart');
                 }
-                $query = $GovernmentModel->getRelated($id, $state, $this->request->getLocale());
+                $query = $GovernmentModel->getRelated($id, $state);
                 if (count($query) > 0) {
                     echo view('government_related', ['query' => $query]);
                 }
                 $GovernmentIdentifierModel = new GovernmentIdentifierModel;
-                $query = $GovernmentIdentifierModel->getByGovernment($id, $state, $this->request->getLocale());
+                $query = $GovernmentIdentifierModel->getByGovernment($id, $state);
                 if (count($query) > 0) {
                     echo view('general_governmentidentifier', ['query' => $query, 'title' => 'Identifier', 'isMultiple' => $this->data['isMultiple']]);
                 }
             }
             $AffectedGovernmentGroupModel = new AffectedGovernmentGroupModel;
-            $query = $AffectedGovernmentGroupModel->getByGovernmentGovernment($id, $state, $this->request->getLocale());
+            $query = $AffectedGovernmentGroupModel->getByGovernmentGovernment($id, $state);
             $events = [];
             if (count($query) > 0) {
                 echo view('government_affectedgovernment', ['query' => $query, 'isMultiple' => $this->data['isMultiple']]);
@@ -110,7 +110,7 @@ class Government extends BaseController
                     $events[] = $row->event;
                 }
             }
-            $query = $AffectedGovernmentGroupModel->getByGovernmentForm($id, $state, $this->data['live']);
+            $query = $AffectedGovernmentGroupModel->getByGovernmentForm($id, $state);
             if (count($query) > 0) {
                 echo view('general_affectedgovernmentform', ['includeGovernment' => false, 'query' => $query]);
                 foreach ($query as $row) {
@@ -128,11 +128,11 @@ class Government extends BaseController
                     }
                 }
                 $GovernmentSourceModel = new GovernmentSourceModel;
-                $query = $GovernmentSourceModel->getByGovernment($id, $state, $this->data['live']);
+                $query = $GovernmentSourceModel->getByGovernment($id, $state);
                 if (count($query) > 0) {
                     echo view('general_governmentsource', ['query' => $query, 'state' => $state, 'type' => 'government', 'isMultiple' => $this->data['isMultiple']]);
                 }
-                $query = $GovernmentModel->getNote($id, $state, $this->request->getLocale());
+                $query = $GovernmentModel->getNote($id, $state);
                 if (count($query) > 0) {
                     echo view(ENVIRONMENT . '/government_note', ['query' => $query, 'isMultiple' => $this->data['isMultiple']]);
                 }
@@ -149,7 +149,7 @@ class Government extends BaseController
                     echo view('general_source', ['query' => $query, 'hasLink' => true]);
                 }
                 $ResearchLogModel = new ResearchLogModel;
-                $query = $ResearchLogModel->getByGovernment($id, $state, $this->data['live']);
+                $query = $ResearchLogModel->getByGovernment($id, $state);
                 if (count($query) > 0) {
                     echo view('government_researchlog', ['query' => $query, 'isMultiple' => $this->data['isMultiple']]);
                 }
@@ -205,7 +205,7 @@ class Government extends BaseController
                     ]);
                     $layers['current'] = 'Approximate Current Boundary';
                 }
-                $query = $GovernmentShapeModel->getPartByGovernment($id, $state, $this->request->getLocale());
+                $query = $GovernmentShapeModel->getPartByGovernment($id, $state);
                 if (count($query) > 0) {
                     echo view('general_gis', [
                         'query' => $query,
