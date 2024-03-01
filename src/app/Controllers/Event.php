@@ -2,6 +2,17 @@
 
 namespace App\Controllers;
 
+use App\Models\AdjudicationModel;
+use App\Models\AffectedGovernmentGroupModel;
+use App\Models\CurrentGovernmentModel;
+use App\Models\EventModel;
+use App\Models\GovernmentSourceModel;
+use App\Models\LawSectionModel;
+use App\Models\MetesDescriptionModel;
+use App\Models\PlssModel;
+use App\Models\RecordingModel;
+use App\Models\SourceCitationModel;
+
 class Event extends BaseController
 {
 
@@ -30,14 +41,10 @@ class Event extends BaseController
     {
         $this->data['state'] = $state;
         $id = $this->getIdInt($id);
-        $query = $this->db->query('SELECT * FROM extra.ci_model_event_detail(?, ?)', [$id, $state])->getResult();
-
+        $EventModel = new EventModel;
+        $query = $EventModel->getDetail($id, $state);
         if (count($query) != 1 or ($query[0]->eventgranted == 'placeholder' and !$this->data['live'])) {
             $this->noRecord($state);
-        } elseif (!empty($query[0]->eventslugnew)) {
-            header("HTTP/1.1 301 Moved Permanently");
-            header("Location: /" . $this->request->getLocale() . "/" . $state . "/event/" . $query[0]->eventslugnew . "/");
-            exit();
         } else {
             $id = $query[0]->eventid;
             $eventIsMapped = ($query[0]->eventismapped == 't');
@@ -45,16 +52,20 @@ class Event extends BaseController
             $this->data['pageTitleType'] = $query[0]->eventtypeshort;
             echo view('header', $this->data);
             echo view('event_detail', ['row' => $query[0]]);
-            $query = $this->db->query('SELECT * FROM extra.ci_model_event_affectedgovernment_part(?, ?, ?)', [$id, $state, $this->request->getLocale()])->getResult();
-            $affectedgovernmentgisquery = $this->db->query('SELECT * FROM extra.ci_model_event_affectedgovernment(?)', [$id])->getResultArray();
+            $AffectedGovernmentGroupModel = new AffectedGovernmentGroupModel;
+            $query = $AffectedGovernmentGroupModel->getByEventGovernment($id, $state);
+            $affectedgovernmentgisquery = $AffectedGovernmentGroupModel->getByEventGeometry($id);
             $affectedGovernment = $this->affectedGovernmentProcess($query, $affectedgovernmentgisquery);
             $hasMap = (count($affectedgovernmentgisquery) > 0);
             $hasAffectedGovernmentMap = (count($affectedgovernmentgisquery) > 0);
             if ($this->data['live']) {
-                $metesdescriptiongisquery = $this->db->query('SELECT * FROM extra_development.ci_model_event_metesdescription_gis(?, ?)', [$id, $state])->getResult();
-                if (count($metesdescriptiongisquery) > 0) {
-                    $hasMap = true;
-                }
+                $MetesDescriptionLineModel = new \App\Models\Development\MetesDescriptionLineModel;
+            } else {
+                $MetesDescriptionLineModel = new \App\Models\MetesDescriptionLineModel;
+            }
+            $metesdescriptiongisquery = $MetesDescriptionLineModel->getGeometryByEvent($id, $state);
+            if (count($metesdescriptiongisquery) > 0) {
+                $hasMap = true;
             }
             if (!$this->data['live'] and !$eventIsMapped) {
                 $hasMap = false;
@@ -65,39 +76,47 @@ class Event extends BaseController
             if (count($query) > 0) {
                 echo view('general_affectedgovernment2', ['affectedGovernment' => $affectedGovernment, 'state' => $state, 'includeDate' => false, 'live' => $this->data['live'], 'isComplete' => true]);
             }
-            $query = $this->db->query('SELECT * FROM extra.ci_model_event_affectedgovernmentform(?, ?, ?, ?)', [$id, $state, $this->data['live'], $this->request->getLocale()])->getResult();
+            $query = $AffectedGovernmentGroupModel->getByEventForm($id, $state);
             if (count($query) > 0) {
                 echo view('general_affectedgovernmentform', ['includeGovernment' => true, 'query' => $query]);
             }
-            $query = $this->db->query('SELECT * FROM extra.ci_model_event_currentgovernment(?, ?, ?)', [$id, $state, $this->request->getLocale()])->getResult();
+            $CurrentGovernmentModel = new CurrentGovernmentModel;
+            $query = $CurrentGovernmentModel->getByEvent($id, $state);
             if (count($query) > 0) {
                 echo view('general_currentgovernment', ['query' => $query, 'state' => $state]);
             }
-            $query = $this->db->query('SELECT * FROM extra.ci_model_event_metesdescription(?)', [$id])->getResult();
+            $MetesDescriptionModel = new MetesDescriptionModel;
+            $query = $MetesDescriptionModel->getByEvent($id);
             if (count($query) > 0) {
                 echo view('general_metes', ['query' => $query, 'hasLink' => true, 'state' => $state, 'title' => 'Metes and Bounds Description']);
             }
-            $query = $this->db->query('SELECT * FROM extra.ci_model_event_plss(?)', [$id])->getResult();
+            $PlssModel = new PlssModel;
+            $query = $PlssModel->getByEvent($id);
             if (count($query) > 0) {
                 echo view('event_plss', ['query' => $query]);
             }
-            $query = $this->db->query('SELECT * FROM extra.ci_model_event_adjudication(?)', [$id])->getResult();
+            $AdjudicationModel = new AdjudicationModel;
+            $query = $AdjudicationModel->getByEvent($id);
             if (count($query) > 0) {
                 echo view('general_adjudication', ['query' => $query, 'state' => $state, 'eventRelationship' => true]);
             }
-            $query = $this->db->query('SELECT * FROM extra.ci_model_event_law(?)', [$id])->getResult();
+            $LawSectionModel = new LawSectionModel;
+            $query = $LawSectionModel->getByEvent($id);
             if (count($query) > 0) {
                 echo view('general_law', ['query' => $query, 'state' => $state, 'title' => 'Law', 'type' => 'relationship', 'includeLawGroup' => true]);
             }
-            $query = $this->db->query('SELECT * FROM extra.ci_model_event_recording(?, ?, ?)', [$id, $state, $this->request->getLocale()])->getResult();
+            $RecordingModel = new RecordingModel;
+            $query = $RecordingModel->getByEvent($id, $state);
             if (count($query) > 0) {
                 echo view('event_recording', ['query' => $query]);
             }
-            $query = $this->db->query('SELECT * FROM extra.ci_model_event_governmentsource(?, ?, ?, ?)', [$id, $state, $this->data['live'], $this->request->getLocale()])->getResult();
+            $GovernmentSourceModel = new GovernmentSourceModel;
+            $query = $GovernmentSourceModel->getByEvent($id, $state);
             if (count($query) > 0) {
                 echo view('general_governmentsource', ['query' => $query, 'state' => $state, 'type' => 'event']);
             }
-            $query = $this->db->query('SELECT * FROM extra.ci_model_event_source(?)', [$id])->getResult();
+            $SourceCitationModel = new SourceCitationModel;
+            $query = $SourceCitationModel->getByEvent($id);
             if (count($query) > 0) {
                 echo view('general_sourcecitation', ['query' => $query, 'state' => $state, 'hasColor' => false, 'hasLink' => true, 'title' => 'Source']);
             }

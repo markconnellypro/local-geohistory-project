@@ -79,6 +79,33 @@ class MetesDescriptionModel extends Model
         return $query ?? [];
     }
 
+    // extra.ci_model_event_metesdescription(integer)
+
+    // VIEW: extra.metesdescriptionextracache
+
+    public function getByEvent($id)
+    {
+        $query = <<<QUERY
+            SELECT metesdescriptionextracache.metesdescriptionslug,
+                metesdescription.metesdescriptiontype,
+                metesdescription.metesdescriptionsource,
+                metesdescription.metesdescriptionbeginningpoint,
+                metesdescriptionextracache.metesdescriptionlong,
+                metesdescription.metesdescriptionacres
+            FROM geohistory.metesdescription
+            JOIN extra.metesdescriptionextracache
+                ON metesdescription.metesdescriptionid = metesdescriptionextracache.metesdescriptionid
+            WHERE metesdescription.event = ?
+            ORDER BY 5;
+        QUERY;
+
+        $query = $this->db->query($query, [
+            $id,
+        ])->getResult();
+
+        return $query ?? [];
+    }
+
     // extra.ci_model_area_metesdescription(integer)
 
     // VIEW: extra.eventextracache

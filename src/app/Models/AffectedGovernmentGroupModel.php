@@ -6,6 +6,106 @@ use CodeIgniter\Model;
 
 class AffectedGovernmentGroupModel extends Model
 {
+    // extra.ci_model_event_affectedgovernmentform(integer, character varying, boolean, character varying)
+
+    // FUNCTION: extra.governmentformlong
+    // FUNCTION: extra.governmentlong
+    // FUNCTION: extra.governmentstatelink
+
+    public function getByEventForm($id, $state)
+    {
+        $query = <<<QUERY
+            SELECT DISTINCT extra.governmentstatelink(affectedgovernmentpart.governmentto, ?, ?) AS governmentstatelink,
+                extra.governmentlong(affectedgovernmentpart.governmentto, ?) AS governmentlong,
+                extra.governmentformlong(affectedgovernmentpart.governmentformto, ?) governmentformlong
+            FROM geohistory.affectedgovernmentgroup
+            JOIN geohistory.affectedgovernmentgrouppart
+                ON affectedgovernmentgroup.event = ?
+                AND affectedgovernmentgroup.affectedgovernmentgroupid = affectedgovernmentgrouppart.affectedgovernmentgroup
+            JOIN geohistory.affectedgovernmentpart
+                ON affectedgovernmentgrouppart.affectedgovernmentpart = affectedgovernmentpart.affectedgovernmentpartid
+                AND affectedgovernmentpart.governmentformto IS NOT NULL
+            ORDER BY 3, 2
+        QUERY;
+
+        $query = $this->db->query($query, [
+            $state,
+            \Config\Services::request()->getLocale(),
+            strtoupper($state),
+            \App\Controllers\BaseController::isLive(),
+            $id,
+        ])->getResult();
+
+        return $query ?? [];
+    }
+
+    // extra.ci_model_event_affectedgovernment(integer)
+
+    public function getByEventGeometry($id)
+    {
+        $query = <<<QUERY
+            SELECT DISTINCT affectedgovernmentgroup.affectedgovernmentgroupid AS id,
+                public.st_asgeojson(public.st_buffer(public.st_collect(governmentshape.governmentshapegeometry), 0)) AS geometry
+            FROM geohistory.affectedgovernmentgroup
+            JOIN gis.affectedgovernmentgis
+                ON affectedgovernmentgroup.affectedgovernmentgroupid = affectedgovernmentgis.affectedgovernment
+                AND affectedgovernmentgroup.event = ?
+            JOIN gis.governmentshape
+                ON affectedgovernmentgis.governmentshape = governmentshape.governmentshapeid
+            GROUP BY 1
+            ORDER BY 1
+        QUERY;
+
+        $query = $this->db->query($query, [
+            $id,
+        ])->getResultArray();
+
+        return $query ?? [];
+    }
+
+    // extra.ci_model_event_affectedgovernment_part(integer, character varying, character varying)
+
+    // FUNCTION: extra.governmentstatelink
+    // FUNCTION: extra.governmentlong
+    // FUNCTION: extra.affectedtypeshort
+    
+    public function getByEventGovernment($id, $state)
+    {
+        $query = <<<QUERY
+            SELECT DISTINCT affectedgovernmentgrouppart.affectedgovernmentgroup AS id,
+                affectedgovernmentlevel.affectedgovernmentlevellong AS affectedgovernmentlevellong,
+                affectedgovernmentlevel.affectedgovernmentleveldisplayorder AS affectedgovernmentleveldisplayorder,
+                affectedgovernmentlevel.affectedgovernmentlevelgroup = 4 AS includelink,
+                COALESCE(extra.governmentstatelink(affectedgovernmentpart.governmentfrom, ?, ?), '') AS governmentfrom,
+                COALESCE(extra.governmentlong(affectedgovernmentpart.governmentfrom, ?), '') AS governmentfromlong,
+                COALESCE(extra.affectedtypeshort(affectedgovernmentpart.affectedtypefrom), '') AS affectedtypefrom,
+                COALESCE(extra.governmentstatelink(affectedgovernmentpart.governmentto, ?, ?), '') AS governmentto,
+                COALESCE(extra.governmentlong(affectedgovernmentpart.governmentto, ?), '') AS governmenttolong,
+                COALESCE(extra.affectedtypeshort(affectedgovernmentpart.affectedtypeto), '') AS affectedtypeto
+            FROM geohistory.affectedgovernmentgroup
+            JOIN geohistory.affectedgovernmentgrouppart
+                ON affectedgovernmentgroup.affectedgovernmentgroupid = affectedgovernmentgrouppart.affectedgovernmentgroup
+                AND affectedgovernmentgroup.event = ?
+            JOIN geohistory.affectedgovernmentlevel
+                ON affectedgovernmentgrouppart.affectedgovernmentlevel = affectedgovernmentlevel.affectedgovernmentlevelid
+            JOIN geohistory.affectedgovernmentpart
+                ON affectedgovernmentgrouppart.affectedgovernmentpart = affectedgovernmentpart.affectedgovernmentpartid
+            ORDER BY 1, 2
+        QUERY;
+
+        $query = $this->db->query($query, [
+            $state,
+            \Config\Services::request()->getLocale(),
+            strtoupper($state),
+            $state,
+            \Config\Services::request()->getLocale(),
+            strtoupper($state),
+            $id,
+        ])->getResult();
+
+        return $query ?? [];
+    }
+
     // extra.ci_model_government_affectedgovernmentform(integer, character varying, boolean)
 
     // FUNCTION: extra.eventsortdate

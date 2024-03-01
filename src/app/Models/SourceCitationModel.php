@@ -60,6 +60,50 @@ class SourceCitationModel extends Model
         return $query ?? [];
     }
 
+    // extra.ci_model_event_source(integer)
+
+    // FUNCTION: extra.shortdate
+    // FUNCTION: extra.rangefix
+    // VIEW: extra.sourcecitationextracache
+    // VIEW: extra.sourceextra
+
+    public function getByEvent($id)
+    {
+        $query = <<<QUERY
+            SELECT sourcecitationextracache.sourcecitationslug,
+                sourceextra.sourceabbreviation,
+                sourcecitation.sourcecitationdatetype || 
+                    CASE WHEN sourcecitation.sourcecitationdatetype = '' THEN '' ELSE ' ' END ||
+                    extra.shortdate(sourcecitation.sourcecitationdate) AS sourcecitationdate,
+                sourcecitation.sourcecitationdate AS sourcecitationdatesort,
+                sourcecitation.sourcecitationdaterangetype || 
+                    CASE WHEN sourcecitation.sourcecitationdaterangetype = '' THEN '' ELSE ' ' END ||
+                extra.shortdate(sourcecitation.sourcecitationdaterange) AS sourcecitationdaterange,
+                sourcecitation.sourcecitationdaterange AS sourcecitationdaterangesort,
+                sourcecitation.sourcecitationvolume,
+                extra.rangefix(sourcecitation.sourcecitationpagefrom, sourcecitation.sourcecitationpageto) AS sourcecitationpage,
+                sourcecitation.sourcecitationtypetitle,
+                sourcecitation.sourcecitationperson
+            FROM geohistory.source
+            JOIN extra.sourceextra
+                ON source.sourceid = sourceextra.sourceid
+            JOIN geohistory.sourcecitation
+                ON source.sourceid = sourcecitation.source
+            JOIN extra.sourcecitationextracache
+                ON sourcecitation.sourcecitationid = sourcecitationextracache.sourcecitationid
+            JOIN geohistory.sourcecitationevent
+                ON sourcecitation.sourcecitationid = sourcecitationevent.sourcecitation 
+                AND sourcecitationevent.event = ?
+            ORDER BY 1, 6, 7, 10
+        QUERY;
+
+        $query = $this->db->query($query, [
+            $id,
+        ])->getResult();
+
+        return $query ?? [];
+    }
+
     public function getByGovernment($integer, $state)
     {
         return [];

@@ -6,6 +6,102 @@ use CodeIgniter\Model;
 
 class EventModel extends Model
 {
+    // extra.ci_model_event_detail(integer, character varying)
+    // extra.ci_model_event_detail(text, character varying)
+
+    // FUNCTION: extra.rangefix
+    // FUNCTION: extra.shortdate
+    // FUNCTION: extra.governmentstatelink
+    // FUNCTION: extra.eventgovernmentcache
+    // FUNCTION: extra.governmentrelationcache
+
+    public function getDetail($id, $state)
+    {
+        if (!is_int($id)) {
+            $id = $this->getSlugId($id, $state);
+        }
+
+        $query = <<<QUERY
+            SELECT DISTINCT 
+                event.eventid,
+                eventtype.eventtypeshort,
+                eventmethod.eventmethodlong,
+                event.eventlong,
+                eventgranted.eventgrantedshort AS eventgranted,
+                    CASE
+                        WHEN eventgranted.eventgrantedshort = 'government' OR (event.eventfrom = 0 AND event.eventto = 0 AND event.eventeffective::text = ''::text AND event.eventeffectivetypepresumedsource IS NULL AND other.otherdatetype IS NULL) THEN false
+                        ELSE true
+                    END AS textflag,
+                extra.rangefix(event.eventfrom::text, event.eventto::text) AS eventrange,
+                extra.shortdate(event.eventeffective) AS eventeffective,
+                eventeffectivetype.eventeffectivetypegroup::text ||
+                    CASE
+                        WHEN eventeffectivetype.eventeffectivetypequalifier IS NOT NULL AND eventeffectivetype.eventeffectivetypequalifier::text = ''::text THEN ''::text
+                        ELSE ': '::text || eventeffectivetype.eventeffectivetypequalifier::text
+                    END AS eventeffectivetype,
+                other.otherdate,
+                other.otherdatetype,
+                event.eventismapped,
+                extra.governmentstatelink(event.government, ?, 'en') AS government
+            FROM geohistory.event
+                JOIN geohistory.eventgranted
+                ON event.eventgranted = eventgranted.eventgrantedid
+                JOIN geohistory.eventmethod
+                ON event.eventmethod = eventmethod.eventmethodid 
+                JOIN geohistory.eventtype
+                ON event.eventtype = eventtype.eventtypeid
+                LEFT JOIN ( SELECT other_1.otherdate,
+                        other_1.otherdatetype
+                    FROM ( SELECT DISTINCT extra.shortdate(filing.filingdate) AS otherdate,
+                                'Final Decree'::text AS otherdatetype
+                            FROM geohistory.adjudicationevent,
+                                geohistory.filing,
+                                geohistory.filingtype
+                            WHERE adjudicationevent.adjudication = filing.adjudication AND filing.filingtype = filingtype.filingtypeid AND filingtype.filingtypefinalrecording AND adjudicationevent.event = ?
+                            UNION
+                            SELECT DISTINCT extra.shortdate(governmentsource.governmentsourcedate) AS otherdate,
+                                'Letters Patent'::text AS otherdatetype
+                            FROM geohistory.governmentsource,
+                                geohistory.governmentsourceevent
+                            WHERE governmentsource.governmentsourceid = governmentsourceevent.governmentsource AND governmentsource.governmentsourcetype::text = 'Letters Patent'::text AND governmentsourceevent.event = ?) other_1
+                    WHERE 1 = (( SELECT count(*) AS rowct
+                            FROM ( SELECT DISTINCT extra.shortdate(filing.filingdate) AS otherdate,
+                                        'Final Decree'::text AS otherdatetype,
+                                        true AS isother
+                                    FROM geohistory.adjudicationevent,
+                                        geohistory.filing,
+                                        geohistory.filingtype
+                                    WHERE adjudicationevent.adjudication = filing.adjudication AND filing.filingtype = filingtype.filingtypeid AND filingtype.filingtypefinalrecording AND adjudicationevent.event = ?
+                                    UNION
+                                    SELECT DISTINCT extra.shortdate(governmentsource.governmentsourcedate) AS otherdate,
+                                        'Letters Patent'::text AS otherdatetype,
+                                        true AS isother
+                                    FROM geohistory.governmentsource,
+                                        geohistory.governmentsourceevent
+                                    WHERE governmentsource.governmentsourceid = governmentsourceevent.governmentsource AND governmentsource.governmentsourcetype::text = 'Letters Patent'::text AND governmentsourceevent.event = ?) other_2))) other ON 0 = 0
+                LEFT JOIN geohistory.eventeffectivetype ON event.eventeffectivetypepresumedsource = eventeffectivetype.eventeffectivetypeid
+                LEFT JOIN extra.eventgovernmentcache ON event.eventid = eventgovernmentcache.eventid
+                LEFT JOIN extra.governmentrelationcache ON eventgovernmentcache.government = governmentrelationcache.governmentid
+            WHERE event.eventid = ?
+                AND (
+                    governmentrelationcache.governmentrelationstate = ? OR 
+                    governmentrelationcache.governmentrelationstate IS NULL
+                )    
+        QUERY;
+
+        $query = $this->db->query($query, [
+            $state,
+            $id,
+            $id,
+            $id,
+            $id,
+            $id,
+            strtoupper($state),
+        ])->getResult();
+
+        return $query ?? [];
+    }
+
     // extra.ci_model_adjudication_event(integer)
 
     // FUNCTION: extra.eventsortdate
@@ -639,5 +735,36 @@ class EventModel extends Model
         ])->getResult();
 
         return $query ?? [];
+    }
+
+    // extra.eventslugidreplacement(text)
+
+    // VIEW: extra.eventextracache
+
+    private function getSlugId($id, $state)
+    {
+        $query = <<<QUERY
+            SELECT eventextracache.eventid AS id,
+                eventextracache.eventslugnew
+            FROM extra.eventextracache
+            WHERE eventextracache.eventslug = ?
+        QUERY;
+
+        $query = $this->db->query($query, [
+            $id,
+        ])->getResult();
+
+        $id = -1;
+
+        if (count($query) == 1) {
+            if (!empty($query[0]->eventslugnew)) {
+                header("HTTP/1.1 301 Moved Permanently");
+                header("Location: /" . \Config\Services::request()->getLocale() . "/" . $state . "/event/" . $query[0]->eventslugnew . "/");
+                exit();
+            }
+            $id = $query[0]->id;
+        }
+        
+        return $id;
     }
 }

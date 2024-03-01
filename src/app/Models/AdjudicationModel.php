@@ -98,6 +98,45 @@ class AdjudicationModel extends Model
         return $query ?? [];
     }
 
+    // extra.ci_model_event_adjudication(integer)
+
+    // FUNCTION: extra.tribunallong
+    // FUNCTION: extra.shortdate
+    // VIEW: extra.adjudicationextracache
+
+    public function getByEvent($id)
+    {
+        $query = <<<QUERY
+            SELECT adjudicationextracache.adjudicationslug,
+                adjudicationtype.adjudicationtypelong,
+                extra.tribunallong(adjudicationtype.tribunal) AS tribunallong,
+                adjudication.adjudicationnumber,
+                extra.shortdate(adjudication.adjudicationterm || CASE
+                    WHEN length(adjudication.adjudicationterm) = 4 THEN '-~07-~28'
+                    WHEN length(adjudication.adjudicationterm) = 7 THEN '-~28'
+                    ELSE ''
+                END) AS adjudicationterm,
+                adjudication.adjudicationterm AS adjudicationtermsort,
+                eventrelationship.eventrelationshipshort AS eventrelationship
+            FROM geohistory.adjudicationevent
+            JOIN geohistory.eventrelationship
+                ON adjudicationevent.eventrelationship = eventrelationship.eventrelationshipid
+            JOIN geohistory.adjudication
+                ON adjudicationevent.adjudication = adjudication.adjudicationid
+            JOIN extra.adjudicationextracache
+                ON adjudication.adjudicationid = adjudicationextracache.adjudicationid
+            JOIN geohistory.adjudicationtype
+                ON adjudication.adjudicationtype = adjudicationtype.adjudicationtypeid
+            WHERE adjudicationevent.event = ?
+        QUERY;
+
+        $query = $this->db->query($query, [
+            $id,
+        ])->getResult();
+
+        return $query ?? [];
+    }
+
     // extra.adjudicationslugid(text)
 
     // VIEW: extra.adjudicationextracache

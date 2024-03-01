@@ -6,6 +6,42 @@ use CodeIgniter\Model;
 
 class LawSectionModel extends Model
 {
+    // extra.ci_model_event_law(integer)
+
+    // VIEW: extra.lawsectionextracache
+
+    public function getByEvent($id)
+    {
+        $query = <<<QUERY
+            SELECT DISTINCT lawsectionextracache.lawsectionslug,
+                law.lawapproved,
+                lawsectionextracache.lawsectioncitation,
+                eventrelationship.eventrelationshipshort AS lawsectioneventrelationship,
+                lawsection.lawsectionfrom,
+                law.lawnumberchapter,
+                lawgroup.lawgrouplong
+            FROM geohistory.law
+            JOIN geohistory.lawsection
+                ON law.lawid = lawsection.law   
+            JOIN extra.lawsectionextracache
+                ON lawsection.lawsectionid = lawsectionextracache.lawsectionid
+            JOIN geohistory.lawsectionevent
+                ON lawsection.lawsectionid = lawsectionevent.lawsection 
+                AND lawsectionevent.event = ?
+            JOIN geohistory.eventrelationship
+                ON lawsectionevent.eventrelationship = eventrelationship.eventrelationshipid
+            LEFT JOIN geohistory.lawgroup
+                ON lawsectionevent.lawgroup = lawgroup.lawgroupid
+            ORDER BY 4, 2, 1
+        QUERY;
+
+        $query = $this->db->query($query, [
+            $id,
+        ])->getResult();
+
+        return $query ?? [];
+    }
+
     // extra.ci_model_search_law_dateevent(character varying, text, character varying)
 
     // FUNCTION: extra.governmentabbreviation
