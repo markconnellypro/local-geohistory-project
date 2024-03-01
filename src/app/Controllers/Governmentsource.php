@@ -2,6 +2,10 @@
 
 namespace App\Controllers;
 
+use App\Models\EventModel;
+use App\Models\GovernmentSourceModel;
+use App\Models\SourceItemPartModel;
+
 class Governmentsource extends BaseController
 {
 
@@ -30,20 +34,22 @@ class Governmentsource extends BaseController
     {
         $this->data['state'] = $state;
         $id = $this->getIdInt($id);
-        $query = $this->db->query('SELECT * FROM extra.ci_model_governmentsource_detail(?, ?, ?, ?)', [$id, $state, $this->data['live'], $this->request->getLocale()])->getResult();
+        $GovernmentSourceModel = new GovernmentSourceModel;
+        $query = $GovernmentSourceModel->getDetail($id, $state, $this->data['live'], $this->request->getLocale());
         if (count($query) != 1) {
             $this->noRecord($state);
         } else {
             $id = $query[0]->governmentsourceid;
-            // $this->data['pageTitle'] = $query[0]->sourceabbreviation . (empty($query[0]->sourcecitationpage) ? '' : ' ' . $query[0]->sourcecitationpage);
             echo view('header', $this->data);
             echo view('general_governmentsource', ['query' => $query, 'state' => $state, 'type' => 'source']);
             echo view('general_source', ['query' => $query, 'hasLink' => $this->data['live']]);
-            $query = $this->db->query('SELECT * FROM extra.ci_model_governmentsource_url(?)', [$id])->getResult();
+            $SourceItemPartModel = new SourceItemPartModel;
+            $query = $SourceItemPartModel->getByGovernmentSource($id);
             if (count($query) > 0) {
                 echo view('general_url', ['query' => $query, 'state' => $state, 'title' => 'Calculated URL']);
             }
-            $query = $this->db->query('SELECT * FROM extra.ci_model_governmentsource_event(?)', [$id])->getResult();
+            $EventModel = new EventModel;
+            $query = $EventModel->getByGovernmentSource($id);
             if (count($query) > 0) {
                 echo view('general_event', ['query' => $query, 'state' => $state, 'title' => 'Event Links']);
             }

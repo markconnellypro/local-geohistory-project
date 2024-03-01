@@ -41,6 +41,48 @@ class SourceItemPartModel extends Model
         return $query ?? [];
     }
 
+    // extra.ci_model_governmentsource_url(integer)
+
+    // FUNCTION: extra.sourceurlid
+
+    public function getByGovernmentSource($id)
+    {
+        $query = <<<QUERY
+            SELECT sourceitem.sourceitemurl ||
+            CASE
+                WHEN sourceitem.sourceitemurlcomplete THEN ''::text
+                ELSE
+                CASE
+                    WHEN sourcecitationpagefrom ~ '^\d+$' THEN sourceitempart.sourceitempartsequencecharacter::text || (sourceitempart.sourceitempartsequence + sourcecitationpagefrom::integer)
+                    ELSE lpad((sourceitempart.sourceitempartsequence + 0)::text, 4, '0'::text) || sourceitempart.sourceitempartsequencecharacter::text
+                END || sourceitempart.sourceitempartsequencecharacterafter::text
+            END AS url
+            FROM geohistory.governmentsource
+            JOIN geohistory.sourceitem
+                ON sourceitem.source = ANY (extra.sourceurlid(governmentsource.source))
+            JOIN geohistory.sourceitempart
+                ON sourceitem.sourceitemid = sourceitempart.sourceitem
+            WHERE (
+                (sourceitempartfrom IS NULL AND sourceitempartto IS NULL) OR
+                sourceitem.sourceitemurlcomplete OR
+                (sourceitempartisbypage AND sourcecitationpagefrom ~ '^\d+$' AND sourcecitationpageto ~ '^\d+$' AND sourceitempartfrom <= sourcecitationpagefrom::integer AND sourceitempartto >= sourcecitationpagefrom::integer)
+                ) AND (
+                (sourcecitationvolume = '' AND governmentsourceterm = '' AND sourceitemvolume = '' AND sourceitemyear IS NULL) OR
+                (sourcecitationvolume <> '' AND sourcecitationvolume = sourceitemvolume) OR
+                (sourcecitationvolume = '' AND governmentsourceterm <> '' AND governmentsourceterm = sourceitemvolume) OR
+                (sourcecitationvolume ~ '^\d{4}$' AND sourcecitationvolume::smallint = sourceitemyear) OR
+                (sourcecitationvolume = '' AND governmentsourceterm ~ '^\d{4}$' AND governmentsourceterm::smallint = sourceitemyear)
+            )
+            AND governmentsource.governmentsourceid = ?
+        QUERY;
+
+        $query = $this->db->query($query, [
+            $id,
+        ])->getResult();
+
+        return $query ?? [];
+    }
+
     // extra.ci_model_source_url(integer)
 
     // FUNCTION: extra.sourceurlid
