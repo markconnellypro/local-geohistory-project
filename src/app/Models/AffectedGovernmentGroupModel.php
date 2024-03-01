@@ -228,4 +228,243 @@ class AffectedGovernmentGroupModel extends Model
 
         return $query ?? [];
     }
+
+    // extra.ci_model_area_affectedgovernment(v_governmentshape integer, v_state character varying, v_locale character varying)
+
+    // FUNCTION: extra.affectedtypeshort
+    // FUNCTION: extra.eventsortdate
+    // FUNCTION: extra.governmentabbreviation
+    // FUNCTION: extra.governmentlong
+    // FUNCTION: extra.governmentshort
+    // FUNCTION: extra.governmentstatelink
+    // FUNCTION: extra.nulltoempty
+    // FUNCTION: extra.rangefix
+    // FUNCTION: extra.shortdate
+
+
+    public function getByGovernmentShape($id, $state)
+    {
+        $query = <<<QUERY
+            WITH foundaffectedgovernment AS (
+                SELECT event.eventid,
+                eventextracache.eventslug,
+                extra.governmentstatelink(affectedgovernment_reconstructed.municipalityfrom, ?, ?) AS municipalityfrom,
+                extra.governmentlong(affectedgovernment_reconstructed.municipalityfrom, ?) AS municipalityfromlong,
+                extra.affectedtypeshort(affectedgovernment_reconstructed.affectedtypemunicipalityfrom) AS affectedtypemunicipalityfrom,
+                extra.governmentstatelink(affectedgovernment_reconstructed.countyfrom, ?, ?) AS countyfrom,
+                extra.governmentshort(affectedgovernment_reconstructed.countyfrom, ?) AS countyfromshort,
+                extra.affectedtypeshort(affectedgovernment_reconstructed.affectedtypecountyfrom) AS affectedtypecountyfrom,
+                extra.governmentstatelink(affectedgovernment_reconstructed.statefrom, ?, ?) AS statefrom,
+                extra.governmentabbreviation(affectedgovernment_reconstructed.statefrom) AS statefromabbreviation,
+                extra.affectedtypeshort(affectedgovernment_reconstructed.affectedtypestatefrom) AS affectedtypestatefrom,
+                extra.governmentstatelink(affectedgovernment_reconstructed.municipalityto, ?, ?) AS municipalityto,
+                extra.governmentlong(affectedgovernment_reconstructed.municipalityto, ?) AS municipalitytolong,
+                extra.affectedtypeshort(affectedgovernment_reconstructed.affectedtypemunicipalityto) AS affectedtypemunicipalityto,
+                extra.governmentstatelink(affectedgovernment_reconstructed.countyto, ?, ?) AS countyto,
+                extra.governmentshort(affectedgovernment_reconstructed.countyto, ?) AS countytoshort,
+                extra.affectedtypeshort(affectedgovernment_reconstructed.affectedtypecountyto) AS affectedtypecountyto,
+                extra.governmentstatelink(affectedgovernment_reconstructed.stateto, ?, ?) AS stateto,
+                extra.governmentabbreviation(affectedgovernment_reconstructed.stateto) AS statetoabbreviation,
+                extra.affectedtypeshort(affectedgovernment_reconstructed.affectedtypestateto) AS affectedtypestateto,
+                CASE WHEN affectedgovernment_reconstructed.submunicipalityfrom IS NOT NULL 
+                    OR affectedgovernment_reconstructed.submunicipalityto IS NOT NULL
+                    OR affectedgovernment_reconstructed.subcountyfrom IS NOT NULL
+                    OR affectedgovernment_reconstructed.subcountyto IS NOT NULL THEN TRUE ELSE FALSE END AS textflag,
+                extra.nulltoempty(extra.governmentstatelink(affectedgovernment_reconstructed.submunicipalityfrom, ?, ?)) AS submunicipalityfrom,
+                extra.nulltoempty(extra.governmentlong(affectedgovernment_reconstructed.submunicipalityfrom, ?)) AS submunicipalityfromlong,
+                extra.nulltoempty(extra.affectedtypeshort(affectedgovernment_reconstructed.affectedtypesubmunicipalityfrom)) AS affectedtypesubmunicipalityfrom,
+                extra.nulltoempty(extra.governmentstatelink(affectedgovernment_reconstructed.submunicipalityto, ?, ?)) AS submunicipalityto,
+                extra.nulltoempty(extra.governmentlong(affectedgovernment_reconstructed.submunicipalityto, ?)) AS submunicipalitytolong,
+                extra.nulltoempty(extra.affectedtypeshort(affectedgovernment_reconstructed.affectedtypesubmunicipalityto)) AS affectedtypesubmunicipalityto,
+                extra.nulltoempty(extra.governmentstatelink(affectedgovernment_reconstructed.subcountyfrom, ?, ?)) AS subcountyfrom,
+                extra.nulltoempty(extra.governmentshort(affectedgovernment_reconstructed.subcountyfrom, ?)) AS subcountyfromshort,
+                extra.nulltoempty(extra.affectedtypeshort(affectedgovernment_reconstructed.affectedtypesubcountyfrom)) AS affectedtypesubcountyfrom,
+                extra.nulltoempty(extra.governmentstatelink(affectedgovernment_reconstructed.subcountyto, ?, ?)) AS subcountyto,
+                extra.nulltoempty(extra.governmentshort(affectedgovernment_reconstructed.subcountyto, ?)) AS subcountytoshort,
+                extra.nulltoempty(extra.affectedtypeshort(affectedgovernment_reconstructed.affectedtypesubcountyto)) AS affectedtypesubcountyto,
+                extra.rangefix(event.eventfrom::text, event.eventto::text) AS eventrange,
+                extra.shortdate(event.eventeffective) AS eventeffective,
+                extra.eventsortdate(event.eventid) AS eventsortdate,
+                (ROW_NUMBER () OVER (ORDER BY extra.eventsortdate(event.eventid), event.eventid))::integer AS eventorder,
+                (ROW_NUMBER () OVER (ORDER BY extra.eventsortdate(event.eventid) DESC, event.eventid DESC))::integer AS eventorderreverse
+                FROM geohistory.event
+                JOIN geohistory.eventgranted
+                ON event.eventgranted = eventgranted.eventgrantedid
+                AND eventgranted.eventgrantedsuccess
+                JOIN extra.eventextracache
+                ON event.eventid = eventextracache.eventid
+                AND eventextracache.eventslugnew IS NULL
+                JOIN extra.affectedgovernment_reconstructed
+                ON affectedgovernment_reconstructed.event = event.eventid
+                JOIN gis.affectedgovernmentgis
+                ON affectedgovernment_reconstructed.affectedgovernmentid = affectedgovernmentgis.affectedgovernment
+                WHERE affectedgovernmentgis.governmentshape = ?
+                GROUP BY 1, eventslug, municipalityfrom, municipalityfromlong, affectedtypemunicipalityfrom, countyfrom, countyfromshort, affectedtypecountyfrom, statefrom, statefromabbreviation, affectedtypestatefrom, municipalityto, municipalitytolong, affectedtypemunicipalityto, countyto, countytoshort, affectedtypecountyto, stateto, statetoabbreviation, affectedtypestateto, submunicipalityfrom, submunicipalityfromlong, affectedtypesubmunicipalityfrom, submunicipalityto, submunicipalitytolong, affectedtypesubmunicipalityto, subcountyfrom, subcountyfromshort, affectedtypesubcountyfrom, subcountyto, subcountytoshort, affectedtypesubcountyto, extra.rangefix(event.eventfrom::text, event.eventto::text), extra.shortdate(event.eventeffective), extra.eventsortdate(event.eventid)
+            ), currentgovernment AS (
+                -- Taken from GovernmentShapeModel->getDetail
+                SELECT DISTINCT governmentshape.governmentshapeid,
+                    COALESCE(extra.governmentstatelink(governmentshape.governmentsubmunicipality, ?, ?), '') AS governmentsubmunicipality,
+                    COALESCE(extra.governmentlong(governmentshape.governmentsubmunicipality, ?), '') AS governmentsubmunicipalitylong,
+                    extra.governmentstatelink(governmentshape.governmentmunicipality, ?, ?) AS governmentmunicipality,
+                    extra.governmentlong(governmentshape.governmentmunicipality, ?) AS governmentmunicipalitylong,
+                    extra.governmentstatelink(governmentshape.governmentcounty, ?, ?) AS governmentcounty,
+                    extra.governmentshort(governmentshape.governmentcounty, ?) AS governmentcountyshort,
+                    extra.governmentstatelink(governmentshape.governmentstate, ?, ?) AS governmentstate,
+                    extra.governmentabbreviation(governmentshape.governmentstate) AS governmentstateabbreviation,
+                    governmentshape.governmentshapeid AS id,
+                    public.st_asgeojson(governmentshape.governmentshapegeometry) AS geometry
+                FROM gis.governmentshape
+                LEFT JOIN extra.areagovernmentcache
+                ON governmentshape.governmentshapeid = areagovernmentcache.governmentshapeid
+                WHERE governmentshape.governmentshapeid = ?
+                AND (governmentrelationstate = ? OR governmentrelationstate IS NULL)
+            )
+            SELECT eventid, eventslug, municipalityfrom, municipalityfromlong, affectedtypemunicipalityfrom, countyfrom, countyfromshort, affectedtypecountyfrom, statefrom, statefromabbreviation, affectedtypestatefrom, municipalityto, municipalitytolong, affectedtypemunicipalityto, countyto, countytoshort, affectedtypecountyto, stateto, statetoabbreviation, affectedtypestateto, textflag, submunicipalityfrom, submunicipalityfromlong, affectedtypesubmunicipalityfrom, submunicipalityto, submunicipalitytolong, affectedtypesubmunicipalityto, subcountyfrom, subcountyfromshort, affectedtypesubcountyfrom, subcountyto, subcountytoshort, affectedtypesubcountyto, eventrange, eventeffective, eventsortdate, 
+               (eventorder * 2 - 1) AS eventorder
+            FROM foundaffectedgovernment
+            UNION
+            SELECT NULL AS eventid,
+               '' AS eventslug,
+               oldg.municipalityto AS municipalityfrom,
+               oldg.municipalitytolong AS municipalityfromlong,
+               'Missing' AS affectedtypemunicipalityfrom,
+               oldg.countyto AS countyfrom,
+               oldg.countytoshort AS countyfromshort,
+               'Missing' AS affectedtypecountyfrom,
+               oldg.stateto AS statefrom,
+               oldg.statetoabbreviation AS statefromabbreviation,
+               'Missing' AS affectedtypestatefrom,
+               newg.municipalityfrom AS municipalityto,
+               newg.municipalityfromlong AS municipalitytolong,
+               'Missing' AS affectedtypemunicipalityto,
+               newg.countyfrom AS countyto,
+               newg.countyfromshort AS countytoshort,
+               'Missing' AS affectedtypecountyto,
+               newg.statefrom AS stateto,
+               newg.statefromabbreviation AS statetoabbreviation,
+               'Missing' AS affectedtypestateto,
+               oldg.textflag OR newg.textflag AS textflag,
+               oldg.submunicipalityto AS submunicipalityfrom,
+               oldg.submunicipalitytolong AS submunicipalityfromlong,
+               CASE WHEN oldg.submunicipalityto = '' THEN '' ELSE 'Missing' END AS affectedtypesubmunicipalityfrom,
+               newg.submunicipalityfrom AS submunicipalityto,
+               newg.submunicipalityfromlong AS submunicipalitytolong,
+               CASE WHEN newg.submunicipalityfrom = '' THEN '' ELSE 'Missing' END AS affectedtypesubmunicipalityto,
+               oldg.subcountyto AS subcountyfrom,
+               oldg.subcountytoshort AS subcountyfromshort,
+               CASE WHEN oldg.subcountyto = '' THEN '' ELSE 'Missing' END AS affectedtypesubcountyfrom,
+               newg.subcountyfrom AS subcountyto,
+               newg.subcountyfromshort AS subcountytoshort,
+               CASE WHEN newg.subcountyfrom = '' THEN '' ELSE 'Missing' END AS affectedtypesubcountyto,
+               '' AS eventrange,
+               '' AS eventeffective,
+               NULL AS eventsortdate,
+               (oldg.eventorder * 2) AS eventorder
+            FROM foundaffectedgovernment oldg
+            JOIN foundaffectedgovernment newg
+               ON oldg.eventorder = newg.eventorder - 1
+               AND NOT (
+                 oldg.submunicipalityto = newg.submunicipalityfrom AND
+                 oldg.subcountyto = newg.subcountyfrom AND
+                 oldg.municipalityto = newg.municipalityfrom AND
+                 oldg.countyto = newg.countyfrom AND
+                 (oldg.stateto = newg.statefrom OR oldg.statetoabbreviation ~ ('^' || newg.statefromabbreviation || '[\-][A-Z]$'))
+               )
+            UNION
+            SELECT NULL AS eventid,
+               '' AS eventslug,
+               oldg.municipalityto AS municipalityfrom,
+               oldg.municipalitytolong AS municipalityfromlong,
+               'Missing' AS affectedtypemunicipalityfrom,
+               oldg.countyto AS countyfrom,
+               oldg.countytoshort AS countyfromshort,
+               'Missing' AS affectedtypecountyfrom,
+               oldg.stateto AS statefrom,
+               oldg.statetoabbreviation AS statefromabbreviation,
+               'Missing' AS affectedtypestatefrom,
+               newg.governmentmunicipality AS municipalityto,
+               newg.governmentmunicipalitylong AS municipalitytolong,
+               'Missing' AS affectedtypemunicipalityto,
+               newg.governmentcounty AS countyto,
+               newg.governmentcountyshort AS countytoshort,
+               'Missing' AS affectedtypecountyto,
+               newg.governmentstate AS stateto,
+               newg.governmentstateabbreviation AS statetoabbreviation,
+               'Missing' AS affectedtypestateto,
+               oldg.textflag OR newg.governmentsubmunicipality <> '' AS textflag,
+               oldg.submunicipalityto AS submunicipalityfrom,
+               oldg.submunicipalitytolong AS submunicipalityfromlong,
+               CASE WHEN oldg.submunicipalityto = '' THEN '' ELSE 'Missing' END AS affectedtypesubmunicipalityfrom,
+               newg.governmentsubmunicipality AS submunicipalityto,
+               newg.governmentsubmunicipalitylong AS submunicipalitytolong,
+               CASE WHEN newg.governmentsubmunicipality = '' THEN '' ELSE 'Missing' END AS affectedtypesubmunicipalityto,
+               oldg.subcountyto AS subcountyfrom,
+               oldg.subcountytoshort AS subcountyfromshort,
+               CASE WHEN oldg.subcountyto = '' THEN '' ELSE 'Missing' END AS affectedtypesubcountyfrom,
+               '' AS subcountyto,
+               '' AS subcountytoshort,
+               '' AS affectedtypesubcountyto,
+               '' AS eventrange,
+               '' AS eventeffective,
+               NULL AS eventsortdate,
+               (oldg.eventorder * 2) AS eventorder
+            FROM foundaffectedgovernment oldg,
+               currentgovernment newg
+            WHERE oldg.eventorderreverse = 1
+               AND NOT (
+                 oldg.submunicipalityto = newg.governmentsubmunicipality AND
+                 oldg.municipalityto = newg.governmentmunicipality AND
+                 oldg.countyto = newg.governmentcounty AND
+                 (oldg.stateto = newg.governmentstate OR oldg.statetoabbreviation ~ ('^' || newg.governmentstateabbreviation || '[\-][A-Z]$'))
+               )
+            ORDER BY 37
+        QUERY;
+
+        $query = $this->db->query($query, [
+            $state,
+            \Config\Services::request()->getLocale(),
+            strtoupper($state),
+            $state,
+            \Config\Services::request()->getLocale(),
+            strtoupper($state),
+            $state,
+            \Config\Services::request()->getLocale(), 
+            $state,
+            \Config\Services::request()->getLocale(),
+            strtoupper($state),
+            $state,
+            \Config\Services::request()->getLocale(),
+            strtoupper($state),
+            $state,
+            \Config\Services::request()->getLocale(), 
+            $state,
+            \Config\Services::request()->getLocale(),
+            strtoupper($state),
+            $state,
+            \Config\Services::request()->getLocale(),
+            strtoupper($state),
+            $state,
+            \Config\Services::request()->getLocale(),
+            strtoupper($state),
+            $state,
+            \Config\Services::request()->getLocale(),
+            strtoupper($state),
+            $id,
+            $state,
+            \Config\Services::request()->getLocale(),
+            strtoupper($state),
+            $state,
+            \Config\Services::request()->getLocale(),
+            strtoupper($state),
+            $state,
+            \Config\Services::request()->getLocale(),
+            strtoupper($state),
+            $state,
+            \Config\Services::request()->getLocale(),
+            $id,
+            strtoupper($state),
+        ])->getResult();
+
+        return $query ?? [];
+    }
 }

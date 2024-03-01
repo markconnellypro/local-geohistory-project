@@ -79,6 +79,41 @@ class MetesDescriptionModel extends Model
         return $query ?? [];
     }
 
+    // extra.ci_model_area_metesdescription(integer)
+
+    // VIEW: extra.eventextracache
+    // VIEW: extra.metesdescriptionextracache
+
+    public function getByGovernmentShape($id)
+    {
+        $query = <<<QUERY
+            SELECT metesdescriptionextracache.metesdescriptionslug,
+                metesdescription.metesdescriptiontype,
+                metesdescription.metesdescriptionsource,
+                metesdescription.metesdescriptionbeginningpoint,
+                metesdescriptionextracache.metesdescriptionlong,
+                metesdescription.metesdescriptionacres,
+                metesdescription.event,
+                eventextracache.eventslug
+            FROM geohistory.metesdescription
+            JOIN extra.metesdescriptionextracache
+                ON metesdescription.metesdescriptionid = metesdescriptionextracache.metesdescriptionid
+            JOIN gis.metesdescriptiongis
+                ON metesdescription.metesdescriptionid = metesdescriptiongis.metesdescription
+            JOIN extra.eventextracache
+                ON metesdescription.event = eventextracache.eventid
+                AND eventextracache.eventslugnew IS NULL
+            WHERE governmentshape = ?
+            ORDER BY 5
+        QUERY;
+
+        $query = $this->db->query($query, [
+            $id,
+        ])->getResult();
+
+        return $query ?? [];
+    }
+
     // extra.metesdescriptionslugid(text)
 
     // VIEW: extra.metesdescriptionextracache

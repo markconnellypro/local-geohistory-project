@@ -6,6 +6,79 @@ use CodeIgniter\Model;
 
 class GovernmentShapeModel extends Model
 {
+    // extra.ci_model_area_currentgovernment(v_governmentshapeid integer, v_state character varying, v_locale character varying)
+    // extra.ci_model_area_currentgovernment(v_governmentshapeid text, v_state character varying, v_locale character varying)
+    
+    // FUNCTION: extra.governmentabbreviation
+    // FUNCTION: extra.governmentlong
+    // FUNCTION: extra.governmentshort
+    // FUNCTION: extra.governmentstatelink
+    // VIEW: extra.areagovernmentcache
+
+    public function getDetail($id, $state)
+    {
+        if (!is_int($id)) {
+            $id = $this->getSlugId($id);
+        }
+
+        $query = <<<QUERY
+            SELECT DISTINCT governmentshape.governmentshapeid,
+                COALESCE(extra.governmentstatelink(governmentshape.governmentsubmunicipality, ?, ?), '') AS governmentsubmunicipality,
+                COALESCE(extra.governmentlong(governmentshape.governmentsubmunicipality, ?), '') AS governmentsubmunicipalitylong,
+                extra.governmentstatelink(governmentshape.governmentmunicipality, ?, ?) AS governmentmunicipality,
+                extra.governmentlong(governmentshape.governmentmunicipality, ?) AS governmentmunicipalitylong,
+                extra.governmentstatelink(governmentshape.governmentcounty, ?, ?) AS governmentcounty,
+                extra.governmentshort(governmentshape.governmentcounty, ?) AS governmentcountyshort,
+                extra.governmentstatelink(governmentshape.governmentstate, ?, ?) AS governmentstate,
+                extra.governmentabbreviation(governmentshape.governmentstate) AS governmentstateabbreviation,
+                governmentshape.governmentshapeid AS id,
+                public.st_asgeojson(governmentshape.governmentshapegeometry) AS geometry
+            FROM gis.governmentshape
+            LEFT JOIN extra.areagovernmentcache
+            ON governmentshape.governmentshapeid = areagovernmentcache.governmentshapeid
+            WHERE governmentshape.governmentshapeid = ?
+            AND (governmentrelationstate = ? OR governmentrelationstate IS NULL)
+            ORDER BY 8, 6, 4, 2
+        QUERY;
+
+        $query = $this->db->query($query, [
+            $state,
+            \Config\Services::request()->getLocale(),
+            strtoupper($state),
+            $state,
+            \Config\Services::request()->getLocale(),
+            strtoupper($state),
+            $state,
+            \Config\Services::request()->getLocale(),
+            strtoupper($state),
+            $state,
+            \Config\Services::request()->getLocale(),
+            $id,
+            strtoupper($state),
+        ])->getResult();
+
+        return $query ?? [];
+    }
+
+    // extra.ci_model_area_point(pointy double precision, pointx double precision)
+
+    public function getPointId($y, $x)
+    {
+        $query = <<<QUERY
+            SELECT DISTINCT governmentshape.governmentshapeid
+                FROM gis.governmentshape
+            WHERE ST_Contains(governmentshape.governmentshapegeometry, ST_SetSRID(ST_Point(?,?),4326))
+            ORDER BY 1
+        QUERY;
+
+        $query = $this->db->query($query, [
+            $x,
+            $y
+        ])->getResult();
+
+        return $query ?? [];
+    }
+
     // extra.ci_model_statistics_mapped_nation_part(character varying, integer, integer, character varying, boolean)
 
     // FUNCTION: extra.governmentabbreviation
@@ -230,7 +303,7 @@ class GovernmentShapeModel extends Model
     // VIEW: extra.governmentshapeextracache
     // VIEW: extra.governmentsubstitutecache
 
-    public function getPartByGovernment($id, $state, $locale)
+    public function getPartByGovernment($id, $state)
     {
         $query = <<<QUERY
             WITH affectedgovernmentsummary AS (
@@ -390,13 +463,13 @@ class GovernmentShapeModel extends Model
             $id,
             strtoupper($state),
             $state,
-            $locale,
+            \Config\Services::request()->getLocale(),
             strtoupper($state),
             $state,
-            $locale,
+            \Config\Services::request()->getLocale(),
             strtoupper($state),
             $state,
-            $locale,
+            \Config\Services::request()->getLocale(),
             strtoupper($state),
             $id,
             $id,
@@ -410,6 +483,31 @@ class GovernmentShapeModel extends Model
         ])->getResult();
 
         return $query ?? [];
+    }
+
+    // extra.governmentshapeslugid(text)
+
+    // VIEW: extra.governmentshapeextracache
+
+    private function getSlugId($id)
+    {
+        $query = <<<QUERY
+            SELECT governmentshapeextracache.governmentshapeid AS id
+                FROM extra.governmentshapeextracache
+            WHERE governmentshapeextracache.governmentshapeslug = ?
+        QUERY;
+
+        $query = $this->db->query($query, [
+            $id,
+        ])->getResult();
+
+        $id = -1;
+
+        if (count($query) == 1) {
+            $id = $query[0]->id;
+        }
+        
+        return $id;
     }
 
     // extra.ci_model_map_tile(v_state character varying, v_z integer, v_x integer, v_y integer)

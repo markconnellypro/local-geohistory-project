@@ -133,6 +133,59 @@ class EventModel extends Model
         return $query ?? [];
     }
 
+    // extra.ci_model_area_event_failure(integer, integer[])
+
+    // FUNCTION: extra.eventsortdate
+    // FUNCTION: extra.rangefix
+    // FUNCTION: extra.shortdate
+    // VIEW: extra.eventextracache
+
+    public function getByGovernmentShapeFailure($id, $events)
+    {
+        $query = <<<QUERY
+            SELECT DISTINCT eventextracache.eventslug,
+                eventtype.eventtypeshort,
+                event.eventlong,
+                extra.rangefix(event.eventfrom::text, event.eventto::text) AS eventrange,
+                eventgranted.eventgrantedshort AS eventgranted,
+                extra.shortdate(event.eventeffective) AS eventeffective,
+                extra.eventsortdate(event.eventid) AS eventsortdate
+            FROM geohistory.event
+            JOIN geohistory.eventgranted
+                ON event.eventgranted = eventgranted.eventgrantedid
+            JOIN geohistory.eventtype
+                ON event.eventtype = eventtype.eventtypeid
+            JOIN extra.eventextracache
+                ON event.eventid = eventextracache.eventid
+                AND eventextracache.eventslugnew IS NULL
+                AND event.eventid <> ALL (?)
+            WHERE (event.eventid IN ( SELECT event_1.eventid
+                    FROM geohistory.event event_1,
+                        geohistory.affectedgovernmentgroup,
+                        gis.affectedgovernmentgis
+                    WHERE event_1.eventid = affectedgovernmentgroup.event
+                        AND affectedgovernmentgroup.affectedgovernmentgroupid = affectedgovernmentgis.affectedgovernment
+                        AND affectedgovernmentgis.governmentshape = ?
+                    UNION
+                    SELECT event_1.eventid
+                    FROM geohistory.event event_1,
+                        geohistory.metesdescription,
+                        gis.metesdescriptiongis
+                    WHERE event_1.eventid = metesdescription.event 
+                        AND metesdescription.metesdescriptionid = metesdescriptiongis.metesdescription
+                        AND metesdescriptiongis.governmentshape = ?))
+            ORDER BY (extra.eventsortdate(event.eventid)), event.eventlong
+        QUERY;
+
+        $query = $this->db->query($query, [
+            $events,
+            $id,
+            $id,
+        ])->getResult();
+
+        return $query ?? [];
+    }
+
     // extra.ci_model_governmentsource_event(integer)
 
     // FUNCTION: extra.eventsortdate

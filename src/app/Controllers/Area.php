@@ -2,6 +2,11 @@
 
 namespace App\Controllers;
 
+use App\Models\AffectedGovernmentGroupModel;
+use App\Models\EventModel;
+use App\Models\GovernmentShapeModel;
+use App\Models\MetesDescriptionModel;
+
 class Area extends BaseController
 {
 
@@ -76,7 +81,8 @@ class Area extends BaseController
             $y = $x;
             $x = $newX;
         }
-        $query = $this->db->query('SELECT * FROM extra.ci_model_area_point(?, ?)', [$y, $x])->getResult();
+        $GovernmentShapeModel = new GovernmentShapeModel;
+        $query = $GovernmentShapeModel->getPointId($y, $x);
         if (count($query) != 1) {
             $this->noRecord($state);
         } else {
@@ -90,7 +96,8 @@ class Area extends BaseController
         if (($this->data['live'] or !empty($y) or !empty($x)) and preg_match('/^\d{1,9}$/', $id)) {
             $id = intval($id);
         }
-        $currentQuery = $this->db->query('SELECT * FROM extra.ci_model_area_currentgovernment(?, ?, ?)', [$id, $state, $this->request->getLocale()])->getResult();
+        $GovernmentShapeModel = new GovernmentShapeModel;
+        $currentQuery = $GovernmentShapeModel->getDetail($id, $state);
         if (count($currentQuery) != 1) {
             $this->noRecord($state);
         } else {
@@ -118,7 +125,8 @@ class Area extends BaseController
             }
             echo view('general_currentgovernment', ['query' => $currentQuery, 'state' => $state]);
             echo view('general_map', ['live' => $this->data['live'], 'includeBase' => true]);
-            $query = $this->db->query('SELECT * FROM extra.ci_model_area_affectedgovernment(?, ?, ?)', [$id, $state, $this->request->getLocale()])->getResult();
+            $AffectedGovernmentGroupModel = new AffectedGovernmentGroupModel;
+            $query = $AffectedGovernmentGroupModel->getByGovernmentShape($id, $state);
             $events = [];
             if (count($query) > 0) {
                 echo view('general_affectedgovernment', ['query' => $query, 'state' => $state, 'includeDate' => true, 'isComplete' => true]);
@@ -128,13 +136,15 @@ class Area extends BaseController
                     }
                 }
             }
-            $query = $this->db->query('SELECT * FROM extra.ci_model_area_metesdescription(?)', [$id])->getResult();
+            $MetesDescriptionModel = new MetesDescriptionModel;
+            $query = $MetesDescriptionModel->getByGovernmentShape($id);
             if (count($query) > 0) {
                 echo view('general_metes', ['query' => $query, 'hasLink' => true, 'state' => $state, 'title' => 'Metes and Bounds Description']);
             }
             $events = array_unique($events);
             $events = '{' . implode(',', $events) . '}';
-            $query = $this->db->query('SELECT * FROM extra.ci_model_area_event_failure(?, ?)', [$id, $events])->getResult();
+            $EventModel = new EventModel;
+            $query = $EventModel->getByGovernmentShapeFailure($id, $events);
             if (count($query) > 0) {
                 echo view('general_event', ['query' => $query, 'state' => $state, 'title' => 'Other Event Links']);
             }
