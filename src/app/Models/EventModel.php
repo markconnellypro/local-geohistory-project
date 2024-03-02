@@ -32,7 +32,7 @@ class EventModel extends Model
                         ELSE true
                     END AS textflag,
                 event.eventyear,
-                extra.shortdate(event.eventeffective) AS eventeffective,
+                event.eventeffectivetext AS eventeffective,
                 eventeffectivetype.eventeffectivetypegroup::text ||
                     CASE
                         WHEN eventeffectivetype.eventeffectivetypequalifier IS NOT NULL AND eventeffectivetype.eventeffectivetypequalifier::text = ''::text THEN ''::text
@@ -104,7 +104,6 @@ class EventModel extends Model
     // extra.ci_model_adjudication_event(integer)
 
     // FUNCTION: extra.eventsortdate
-    // FUNCTION: extra.shortdate
     // VIEW: extra.eventextracache
 
     public function getByAdjudication($id)
@@ -115,7 +114,7 @@ class EventModel extends Model
                 event.eventlong,
                 event.eventyear,
                 eventgranted.eventgrantedshort AS eventgranted,
-                extra.shortdate(event.eventeffective) AS eventeffective,
+                event.eventeffectivetext AS eventeffective,
                 extra.eventsortdate(event.eventid) AS eventsortdate,
                 eventrelationship.eventrelationshipshort AS eventrelationship
             FROM geohistory.event
@@ -144,7 +143,6 @@ class EventModel extends Model
     // extra.ci_model_reporter_event(integer)
 
     // FUNCTION: extra.eventsortdate
-    // FUNCTION: extra.shortdate
     // VIEW: extra.eventextracache
 
     public function getByAdjudicationSourceCitation($id)
@@ -155,7 +153,7 @@ class EventModel extends Model
                 event.eventlong,
                 event.eventyear,
                 eventgranted.eventgrantedshort AS eventgranted,
-                extra.shortdate(event.eventeffective) AS eventeffective,
+                event.eventeffectivetext AS eventeffective,
                 extra.eventsortdate(event.eventid) AS eventsortdate
             FROM geohistory.event
             JOIN geohistory.eventgranted
@@ -183,7 +181,6 @@ class EventModel extends Model
     // extra.ci_model_government_event_failure(integer, integer[])
 
     // FUNCTION: extra.eventsortdate
-    // FUNCTION: extra.shortdate
     // VIEW: extra.eventextracache
     // VIEW: extra.eventgovernmentcache
     // VIEW: extra.governmentsubstitutecache
@@ -196,7 +193,7 @@ class EventModel extends Model
                 event.eventlong,
                 event.eventyear,
                 eventgranted.eventgrantedshort AS eventgranted,
-                extra.shortdate(event.eventeffective) AS eventeffective,
+                event.eventeffectivetext AS eventeffective,
                 extra.eventsortdate(event.eventid) AS eventsortdate
             FROM geohistory.event
             JOIN geohistory.eventgranted
@@ -228,7 +225,6 @@ class EventModel extends Model
     // extra.ci_model_area_event_failure(integer, integer[])
 
     // FUNCTION: extra.eventsortdate
-    // FUNCTION: extra.shortdate
     // VIEW: extra.eventextracache
 
     public function getByGovernmentShapeFailure($id, $events)
@@ -239,7 +235,7 @@ class EventModel extends Model
                 event.eventlong,
                 event.eventyear,
                 eventgranted.eventgrantedshort AS eventgranted,
-                extra.shortdate(event.eventeffective) AS eventeffective,
+                event.eventeffectivetext AS eventeffective,
                 extra.eventsortdate(event.eventid) AS eventsortdate
             FROM geohistory.event
             JOIN geohistory.eventgranted
@@ -280,7 +276,6 @@ class EventModel extends Model
     // extra.ci_model_governmentsource_event(integer)
 
     // FUNCTION: extra.eventsortdate
-    // FUNCTION: extra.shortdate
     // VIEW: extra.eventextracache
 
     public function getByGovernmentSource($id)
@@ -291,7 +286,7 @@ class EventModel extends Model
                 event.eventlong,
                 event.eventyear,
                 eventgranted.eventgrantedshort AS eventgranted,
-                extra.shortdate(event.eventeffective) AS eventeffective,
+                event.eventeffectivetext AS eventeffective,
                 extra.eventsortdate(event.eventid) AS eventsortdate
             FROM geohistory.event
             JOIN geohistory.eventgranted
@@ -317,7 +312,6 @@ class EventModel extends Model
     // extra.ci_model_government_event_success(integer, integer[])
 
     // FUNCTION: extra.eventsortdate
-    // FUNCTION: extra.shortdate
     // VIEW: extra.eventextracache
     // VIEW: extra.eventgovernmentcache
     // VIEW: extra.governmentsubstitutecache
@@ -330,7 +324,7 @@ class EventModel extends Model
                 event.eventlong,
                 event.eventyear,
                 eventgranted.eventgrantedshort AS eventgranted,
-                extra.shortdate(event.eventeffective) AS eventeffective,
+                event.eventeffectivetext AS eventeffective,
                 extra.eventsortdate(event.eventid) AS eventsortdate
             FROM geohistory.event
             JOIN geohistory.eventgranted
@@ -361,7 +355,6 @@ class EventModel extends Model
     // extra.ci_model_lawalternate_event(integer)
 
     // FUNCTION: extra.eventsortdate
-    // FUNCTION: extra.shortdate
     // VIEW: extra.eventextracache
 
     public function getByLawAlternateSection($id)
@@ -372,7 +365,7 @@ class EventModel extends Model
                 event.eventlong,
                 event.eventyear,
                 eventgranted.eventgrantedshort AS eventgranted,
-                extra.shortdate(event.eventeffective) AS eventeffective,
+                event.eventeffectivetext AS eventeffective,
                 extra.eventsortdate(event.eventid) AS eventsortdate,
                 eventrelationship.eventrelationshipshort AS eventrelationship,
                 lawgroup.lawgrouplong
@@ -406,7 +399,6 @@ class EventModel extends Model
     // extra.ci_model_law_event(integer)
 
     // FUNCTION: extra.eventsortdate
-    // FUNCTION: extra.shortdate
     // VIEW: extra.eventextracache
 
     public function getByLawSection($id)
@@ -417,7 +409,7 @@ class EventModel extends Model
                 event.eventlong,
                 event.eventyear,
                 eventgranted.eventgrantedshort AS eventgranted,
-                extra.shortdate(event.eventeffective) AS eventeffective,
+                event.eventeffectivetext AS eventeffective,
                 extra.eventsortdate(event.eventid) AS eventsortdate,
                 eventrelationship.eventrelationshipshort AS eventrelationship,
                 lawgroup.lawgrouplong
@@ -449,7 +441,6 @@ class EventModel extends Model
     // extra.ci_model_source_event(integer)
 
     // FUNCTION: extra.eventsortdate
-    // FUNCTION: extra.shortdate
     // VIEW: extra.eventextracache
 
     public function getBySourceCitation($id)
@@ -460,7 +451,7 @@ class EventModel extends Model
                 event.eventlong,
                 event.eventyear,
                 eventgranted.eventgrantedshort AS eventgranted,
-                extra.shortdate(event.eventeffective) AS eventeffective,
+                event.eventeffectivetext AS eventeffective,
                 extra.eventsortdate(event.eventid) AS eventsortdate
             FROM geohistory.event
             JOIN geohistory.eventgranted
@@ -720,7 +711,6 @@ class EventModel extends Model
     // extra.ci_model_search_event_government(text, text, text, text, integer, integer)
 
     // FUNCTION: extra.eventsortdate
-    // FUNCTION: extra.shortdate
     // VIEW: extra.eventextracache
     // VIEW: extra.eventgovernmentcache
     // VIEW: extra.governmentextracache
@@ -754,7 +744,7 @@ class EventModel extends Model
                 event.eventlong,
                 event.eventyear,
                 eventgranted.eventgrantedshort AS eventgranted,
-                extra.shortdate(event.eventeffective) AS eventeffective,
+                event.eventeffectivetext AS eventeffective,
                 extra.eventsortdate(event.eventid) AS eventsortdate
                 FROM alternategovernment
                 JOIN extra.eventgovernmentcache      

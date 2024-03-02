@@ -111,7 +111,6 @@ class AffectedGovernmentGroupModel extends Model
     // FUNCTION: extra.eventsortdate
     // FUNCTION: extra.governmentformlong
     // FUNCTION: extra.governmentlong
-    // FUNCTION: extra.shortdate
     // VIEW: extra.eventextracache
     // VIEW: extra.governmentsubstitute
 
@@ -123,7 +122,7 @@ class AffectedGovernmentGroupModel extends Model
                 eventextracache.eventslug,
                 extra.governmentformlong(affectedgovernmentpart.governmentformto, ?) governmentformlong,
                 event.eventyear,
-                extra.shortdate(event.eventeffective) AS eventeffective,
+                event.eventeffectivetext AS eventeffective,
                 event.eventeffective AS eventeffectivesort,
                 NOT eventgranted.eventgrantedcertainty AS eventreconstructed,
                 extra.governmentlong(affectedgovernmentpart.governmentto, ?) AS governmentaffectedlong
@@ -163,7 +162,7 @@ class AffectedGovernmentGroupModel extends Model
     // FUNCTION: extra.governmentlong
     // FUNCTION: extra.governmentstatelink
     // FUNCTION: extra.governmentsubstitutedcache
-    // FUNCTION: extra.shortdate
+
     // VIEW: extra.eventextracache
     // VIEW: extra.governmentsubstitutecache
 
@@ -187,7 +186,7 @@ class AffectedGovernmentGroupModel extends Model
                     ELSE ''
                 END AS affectedtypeother,
                 event.eventyear,
-                extra.shortdate(event.eventeffective) AS eventeffective,
+                event.eventeffectivetext AS eventeffective,
                 event.eventeffective AS eventeffectivesort,
                 NOT eventgranted.eventgrantedcertainty AS eventreconstructed,
                 extra.governmentlong(affectedgovernment.governmentaffected, ?) AS governmentaffectedlong
@@ -335,9 +334,6 @@ class AffectedGovernmentGroupModel extends Model
     // FUNCTION: extra.governmentlong
     // FUNCTION: extra.governmentshort
     // FUNCTION: extra.governmentstatelink
-    // FUNCTION: extra.nulltoempty
-    // FUNCTION: extra.shortdate
-
 
     public function getByGovernmentShape($id, $state)
     {
@@ -367,20 +363,20 @@ class AffectedGovernmentGroupModel extends Model
                     OR affectedgovernment_reconstructed.submunicipalityto IS NOT NULL
                     OR affectedgovernment_reconstructed.subcountyfrom IS NOT NULL
                     OR affectedgovernment_reconstructed.subcountyto IS NOT NULL THEN TRUE ELSE FALSE END AS textflag,
-                extra.nulltoempty(extra.governmentstatelink(affectedgovernment_reconstructed.submunicipalityfrom, ?, ?)) AS submunicipalityfrom,
-                extra.nulltoempty(extra.governmentlong(affectedgovernment_reconstructed.submunicipalityfrom, ?)) AS submunicipalityfromlong,
-                extra.nulltoempty(extra.affectedtypeshort(affectedgovernment_reconstructed.affectedtypesubmunicipalityfrom)) AS affectedtypesubmunicipalityfrom,
-                extra.nulltoempty(extra.governmentstatelink(affectedgovernment_reconstructed.submunicipalityto, ?, ?)) AS submunicipalityto,
-                extra.nulltoempty(extra.governmentlong(affectedgovernment_reconstructed.submunicipalityto, ?)) AS submunicipalitytolong,
-                extra.nulltoempty(extra.affectedtypeshort(affectedgovernment_reconstructed.affectedtypesubmunicipalityto)) AS affectedtypesubmunicipalityto,
-                extra.nulltoempty(extra.governmentstatelink(affectedgovernment_reconstructed.subcountyfrom, ?, ?)) AS subcountyfrom,
-                extra.nulltoempty(extra.governmentshort(affectedgovernment_reconstructed.subcountyfrom, ?)) AS subcountyfromshort,
-                extra.nulltoempty(extra.affectedtypeshort(affectedgovernment_reconstructed.affectedtypesubcountyfrom)) AS affectedtypesubcountyfrom,
-                extra.nulltoempty(extra.governmentstatelink(affectedgovernment_reconstructed.subcountyto, ?, ?)) AS subcountyto,
-                extra.nulltoempty(extra.governmentshort(affectedgovernment_reconstructed.subcountyto, ?)) AS subcountytoshort,
-                extra.nulltoempty(extra.affectedtypeshort(affectedgovernment_reconstructed.affectedtypesubcountyto)) AS affectedtypesubcountyto,
+                COALESCE(extra.governmentstatelink(affectedgovernment_reconstructed.submunicipalityfrom, ?, ?), '') AS submunicipalityfrom,
+                COALESCE(extra.governmentlong(affectedgovernment_reconstructed.submunicipalityfrom, ?), '') AS submunicipalityfromlong,
+                COALESCE(extra.affectedtypeshort(affectedgovernment_reconstructed.affectedtypesubmunicipalityfrom), '') AS affectedtypesubmunicipalityfrom,
+                COALESCE(extra.governmentstatelink(affectedgovernment_reconstructed.submunicipalityto, ?, ?), '') AS submunicipalityto,
+                COALESCE(extra.governmentlong(affectedgovernment_reconstructed.submunicipalityto, ?), '') AS submunicipalitytolong,
+                COALESCE(extra.affectedtypeshort(affectedgovernment_reconstructed.affectedtypesubmunicipalityto), '') AS affectedtypesubmunicipalityto,
+                COALESCE(extra.governmentstatelink(affectedgovernment_reconstructed.subcountyfrom, ?, ?), '') AS subcountyfrom,
+                COALESCE(extra.governmentshort(affectedgovernment_reconstructed.subcountyfrom, ?), '') AS subcountyfromshort,
+                COALESCE(extra.affectedtypeshort(affectedgovernment_reconstructed.affectedtypesubcountyfrom), '') AS affectedtypesubcountyfrom,
+                COALESCE(extra.governmentstatelink(affectedgovernment_reconstructed.subcountyto, ?, ?), '') AS subcountyto,
+                COALESCE(extra.governmentshort(affectedgovernment_reconstructed.subcountyto, ?), '') AS subcountytoshort,
+                COALESCE(extra.affectedtypeshort(affectedgovernment_reconstructed.affectedtypesubcountyto), '') AS affectedtypesubcountyto,
                 event.eventyear,
-                extra.shortdate(event.eventeffective) AS eventeffective,
+                event.eventeffectivetext AS eventeffective,
                 extra.eventsortdate(event.eventid) AS eventsortdate,
                 (ROW_NUMBER () OVER (ORDER BY extra.eventsortdate(event.eventid), event.eventid))::integer AS eventorder,
                 (ROW_NUMBER () OVER (ORDER BY extra.eventsortdate(event.eventid) DESC, event.eventid DESC))::integer AS eventorderreverse
@@ -396,7 +392,7 @@ class AffectedGovernmentGroupModel extends Model
                 JOIN gis.affectedgovernmentgis
                 ON affectedgovernment_reconstructed.affectedgovernmentid = affectedgovernmentgis.affectedgovernment
                 WHERE affectedgovernmentgis.governmentshape = ?
-                GROUP BY 1, eventslug, municipalityfrom, municipalityfromlong, affectedtypemunicipalityfrom, countyfrom, countyfromshort, affectedtypecountyfrom, statefrom, statefromabbreviation, affectedtypestatefrom, municipalityto, municipalitytolong, affectedtypemunicipalityto, countyto, countytoshort, affectedtypecountyto, stateto, statetoabbreviation, affectedtypestateto, submunicipalityfrom, submunicipalityfromlong, affectedtypesubmunicipalityfrom, submunicipalityto, submunicipalitytolong, affectedtypesubmunicipalityto, subcountyfrom, subcountyfromshort, affectedtypesubcountyfrom, subcountyto, subcountytoshort, affectedtypesubcountyto, event.eventyear, extra.shortdate(event.eventeffective), extra.eventsortdate(event.eventid)
+                GROUP BY 1, eventslug, municipalityfrom, municipalityfromlong, affectedtypemunicipalityfrom, countyfrom, countyfromshort, affectedtypecountyfrom, statefrom, statefromabbreviation, affectedtypestatefrom, municipalityto, municipalitytolong, affectedtypemunicipalityto, countyto, countytoshort, affectedtypecountyto, stateto, statetoabbreviation, affectedtypestateto, submunicipalityfrom, submunicipalityfromlong, affectedtypesubmunicipalityfrom, submunicipalityto, submunicipalitytolong, affectedtypesubmunicipalityto, subcountyfrom, subcountyfromshort, affectedtypesubcountyfrom, subcountyto, subcountytoshort, affectedtypesubcountyto, event.eventyear, event.eventeffectivetext, extra.eventsortdate(event.eventid)
             ), currentgovernment AS (
                 -- Taken from GovernmentShapeModel->getDetail
                 SELECT DISTINCT governmentshape.governmentshapeid,
