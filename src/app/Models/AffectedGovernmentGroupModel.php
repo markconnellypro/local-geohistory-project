@@ -111,7 +111,6 @@ class AffectedGovernmentGroupModel extends Model
     // FUNCTION: extra.eventsortdate
     // FUNCTION: extra.governmentformlong
     // FUNCTION: extra.governmentlong
-    // FUNCTION: extra.rangefix
     // FUNCTION: extra.shortdate
     // VIEW: extra.eventextracache
     // VIEW: extra.governmentsubstitute
@@ -123,7 +122,7 @@ class AffectedGovernmentGroupModel extends Model
                 event.eventid AS event,
                 eventextracache.eventslug,
                 extra.governmentformlong(affectedgovernmentpart.governmentformto, ?) governmentformlong,
-                extra.rangefix(event.eventfrom::text, event.eventto::text) AS eventrange,
+                event.eventyear,
                 extra.shortdate(event.eventeffective) AS eventeffective,
                 event.eventeffective AS eventeffectivesort,
                 NOT eventgranted.eventgrantedcertainty AS eventreconstructed,
@@ -164,7 +163,6 @@ class AffectedGovernmentGroupModel extends Model
     // FUNCTION: extra.governmentlong
     // FUNCTION: extra.governmentstatelink
     // FUNCTION: extra.governmentsubstitutedcache
-    // FUNCTION: extra.rangefix
     // FUNCTION: extra.shortdate
     // VIEW: extra.eventextracache
     // VIEW: extra.governmentsubstitutecache
@@ -188,7 +186,7 @@ class AffectedGovernmentGroupModel extends Model
                     WHEN affectedgovernment.affectedtypeotherwithin THEN ' (Within)'
                     ELSE ''
                 END AS affectedtypeother,
-                extra.rangefix(event.eventfrom::text, event.eventto::text) AS eventrange,
+                event.eventyear,
                 extra.shortdate(event.eventeffective) AS eventeffective,
                 event.eventeffective AS eventeffectivesort,
                 NOT eventgranted.eventgrantedcertainty AS eventreconstructed,
@@ -338,7 +336,6 @@ class AffectedGovernmentGroupModel extends Model
     // FUNCTION: extra.governmentshort
     // FUNCTION: extra.governmentstatelink
     // FUNCTION: extra.nulltoempty
-    // FUNCTION: extra.rangefix
     // FUNCTION: extra.shortdate
 
 
@@ -382,7 +379,7 @@ class AffectedGovernmentGroupModel extends Model
                 extra.nulltoempty(extra.governmentstatelink(affectedgovernment_reconstructed.subcountyto, ?, ?)) AS subcountyto,
                 extra.nulltoempty(extra.governmentshort(affectedgovernment_reconstructed.subcountyto, ?)) AS subcountytoshort,
                 extra.nulltoempty(extra.affectedtypeshort(affectedgovernment_reconstructed.affectedtypesubcountyto)) AS affectedtypesubcountyto,
-                extra.rangefix(event.eventfrom::text, event.eventto::text) AS eventrange,
+                event.eventyear,
                 extra.shortdate(event.eventeffective) AS eventeffective,
                 extra.eventsortdate(event.eventid) AS eventsortdate,
                 (ROW_NUMBER () OVER (ORDER BY extra.eventsortdate(event.eventid), event.eventid))::integer AS eventorder,
@@ -399,7 +396,7 @@ class AffectedGovernmentGroupModel extends Model
                 JOIN gis.affectedgovernmentgis
                 ON affectedgovernment_reconstructed.affectedgovernmentid = affectedgovernmentgis.affectedgovernment
                 WHERE affectedgovernmentgis.governmentshape = ?
-                GROUP BY 1, eventslug, municipalityfrom, municipalityfromlong, affectedtypemunicipalityfrom, countyfrom, countyfromshort, affectedtypecountyfrom, statefrom, statefromabbreviation, affectedtypestatefrom, municipalityto, municipalitytolong, affectedtypemunicipalityto, countyto, countytoshort, affectedtypecountyto, stateto, statetoabbreviation, affectedtypestateto, submunicipalityfrom, submunicipalityfromlong, affectedtypesubmunicipalityfrom, submunicipalityto, submunicipalitytolong, affectedtypesubmunicipalityto, subcountyfrom, subcountyfromshort, affectedtypesubcountyfrom, subcountyto, subcountytoshort, affectedtypesubcountyto, extra.rangefix(event.eventfrom::text, event.eventto::text), extra.shortdate(event.eventeffective), extra.eventsortdate(event.eventid)
+                GROUP BY 1, eventslug, municipalityfrom, municipalityfromlong, affectedtypemunicipalityfrom, countyfrom, countyfromshort, affectedtypecountyfrom, statefrom, statefromabbreviation, affectedtypestatefrom, municipalityto, municipalitytolong, affectedtypemunicipalityto, countyto, countytoshort, affectedtypecountyto, stateto, statetoabbreviation, affectedtypestateto, submunicipalityfrom, submunicipalityfromlong, affectedtypesubmunicipalityfrom, submunicipalityto, submunicipalitytolong, affectedtypesubmunicipalityto, subcountyfrom, subcountyfromshort, affectedtypesubcountyfrom, subcountyto, subcountytoshort, affectedtypesubcountyto, event.eventyear, extra.shortdate(event.eventeffective), extra.eventsortdate(event.eventid)
             ), currentgovernment AS (
                 -- Taken from GovernmentShapeModel->getDetail
                 SELECT DISTINCT governmentshape.governmentshapeid,
@@ -419,7 +416,7 @@ class AffectedGovernmentGroupModel extends Model
                 WHERE governmentshape.governmentshapeid = ?
                 AND (governmentrelationstate = ? OR governmentrelationstate IS NULL)
             )
-            SELECT eventid, eventslug, municipalityfrom, municipalityfromlong, affectedtypemunicipalityfrom, countyfrom, countyfromshort, affectedtypecountyfrom, statefrom, statefromabbreviation, affectedtypestatefrom, municipalityto, municipalitytolong, affectedtypemunicipalityto, countyto, countytoshort, affectedtypecountyto, stateto, statetoabbreviation, affectedtypestateto, textflag, submunicipalityfrom, submunicipalityfromlong, affectedtypesubmunicipalityfrom, submunicipalityto, submunicipalitytolong, affectedtypesubmunicipalityto, subcountyfrom, subcountyfromshort, affectedtypesubcountyfrom, subcountyto, subcountytoshort, affectedtypesubcountyto, eventrange, eventeffective, eventsortdate, 
+            SELECT eventid, eventslug, municipalityfrom, municipalityfromlong, affectedtypemunicipalityfrom, countyfrom, countyfromshort, affectedtypecountyfrom, statefrom, statefromabbreviation, affectedtypestatefrom, municipalityto, municipalitytolong, affectedtypemunicipalityto, countyto, countytoshort, affectedtypecountyto, stateto, statetoabbreviation, affectedtypestateto, textflag, submunicipalityfrom, submunicipalityfromlong, affectedtypesubmunicipalityfrom, submunicipalityto, submunicipalitytolong, affectedtypesubmunicipalityto, subcountyfrom, subcountyfromshort, affectedtypesubcountyfrom, subcountyto, subcountytoshort, affectedtypesubcountyto, eventyear, eventeffective, eventsortdate, 
                (eventorder * 2 - 1) AS eventorder
             FROM foundaffectedgovernment
             UNION
@@ -456,7 +453,7 @@ class AffectedGovernmentGroupModel extends Model
                newg.subcountyfrom AS subcountyto,
                newg.subcountyfromshort AS subcountytoshort,
                CASE WHEN newg.subcountyfrom = '' THEN '' ELSE 'Missing' END AS affectedtypesubcountyto,
-               '' AS eventrange,
+               '' AS eventyear,
                '' AS eventeffective,
                NULL AS eventsortdate,
                (oldg.eventorder * 2) AS eventorder
@@ -504,7 +501,7 @@ class AffectedGovernmentGroupModel extends Model
                '' AS subcountyto,
                '' AS subcountytoshort,
                '' AS affectedtypesubcountyto,
-               '' AS eventrange,
+               '' AS eventyear,
                '' AS eventeffective,
                NULL AS eventsortdate,
                (oldg.eventorder * 2) AS eventorder

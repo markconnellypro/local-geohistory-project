@@ -26,7 +26,7 @@
                     <td><?= $row->affectedtypesame . ($row->eventreconstructed == 't' ? '?' : '') ?></td>
                     <td><?php echo view('general_link', ['link' => $row->governmentstatelink, 'text' => $row->governmentlong]) ?></td>
                     <td><?= $row->affectedtypeother . ($row->eventreconstructed == 't' ? '?' : '') ?></td>
-                    <td data-sort="<?= $row->eventsortdate ?>"><?= (empty($row->eventeffective) ? $row->eventrange : $row->eventeffective) ?></td>
+                    <td data-sort="<?= $row->eventsortdate ?>"><?= (empty($row->eventeffective) ? $row->eventyear : $row->eventeffective) ?></td>
                 </tr>
             <?php $i++;
             } ?>

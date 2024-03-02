@@ -10,7 +10,6 @@ class MetesDescriptionModel extends Model
     // extra.ci_model_metes_detail(text, character varying)
 
     // FUNCTION: extra.eventsortdate
-    // FUNCTION: extra.rangefix
     // FUNCTION: extra.shortdate
     // VIEW: extra.metesdescriptionextracache
     // VIEW: extra.eventextracache
@@ -38,7 +37,7 @@ class MetesDescriptionModel extends Model
                 eventextracache.eventslug,
                 eventtype.eventtypeshort,
                 event.eventlong,
-                extra.rangefix(event.eventfrom::text, event.eventto::text) AS eventrange,
+                event.eventyear,
                 eventgranted.eventgrantedshort AS eventgranted,
                 extra.shortdate(event.eventeffective) AS eventeffective,
                 extra.eventsortdate(event.eventid) AS eventsortdate

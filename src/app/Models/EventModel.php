@@ -9,7 +9,6 @@ class EventModel extends Model
     // extra.ci_model_event_detail(integer, character varying)
     // extra.ci_model_event_detail(text, character varying)
 
-    // FUNCTION: extra.rangefix
     // FUNCTION: extra.shortdate
     // FUNCTION: extra.governmentstatelink
     // FUNCTION: extra.eventgovernmentcache
@@ -32,7 +31,7 @@ class EventModel extends Model
                         WHEN eventgranted.eventgrantedshort = 'government' OR (event.eventfrom = 0 AND event.eventto = 0 AND event.eventeffective::text = ''::text AND event.eventeffectivetypepresumedsource IS NULL AND other.otherdatetype IS NULL) THEN false
                         ELSE true
                     END AS textflag,
-                extra.rangefix(event.eventfrom::text, event.eventto::text) AS eventrange,
+                event.eventyear,
                 extra.shortdate(event.eventeffective) AS eventeffective,
                 eventeffectivetype.eventeffectivetypegroup::text ||
                     CASE
@@ -105,7 +104,6 @@ class EventModel extends Model
     // extra.ci_model_adjudication_event(integer)
 
     // FUNCTION: extra.eventsortdate
-    // FUNCTION: extra.rangefix
     // FUNCTION: extra.shortdate
     // VIEW: extra.eventextracache
 
@@ -115,7 +113,7 @@ class EventModel extends Model
             SELECT DISTINCT eventextracache.eventslug,
                 eventtype.eventtypeshort,
                 event.eventlong,
-                extra.rangefix(event.eventfrom::text, event.eventto::text) AS eventrange,
+                event.eventyear,
                 eventgranted.eventgrantedshort AS eventgranted,
                 extra.shortdate(event.eventeffective) AS eventeffective,
                 extra.eventsortdate(event.eventid) AS eventsortdate,
@@ -146,7 +144,6 @@ class EventModel extends Model
     // extra.ci_model_reporter_event(integer)
 
     // FUNCTION: extra.eventsortdate
-    // FUNCTION: extra.rangefix
     // FUNCTION: extra.shortdate
     // VIEW: extra.eventextracache
 
@@ -156,7 +153,7 @@ class EventModel extends Model
             SELECT DISTINCT eventextracache.eventslug,
                 eventtype.eventtypeshort,
                 event.eventlong,
-                extra.rangefix(event.eventfrom::text, event.eventto::text) AS eventrange,
+                event.eventyear,
                 eventgranted.eventgrantedshort AS eventgranted,
                 extra.shortdate(event.eventeffective) AS eventeffective,
                 extra.eventsortdate(event.eventid) AS eventsortdate
@@ -186,7 +183,6 @@ class EventModel extends Model
     // extra.ci_model_government_event_failure(integer, integer[])
 
     // FUNCTION: extra.eventsortdate
-    // FUNCTION: extra.rangefix
     // FUNCTION: extra.shortdate
     // VIEW: extra.eventextracache
     // VIEW: extra.eventgovernmentcache
@@ -198,7 +194,7 @@ class EventModel extends Model
             SELECT DISTINCT eventextracache.eventslug,
                 eventtype.eventtypeshort,
                 event.eventlong,
-                extra.rangefix(event.eventfrom::text, event.eventto::text) AS eventrange,
+                event.eventyear,
                 eventgranted.eventgrantedshort AS eventgranted,
                 extra.shortdate(event.eventeffective) AS eventeffective,
                 extra.eventsortdate(event.eventid) AS eventsortdate
@@ -232,7 +228,6 @@ class EventModel extends Model
     // extra.ci_model_area_event_failure(integer, integer[])
 
     // FUNCTION: extra.eventsortdate
-    // FUNCTION: extra.rangefix
     // FUNCTION: extra.shortdate
     // VIEW: extra.eventextracache
 
@@ -242,7 +237,7 @@ class EventModel extends Model
             SELECT DISTINCT eventextracache.eventslug,
                 eventtype.eventtypeshort,
                 event.eventlong,
-                extra.rangefix(event.eventfrom::text, event.eventto::text) AS eventrange,
+                event.eventyear,
                 eventgranted.eventgrantedshort AS eventgranted,
                 extra.shortdate(event.eventeffective) AS eventeffective,
                 extra.eventsortdate(event.eventid) AS eventsortdate
@@ -285,7 +280,6 @@ class EventModel extends Model
     // extra.ci_model_governmentsource_event(integer)
 
     // FUNCTION: extra.eventsortdate
-    // FUNCTION: extra.rangefix
     // FUNCTION: extra.shortdate
     // VIEW: extra.eventextracache
 
@@ -295,7 +289,7 @@ class EventModel extends Model
             SELECT DISTINCT eventextracache.eventslug,
                 eventtype.eventtypeshort,
                 event.eventlong,
-                extra.rangefix(event.eventfrom::text, event.eventto::text) AS eventrange,
+                event.eventyear,
                 eventgranted.eventgrantedshort AS eventgranted,
                 extra.shortdate(event.eventeffective) AS eventeffective,
                 extra.eventsortdate(event.eventid) AS eventsortdate
@@ -323,7 +317,6 @@ class EventModel extends Model
     // extra.ci_model_government_event_success(integer, integer[])
 
     // FUNCTION: extra.eventsortdate
-    // FUNCTION: extra.rangefix
     // FUNCTION: extra.shortdate
     // VIEW: extra.eventextracache
     // VIEW: extra.eventgovernmentcache
@@ -335,7 +328,7 @@ class EventModel extends Model
             SELECT DISTINCT eventextracache.eventslug,
                 eventtype.eventtypeshort,
                 event.eventlong,
-                extra.rangefix(event.eventfrom::text, event.eventto::text) AS eventrange,
+                event.eventyear,
                 eventgranted.eventgrantedshort AS eventgranted,
                 extra.shortdate(event.eventeffective) AS eventeffective,
                 extra.eventsortdate(event.eventid) AS eventsortdate
@@ -368,7 +361,6 @@ class EventModel extends Model
     // extra.ci_model_lawalternate_event(integer)
 
     // FUNCTION: extra.eventsortdate
-    // FUNCTION: extra.rangefix
     // FUNCTION: extra.shortdate
     // VIEW: extra.eventextracache
 
@@ -378,7 +370,7 @@ class EventModel extends Model
             SELECT DISTINCT eventextracache.eventslug,
                 eventtype.eventtypeshort,
                 event.eventlong,
-                extra.rangefix(event.eventfrom::text, event.eventto::text) AS eventrange,
+                event.eventyear,
                 eventgranted.eventgrantedshort AS eventgranted,
                 extra.shortdate(event.eventeffective) AS eventeffective,
                 extra.eventsortdate(event.eventid) AS eventsortdate,
@@ -414,7 +406,6 @@ class EventModel extends Model
     // extra.ci_model_law_event(integer)
 
     // FUNCTION: extra.eventsortdate
-    // FUNCTION: extra.rangefix
     // FUNCTION: extra.shortdate
     // VIEW: extra.eventextracache
 
@@ -424,7 +415,7 @@ class EventModel extends Model
             SELECT DISTINCT eventextracache.eventslug,
                 eventtype.eventtypeshort,
                 event.eventlong,
-                extra.rangefix(event.eventfrom::text, event.eventto::text) AS eventrange,
+                event.eventyear,
                 eventgranted.eventgrantedshort AS eventgranted,
                 extra.shortdate(event.eventeffective) AS eventeffective,
                 extra.eventsortdate(event.eventid) AS eventsortdate,
@@ -458,7 +449,6 @@ class EventModel extends Model
     // extra.ci_model_source_event(integer)
 
     // FUNCTION: extra.eventsortdate
-    // FUNCTION: extra.rangefix
     // FUNCTION: extra.shortdate
     // VIEW: extra.eventextracache
 
@@ -468,7 +458,7 @@ class EventModel extends Model
             SELECT DISTINCT eventextracache.eventslug,
                 eventtype.eventtypeshort,
                 event.eventlong,
-                extra.rangefix(event.eventfrom::text, event.eventto::text) AS eventrange,
+                event.eventyear,
                 eventgranted.eventgrantedshort AS eventgranted,
                 extra.shortdate(event.eventeffective) AS eventeffective,
                 extra.eventsortdate(event.eventid) AS eventsortdate
@@ -730,7 +720,6 @@ class EventModel extends Model
     // extra.ci_model_search_event_government(text, text, text, text, integer, integer)
 
     // FUNCTION: extra.eventsortdate
-    // FUNCTION: extra.rangefix
     // FUNCTION: extra.shortdate
     // VIEW: extra.eventextracache
     // VIEW: extra.eventgovernmentcache
@@ -763,7 +752,7 @@ class EventModel extends Model
             SELECT DISTINCT eventextracache.eventslug,
                 eventtype.eventtypeshort,
                 event.eventlong,
-                extra.rangefix(event.eventfrom::text, event.eventto::text) AS eventrange,
+                event.eventyear,
                 eventgranted.eventgrantedshort AS eventgranted,
                 extra.shortdate(event.eventeffective) AS eventeffective,
                 extra.eventsortdate(event.eventid) AS eventsortdate

@@ -31,7 +31,7 @@
                     <?php } ?>
                     <td><?= $row->governmentformlong . ((!$includeGovernment and $row->eventreconstructed == 't') ? '?' : '') ?></td>
                     <?php if (!$includeGovernment) { ?>
-                        <td data-sort="<?= $row->eventsortdate ?>"><?= (empty($row->eventeffective) ? $row->eventrange : $row->eventeffective) ?></td>
+                        <td data-sort="<?= $row->eventsortdate ?>"><?= (empty($row->eventeffective) ? $row->eventyear : $row->eventeffective) ?></td>
                     <?php } ?>
                 </tr>
             <?php $i++;

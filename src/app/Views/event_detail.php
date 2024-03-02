@@ -51,7 +51,7 @@
             </thead>
             <tbody>
                 <tr>
-                    <td><?= $row->eventrange ?></td>
+                    <td><?= $row->eventyear ?></td>
                     <td><?= $row->otherdate ?></td>
                     <td><?= $row->eventeffective ?></td>
                     <td><?= $row->eventeffectivetype ?></td>
