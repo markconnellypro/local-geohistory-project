@@ -13,7 +13,6 @@ class GovernmentSourceModel extends Model
     // FUNCTION: extra.governmentstatelink
     // FUNCTION: extra.rangefix
     // FUNCTION: extra.shortdate
-    // FUNCTION: extra.zeropad
     // VIEW: extra.sourceextra
 
     public function getDetail($id, $state)
@@ -43,7 +42,7 @@ class GovernmentSourceModel extends Model
                         WHEN governmentsource.governmentsourcedate <> '' THEN governmentsource.governmentsourcedate
                         WHEN governmentsource.governmentsourceeffectivedate <> '' THEN governmentsource.governmentsourceeffectivedate
                         ELSE ''
-                    END || governmentsource.governmentsourcetype || extra.zeropad(governmentsource.governmentsourcenumber, 5) AS governmentsourcesort,
+                    END || governmentsource.governmentsourcetype || lpad(governmentsource.governmentsourcenumber, 5, '0') AS governmentsourcesort,
                 governmentsource.governmentsourcebody,
                 governmentsource.governmentsourceterm,
                 governmentsource.governmentsourceapproved,
@@ -110,7 +109,6 @@ class GovernmentSourceModel extends Model
     // FUNCTION: extra.governmentstatelink
     // FUNCTION: extra.rangefix
     // FUNCTION: extra.shortdate
-    // FUNCTION: extra.zeropad
     // VIEW: extra.governmentsourceextracache
 
     public function getByEvent($id, $state)
@@ -135,7 +133,7 @@ class GovernmentSourceModel extends Model
                         WHEN governmentsource.governmentsourcedate <> '' THEN governmentsource.governmentsourcedate
                         WHEN governmentsource.governmentsourceeffectivedate <> '' THEN governmentsource.governmentsourceeffectivedate
                         ELSE ''
-                    END || governmentsource.governmentsourcetype || extra.zeropad(governmentsource.governmentsourcenumber, 5) AS governmentsourcesort,
+                    END || governmentsource.governmentsourcetype || lpad(governmentsource.governmentsourcenumber, 5, '0') AS governmentsourcesort,
                 governmentsource.governmentsourcebody,
                 governmentsource.governmentsourceterm,
                 governmentsource.governmentsourceapproved,
@@ -197,7 +195,6 @@ class GovernmentSourceModel extends Model
     // FUNCTION: extra.governmentlong
     // FUNCTION: extra.rangefix
     // FUNCTION: extra.shortdate
-    // FUNCTION: extra.zeropad
     // VIEW: extra.eventextracache
     // VIEW: extra.governmentsubstitutecache
 
@@ -222,7 +219,7 @@ class GovernmentSourceModel extends Model
                         WHEN governmentsource.governmentsourcedate <> '' THEN governmentsource.governmentsourcedate
                         WHEN governmentsource.governmentsourceeffectivedate <> '' THEN governmentsource.governmentsourceeffectivedate
                         ELSE ''
-                    END || governmentsource.governmentsourcetype || extra.zeropad(governmentsource.governmentsourcenumber, 5) AS governmentsourcesort,
+                    END || governmentsource.governmentsourcetype || lpad(governmentsource.governmentsourcenumber, 5, '0') AS governmentsourcesort,
                 governmentsource.governmentsourcebody,
                 governmentsource.governmentsourceterm,
                 governmentsource.governmentsourceapproved,

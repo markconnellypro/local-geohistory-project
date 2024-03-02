@@ -86,7 +86,6 @@ class SourceItemPartModel extends Model
     // extra.ci_model_lawalternate_url(integer, boolean)
 
     // FUNCTION: extra.sourceurlid
-    // FUNCTION: extra.zeropad
 
     public function getByLawAlternateSection($id)
     {
@@ -94,11 +93,11 @@ class SourceItemPartModel extends Model
             SELECT sourceitem.sourceitemurl ||
                 CASE
                     WHEN sourceitem.sourceitemurlcomplete THEN ''
-                    ELSE (sourceitempart.sourceitempartsequencecharacter || extra.zeropad(sourceitempart.sourceitempartsequence +
+                    ELSE (sourceitempart.sourceitempartsequencecharacter || lpad((sourceitempart.sourceitempartsequence +
                     CASE
                         WHEN sourceitempart.sourceitempartisbypage THEN lawalternatesection.lawalternatesectionpagefrom
                         ELSE lawalternate.lawalternatenumberchapter
-                    END, sourceitempart.sourceitempartzeropad)) || sourceitempart.sourceitempartsequencecharacterafter
+                    END)::text, sourceitempart.sourceitempartzeropad, '0')) || sourceitempart.sourceitempartsequencecharacterafter
                 END AS url
         FROM geohistory.lawalternatesection
         JOIN geohistory.lawalternate
@@ -145,7 +144,6 @@ class SourceItemPartModel extends Model
     // extra.ci_model_law_url(integer, boolean)
 
     // FUNCTION: extra.sourceurlid
-    // FUNCTION: extra.zeropad
 
     public function getByLawSection($id)
     {
@@ -153,11 +151,11 @@ class SourceItemPartModel extends Model
             SELECT sourceitem.sourceitemurl ||
                 CASE
                     WHEN sourceitem.sourceitemurlcomplete THEN ''
-                    ELSE (sourceitempart.sourceitempartsequencecharacter || extra.zeropad(sourceitempart.sourceitempartsequence +
+                    ELSE (sourceitempart.sourceitempartsequencecharacter || lpad((sourceitempart.sourceitempartsequence +
                     CASE
                         WHEN sourceitempart.sourceitempartisbypage THEN lawsection.lawsectionpagefrom
                         ELSE law.lawnumberchapter
-                    END, sourceitempart.sourceitempartzeropad)) || sourceitempart.sourceitempartsequencecharacterafter
+                    END)::text, sourceitempart.sourceitempartzeropad, '0')) || sourceitempart.sourceitempartsequencecharacterafter
                 END AS url
         FROM geohistory.lawsection
         JOIN geohistory.law
