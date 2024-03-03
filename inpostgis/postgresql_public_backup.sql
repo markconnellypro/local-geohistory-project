@@ -1187,62 +1187,6 @@ $_$;
 ALTER FUNCTION extra.metesdescriptionslug(integer) OWNER TO postgres;
 
 --
--- Name: nulltoempty(integer[]); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.nulltoempty(integer[]) RETURNS integer[]
-    LANGUAGE sql IMMUTABLE
-    AS $_$
-        SELECT CASE WHEN $1 IS NULL
-            THEN ARRAY[]::integer[] ELSE $1 END AS nulltoempty;
-    $_$;
-
-
-ALTER FUNCTION extra.nulltoempty(integer[]) OWNER TO postgres;
-
---
--- Name: nulltoempty(text); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.nulltoempty(text) RETURNS text
-    LANGUAGE sql IMMUTABLE
-    AS $_$
-        SELECT CASE WHEN $1 IS NULL
-            THEN '' ELSE $1 END AS nulltoempty;
-    $_$;
-
-
-ALTER FUNCTION extra.nulltoempty(text) OWNER TO postgres;
-
---
--- Name: nulltozero(integer); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.nulltozero(integer) RETURNS integer
-    LANGUAGE sql IMMUTABLE
-    AS $_$
-        SELECT CASE WHEN $1 IS NULL
-            THEN 0 ELSE $1 END AS nulltozero;
-    $_$;
-
-
-ALTER FUNCTION extra.nulltozero(integer) OWNER TO postgres;
-
---
--- Name: nulltozero(bigint); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.nulltozero(bigint) RETURNS integer
-    LANGUAGE sql IMMUTABLE
-    AS $_$
-        SELECT CASE WHEN $1 IS NULL
-            THEN 0::integer ELSE $1::integer END AS nulltozero;
-    $_$;
-
-
-ALTER FUNCTION extra.nulltozero(bigint) OWNER TO postgres;
-
---
 -- Name: plsstownshiplong(integer); Type: FUNCTION; Schema: extra; Owner: postgres
 --
 
@@ -1349,8 +1293,8 @@ CREATE FUNCTION extra.rangefix(text, text) RETURNS text
 
     DECLARE fullrange TEXT;
     BEGIN
-        $1 := extra.nulltoempty($1::text);
-        $2 := extra.nulltoempty($2::text);
+        $1 := COALESCE($1::text, '');
+        $2 := COALESCE($2::text, '');
         IF $2 = '' OR $1 = $2 THEN
             fullrange := $1;
         ELSEIF $1 = '' THEN
@@ -1858,30 +1802,17 @@ $_$;
 ALTER FUNCTION extra.tribunalshort(integer, integer, character varying) OWNER TO postgres;
 
 --
--- Name: zeropad(integer, integer); Type: FUNCTION; Schema: extra; Owner: postgres
+-- Name: datetonumeric(date); Type: FUNCTION; Schema: geohistory; Owner: postgres
 --
 
-CREATE FUNCTION extra.zeropad(integer, integer) RETURNS text
+CREATE FUNCTION geohistory.datetonumeric(date) RETURNS numeric
     LANGUAGE sql IMMUTABLE
     AS $_$
-        SELECT repeat('0', $2 - length($1::text)) || $1;
-    $_$;
+        SELECT to_char($1, 'J')::numeric;
+$_$;
 
 
-ALTER FUNCTION extra.zeropad(integer, integer) OWNER TO postgres;
-
---
--- Name: zeropad(text, integer); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.zeropad(text, integer) RETURNS text
-    LANGUAGE sql IMMUTABLE
-    AS $_$
-        SELECT repeat('0', $2 - length($1)) || $1;
-    $_$;
-
-
-ALTER FUNCTION extra.zeropad(text, integer) OWNER TO postgres;
+ALTER FUNCTION geohistory.datetonumeric(date) OWNER TO postgres;
 
 --
 -- Name: government_insertupdate(); Type: FUNCTION; Schema: geohistory; Owner: postgres
@@ -2155,6 +2086,34 @@ $$;
 
 
 ALTER FUNCTION geohistory.metesdescriptionline_insertupdate() OWNER TO postgres;
+
+--
+-- Name: rangeformat(text, text); Type: FUNCTION; Schema: geohistory; Owner: postgres
+--
+
+CREATE FUNCTION geohistory.rangeformat(text, text) RETURNS text
+    LANGUAGE plpgsql IMMUTABLE
+    AS $_$
+
+    DECLARE fullrange TEXT;
+    BEGIN
+        $1 := COALESCE($1::text, '');
+        $2 := COALESCE($2::text, '');
+        IF $2 = '' OR $1 = $2 THEN
+            fullrange := $1;
+        ELSEIF $1 = '' THEN
+            fullrange := '–' || $2;
+        ELSEIF $2 = 'missing' THEN
+            fullrange := $1 || ' (' || $2 || ')';
+        ELSE
+            fullrange := $1 || '–' || $2;
+        END IF;
+        RETURN fullrange;
+    END
+$_$;
+
+
+ALTER FUNCTION geohistory.rangeformat(text, text) OWNER TO postgres;
 
 --
 -- Name: source_insert(); Type: FUNCTION; Schema: geohistory; Owner: postgres
@@ -2797,6 +2756,7 @@ CREATE TABLE geohistory.event (
     eventlong character varying(500) NOT NULL,
     eventfrom smallint NOT NULL,
     eventto smallint NOT NULL,
+    eventgranted integer NOT NULL,
     eventeffective calendar.historicdatetext DEFAULT (''::text)::calendar.historicdatetext NOT NULL,
     eventeffectivetypestatutory integer,
     eventeffectivetypepresumedsource integer,
@@ -2805,7 +2765,45 @@ CREATE TABLE geohistory.event (
     eventismapped boolean DEFAULT false NOT NULL,
     eventismappedtype character varying(100) DEFAULT ''::character varying NOT NULL,
     government integer,
-    eventgranted integer NOT NULL,
+    eventdatetext text GENERATED ALWAYS AS (
+CASE
+    WHEN (((eventeffective)::text = ''::text) AND (eventfrom IS NULL) AND (eventto IS NULL)) THEN '?'::text
+    WHEN ((eventeffective)::text <> ''::text) THEN calendar.historicdatetextformat((eventeffective)::calendar.historicdate, 'short'::text, 'en'::text)
+    ELSE geohistory.rangeformat((eventfrom)::text, (eventto)::text)
+END) STORED,
+    eventeffectivetext text GENERATED ALWAYS AS (calendar.historicdatetextformat((eventeffective)::calendar.historicdate, 'short'::text, 'en'::text)) STORED,
+    eventyear text GENERATED ALWAYS AS (geohistory.rangeformat((eventfrom)::text, (eventto)::text)) STORED,
+    eventsort numeric GENERATED ALWAYS AS ((geohistory.datetonumeric(
+CASE
+    WHEN ((calendar.historicdate((eventeffective)::text)).gregorian IS NOT NULL) THEN (calendar.historicdate((eventeffective)::text)).gregorian
+    ELSE make_date(
+    CASE
+        WHEN (eventto <> 0) THEN (eventto)::integer
+        WHEN (eventfrom <> 0) THEN (eventfrom)::integer
+        ELSE 1
+    END, 1, 1)
+END) + (0.01 * (eventeffectiveorder)::numeric))) STORED,
+    eventsortdate date GENERATED ALWAYS AS (
+CASE
+    WHEN ((calendar.historicdate((eventeffective)::text)).gregorian IS NOT NULL) THEN (calendar.historicdate((eventeffective)::text)).gregorian
+    ELSE make_date(
+    CASE
+        WHEN (eventto <> 0) THEN (eventto)::integer
+        WHEN (eventfrom <> 0) THEN (eventfrom)::integer
+        ELSE 1
+    END, 1, 1)
+END) STORED,
+    eventsortyear integer GENERATED ALWAYS AS ((
+CASE
+    WHEN ((calendar.historicdate((eventeffective)::text)).gregorian IS NOT NULL) THEN date_part('year'::text, (calendar.historicdate((eventeffective)::text)).gregorian)
+    ELSE (
+    CASE
+        WHEN (eventto <> 0) THEN (eventto)::integer
+        WHEN (eventfrom <> 0) THEN (eventfrom)::integer
+        ELSE 1
+    END)::double precision
+END)::integer) STORED,
+    eventslug text GENERATED ALWAYS AS (lower(regexp_replace(regexp_replace(replace((eventlong)::text, ', '::text, ' '::text), '[ʻ \/'',]'::text, '-'::text, 'g'::text), '[:\*\(\)\?\.\[\]]'::text, ''::text, 'g'::text))) STORED,
     CONSTRAINT event_check CHECK (((eventfrom <= eventto) AND ((eventlong)::text <> ''::text) AND (((eventgranted = 17) AND (government IS NOT NULL)) OR ((eventgranted <> 17) AND (government IS NULL)))))
 );
 
@@ -2975,9 +2973,9 @@ CREATE TABLE geohistory.lawsectionevent (
     lawsectioneventid integer NOT NULL,
     lawsection integer NOT NULL,
     event integer NOT NULL,
-    lawsectioneventnotes text DEFAULT ''::text NOT NULL,
-    lawgroup integer,
     eventrelationship integer NOT NULL,
+    lawsectioneventnotes text,
+    lawgroup integer,
     CONSTRAINT lawsectionevent_check CHECK ((eventrelationship <> ALL (ARRAY[6, 7, 9])))
 );
 
@@ -3572,7 +3570,7 @@ ALTER MATERIALIZED VIEW extra.tribunalgovernmentcache OWNER TO postgres;
 --
 
 CREATE VIEW extra.adjudicationsearch AS
- SELECT DISTINCT (lpad((adjudication.adjudicationid)::text, 6, '0'::text) || lpad((extra.nulltozero(adjudicationlocation.adjudicationlocationid))::text, 6, '0'::text)) AS adjudicationlocationid,
+ SELECT DISTINCT (lpad((adjudication.adjudicationid)::text, 6, '0'::text) || lpad((COALESCE(adjudicationlocation.adjudicationlocationid, 0))::text, 6, '0'::text)) AS adjudicationlocationid,
     lpad((adjudication.adjudicationid)::text, 6, '0'::text) AS adjudicationid,
     adjudication.adjudicationnumber,
     adjudication.adjudicationterm,
@@ -3584,16 +3582,16 @@ CREATE VIEW extra.adjudicationsearch AS
     adjudicationtype.adjudicationtypeshort,
     adjudicationtype.adjudicationtypeabbreviation,
     lpad((adjudicationtype.adjudicationtypeid)::text, 6, '0'::text) AS adjudicationtypeid,
-    lpad(extra.nulltoempty((adjudicationlocationtype.adjudicationlocationtypeid)::text), 6, '0'::text) AS adjudicationlocationtypeid,
-    extra.nulltoempty((adjudicationlocation.adjudicationlocationvolume)::text) AS adjudicationlocationvolume,
-    extra.nulltoempty((adjudicationlocation.adjudicationlocationpagefrom)::text) AS adjudicationlocationpagefrom,
-    extra.nulltoempty((adjudicationlocation.adjudicationlocationpageto)::text) AS adjudicationlocationpageto,
+    lpad(COALESCE((adjudicationlocationtype.adjudicationlocationtypeid)::text, ''::text), 6, '0'::text) AS adjudicationlocationtypeid,
+    COALESCE((adjudicationlocation.adjudicationlocationvolume)::text, ''::text) AS adjudicationlocationvolume,
+    COALESCE((adjudicationlocation.adjudicationlocationpagefrom)::text, ''::text) AS adjudicationlocationpagefrom,
+    COALESCE((adjudicationlocation.adjudicationlocationpageto)::text, ''::text) AS adjudicationlocationpageto,
         CASE
             WHEN ((adjudicationgovernmentcache.governmentrelationstate = b.governmentrelationstate) OR (adjudicationgovernmentcache.governmentrelationstate IS NULL)) THEN b.tribunalshort
-            ELSE extra.nulltoempty(b.tribunalshortstate)
+            ELSE COALESCE(b.tribunalshortstate, ''::text)
         END AS adjudicationlocationtribunal,
-    extra.nulltoempty((adjudicationlocationtype.adjudicationlocationtypeshort)::text) AS adjudicationlocationtypeshort,
-    extra.nulltoempty((adjudicationlocationtype.adjudicationlocationtypeabbreviation)::text) AS adjudicationlocationtypeabbreviation,
+    COALESCE((adjudicationlocationtype.adjudicationlocationtypeshort)::text, ''::text) AS adjudicationlocationtypeshort,
+    COALESCE((adjudicationlocationtype.adjudicationlocationtypeabbreviation)::text, ''::text) AS adjudicationlocationtypeabbreviation,
         CASE
             WHEN (adjudicationgovernmentcache.governmentrelationstate IS NULL) THEN upper("left"(a.tribunalshortstate, 2))
             ELSE adjudicationgovernmentcache.governmentrelationstate
@@ -3622,8 +3620,8 @@ CREATE VIEW extra.adjudicationsearch AS
         END, adjudicationtype.adjudicationtypeshort, adjudication.adjudicationterm, adjudication.adjudicationnumber,
         CASE
             WHEN ((adjudicationgovernmentcache.governmentrelationstate = b.governmentrelationstate) OR (adjudicationgovernmentcache.governmentrelationstate IS NULL)) THEN b.tribunalshort
-            ELSE extra.nulltoempty(b.tribunalshortstate)
-        END, (extra.nulltoempty((adjudicationlocationtype.adjudicationlocationtypeshort)::text)), (extra.nulltoempty((adjudicationlocation.adjudicationlocationvolume)::text)), (extra.nulltoempty((adjudicationlocation.adjudicationlocationpagefrom)::text));
+            ELSE COALESCE(b.tribunalshortstate, ''::text)
+        END, COALESCE((adjudicationlocationtype.adjudicationlocationtypeshort)::text, ''::text), COALESCE((adjudicationlocation.adjudicationlocationvolume)::text, ''::text), COALESCE((adjudicationlocation.adjudicationlocationpagefrom)::text, ''::text);
 
 
 ALTER VIEW extra.adjudicationsearch OWNER TO postgres;
@@ -4315,19 +4313,19 @@ CREATE VIEW extra.governmentchangecount AS
              LEFT JOIN creationdissolution ON (((affectedgovernmentsummaryeventpart.eventid = creationdissolution.eventid) AND (affectedgovernmentsummaryeventpart.governmentid = creationdissolution.governmentid))))
         ), alterfrom AS (
          SELECT affectedgovernmentsummaryevent.governmentid,
-            extra.nulltoempty(array_agg(DISTINCT affectedgovernmentsummaryevent.eventid ORDER BY affectedgovernmentsummaryevent.eventid)) AS eventid
+            COALESCE(array_agg(DISTINCT affectedgovernmentsummaryevent.eventid ORDER BY affectedgovernmentsummaryevent.eventid), ARRAY[]::integer[]) AS eventid
            FROM affectedgovernmentsummaryevent
           WHERE ((affectedgovernmentsummaryevent.affectedside = 'from'::text) AND ((affectedgovernmentsummaryevent.affectedtypecreationdissolution)::text = 'alter'::text))
           GROUP BY affectedgovernmentsummaryevent.governmentid
         ), alterto AS (
          SELECT affectedgovernmentsummaryevent.governmentid,
-            extra.nulltoempty(array_agg(DISTINCT affectedgovernmentsummaryevent.eventid ORDER BY affectedgovernmentsummaryevent.eventid)) AS eventid
+            COALESCE(array_agg(DISTINCT affectedgovernmentsummaryevent.eventid ORDER BY affectedgovernmentsummaryevent.eventid), ARRAY[]::integer[]) AS eventid
            FROM affectedgovernmentsummaryevent
           WHERE ((affectedgovernmentsummaryevent.affectedside = 'to'::text) AND ((affectedgovernmentsummaryevent.affectedtypecreationdissolution)::text = 'alter'::text))
           GROUP BY affectedgovernmentsummaryevent.governmentid
         ), altertotal AS (
          SELECT affectedgovernmentsummaryevent.governmentid,
-            extra.nulltoempty(array_agg(DISTINCT affectedgovernmentsummaryevent.eventid ORDER BY affectedgovernmentsummaryevent.eventid)) AS eventid
+            COALESCE(array_agg(DISTINCT affectedgovernmentsummaryevent.eventid ORDER BY affectedgovernmentsummaryevent.eventid), ARRAY[]::integer[]) AS eventid
            FROM affectedgovernmentsummaryevent
           WHERE ((affectedgovernmentsummaryevent.affectedtypecreationdissolution)::text = 'alter'::text)
           GROUP BY affectedgovernmentsummaryevent.governmentid
@@ -4356,18 +4354,18 @@ CREATE VIEW extra.governmentchangecount AS
           WHERE ((affectedgovernmentsummaryevent.affectedtypecreationdissolution)::text = 'end'::text)
           GROUP BY affectedgovernmentsummaryevent.governmentid
         )
- SELECT extra.nulltoempty(extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentid))) AS governmentstate,
+ SELECT COALESCE(extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentid)), ''::text) AS governmentstate,
     government.governmentlevel,
     government.governmenttype,
-    extra.nulltoempty(affectedgovernmentform."Form") AS currentform,
-    extra.nulltoempty(affectedgovernmentform."Form Detailed") AS currentformdetailed,
+    COALESCE(affectedgovernmentform."Form", ''::text) AS currentform,
+    COALESCE(affectedgovernmentform."Form Detailed", ''::text) AS currentformdetailed,
         CASE
             WHEN (government.governmentlevel > 3) THEN extra.governmentname(government.governmentcurrentleadparent)
             ELSE ''::text
         END AS governmentleadparentcounty,
     government.governmentid,
     extra.governmentlong(government.governmentid) AS governmentlong,
-    extra.nulltozero(array_length(creation.eventid, 1)) AS creation,
+    COALESCE(array_length(creation.eventid, 1), 0) AS creation,
     creation.eventid AS creationevent,
         CASE
             WHEN (array_length(creation.eventid, 1) = 1) THEN creation.eventtextshortdate[1]
@@ -4382,7 +4380,7 @@ CREATE VIEW extra.governmentchangecount AS
             ELSE NULL::date
         END AS creationsort,
         CASE
-            WHEN (array_length(creation.eventid, 1) = 1) THEN extra.nulltoempty(creation.eventeffectivetype[1])
+            WHEN (array_length(creation.eventid, 1) = 1) THEN COALESCE(creation.eventeffectivetype[1], ''::text)
             ELSE ''::text
         END AS creationhow,
         CASE
@@ -4390,10 +4388,10 @@ CREATE VIEW extra.governmentchangecount AS
             ELSE creation.lawsection
         END AS creationlawsection,
     creation.originalgovernmentid AS creationas,
-    extra.nulltozero(array_length(alterfrom.eventid, 1)) AS alterfrom,
-    extra.nulltozero(array_length(alterto.eventid, 1)) AS alterto,
-    extra.nulltozero(array_length(altertotal.eventid, 1)) AS altertotal,
-    extra.nulltozero(array_length(dissolution.eventid, 1)) AS dissolution,
+    COALESCE(array_length(alterfrom.eventid, 1), 0) AS alterfrom,
+    COALESCE(array_length(alterto.eventid, 1), 0) AS alterto,
+    COALESCE(array_length(altertotal.eventid, 1), 0) AS altertotal,
+    COALESCE(array_length(dissolution.eventid, 1), 0) AS dissolution,
     dissolution.eventid AS dissolutionevent,
         CASE
             WHEN (array_length(dissolution.eventid, 1) = 1) THEN dissolution.eventtextshortdate[1]
@@ -4408,7 +4406,7 @@ CREATE VIEW extra.governmentchangecount AS
             ELSE NULL::date
         END AS dissolutionsort,
         CASE
-            WHEN (array_length(dissolution.eventid, 1) = 1) THEN extra.nulltoempty(dissolution.eventeffectivetype[1])
+            WHEN (array_length(dissolution.eventid, 1) = 1) THEN COALESCE(dissolution.eventeffectivetype[1], ''::text)
             ELSE ''::text
         END AS dissolutionhow,
         CASE
@@ -4517,19 +4515,19 @@ CREATE VIEW extra.governmentchangecountpart AS
           GROUP BY affectedgovernmentsummary.eventid, affectedgovernmentsummary.governmentid, affectedgovernmentsummary.affectedtypeid, affectedgovernmentsummary.affectedside, affectedtype.affectedtypecreationdissolution, (extra.eventsortdatedate((event.eventeffective)::character varying, event.eventfrom, event.eventto)), (extra.eventtextshortdate((event.eventeffective)::character varying, event.eventfrom, event.eventto)), (extra.eventeffectivetype(eventeffectivetype.eventeffectivetypegroup, eventeffectivetype.eventeffectivetypequalifier)), event.eventeffective, event.eventfrom, event.eventto
         ), alterfrom AS (
          SELECT affectedgovernmentsummaryevent.governmentid,
-            extra.nulltoempty(array_agg(DISTINCT affectedgovernmentsummaryevent.eventid ORDER BY affectedgovernmentsummaryevent.eventid)) AS eventid
+            COALESCE(array_agg(DISTINCT affectedgovernmentsummaryevent.eventid ORDER BY affectedgovernmentsummaryevent.eventid), ARRAY[]::integer[]) AS eventid
            FROM affectedgovernmentsummaryevent
           WHERE ((affectedgovernmentsummaryevent.affectedside = 'from'::text) AND ((affectedgovernmentsummaryevent.affectedtypecreationdissolution)::text = 'alter'::text))
           GROUP BY affectedgovernmentsummaryevent.governmentid
         ), alterto AS (
          SELECT affectedgovernmentsummaryevent.governmentid,
-            extra.nulltoempty(array_agg(DISTINCT affectedgovernmentsummaryevent.eventid ORDER BY affectedgovernmentsummaryevent.eventid)) AS eventid
+            COALESCE(array_agg(DISTINCT affectedgovernmentsummaryevent.eventid ORDER BY affectedgovernmentsummaryevent.eventid), ARRAY[]::integer[]) AS eventid
            FROM affectedgovernmentsummaryevent
           WHERE ((affectedgovernmentsummaryevent.affectedside = 'to'::text) AND ((affectedgovernmentsummaryevent.affectedtypecreationdissolution)::text = 'alter'::text))
           GROUP BY affectedgovernmentsummaryevent.governmentid
         ), altertotal AS (
          SELECT affectedgovernmentsummaryevent.governmentid,
-            extra.nulltoempty(array_agg(DISTINCT affectedgovernmentsummaryevent.eventid ORDER BY affectedgovernmentsummaryevent.eventid)) AS eventid
+            COALESCE(array_agg(DISTINCT affectedgovernmentsummaryevent.eventid ORDER BY affectedgovernmentsummaryevent.eventid), ARRAY[]::integer[]) AS eventid
            FROM affectedgovernmentsummaryevent
           WHERE ((affectedgovernmentsummaryevent.affectedtypecreationdissolution)::text = 'alter'::text)
           GROUP BY affectedgovernmentsummaryevent.governmentid
@@ -4556,18 +4554,18 @@ CREATE VIEW extra.governmentchangecountpart AS
           WHERE ((affectedgovernmentsummaryevent.affectedtypecreationdissolution)::text = 'end'::text)
           GROUP BY affectedgovernmentsummaryevent.governmentid
         )
- SELECT extra.nulltoempty(extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentid))) AS governmentstate,
+ SELECT COALESCE(extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentid)), ''::text) AS governmentstate,
     government.governmentlevel,
     government.governmenttype,
-    extra.nulltoempty(affectedgovernmentform."Form") AS currentform,
-    extra.nulltoempty(affectedgovernmentform."Form Detailed") AS currentformdetailed,
+    COALESCE(affectedgovernmentform."Form", ''::text) AS currentform,
+    COALESCE(affectedgovernmentform."Form Detailed", ''::text) AS currentformdetailed,
         CASE
             WHEN (government.governmentlevel > 3) THEN extra.governmentname(government.governmentcurrentleadparent)
             ELSE ''::text
         END AS governmentleadparentcounty,
     government.governmentid,
     extra.governmentlong(government.governmentid) AS governmentlong,
-    extra.nulltozero(array_length(creation.eventid, 1)) AS creation,
+    COALESCE(array_length(creation.eventid, 1), 0) AS creation,
     creation.eventid AS creationevent,
         CASE
             WHEN (array_length(creation.eventid, 1) = 1) THEN creation.eventtextshortdate[1]
@@ -4582,17 +4580,17 @@ CREATE VIEW extra.governmentchangecountpart AS
             ELSE NULL::date
         END AS creationsort,
         CASE
-            WHEN (array_length(creation.eventid, 1) = 1) THEN extra.nulltoempty(creation.eventeffectivetype[1])
+            WHEN (array_length(creation.eventid, 1) = 1) THEN COALESCE(creation.eventeffectivetype[1], ''::text)
             ELSE ''::text
         END AS creationhow,
         CASE
             WHEN (creation.lawsection IS NULL) THEN false
             ELSE creation.lawsection
         END AS creationlawsection,
-    extra.nulltozero(array_length(alterfrom.eventid, 1)) AS alterfrom,
-    extra.nulltozero(array_length(alterto.eventid, 1)) AS alterto,
-    extra.nulltozero(array_length(altertotal.eventid, 1)) AS altertotal,
-    extra.nulltozero(array_length(dissolution.eventid, 1)) AS dissolution,
+    COALESCE(array_length(alterfrom.eventid, 1), 0) AS alterfrom,
+    COALESCE(array_length(alterto.eventid, 1), 0) AS alterto,
+    COALESCE(array_length(altertotal.eventid, 1), 0) AS altertotal,
+    COALESCE(array_length(dissolution.eventid, 1), 0) AS dissolution,
     dissolution.eventid AS dissolutionevent,
         CASE
             WHEN (array_length(dissolution.eventid, 1) = 1) THEN dissolution.eventtextshortdate[1]
@@ -4607,7 +4605,7 @@ CREATE VIEW extra.governmentchangecountpart AS
             ELSE NULL::date
         END AS dissolutionsort,
         CASE
-            WHEN (array_length(dissolution.eventid, 1) = 1) THEN extra.nulltoempty(dissolution.eventeffectivetype[1])
+            WHEN (array_length(dissolution.eventid, 1) = 1) THEN COALESCE(dissolution.eventeffectivetype[1], ''::text)
             ELSE ''::text
         END AS dissolutionhow,
         CASE
@@ -6401,8 +6399,8 @@ CREATE TABLE geohistory.recordingevent (
     recordingeventid integer NOT NULL,
     event integer NOT NULL,
     recording integer NOT NULL,
-    recordingeventinclude boolean,
     eventrelationship integer NOT NULL,
+    recordingeventinclude boolean,
     CONSTRAINT recordingevent_check CHECK ((eventrelationship <> ALL (ARRAY[6, 7, 9])))
 );
 
@@ -7315,13 +7313,13 @@ CREATE TABLE geohistory.governmentidentifiertype (
     source integer,
     isinteger boolean DEFAULT true NOT NULL,
     governmentidentifiertypeurl text DEFAULT ''::text NOT NULL,
-    governmentidentifiertypeslug text,
-    governmentidentifiertypeprefixdelimiter character varying(1) DEFAULT ''::character varying NOT NULL,
-    governmentidentifiertypenote text DEFAULT ''::text NOT NULL,
     governmentidentifiertypeprefixlengthfrom integer,
     governmentidentifiertypeprefixlengthto integer,
     governmentidentifiertypelengthfrom integer,
     governmentidentifiertypelengthto integer,
+    governmentidentifiertypeslug text,
+    governmentidentifiertypeprefixdelimiter character varying(1) DEFAULT ''::character varying NOT NULL,
+    governmentidentifiertypenote text DEFAULT ''::text NOT NULL,
     CONSTRAINT governmentidentifiertype_check CHECK (((governmentidentifiertypeshort)::text <> ''::text))
 );
 
@@ -11228,7 +11226,7 @@ CREATE TRIGGER lawsection_update_trigger BEFORE UPDATE OF law ON geohistory.laws
 -- Name: lawsectionevent lawsectionevent_insertupdate_trigger; Type: TRIGGER; Schema: geohistory; Owner: postgres
 --
 
-CREATE TRIGGER lawsectionevent_insertupdate_trigger BEFORE INSERT OR UPDATE OF lawsection, eventrelationship, lawgroup ON geohistory.lawsectionevent FOR EACH ROW EXECUTE FUNCTION geohistory.lawsectionevent_insertupdate();
+CREATE TRIGGER lawsectionevent_insertupdate_trigger BEFORE INSERT OR UPDATE OF lawsection, lawgroup, eventrelationship ON geohistory.lawsectionevent FOR EACH ROW EXECUTE FUNCTION geohistory.lawsectionevent_insertupdate();
 
 
 --
@@ -12565,34 +12563,6 @@ REVOKE ALL ON FUNCTION extra.metesdescriptionslug(integer) FROM PUBLIC;
 
 
 --
--- Name: FUNCTION nulltoempty(integer[]); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.nulltoempty(integer[]) FROM PUBLIC;
-
-
---
--- Name: FUNCTION nulltoempty(text); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.nulltoempty(text) FROM PUBLIC;
-
-
---
--- Name: FUNCTION nulltozero(integer); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.nulltozero(integer) FROM PUBLIC;
-
-
---
--- Name: FUNCTION nulltozero(bigint); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.nulltozero(bigint) FROM PUBLIC;
-
-
---
 -- Name: FUNCTION plsstownshiplong(integer); Type: ACL; Schema: extra; Owner: postgres
 --
 
@@ -12712,17 +12682,17 @@ REVOKE ALL ON FUNCTION extra.tribunalshort(integer, integer, character varying) 
 
 
 --
--- Name: FUNCTION zeropad(integer, integer); Type: ACL; Schema: extra; Owner: postgres
+-- Name: FUNCTION datetonumeric(date); Type: ACL; Schema: geohistory; Owner: postgres
 --
 
-REVOKE ALL ON FUNCTION extra.zeropad(integer, integer) FROM PUBLIC;
+REVOKE ALL ON FUNCTION geohistory.datetonumeric(date) FROM PUBLIC;
 
 
 --
--- Name: FUNCTION zeropad(text, integer); Type: ACL; Schema: extra; Owner: postgres
+-- Name: FUNCTION rangeformat(text, text); Type: ACL; Schema: geohistory; Owner: postgres
 --
 
-REVOKE ALL ON FUNCTION extra.zeropad(text, integer) FROM PUBLIC;
+REVOKE ALL ON FUNCTION geohistory.rangeformat(text, text) FROM PUBLIC;
 
 
 --
