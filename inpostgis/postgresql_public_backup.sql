@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 16.1 (Debian 16.1-1.pgdg110+1)
+-- Dumped from database version 16.2 (Debian 16.2-1.pgdg110+2)
 -- Dumped by pg_dump version 16.2 (Ubuntu 16.2-1.pgdg22.04+1)
 
 SET statement_timeout = 0;
@@ -127,180 +127,6 @@ CREATE FUNCTION extra.eventeffectivetype(eventeffectivetypegroup character varyi
 
 
 ALTER FUNCTION extra.eventeffectivetype(eventeffectivetypegroup character varying, eventeffectivetypequalifier character varying) OWNER TO postgres;
-
---
--- Name: eventslug(integer); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.eventslug(integer) RETURNS text
-    LANGUAGE sql STABLE
-    AS $_$
-
- SELECT lower(regexp_replace(regexp_replace(replace(event.eventlong, ', ', ' '), '[ʻ \/'',]', '-', 'g'), '[:\*\(\)\?\.\[\]]', '', 'g')) AS eventslug
-   FROM geohistory.event
-  WHERE event.eventid = $1;
-     
-$_$;
-
-
-ALTER FUNCTION extra.eventslug(integer) OWNER TO postgres;
-
---
--- Name: eventsortdate(integer); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.eventsortdate(integer) RETURNS numeric
-    LANGUAGE sql STABLE
-    AS $_$
-
-     SELECT extra.eventsortdate(event.eventeffective, event.eventfrom, event.eventto, event.eventeffectiveorder) AS eventsortdate
-       FROM geohistory.event
-       WHERE eventid = $1;
-    
-$_$;
-
-
-ALTER FUNCTION extra.eventsortdate(integer) OWNER TO postgres;
-
---
--- Name: eventsortdate(character varying, smallint, smallint, integer); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.eventsortdate(eventeffective character varying, eventfrom smallint, eventto smallint, eventeffectiveorder integer) RETURNS numeric
-    LANGUAGE sql IMMUTABLE
-    AS $$
-
-     SELECT
-            to_char(CASE
-                WHEN (calendar.historicdate(eventeffective)).gregorian IS NOT NULL THEN (calendar.historicdate(eventeffective)).gregorian
-                ELSE make_date(CASE
-                    WHEN eventto <> 0 THEN eventto
-                    WHEN eventfrom <> 0 THEN eventfrom
-                    ELSE 1
-                END, 1, 1)
-            END, 'J')::numeric + 0.01 * eventeffectiveorder AS eventsortdate;
-    
-$$;
-
-
-ALTER FUNCTION extra.eventsortdate(eventeffective character varying, eventfrom smallint, eventto smallint, eventeffectiveorder integer) OWNER TO postgres;
-
---
--- Name: eventsortdatedate(integer); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.eventsortdatedate(integer) RETURNS date
-    LANGUAGE sql STABLE
-    AS $_$
-
-     SELECT extra.eventsortdatedate(event.eventeffective, event.eventfrom, event.eventto) AS eventsortdatedate
-       FROM geohistory.event
-       WHERE eventid = $1;
-    
-$_$;
-
-
-ALTER FUNCTION extra.eventsortdatedate(integer) OWNER TO postgres;
-
---
--- Name: eventsortdatedate(character varying, smallint, smallint); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.eventsortdatedate(eventeffective character varying, eventfrom smallint, eventto smallint) RETURNS date
-    LANGUAGE sql IMMUTABLE
-    AS $$
-
-     SELECT
-            CASE
-                WHEN (calendar.historicdate(eventeffective)).gregorian IS NOT NULL THEN (calendar.historicdate(eventeffective)).gregorian
-                ELSE make_date(CASE
-                    WHEN eventto <> 0 THEN eventto
-                    WHEN eventfrom <> 0 THEN eventfrom
-                    ELSE 1
-                END, 1, 1)
-            END AS eventsortdatedate;
-    
-$$;
-
-
-ALTER FUNCTION extra.eventsortdatedate(eventeffective character varying, eventfrom smallint, eventto smallint) OWNER TO postgres;
-
---
--- Name: eventsortdateyear(integer); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.eventsortdateyear(integer) RETURNS integer
-    LANGUAGE sql STABLE
-    AS $_$
-
-     SELECT extra.eventsortdateyear(event.eventeffective, event.eventfrom, event.eventto) AS eventsortdateyear
-       FROM geohistory.event
-       WHERE eventid = $1;
-    
-$_$;
-
-
-ALTER FUNCTION extra.eventsortdateyear(integer) OWNER TO postgres;
-
---
--- Name: eventsortdateyear(character varying, smallint, smallint); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.eventsortdateyear(eventeffective character varying, eventfrom smallint, eventto smallint) RETURNS integer
-    LANGUAGE sql IMMUTABLE
-    AS $$
-
-     SELECT
-            (CASE
-			    WHEN (calendar.historicdate(eventeffective)).gregorian IS NOT NULL THEN date_part('year', (calendar.historicdate(eventeffective)).gregorian)
-                ELSE CASE
-                    WHEN eventto <> 0 THEN eventto
-                    WHEN eventfrom <> 0 THEN eventfrom
-                    ELSE 1
-                END
-            END)::integer AS eventsortdateyear;
-    
-$$;
-
-
-ALTER FUNCTION extra.eventsortdateyear(eventeffective character varying, eventfrom smallint, eventto smallint) OWNER TO postgres;
-
---
--- Name: eventtextshortdate(integer); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.eventtextshortdate(integer) RETURNS text
-    LANGUAGE sql STABLE
-    AS $_$
-
-     SELECT extra.eventtextshortdate(event.eventeffective, event.eventfrom, event.eventto) AS eventtextdate
-       FROM geohistory.event
-       WHERE eventid = $1;
-    
-$_$;
-
-
-ALTER FUNCTION extra.eventtextshortdate(integer) OWNER TO postgres;
-
---
--- Name: eventtextshortdate(character varying, smallint, smallint); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.eventtextshortdate(eventeffective character varying, eventfrom smallint, eventto smallint) RETURNS text
-    LANGUAGE sql IMMUTABLE
-    AS $$
-
-     SELECT
-            CASE
-                WHEN eventeffective = '' AND eventfrom IS NULL AND eventto IS NULL THEN '?'
-                WHEN eventeffective::text <> ''::text THEN extra.shortdate(eventeffective)
-                ELSE extra.rangefix(eventfrom::text, eventto::text)
-            END AS eventtextdate;
-    
-$$;
-
-
-ALTER FUNCTION extra.eventtextshortdate(eventeffective character varying, eventfrom smallint, eventto smallint) OWNER TO postgres;
 
 --
 -- Name: fulldate(text); Type: FUNCTION; Schema: extra; Owner: postgres
@@ -1174,11 +1000,13 @@ CREATE FUNCTION extra.metesdescriptionslug(integer) RETURNS text
     LANGUAGE sql STABLE
     AS $_$
 
- SELECT extra.eventslug(metesdescription.event) || CASE
+ SELECT event.eventslug || CASE
     WHEN metesdescription.metesdescriptionname = '' THEN ''
     ELSE '-' || lower(regexp_replace(regexp_replace(replace(metesdescription.metesdescriptionname, ', ', ' '), '[ \/'',"]', '-', 'g'), '[\(\)\?\.\[\]]', '', 'g'))
    END AS metesdescriptionslug
    FROM geohistory.metesdescription
+   JOIN geohistory.event
+     ON metesdescription.event = event.eventid
   WHERE metesdescription.metesdescriptionid = $1;
      
 $_$;
@@ -3880,15 +3708,15 @@ CREATE VIEW extra.affectedgovernmentform AS
     extra.governmentformlongreport(governmentforms.governmentform) AS "Form",
     extra.governmentformlong(governmentforms.governmentform, true) AS "Form Detailed",
     governmentforms.governmentform AS "Form ID",
-    (('J'::text || trunc(extra.eventsortdate(governmentforms.event), 0)))::date AS "Date",
+    event.eventsortdate AS "Date",
     governmentforms.event AS "Event",
     (extra.governmenttype(governmentforms.government) = split_part(replace(extra.governmentformlong(governmentforms.governmentform), ' '::text, ','::text), ','::text, 1)) AS "Type-Form Match",
-    row_number() OVER (PARTITION BY governmentforms.government ORDER BY (('J'::text || trunc(extra.eventsortdate(governmentforms.event), 0)))::date DESC) AS "Recentness"
+    row_number() OVER (PARTITION BY governmentforms.government ORDER BY event.eventsortdate DESC) AS "Recentness"
    FROM ((governmentforms
      JOIN geohistory.event ON ((governmentforms.event = event.eventid)))
      JOIN geohistory.eventgranted ON (((event.eventgranted = eventgranted.eventgrantedid) AND eventgranted.eventgrantedsuccess)))
   WHERE ((extra.governmentstatus(governmentforms.government) <> ALL (ARRAY['placeholder'::text, 'proposed'::text, 'unincorporated'::text])) AND (extra.governmenttype(governmentforms.government) <> 'Ward'::text))
-  ORDER BY (extra.governmentabbreviation(extra.governmentcurrentleadstateid(governmentforms.government))), governmentforms.government, (('J'::text || trunc(extra.eventsortdate(governmentforms.event), 0)))::date;
+  ORDER BY (extra.governmentabbreviation(extra.governmentcurrentleadstateid(governmentforms.government))), governmentforms.government, event.eventsortdate;
 
 
 ALTER VIEW extra.affectedgovernmentform OWNER TO postgres;
@@ -3971,62 +3799,6 @@ CREATE MATERIALIZED VIEW extra.areagovernmentcache AS
 
 
 ALTER MATERIALIZED VIEW extra.areagovernmentcache OWNER TO postgres;
-
---
--- Name: eventextra; Type: VIEW; Schema: extra; Owner: postgres
---
-
-CREATE VIEW extra.eventextra AS
- SELECT eventid,
-    extra.eventslug(eventid) AS eventslug
-   FROM geohistory.event
-  ORDER BY eventid;
-
-
-ALTER VIEW extra.eventextra OWNER TO postgres;
-
---
--- Name: eventslugretired; Type: TABLE; Schema: geohistory; Owner: postgres
---
-
-CREATE TABLE geohistory.eventslugretired (
-    eventslugretiredid integer NOT NULL,
-    eventid integer,
-    eventslug text
-);
-
-
-ALTER TABLE geohistory.eventslugretired OWNER TO postgres;
-
---
--- Name: TABLE eventslugretired; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON TABLE geohistory.eventslugretired IS 'This table includes superseded slugs solely to prevent broken links on the production site, and is not included in open data.';
-
-
---
--- Name: eventextracache; Type: MATERIALIZED VIEW; Schema: extra; Owner: postgres
---
-
-CREATE MATERIALIZED VIEW extra.eventextracache AS
- SELECT DISTINCT eventextra.eventid,
-    eventextra.eventslug,
-    NULL::text AS eventslugnew
-   FROM extra.eventextra
-UNION
- SELECT DISTINCT eventextra.eventid,
-    eventslugretired.eventslug,
-    eventextra.eventslug AS eventslugnew
-   FROM ((extra.eventextra
-     JOIN geohistory.eventslugretired ON (((eventextra.eventid = eventslugretired.eventid) AND (eventextra.eventslug <> eventslugretired.eventslug))))
-     LEFT JOIN extra.eventextra otherslug ON ((eventslugretired.eventslug = otherslug.eventslug)))
-  WHERE (otherslug.eventslug IS NULL)
-  ORDER BY 1
-  WITH NO DATA;
-
-
-ALTER MATERIALIZED VIEW extra.eventextracache OWNER TO postgres;
 
 --
 -- Name: eventgovernmentcache; Type: MATERIALIZED VIEW; Schema: extra; Owner: postgres
@@ -4271,8 +4043,8 @@ CREATE VIEW extra.governmentchangecount AS
             affectedgovernmentsummary.affectedtypeid,
             affectedgovernmentsummary.affectedside,
             affectedtype.affectedtypecreationdissolution,
-            extra.eventsortdatedate((event.eventeffective)::character varying, event.eventfrom, event.eventto) AS eventsortdatedate,
-            extra.eventtextshortdate((event.eventeffective)::character varying, event.eventfrom, event.eventto) AS eventtextshortdate,
+            event.eventsortdate,
+            event.eventdatetext,
             initcap(((event.eventeffective)::calendar.historicdate)."precision") AS eventeffectiveprecision,
             extra.eventeffectivetype(eventeffectivetype.eventeffectivetypegroup, eventeffectivetype.eventeffectivetypequalifier) AS eventeffectivetype,
             sum(
@@ -4288,7 +4060,7 @@ CREATE VIEW extra.governmentchangecount AS
              JOIN geohistory.affectedtype ON ((affectedgovernmentsummary.affectedtypeid = affectedtype.affectedtypeid)))
              LEFT JOIN geohistory.lawsectionevent ON ((event.eventid = lawsectionevent.event)))
              LEFT JOIN geohistory.eventrelationship ON (((lawsectionevent.eventrelationship = eventrelationship.eventrelationshipid) AND eventrelationship.eventrelationshipsufficient)))
-          GROUP BY affectedgovernmentsummary.eventid, governmentsubstitute.governmentsubstitute, affectedgovernmentsummary.affectedtypeid, affectedgovernmentsummary.affectedside, affectedtype.affectedtypecreationdissolution, (extra.eventsortdatedate((event.eventeffective)::character varying, event.eventfrom, event.eventto)), (extra.eventtextshortdate((event.eventeffective)::character varying, event.eventfrom, event.eventto)), (extra.eventeffectivetype(eventeffectivetype.eventeffectivetypegroup, eventeffectivetype.eventeffectivetypequalifier)), event.eventeffective, event.eventfrom, event.eventto
+          GROUP BY affectedgovernmentsummary.eventid, governmentsubstitute.governmentsubstitute, affectedgovernmentsummary.affectedtypeid, affectedgovernmentsummary.affectedside, affectedtype.affectedtypecreationdissolution, event.eventsortdate, event.eventdatetext, (extra.eventeffectivetype(eventeffectivetype.eventeffectivetypegroup, eventeffectivetype.eventeffectivetypequalifier)), event.eventeffective, event.eventfrom, event.eventto
         ), creationdissolution AS (
          SELECT DISTINCT creationaffectedgovernmentsummaryeventpart.governmentid,
             creationaffectedgovernmentsummaryeventpart.eventid
@@ -4304,8 +4076,8 @@ CREATE VIEW extra.governmentchangecount AS
                     WHEN (creationdissolution.eventid IS NOT NULL) THEN 'alter'::character varying
                     ELSE affectedgovernmentsummaryeventpart.affectedtypecreationdissolution
                 END AS affectedtypecreationdissolution,
-            affectedgovernmentsummaryeventpart.eventsortdatedate,
-            affectedgovernmentsummaryeventpart.eventtextshortdate,
+            affectedgovernmentsummaryeventpart.eventsortdate,
+            affectedgovernmentsummaryeventpart.eventdatetext,
             affectedgovernmentsummaryeventpart.eventeffectiveprecision,
             affectedgovernmentsummaryeventpart.eventeffectivetype,
             affectedgovernmentsummaryeventpart.lawsection
@@ -4333,8 +4105,8 @@ CREATE VIEW extra.governmentchangecount AS
          SELECT affectedgovernmentsummaryevent.governmentid,
             extra.array_combine(array_agg(affectedgovernmentsummaryevent.originalgovernmentid)) AS originalgovernmentid,
             array_agg(DISTINCT affectedgovernmentsummaryevent.eventid ORDER BY affectedgovernmentsummaryevent.eventid) AS eventid,
-            array_agg(DISTINCT affectedgovernmentsummaryevent.eventsortdatedate) AS eventsortdatedate,
-            array_agg(DISTINCT affectedgovernmentsummaryevent.eventtextshortdate) AS eventtextshortdate,
+            array_agg(DISTINCT affectedgovernmentsummaryevent.eventsortdate) AS eventsortdate,
+            array_agg(DISTINCT affectedgovernmentsummaryevent.eventdatetext) AS eventdatetext,
             array_agg(DISTINCT affectedgovernmentsummaryevent.eventeffectiveprecision) AS eventeffectiveprecision,
             array_agg(DISTINCT affectedgovernmentsummaryevent.eventeffectivetype) AS eventeffectivetype,
             (sum(affectedgovernmentsummaryevent.lawsection) > (0)::numeric) AS lawsection
@@ -4345,8 +4117,8 @@ CREATE VIEW extra.governmentchangecount AS
          SELECT affectedgovernmentsummaryevent.governmentid,
             extra.array_combine(array_agg(affectedgovernmentsummaryevent.originalgovernmentid)) AS originalgovernmentid,
             array_agg(DISTINCT affectedgovernmentsummaryevent.eventid ORDER BY affectedgovernmentsummaryevent.eventid) AS eventid,
-            array_agg(DISTINCT affectedgovernmentsummaryevent.eventsortdatedate) AS eventsortdatedate,
-            array_agg(DISTINCT affectedgovernmentsummaryevent.eventtextshortdate) AS eventtextshortdate,
+            array_agg(DISTINCT affectedgovernmentsummaryevent.eventsortdate) AS eventsortdate,
+            array_agg(DISTINCT affectedgovernmentsummaryevent.eventdatetext) AS eventdatetext,
             array_agg(DISTINCT affectedgovernmentsummaryevent.eventeffectiveprecision) AS eventeffectiveprecision,
             array_agg(DISTINCT affectedgovernmentsummaryevent.eventeffectivetype) AS eventeffectivetype,
             (sum(affectedgovernmentsummaryevent.lawsection) > (0)::numeric) AS lawsection
@@ -4368,7 +4140,7 @@ CREATE VIEW extra.governmentchangecount AS
     COALESCE(array_length(creation.eventid, 1), 0) AS creation,
     creation.eventid AS creationevent,
         CASE
-            WHEN (array_length(creation.eventid, 1) = 1) THEN creation.eventtextshortdate[1]
+            WHEN (array_length(creation.eventid, 1) = 1) THEN creation.eventdatetext[1]
             ELSE ''::text
         END AS creationtext,
         CASE
@@ -4376,7 +4148,7 @@ CREATE VIEW extra.governmentchangecount AS
             ELSE 'None'::text
         END AS creationprecision,
         CASE
-            WHEN (array_length(creation.eventid, 1) = 1) THEN creation.eventsortdatedate[1]
+            WHEN (array_length(creation.eventid, 1) = 1) THEN creation.eventsortdate[1]
             ELSE NULL::date
         END AS creationsort,
         CASE
@@ -4394,7 +4166,7 @@ CREATE VIEW extra.governmentchangecount AS
     COALESCE(array_length(dissolution.eventid, 1), 0) AS dissolution,
     dissolution.eventid AS dissolutionevent,
         CASE
-            WHEN (array_length(dissolution.eventid, 1) = 1) THEN dissolution.eventtextshortdate[1]
+            WHEN (array_length(dissolution.eventid, 1) = 1) THEN dissolution.eventdatetext[1]
             ELSE ''::text
         END AS dissolutiontext,
         CASE
@@ -4402,7 +4174,7 @@ CREATE VIEW extra.governmentchangecount AS
             ELSE 'None'::text
         END AS dissolutionprecision,
         CASE
-            WHEN (array_length(dissolution.eventid, 1) = 1) THEN dissolution.eventsortdatedate[1]
+            WHEN (array_length(dissolution.eventid, 1) = 1) THEN dissolution.eventsortdate[1]
             ELSE NULL::date
         END AS dissolutionsort,
         CASE
@@ -4496,8 +4268,8 @@ CREATE VIEW extra.governmentchangecountpart AS
             affectedgovernmentsummary.affectedtypeid,
             affectedgovernmentsummary.affectedside,
             affectedtype.affectedtypecreationdissolution,
-            extra.eventsortdatedate((event.eventeffective)::character varying, event.eventfrom, event.eventto) AS eventsortdatedate,
-            extra.eventtextshortdate((event.eventeffective)::character varying, event.eventfrom, event.eventto) AS eventtextshortdate,
+            event.eventsortdate,
+            event.eventdatetext,
             initcap(((event.eventeffective)::calendar.historicdate)."precision") AS eventeffectiveprecision,
             extra.eventeffectivetype(eventeffectivetype.eventeffectivetypegroup, eventeffectivetype.eventeffectivetypequalifier) AS eventeffectivetype,
             sum(
@@ -4512,7 +4284,7 @@ CREATE VIEW extra.governmentchangecountpart AS
              JOIN geohistory.affectedtype ON ((affectedgovernmentsummary.affectedtypeid = affectedtype.affectedtypeid)))
              LEFT JOIN geohistory.lawsectionevent ON ((event.eventid = lawsectionevent.event)))
              LEFT JOIN geohistory.eventrelationship ON (((lawsectionevent.eventrelationship = eventrelationship.eventrelationshipid) AND eventrelationship.eventrelationshipsufficient)))
-          GROUP BY affectedgovernmentsummary.eventid, affectedgovernmentsummary.governmentid, affectedgovernmentsummary.affectedtypeid, affectedgovernmentsummary.affectedside, affectedtype.affectedtypecreationdissolution, (extra.eventsortdatedate((event.eventeffective)::character varying, event.eventfrom, event.eventto)), (extra.eventtextshortdate((event.eventeffective)::character varying, event.eventfrom, event.eventto)), (extra.eventeffectivetype(eventeffectivetype.eventeffectivetypegroup, eventeffectivetype.eventeffectivetypequalifier)), event.eventeffective, event.eventfrom, event.eventto
+          GROUP BY affectedgovernmentsummary.eventid, affectedgovernmentsummary.governmentid, affectedgovernmentsummary.affectedtypeid, affectedgovernmentsummary.affectedside, affectedtype.affectedtypecreationdissolution, event.eventsortdate, event.eventdatetext, (extra.eventeffectivetype(eventeffectivetype.eventeffectivetypegroup, eventeffectivetype.eventeffectivetypequalifier)), event.eventeffective, event.eventfrom, event.eventto
         ), alterfrom AS (
          SELECT affectedgovernmentsummaryevent.governmentid,
             COALESCE(array_agg(DISTINCT affectedgovernmentsummaryevent.eventid ORDER BY affectedgovernmentsummaryevent.eventid), ARRAY[]::integer[]) AS eventid
@@ -4534,8 +4306,8 @@ CREATE VIEW extra.governmentchangecountpart AS
         ), creation AS (
          SELECT affectedgovernmentsummaryevent.governmentid,
             array_agg(DISTINCT affectedgovernmentsummaryevent.eventid ORDER BY affectedgovernmentsummaryevent.eventid) AS eventid,
-            array_agg(DISTINCT affectedgovernmentsummaryevent.eventsortdatedate) AS eventsortdatedate,
-            array_agg(DISTINCT affectedgovernmentsummaryevent.eventtextshortdate) AS eventtextshortdate,
+            array_agg(DISTINCT affectedgovernmentsummaryevent.eventsortdate) AS eventsortdate,
+            array_agg(DISTINCT affectedgovernmentsummaryevent.eventdatetext) AS eventdatetext,
             array_agg(DISTINCT affectedgovernmentsummaryevent.eventeffectiveprecision) AS eventeffectiveprecision,
             array_agg(DISTINCT affectedgovernmentsummaryevent.eventeffectivetype) AS eventeffectivetype,
             (sum(affectedgovernmentsummaryevent.lawsection) > (0)::numeric) AS lawsection
@@ -4545,8 +4317,8 @@ CREATE VIEW extra.governmentchangecountpart AS
         ), dissolution AS (
          SELECT affectedgovernmentsummaryevent.governmentid,
             array_agg(DISTINCT affectedgovernmentsummaryevent.eventid ORDER BY affectedgovernmentsummaryevent.eventid) AS eventid,
-            array_agg(DISTINCT affectedgovernmentsummaryevent.eventsortdatedate) AS eventsortdatedate,
-            array_agg(DISTINCT affectedgovernmentsummaryevent.eventtextshortdate) AS eventtextshortdate,
+            array_agg(DISTINCT affectedgovernmentsummaryevent.eventsortdate) AS eventsortdate,
+            array_agg(DISTINCT affectedgovernmentsummaryevent.eventdatetext) AS eventdatetext,
             array_agg(DISTINCT affectedgovernmentsummaryevent.eventeffectiveprecision) AS eventeffectiveprecision,
             array_agg(DISTINCT affectedgovernmentsummaryevent.eventeffectivetype) AS eventeffectivetype,
             (sum(affectedgovernmentsummaryevent.lawsection) > (0)::numeric) AS lawsection
@@ -4568,7 +4340,7 @@ CREATE VIEW extra.governmentchangecountpart AS
     COALESCE(array_length(creation.eventid, 1), 0) AS creation,
     creation.eventid AS creationevent,
         CASE
-            WHEN (array_length(creation.eventid, 1) = 1) THEN creation.eventtextshortdate[1]
+            WHEN (array_length(creation.eventid, 1) = 1) THEN creation.eventdatetext[1]
             ELSE ''::text
         END AS creationtext,
         CASE
@@ -4576,7 +4348,7 @@ CREATE VIEW extra.governmentchangecountpart AS
             ELSE 'None'::text
         END AS creationprecision,
         CASE
-            WHEN (array_length(creation.eventid, 1) = 1) THEN creation.eventsortdatedate[1]
+            WHEN (array_length(creation.eventid, 1) = 1) THEN creation.eventsortdate[1]
             ELSE NULL::date
         END AS creationsort,
         CASE
@@ -4593,7 +4365,7 @@ CREATE VIEW extra.governmentchangecountpart AS
     COALESCE(array_length(dissolution.eventid, 1), 0) AS dissolution,
     dissolution.eventid AS dissolutionevent,
         CASE
-            WHEN (array_length(dissolution.eventid, 1) = 1) THEN dissolution.eventtextshortdate[1]
+            WHEN (array_length(dissolution.eventid, 1) = 1) THEN dissolution.eventdatetext[1]
             ELSE ''::text
         END AS dissolutiontext,
         CASE
@@ -4601,7 +4373,7 @@ CREATE VIEW extra.governmentchangecountpart AS
             ELSE 'None'::text
         END AS dissolutionprecision,
         CASE
-            WHEN (array_length(dissolution.eventid, 1) = 1) THEN dissolution.eventsortdatedate[1]
+            WHEN (array_length(dissolution.eventid, 1) = 1) THEN dissolution.eventsortdate[1]
             ELSE NULL::date
         END AS dissolutionsort,
         CASE
@@ -4777,8 +4549,8 @@ CREATE VIEW extra.governmentshape_history AS
  WITH affectedgovernmentorder AS (
          SELECT affectedgovernmentgis.governmentshape AS governmentshapeid,
             affectedgovernment_reconstructed.affectedgovernmentid,
-            row_number() OVER (PARTITION BY affectedgovernmentgis.governmentshape ORDER BY (extra.eventsortdate(event.eventid))) AS shapeorder,
-            extra.eventsortdate(event.eventid) AS eventsortdate,
+            row_number() OVER (PARTITION BY affectedgovernmentgis.governmentshape ORDER BY event.eventsort) AS shapeorder,
+            event.eventsort,
             affectedgovernment_reconstructed.submunicipalityto,
             affectedgovernment_reconstructed.municipalityto,
             affectedgovernment_reconstructed.subcountyto,
@@ -4788,18 +4560,17 @@ CREATE VIEW extra.governmentshape_history AS
             governmentshape.governmentmunicipality,
             governmentshape.governmentcounty,
             governmentshape.governmentstate
-           FROM (((((gis.affectedgovernmentgis
+           FROM ((((gis.affectedgovernmentgis
              JOIN gis.governmentshape ON ((affectedgovernmentgis.governmentshape = governmentshape.governmentshapeid)))
              JOIN extra.affectedgovernment_reconstructed ON ((affectedgovernmentgis.affectedgovernment = affectedgovernment_reconstructed.affectedgovernmentid)))
              JOIN geohistory.event ON ((affectedgovernment_reconstructed.event = event.eventid)))
-             JOIN extra.eventextracache ON ((event.eventid = eventextracache.eventid)))
              JOIN geohistory.eventgranted ON (((event.eventgranted = eventgranted.eventgrantedid) AND eventgranted.eventgrantedsuccess)))
         )
  SELECT currentorder.governmentshapeid,
-    currentorder.eventsortdate AS startdate,
+    currentorder.eventsort AS startdate,
         CASE
-            WHEN (nextorder.eventsortdate IS NULL) THEN (to_char((CURRENT_DATE)::timestamp with time zone, 'J'::text))::numeric
-            ELSE nextorder.eventsortdate
+            WHEN (nextorder.eventsort IS NULL) THEN (to_char((CURRENT_DATE)::timestamp with time zone, 'J'::text))::numeric
+            ELSE nextorder.eventsort
         END AS enddate,
     currentorder.submunicipalityto,
     currentorder.municipalityto,
@@ -4815,7 +4586,7 @@ CREATE VIEW extra.governmentshape_history AS
 UNION
  SELECT affectedgovernmentorder.governmentshapeid,
     (0)::numeric AS startdate,
-    affectedgovernmentorder.eventsortdate AS enddate,
+    affectedgovernmentorder.eventsort AS enddate,
     affectedgovernment_reconstructed.submunicipalityfrom AS submunicipalityto,
     affectedgovernment_reconstructed.municipalityfrom AS municipalityto,
     affectedgovernment_reconstructed.subcountyfrom AS subcountyto,
@@ -5575,55 +5346,55 @@ CREATE MATERIALIZED VIEW extra.statistics_createddissolved AS
             'county'::text AS governmenttype,
             countyevents.governmentstate,
             countyevents.governmentcounty,
-            extra.eventsortdateyear(event.eventid) AS eventyear,
+            event.eventsortyear,
             countyevents.affectedtypecreationdissolution,
             (count(DISTINCT countyevents.governmentid))::integer AS governmentcount
            FROM ((geohistory.event
              JOIN countyevents ON ((event.eventid = countyevents.event)))
              JOIN geohistory.eventgranted ON (((event.eventgranted = eventgranted.eventgrantedid) AND eventgranted.eventgrantedsuccess)))
-          GROUP BY 'historic'::text, 'county'::text, countyevents.governmentstate, countyevents.governmentcounty, (extra.eventsortdateyear(event.eventid)), countyevents.affectedtypecreationdissolution
+          GROUP BY 'historic'::text, 'county'::text, countyevents.governmentstate, countyevents.governmentcounty, event.eventsortyear, countyevents.affectedtypecreationdissolution
         UNION
          SELECT 'historic'::text AS grouptype,
             'state'::text AS governmenttype,
             stateevents.governmentstate,
             NULL::integer AS governmentcounty,
-            extra.eventsortdateyear(event.eventid) AS eventyear,
+            event.eventsortyear,
             stateevents.affectedtypecreationdissolution,
             count(DISTINCT stateevents.governmentid) AS governmentcount
            FROM ((geohistory.event
              JOIN stateevents ON ((event.eventid = stateevents.event)))
              JOIN geohistory.eventgranted ON (((event.eventgranted = eventgranted.eventgrantedid) AND eventgranted.eventgrantedsuccess)))
-          GROUP BY 'historic'::text, 'state'::text, stateevents.governmentstate, NULL::integer, (extra.eventsortdateyear(event.eventid)), stateevents.affectedtypecreationdissolution
+          GROUP BY 'historic'::text, 'state'::text, stateevents.governmentstate, NULL::integer, event.eventsortyear, stateevents.affectedtypecreationdissolution
         UNION
          SELECT 'historic'::text AS grouptype,
             'nation'::text AS governmenttype,
             'production'::text AS governmentstate,
             NULL::integer AS governmentcounty,
-            extra.eventsortdateyear(event.eventid) AS eventyear,
+            event.eventsortyear,
             eventstates.affectedtypecreationdissolution,
             count(DISTINCT eventstates.governmentid) AS governmentcount
            FROM ((geohistory.event
              JOIN eventstates ON (((event.eventid = eventstates.event) AND (eventstates.governmentstates && ARRAY['NJ'::text, 'PA'::text]))))
              JOIN geohistory.eventgranted ON (((event.eventgranted = eventgranted.eventgrantedid) AND eventgranted.eventgrantedsuccess)))
-          GROUP BY 'historic'::text, 'nation'::text, 'production'::text, NULL::integer, (extra.eventsortdateyear(event.eventid)), eventstates.affectedtypecreationdissolution
+          GROUP BY 'historic'::text, 'nation'::text, 'production'::text, NULL::integer, event.eventsortyear, eventstates.affectedtypecreationdissolution
         UNION
          SELECT 'historic'::text AS grouptype,
             'nation'::text AS governmenttype,
             'development'::text AS governmentstate,
             NULL::integer AS governmentcounty,
-            extra.eventsortdateyear(event.eventid) AS eventyear,
+            event.eventsortyear,
             eventstates.affectedtypecreationdissolution,
             count(DISTINCT eventstates.governmentid) AS governmentcount
            FROM ((geohistory.event
              JOIN eventstates ON (((event.eventid = eventstates.event) AND (eventstates.governmentstates && ARRAY['DE'::text, 'ME'::text, 'MA'::text, 'MD'::text, 'MI'::text, 'MN'::text, 'NJ'::text, 'NY'::text, 'OH'::text, 'PA'::text]))))
              JOIN geohistory.eventgranted ON (((event.eventgranted = eventgranted.eventgrantedid) AND eventgranted.eventgrantedsuccess)))
-          GROUP BY 'historic'::text, 'nation'::text, 'development'::text, NULL::integer, (extra.eventsortdateyear(event.eventid)), eventstates.affectedtypecreationdissolution
+          GROUP BY 'historic'::text, 'nation'::text, 'development'::text, NULL::integer, event.eventsortyear, eventstates.affectedtypecreationdissolution
         )
  SELECT DISTINCT summary.grouptype,
     summary.governmenttype,
     summary.governmentstate,
     summary.governmentcounty,
-    summary.eventyear,
+    summary.eventsortyear,
         CASE
             WHEN (creation.governmentcount IS NULL) THEN (0)::bigint
             ELSE creation.governmentcount
@@ -5633,9 +5404,9 @@ CREATE MATERIALIZED VIEW extra.statistics_createddissolved AS
             ELSE dissolution.governmentcount
         END AS dissolved
    FROM ((summary
-     LEFT JOIN summary creation ON (((summary.grouptype = creation.grouptype) AND (summary.governmenttype = creation.governmenttype) AND (summary.governmentstate = creation.governmentstate) AND (((summary.governmentcounty IS NULL) AND (creation.governmentcounty IS NULL)) OR (summary.governmentcounty = creation.governmentcounty)) AND (summary.eventyear = creation.eventyear) AND ((creation.affectedtypecreationdissolution)::text = 'begin'::text))))
-     LEFT JOIN summary dissolution ON (((summary.grouptype = dissolution.grouptype) AND (summary.governmenttype = dissolution.governmenttype) AND (summary.governmentstate = dissolution.governmentstate) AND (((summary.governmentcounty IS NULL) AND (dissolution.governmentcounty IS NULL)) OR (summary.governmentcounty = dissolution.governmentcounty)) AND (summary.eventyear = dissolution.eventyear) AND ((dissolution.affectedtypecreationdissolution)::text = 'end'::text))))
-  ORDER BY summary.grouptype, summary.governmenttype, summary.governmentstate, summary.governmentcounty, summary.eventyear
+     LEFT JOIN summary creation ON (((summary.grouptype = creation.grouptype) AND (summary.governmenttype = creation.governmenttype) AND (summary.governmentstate = creation.governmentstate) AND (((summary.governmentcounty IS NULL) AND (creation.governmentcounty IS NULL)) OR (summary.governmentcounty = creation.governmentcounty)) AND (summary.eventsortyear = creation.eventsortyear) AND ((creation.affectedtypecreationdissolution)::text = 'begin'::text))))
+     LEFT JOIN summary dissolution ON (((summary.grouptype = dissolution.grouptype) AND (summary.governmenttype = dissolution.governmenttype) AND (summary.governmentstate = dissolution.governmentstate) AND (((summary.governmentcounty IS NULL) AND (dissolution.governmentcounty IS NULL)) OR (summary.governmentcounty = dissolution.governmentcounty)) AND (summary.eventsortyear = dissolution.eventsortyear) AND ((dissolution.affectedtypecreationdissolution)::text = 'end'::text))))
+  ORDER BY summary.grouptype, summary.governmenttype, summary.governmentstate, summary.governmentcounty, summary.eventsortyear
   WITH NO DATA;
 
 
@@ -5741,52 +5512,52 @@ CREATE MATERIALIZED VIEW extra.statistics_eventtype AS
     countyevents.governmentstate,
     countyevents.governmentcounty,
     event.eventtype,
-    extra.eventsortdateyear(event.eventid) AS eventyear,
+    event.eventsortyear,
     (count(DISTINCT event.eventid))::integer AS eventcount,
     array_agg(DISTINCT event.eventid ORDER BY event.eventid) AS eventlist
    FROM ((geohistory.event
      JOIN countyevents ON ((event.eventid = countyevents.event)))
      JOIN geohistory.eventgranted ON (((event.eventgranted = eventgranted.eventgrantedid) AND eventgranted.eventgrantedsuccess)))
-  GROUP BY 'county'::text, countyevents.governmentstate, countyevents.governmentcounty, event.eventtype, (extra.eventsortdateyear(event.eventid))
+  GROUP BY 'county'::text, countyevents.governmentstate, countyevents.governmentcounty, event.eventtype, event.eventsortyear
 UNION
  SELECT 'historic'::text AS grouptype,
     'state'::text AS governmenttype,
     stateevents.governmentstate,
     NULL::integer AS governmentcounty,
     event.eventtype,
-    extra.eventsortdateyear(event.eventid) AS eventyear,
+    event.eventsortyear,
     count(DISTINCT event.eventid) AS eventcount,
     array_agg(DISTINCT event.eventid ORDER BY event.eventid) AS eventlist
    FROM ((geohistory.event
      JOIN stateevents ON ((event.eventid = stateevents.event)))
      JOIN geohistory.eventgranted ON (((event.eventgranted = eventgranted.eventgrantedid) AND eventgranted.eventgrantedsuccess)))
-  GROUP BY 'state'::text, stateevents.governmentstate, NULL::integer, event.eventtype, (extra.eventsortdateyear(event.eventid))
+  GROUP BY 'state'::text, stateevents.governmentstate, NULL::integer, event.eventtype, event.eventsortyear
 UNION
  SELECT 'historic'::text AS grouptype,
     'nation'::text AS governmenttype,
     'production'::text AS governmentstate,
     NULL::integer AS governmentcounty,
     event.eventtype,
-    extra.eventsortdateyear(event.eventid) AS eventyear,
+    event.eventsortyear,
     count(DISTINCT event.eventid) AS eventcount,
     array_agg(DISTINCT event.eventid ORDER BY event.eventid) AS eventlist
    FROM ((geohistory.event
      JOIN eventstates ON (((event.eventid = eventstates.event) AND (eventstates.governmentstates && ARRAY['NJ'::text, 'PA'::text]))))
      JOIN geohistory.eventgranted ON (((event.eventgranted = eventgranted.eventgrantedid) AND eventgranted.eventgrantedsuccess)))
-  GROUP BY 'state'::text, 'production'::text, NULL::integer, event.eventtype, (extra.eventsortdateyear(event.eventid))
+  GROUP BY 'state'::text, 'production'::text, NULL::integer, event.eventtype, event.eventsortyear
 UNION
  SELECT 'historic'::text AS grouptype,
     'nation'::text AS governmenttype,
     'development'::text AS governmentstate,
     NULL::integer AS governmentcounty,
     event.eventtype,
-    extra.eventsortdateyear(event.eventid) AS eventyear,
+    event.eventsortyear,
     count(DISTINCT event.eventid) AS eventcount,
     array_agg(DISTINCT event.eventid ORDER BY event.eventid) AS eventlist
    FROM ((geohistory.event
      JOIN eventstates ON (((event.eventid = eventstates.event) AND (eventstates.governmentstates && ARRAY['DE'::text, 'ME'::text, 'MA'::text, 'MD'::text, 'MI'::text, 'MN'::text, 'NJ'::text, 'NY'::text, 'OH'::text, 'PA'::text]))))
      JOIN geohistory.eventgranted ON (((event.eventgranted = eventgranted.eventgrantedid) AND eventgranted.eventgrantedsuccess)))
-  GROUP BY 'state'::text, 'development'::text, NULL::integer, event.eventtype, (extra.eventsortdateyear(event.eventid))
+  GROUP BY 'state'::text, 'development'::text, NULL::integer, event.eventtype, event.eventsortyear
   ORDER BY 1, 2, 3, 4, 5
   WITH NO DATA;
 
@@ -7065,6 +6836,26 @@ ALTER SEQUENCE geohistory.eventrelationship_eventrelationshipid_seq OWNER TO pos
 --
 
 ALTER SEQUENCE geohistory.eventrelationship_eventrelationshipid_seq OWNED BY geohistory.eventrelationship.eventrelationshipid;
+
+
+--
+-- Name: eventslugretired; Type: TABLE; Schema: geohistory; Owner: postgres
+--
+
+CREATE TABLE geohistory.eventslugretired (
+    eventslugretiredid integer NOT NULL,
+    eventid integer,
+    eventslug text
+);
+
+
+ALTER TABLE geohistory.eventslugretired OWNER TO postgres;
+
+--
+-- Name: TABLE eventslugretired; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON TABLE geohistory.eventslugretired IS 'This table includes superseded slugs solely to prevent broken links on the production site, and is not included in open data.';
 
 
 --
@@ -10334,20 +10125,6 @@ CREATE INDEX areagovernmentcache_governmentshapeid_idx ON extra.areagovernmentca
 
 
 --
--- Name: eventextracache_eventid_idx; Type: INDEX; Schema: extra; Owner: postgres
---
-
-CREATE INDEX eventextracache_eventid_idx ON extra.eventextracache USING btree (eventid);
-
-
---
--- Name: eventextracache_eventslug_idx; Type: INDEX; Schema: extra; Owner: postgres
---
-
-CREATE INDEX eventextracache_eventslug_idx ON extra.eventextracache USING btree (eventslug);
-
-
---
 -- Name: eventgovernmentcache_eventid_idx; Type: INDEX; Schema: extra; Owner: postgres
 --
 
@@ -10719,6 +10496,13 @@ CREATE INDEX event_eventmethod_idx ON geohistory.event USING btree (eventmethod)
 
 
 --
+-- Name: event_eventslug_idx; Type: INDEX; Schema: geohistory; Owner: postgres
+--
+
+CREATE INDEX event_eventslug_idx ON geohistory.event USING btree (eventslug);
+
+
+--
 -- Name: event_eventtype_idx; Type: INDEX; Schema: geohistory; Owner: postgres
 --
 
@@ -10744,6 +10528,13 @@ CREATE INDEX eventgranted_eventgrantedshort_idx ON geohistory.eventgranted USING
 --
 
 CREATE INDEX eventrelationship_eventrelationshipshort_idx ON geohistory.eventrelationship USING btree (eventrelationshipshort);
+
+
+--
+-- Name: eventslugretired_eventslug_idx; Type: INDEX; Schema: geohistory; Owner: postgres
+--
+
+CREATE INDEX eventslugretired_eventslug_idx ON geohistory.eventslugretired USING btree (eventslug);
 
 
 --
@@ -12231,69 +12022,6 @@ REVOKE ALL ON FUNCTION extra.eventeffectivetype(integer) FROM PUBLIC;
 --
 
 REVOKE ALL ON FUNCTION extra.eventeffectivetype(eventeffectivetypegroup character varying, eventeffectivetypequalifier character varying) FROM PUBLIC;
-
-
---
--- Name: FUNCTION eventslug(integer); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.eventslug(integer) FROM PUBLIC;
-
-
---
--- Name: FUNCTION eventsortdate(integer); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.eventsortdate(integer) FROM PUBLIC;
-
-
---
--- Name: FUNCTION eventsortdate(eventeffective character varying, eventfrom smallint, eventto smallint, eventeffectiveorder integer); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.eventsortdate(eventeffective character varying, eventfrom smallint, eventto smallint, eventeffectiveorder integer) FROM PUBLIC;
-
-
---
--- Name: FUNCTION eventsortdatedate(integer); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.eventsortdatedate(integer) FROM PUBLIC;
-
-
---
--- Name: FUNCTION eventsortdatedate(eventeffective character varying, eventfrom smallint, eventto smallint); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.eventsortdatedate(eventeffective character varying, eventfrom smallint, eventto smallint) FROM PUBLIC;
-
-
---
--- Name: FUNCTION eventsortdateyear(integer); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.eventsortdateyear(integer) FROM PUBLIC;
-
-
---
--- Name: FUNCTION eventsortdateyear(eventeffective character varying, eventfrom smallint, eventto smallint); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.eventsortdateyear(eventeffective character varying, eventfrom smallint, eventto smallint) FROM PUBLIC;
-
-
---
--- Name: FUNCTION eventtextshortdate(integer); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.eventtextshortdate(integer) FROM PUBLIC;
-
-
---
--- Name: FUNCTION eventtextshortdate(eventeffective character varying, eventfrom smallint, eventto smallint); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.eventtextshortdate(eventeffective character varying, eventfrom smallint, eventto smallint) FROM PUBLIC;
 
 
 --
