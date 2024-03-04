@@ -107,12 +107,8 @@ abstract class BaseController extends Controller
 
     protected function isInternetExplorer(): bool
     {
-        if (isset($_SERVER['HTTP_USER_AGENT'])) {
-            $browser = strtolower($_SERVER['HTTP_USER_AGENT']);
-            return str_contains($browser, 'msie') || str_contains($browser, 'internet explorer') || str_contains($browser, 'trident');
-        } else {
-            return false;
-        }
+        $agent = \Config\Services::request()->getUserAgent();
+        return $agent->getBrowser() == 'Internet Explorer';
     }
 
     protected function getIdInt($id)

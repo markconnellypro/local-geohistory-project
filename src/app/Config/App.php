@@ -20,7 +20,10 @@ class App extends BaseConfig
 
     public function __construct()
     {
-        $this->baseURL = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . '/';
+        $requestScheme = \Config\Services::superglobals()->server('REQUEST_SCHEME') ?? 'http';
+        $httpHost = \Config\Services::superglobals()->server('HTTP_HOST') ?? '[::1]';
+
+        $this->baseURL = $requestScheme . '://' . $httpHost . '/';
     }
 
     /**
