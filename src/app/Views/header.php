@@ -4,7 +4,7 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta charset="UTF-8">
-    <title><?= (!isset($pageTitle) ? '' : $pageTitle . ' | ') . (!isset($pageTitleType) ? '' : $pageTitleType . ' | ') . $title . ' | ' . (empty($state) ? '' : strtoupper($state) . ' | ') ?><?= lang('Template.projectName') ?></title>
+    <title><?= (isset($pageTitle) ? $pageTitle . ' | ' : '') . (isset($pageTitleType) ? $pageTitleType . ' | ' : '') . $title . ' | ' . (empty($state) ? '' : strtoupper($state) . ' | ') ?><?= lang('Template.projectName') ?></title>
     <link rel="preload" href="/asset/font/lora-regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
     <link rel="preload" href="/asset/font/lora-semibold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
     <link rel="preload" href="/asset/font/lora-italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
@@ -31,7 +31,7 @@
                 <div id="headertitle"><a href="/<?= \Config\Services::request()->getLocale() ?>/"><?= lang('Template.projectName') ?></a></div>
                 <div id="headerimagenavigation">
                     <div class="headerimageblock">
-                        <?php if (!empty($state) and $state != 'usa') { ?>
+                        <?php if (!empty($state) && $state != 'usa') { ?>
                             <a href="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/" aria-label="<?= strtoupper($state) ?>">
                                 <?= view('general_svg_icon', ['iconLabel' => strtoupper($state) . ' map icon', 'iconName' => $state, 'iconType' => 'headericon']); ?>
                                 <br><?= strtoupper($state) ?>
@@ -54,7 +54,7 @@
                                     </div>
                                 <?php } ?>
                                 <div class="keyiconcontainer">
-                                    <a href="/<?= \Config\Services::request()->getLocale() ?><?= ((!empty($state) and $state != 'usa') ? '/' . $state : '') ?>/about/" aria-label="About">
+                                    <a href="/<?= \Config\Services::request()->getLocale() ?><?= ((!empty($state) && $state != 'usa') ? '/' . $state : '') ?>/about/" aria-label="About">
                                         <?= view('general_svg_icon', ['iconLabel' => 'about icon', 'iconName' => 'about', 'iconType' => 'keyiconlarge']); ?>
                                     </a>
                                 </div>
@@ -64,7 +64,7 @@
                                     </a>
                                 </div>
                                 <div class="keyiconcontainer">
-                                    <a href="/<?= \Config\Services::request()->getLocale() ?><?= ((!empty($state) and $state != 'usa') ? '/' . $state : '') ?>/statistics/" aria-label="Statistics">
+                                    <a href="/<?= \Config\Services::request()->getLocale() ?><?= ((!empty($state) && $state != 'usa') ? '/' . $state : '') ?>/statistics/" aria-label="Statistics">
                                         <?= view('general_svg_icon', ['iconLabel' => 'statistics icon', 'iconName' => 'statistics', 'iconType' => 'keyiconlarge']); ?>
                                     </a>
                                 </div>

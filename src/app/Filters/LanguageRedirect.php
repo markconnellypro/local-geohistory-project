@@ -12,7 +12,7 @@ class LanguageRedirect implements FilterInterface
     {
         $segments = $request->uri->getSegments();
         $locale = $request->getLocale();
-        if (isset($segments[0]) and $segments[0] !== $locale and $segments !== ['robots.txt']) {
+        if (isset($segments[0]) && $segments[0] !== $locale && $segments !== ['robots.txt']) {
             $segments[0] = $locale;
             $segments = '/' . implode('/', $segments) . '/';
             return redirect()->to($segments);

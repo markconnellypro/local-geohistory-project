@@ -1,4 +1,3 @@
-
 var map = L.map("map", {
   layers: [baseMap, governmentOverlayMap<?php foreach ($layers as $key => $layer) {
     echo ', ', $key, 'layer';
@@ -28,7 +27,7 @@ Object.keys(stateOverlayMaps).forEach(function (element) {
 
 L.control.layers(baseMaps, overlayMaps).addTo(map);
 
-<?php foreach (array_reverse($layers) as $key => $layer) {
+<?php foreach (array_keys(array_reverse($layers)) as $key) {
   echo $key, "layer.bringToFront();\n";
 } ?>
 
@@ -93,7 +92,7 @@ info2.update = info2RegularUpdate;
 
 info2.addTo(map);
 
-<?php } if ($live OR $showTimeline) { ?>
+<?php } if ($live || $showTimeline) { ?>
 
 /* Timeline */
 

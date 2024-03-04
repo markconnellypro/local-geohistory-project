@@ -23,7 +23,7 @@ this._div.innerHTML = textToAdd;
 };
 downloadBox.addTo(map);
 map.addControl(new L.Control.Fullscreen());
-<?php if ($live and $includeBase) { ?>
+<?php if ($live && $includeBase) { ?>
     map.on("click", function(e) {
     document.getElementById("coord").innerHTML = +e.latlng.lng.toFixed(7) + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + +e.latlng.lat.toFixed(7);
     });

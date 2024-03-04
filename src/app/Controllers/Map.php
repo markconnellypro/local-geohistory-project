@@ -29,7 +29,7 @@ class Map extends BaseController
         $response->setHeader('Cache-Control', 'max-age=86400');
         $response->setHeader('Content-Type', 'application/json');
         $json = json_decode(file_get_contents(__DIR__ . '/../../html/asset/map/map_style_base.json'), true);
-        if (strpos(getenv('map_tile'), '.json') !== FALSE or strpos(getenv('map_tile'), '.pmtiles') !== FALSE) {
+        if (str_contains(getenv('map_tile'), '.json') || str_contains(getenv('map_tile'), '.pmtiles')) {
             $json['sources']['street-tile']['url'] = getenv('map_tile');
             unset($json['sources']['street-tile']['tiles']);
         } else {
@@ -37,7 +37,7 @@ class Map extends BaseController
             unset($json['sources']['street-tile']['url']);
         }
         $json['glyphs'] = getenv('map_glyph');
-        if (!empty(getenv('map_elevation')) and $maxZoom == 14 and !($this->data['live'] and !$this->data['online'])) {
+        if (!(getenv('map_elevation') === [] || (getenv('map_elevation') === '' || getenv('map_elevation') === '0') || getenv('map_elevation') === false) && $maxZoom == 14 && !($this->data['live'] && !$this->data['online'])) {
             $json['sources']['elevation-tile']['tiles'][] = getenv('map_elevation');
         } else {
             unset($json['sources']['elevation-tile']);
@@ -49,7 +49,7 @@ class Map extends BaseController
             }
         }
         foreach ($json['layers'] as $layerNumber => $layerContent) {
-            if (!empty($layerContent['layout']['text-field']) and $layerContent['layout']['text-field'] == '{name}') {
+            if (!empty($layerContent['layout']['text-field']) && $layerContent['layout']['text-field'] == '{name}') {
                 $json['layers'][$layerNumber]['layout']['text-field'] = [
                     'coalesce',
                     ['get', 'name_' . \Config\Services::request()->getLocale()],
@@ -77,10 +77,10 @@ class Map extends BaseController
         echo view('leaflet_state_base', $this->data);
         try {
             echo view('leaflet_state_' . $state, $this->data);
-        } catch (\Throwable $t) {
+        } catch (\Throwable) {
             try {
                 echo view('development/leaflet_state_' . $state, $this->data);
-            } catch (\Throwable $t) {
+            } catch (\Throwable) {
                 echo view('leaflet_state', $this->data);
             }
         }

@@ -37,7 +37,7 @@ class Area extends BaseController
                     $this->addressCensusBureau($state, $addressText);
                 }
             }
-        } catch (\Throwable $t) {
+        } catch (\Throwable) {
             $this->addressCensusBureau($state, $addressText);
         }
     }
@@ -47,14 +47,14 @@ class Area extends BaseController
         try {
             $data = file_get_contents('https://geocoding.geo.census.gov/geocoder/locations/onelineaddress?benchmark=9&format=json&address=' . $addressText);
             if (($data = json_decode($data, TRUE)) !== FALSE) {
-                if (count($data['result']['addressMatches']) == 1 and strtolower($data['result']['addressMatches'][0]['addressComponents']['state']) == $state) {
+                if (count($data['result']['addressMatches']) == 1 && strtolower($data['result']['addressMatches'][0]['addressComponents']['state']) == $state) {
                     $this->data['extraAttribution'] = 'Address searching courtesy of the <a href="https://geocoding.geo.census.gov/geocoder/">U.S. Census Bureau</a>.';
                     $this->point($state, $data['result']['addressMatches'][0]['coordinates']['y'], $data['result']['addressMatches'][0]['coordinates']['x'], $addressText);
                 } else {
                     $this->noRecord($state);
                 }
             }
-        } catch (\Throwable $t) {
+        } catch (\Throwable) {
             $this->noRecord($state);
         }
     }
@@ -69,14 +69,14 @@ class Area extends BaseController
 
     public function point($state, $y = 0, $x = 0, $addressText = ''): void
     {
-        if (empty($y) and !empty($this->request->getPost('y', FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION))) {
+        if (empty($y) && !empty($this->request->getPost('y', FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION))) {
             $y = $this->request->getPost('y', FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
         }
-        if (empty($x) and !empty($this->request->getPost('x', FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION))) {
+        if (empty($x) && !empty($this->request->getPost('x', FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION))) {
             $x = $this->request->getPost('x', FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
         }
         // Only applies in US
-        if ($y < 0 or $x > 0) {
+        if ($y < 0 || $x > 0) {
             $newX = $y;
             $y = $x;
             $x = $newX;
@@ -93,8 +93,8 @@ class Area extends BaseController
     public function view($state, $id, $y = 0, $x = 0, $addressText = ''): void
     {
         $this->data['state'] = $state;
-        if (($this->data['live'] or !empty($y) or !empty($x)) and preg_match('/^\d{1,9}$/', $id)) {
-            $id = intval($id);
+        if (($this->data['live'] || !empty($y) || !empty($x)) && preg_match('/^\d{1,9}$/', $id)) {
+            $id = (int) $id;
         }
         $GovernmentShapeModel = new GovernmentShapeModel;
         $currentQuery = $GovernmentShapeModel->getDetail($id, $state);
@@ -109,7 +109,7 @@ class Area extends BaseController
                 $currentQuery[0]->governmentstateabbreviation
             ];
             foreach ($governmentArray as $g) {
-                if (!empty($g) and substr($g, 0, 14) !== 'Unincorporated' and substr($g, 0, 11) !== 'Unorganized' and substr($g, 0, 7) !== 'Unknown') {
+                if (!empty($g) && !str_starts_with($g, 'Unincorporated') && !str_starts_with($g, 'Unorganized') && !str_starts_with($g, 'Unknown')) {
                     $this->data['pageTitle'] = $g;
                     break;
                 }
@@ -117,7 +117,7 @@ class Area extends BaseController
             echo view('header', $this->data);
             if (!empty($addressText)) {
                 $searchParameter['Address'] = $addressText;
-            } elseif (!empty($x) or !empty($y)) {
+            } elseif (!empty($x) || !empty($y)) {
                 $searchParameter['Coordinates'] = $y . ', ' . $x;
             }
             if (isset($searchParameter)) {
@@ -159,7 +159,7 @@ class Area extends BaseController
                 'fillOpacity' => 0.5
             ]);
             $includePoint = false;
-            if (!empty($x) and !empty($y)) {
+            if (!empty($x) && !empty($y)) {
                 $includePoint = true;
                 $query = [(object)[
                     'line' => '',

@@ -83,9 +83,9 @@ class Statistics extends BaseController
 
         $from = $this->request->getPost('from', FILTER_SANITIZE_NUMBER_INT);
         $to = $this->request->getPost('to', FILTER_SANITIZE_NUMBER_INT);
-        if (empty($from) and empty($to)) {
+        if (empty($from) && empty($to)) {
             $from = 0;
-            $to = intval(date('Y'));
+            $to = (int) date('Y');
         } elseif (empty($from)) {
             $from = $to;
         } elseif (empty($to)) {
@@ -95,7 +95,7 @@ class Statistics extends BaseController
             $to = $from;
             $from = $temporary;
         }
-        if ($from == $to or $from == 0) {
+        if ($from == $to || $from == 0) {
             $dateRange = $from;
             $dateRangePlural = '';
         } else {

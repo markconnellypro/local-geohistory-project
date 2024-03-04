@@ -9,7 +9,7 @@
                     <th>Detail</th>
                     <th>Date <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#date" aria-label="Date Key"><?= view('general_svg_icon', ['iconLabel' => 'key icon', 'iconName' => 'key', 'iconType' => 'keyicon']); ?></a>
                     </th>
-                <?php } elseif ($live and $isComplete) { ?>
+                <?php } elseif ($live && $isComplete) { ?>
                     <th>Map<br>Link</th>
                 <?php }
                 if ($isComplete) { ?>
@@ -30,7 +30,7 @@
                     <?php if ($includeDate) { ?>
                         <td data-sort="<?= $row->eventorder ?>"><?php echo view('general_link', ['link' => (empty($row->eventslug) ? '' : "/" . \Config\Services::request()->getLocale() . "/" . $state . "/event/" . $row->eventslug . "/"), 'text' => (empty($row->eventslug) ? 'Missing' : 'View')]) ?></td>
                         <td data-sort="<?= $row->eventsort ?>"><?= (empty($row->eventeffective) ? $row->eventyear : $row->eventeffective) ?></td>
-                    <?php } elseif ($live and $isComplete) { ?>
+                    <?php } elseif ($live && $isComplete) { ?>
                         <td>
                             <?php echo view('general_link', ['link' => str_replace('government', 'governmentmap', $row->municipalityfrom) . $row->id . "/", 'text' => 'From']) ?><br>
                             <?php if (!empty($row->submunicipalityfrom)) { ?>
@@ -56,7 +56,7 @@
                     <td>
                         <?php echo view('general_link', ['link' => $row->countyfrom, 'text' => $row->countyfromshort]) ?><br>
                         <span class="i"><?= $row->affectedtypecountyfrom ?> <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#affectedtype" aria-label="Affected Type Key"><?= view('general_svg_icon', ['iconLabel' => 'key icon', 'iconName' => 'key', 'iconType' => 'keyicontext']); ?></a></span>
-                        <?php if ($isComplete and $row->subcountyfrom !== '') { ?>
+                        <?php if ($isComplete && $row->subcountyfrom !== '') { ?>
                             <br><span class="b i">Sub:</span>
                             <?php echo view('general_link', ['link' => $row->subcountyfrom, 'text' => $row->subcountyfromshort]) ?>
                             <br><span class="i"><?= $row->affectedtypesubcountyfrom ?> <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#affectedtype" aria-label="Affected Type Key"><?= view('general_svg_icon', ['iconLabel' => 'key icon', 'iconName' => 'key', 'iconType' => 'keyicontext']); ?></a></span>
@@ -80,7 +80,7 @@
                     <td>
                         <?php echo view('general_link', ['link' => $row->countyto, 'text' => $row->countytoshort]) ?><br>
                         <span class="i"><?= $row->affectedtypecountyto ?> <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#affectedtype" aria-label="Affected Type Key"><?= view('general_svg_icon', ['iconLabel' => 'key icon', 'iconName' => 'key', 'iconType' => 'keyicontext']); ?></a></span>
-                        <?php if ($isComplete and $row->subcountyto !== '') { ?>
+                        <?php if ($isComplete && $row->subcountyto !== '') { ?>
                             <br><span class="b i">Sub:</span>
                             <?php echo view('general_link', ['link' => $row->subcountyto, 'text' => $row->subcountytoshort]) ?>
                             <br><span class="i"><?= $row->affectedtypesubcountyto ?> <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#affectedtype" aria-label="Affected Type Key"><?= view('general_svg_icon', ['iconLabel' => 'key icon', 'iconName' => 'key', 'iconType' => 'keyicontext']); ?></a></span>

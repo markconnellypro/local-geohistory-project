@@ -44,7 +44,7 @@ class Metes extends BaseController
             $hasMap = false;
             $hasMetes = false;
             $hasArea = (!is_null($areaQuery[0]->geometry));
-            $hasBegin = ($areaQuery[0]->hasbeginpoint == 't' or $hasArea);
+            $hasBegin = ($areaQuery[0]->hasbeginpoint == 't' || $hasArea);
             if ($this->data['live']) {
                 $MetesDescriptionLineModel = new \App\Models\Development\MetesDescriptionLineModel;
             } else {
@@ -52,7 +52,7 @@ class Metes extends BaseController
             }
             $geometryQuery = $MetesDescriptionLineModel->getGeometryByMetesDescription($id);
             $hasMetes = (count($geometryQuery) > 1);
-            if ($hasArea or $hasMetes) {
+            if ($hasArea || $hasMetes) {
                 $hasMap = true;
                 echo view('general_map', ['live' => $this->data['live'], 'includeBase' => $hasBegin, 'includeDisclaimer' => true]);
             }

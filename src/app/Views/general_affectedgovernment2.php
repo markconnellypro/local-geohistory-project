@@ -9,11 +9,11 @@
                     <th>Detail</th>
                     <th>Date <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#date" aria-label="Date Key"><?= view('general_svg_icon', ['iconLabel' => 'key icon', 'iconName' => 'key', 'iconType' => 'keyicon']); ?></a>
                     </th>
-                <?php } elseif ($live and $isComplete) { ?>
+                <?php } elseif ($live && $isComplete) { ?>
                     <th>Map<br>Link</th>
                     <?php }
                 foreach ($affectedGovernment['types'] as $fromTo => $levels) {
-                    foreach ($levels as $levelOrder => $level) { ?>
+                    foreach ($levels as $level) { ?>
                         <th><?= ucfirst($fromTo) . '<br>' . str_replace(' ', '<br>', $level) ?></th>
                 <?php  }
                 } ?>
@@ -25,11 +25,11 @@
                     <?php if ($includeDate) { ?>
                         <td data-sort="<?= $row->eventorder ?>"><?php echo view('general_link', ['link' => (empty($row->eventslug) ? '' : "/" . \Config\Services::request()->getLocale() . "/" . $state . "/event/" . $row->eventslug . "/"), 'text' => (empty($row->eventslug) ? 'Missing' : 'View')]) ?></td>
                         <td data-sort="<?= $row->eventsort ?>"><?= (empty($row->eventeffective) ? $row->eventyear : $row->eventeffective) ?></td>
-                    <?php } elseif ($live and $isComplete) { ?>
+                    <?php } elseif ($live && $isComplete) { ?>
                         <td>
 
                             <?php foreach ($affectedGovernment['linkTypes'] as $fromTo => $levels) {
-                                foreach ($levels as $levelOrder => $level) {
+                                foreach ($levels as $level) {
                                     if (isset($row->{ucfirst($fromTo) . ' ' . $level . ' Long'})) { ?>
                                         <?php echo view('general_link', ['link' => str_replace('government', 'governmentmap', $row->{ucfirst($fromTo) . ' ' . $level . ' Link'}) . $id . "/", 'text' => ucfirst($fromTo)]) ?><br>
                             <?php
@@ -39,7 +39,7 @@
                         </td>
                         <?php }
                     foreach ($affectedGovernment['types'] as $fromTo => $levels) {
-                        foreach ($levels as $levelOrder => $level) { ?>
+                        foreach ($levels as $level) { ?>
                             <td>
                                 <?php if (isset($row->{ucfirst($fromTo) . ' ' . $level . ' Long'})) { ?>
                                     <?php echo view('general_link', ['link' => $row->{ucfirst($fromTo) . ' ' . $level . ' Link'}, 'text' => $row->{ucfirst($fromTo) . ' ' . $level . ' Long'}]) ?>

@@ -22,7 +22,7 @@
                 <tr>
                     <td><a href="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/law/<?= $row->lawsectionslug ?>/"><?= (empty($row->lawsectionslug) ? '' : 'View') ?></a></td>
                     <td data-sort="<?= $row->lawapproved ?>"><?= $row->lawsectioncitation ?></td>
-                    <?php if ($type == 'relationship' AND isset($includeLawGroup)) { ?>
+                    <?php if ($type == 'relationship' && isset($includeLawGroup)) { ?>
                         <td><?= $row->lawgrouplong ?></td>
                     <?php } ?>
                     <td><?= (($type == 'relationship') ? $row->lawsectioneventrelationship : $row->eventtypeshort) ?></td>

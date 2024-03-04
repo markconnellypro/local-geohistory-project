@@ -1,4 +1,4 @@
-	var <?= $element ?>data = {
+var <?= $element ?>data = {
 	"type": "FeatureCollection",
 	"features": [
 	<?php $i = 0;
@@ -56,10 +56,10 @@
 					return L.circleMarker(latlng,' : 'style:') ?> <?php if (!isset($customStyle)) { ?>{
 	    weight: <?= $weight ?>,
 	    color: "#<?= $color ?>",
-	    opacity: <?= (isset($opacity) ? $opacity : '1') ?>,
+	    opacity: <?= ($opacity ?? '1') ?>,
 	    fillOpacity: <?= $fillOpacity ?>
 	    <?= (isset($radius) ? ', radius:' . $radius : '') ?>
-	    <?= ((isset($attribution) and !empty($attribution)) ? ", attribution: '" . $attribution . "'" : '') ?>
+	    <?= ((isset($attribution) && !empty($attribution)) ? ", attribution: '" . $attribution . "'" : '') ?>
 	    <?= ($element == 'point' ? '});' : '') ?>
 	    }<?php } else {
                                                                         echo $customStyle;

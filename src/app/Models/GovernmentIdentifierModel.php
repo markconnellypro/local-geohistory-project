@@ -143,8 +143,8 @@ class GovernmentIdentifierModel extends Model
             strtolower($identifier),
             strtolower($identifier),
             strtolower($identifier),
-            intval($identifier),
-            intval($identifier),
+            (int) $identifier,
+            (int) $identifier,
         ])->getResult();
 
         return $query ?? [];

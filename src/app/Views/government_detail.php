@@ -25,7 +25,7 @@
         </tbody>
     </table>
 </section>
-<?php if ($row->textflag == 't' and !$isHistory) { ?>
+<?php if ($row->textflag == 't' && !$isHistory) { ?>
     <section>
         <h2>Detail</h2>
         <table class="normal cell-border compact stripe">

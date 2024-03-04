@@ -24,8 +24,8 @@
     </section>
     <script>
         var mapPath = [
-            <?php if ($state == 'ma' and (empty($dateRange) or substr($dateRange, 0, 4) < '1821')) { ?> '/asset/development/map/statistics/me.geojson',
-            <?php } ?> '/asset/<?= (($live and (empty($state) or !in_array($state, \App\Controllers\BaseController::getProductionJurisdictions()))) ? 'development/' : '') ?>map/statistics/<?= (empty($state) ? ($live ? 'development' : 'production') : $state) ?>.geojson'
+            <?php if ($state == 'ma' && (empty($dateRange) || substr($dateRange, 0, 4) < '1821')) { ?> '/asset/development/map/statistics/me.geojson',
+            <?php } ?> '/asset/<?= (($live && (empty($state) || !in_array($state, \App\Controllers\BaseController::getProductionJurisdictions()))) ? 'development/' : '') ?>map/statistics/<?= (empty($state) ? ($live ? 'development' : 'production') : $state) ?>.geojson'
         ];
         var partData = <?= $query ?>;
         var lastLayer = "";

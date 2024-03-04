@@ -53,15 +53,6 @@ class Search extends BaseController
         ];
     }
 
-    private function emptyToArray($a)
-    {
-        if (empty($a)) {
-            return '{}';
-        } else {
-            return '{' . $a . '}';
-        }
-    }
-
     private function emptyToEmpty($a)
     {
         if (empty($a)) {
@@ -73,21 +64,17 @@ class Search extends BaseController
 
     private function emptyToZero($a): int
     {
-        return (empty($a) ? 0 : intval($a));
+        return (empty($a) ? 0 : (int) $a);
     }
 
     private function governmentLevel($a): int
     {
-        switch ($a) {
-            case 'State':
-                return 2;
-            case 'County':
-                return 3;
-            case 'Municipality':
-                return 4;
-            default:
-                return 0;
-        }
+        return match ($a) {
+            'State' => 2,
+            'County' => 3,
+            'Municipality' => 4,
+            default => 0,
+        };
     }
 
     public function governmentlookup($state, $government = '', $type = ''): void
@@ -105,7 +92,7 @@ class Search extends BaseController
         $stateArray = $this->getJurisdictions();
         $this->data['state'] = $state;
         echo view('header', $this->data);
-        if (!$this->data['live'] and !in_array($state, $stateArray)) {
+        if (!$this->data['live'] && !in_array($state, $stateArray)) {
             echo view('search_unavailable');
         } else {
             $GovernmentModel = new GovernmentModel;
@@ -204,7 +191,7 @@ class Search extends BaseController
                 break;
         }
 
-        if (count($fields) > 0) {
+        if ($fields !== []) {
             echo view('header', $this->data);
             $model = "App\\Models\\" . $model;
             $model = new $model;
@@ -215,7 +202,7 @@ class Search extends BaseController
                 'Search By' => $this->typeType[$this->request->getPost('type')],
             ];
             foreach ($this->request->getPost() as $key => $value) {
-                if (!empty($value) and $key != 'type') {
+                if (!empty($value) && $key != 'type') {
                     $searchParameter[$this->parameterType[$key]] = $value;
                 }
             }

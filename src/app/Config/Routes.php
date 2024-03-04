@@ -83,6 +83,6 @@ if (is_file(APPPATH . 'Config/' . ENVIRONMENT . '/Routes.php')) {
 if (mb_strpos(base_url(), $_ENV['app_baseLocalGeohistoryProjectUrl']) !== FALSE) {
     $routes->add('{locale}', 'Welcome');
     $routes->add('/', 'Welcome::language');
-    $routes->set404Override('App\Controllers\Fourofour');
+    $routes->set404Override(\App\Controllers\Fourofour::class);
     $routes->add('(:any)', 'Fourofour');
 }

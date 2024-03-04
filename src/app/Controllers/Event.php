@@ -43,7 +43,7 @@ class Event extends BaseController
         $id = $this->getIdInt($id);
         $EventModel = new EventModel;
         $query = $EventModel->getDetail($id, $state);
-        if (count($query) != 1 or ($query[0]->eventgranted == 'placeholder' and !$this->data['live'])) {
+        if (count($query) != 1 || $query[0]->eventgranted == 'placeholder' && !$this->data['live']) {
             $this->noRecord($state);
         } else {
             $id = $query[0]->eventid;
@@ -67,7 +67,7 @@ class Event extends BaseController
             if (count($metesdescriptiongisquery) > 0) {
                 $hasMap = true;
             }
-            if (!$this->data['live'] and !$eventIsMapped) {
+            if (!$this->data['live'] && !$eventIsMapped) {
                 $hasMap = false;
             }
             if ($hasMap) {
@@ -136,7 +136,7 @@ class Event extends BaseController
                     ]);
                 }
                 $layers = [];
-                if ($this->data['live'] and count($metesdescriptiongisquery) > 0) {
+                if ($this->data['live'] && count($metesdescriptiongisquery) > 0) {
                     echo view('general_gis', [
                         'query' => $metesdescriptiongisquery,
                         'element' => 'metesdescription',

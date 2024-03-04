@@ -29,7 +29,7 @@
                     if (!empty($isMultiple)) { ?>
                         <td><?= $row->governmentaffectedlong ?></td>
                     <?php } ?>
-                    <td><?= $row->governmentformlong . ((!$includeGovernment and $row->eventreconstructed == 't') ? '?' : '') ?></td>
+                    <td><?= $row->governmentformlong . ((!$includeGovernment && $row->eventreconstructed == 't') ? '?' : '') ?></td>
                     <?php if (!$includeGovernment) { ?>
                         <td data-sort="<?= $row->eventsort ?>"><?= (empty($row->eventeffective) ? $row->eventyear : $row->eventeffective) ?></td>
                     <?php } ?>

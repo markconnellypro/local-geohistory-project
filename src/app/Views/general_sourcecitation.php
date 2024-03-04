@@ -11,7 +11,7 @@
                         <th>Source</th>
                     <?php }
                 }
-                if ($hasColor or (!$hasLink and $live)) { ?>
+                if ($hasColor || !$hasLink && $live) { ?>
                     <th>ID</th>
                 <?php } ?>
                 <th>Title</th>
@@ -25,7 +25,7 @@
         <tbody>
             <?php foreach ($query as $row) {
                 if ($hasColor) {
-                    $rowColor = ($row->citationcount > 0 ? (($row->citationeventnothandledcount > 0 or $row->sourcecitationnothandled == 't') ? 'preliminary' : 'complete') : 'incomplete');
+                    $rowColor = ($row->citationcount > 0 ? (($row->citationeventnothandledcount > 0 || $row->sourcecitationnothandled == 't') ? 'preliminary' : 'complete') : 'incomplete');
                 }
             ?>
                 <tr>
@@ -35,7 +35,7 @@
                                 <td<?= ($hasColor ? ' class="folder' . $rowColor . '"' : '') ?>><?= $row->sourceabbreviation ?></td>
                                 <?php }
                         }
-                        if ($hasColor or (!$hasLink and $live)) { ?>
+                        if ($hasColor || !$hasLink && $live) { ?>
                                 <td<?= ($hasColor ? ' class="folder' . $rowColor . '" data-sort="' . $rowColor . '"' : '') ?>><?= $row->sourcecitationid ?></td>
                                 <?php } ?>
                                 <td<?= ($hasColor ? ' class="folder' . $rowColor . '"' : '') ?>><?= $row->sourcecitationtypetitle ?></td>

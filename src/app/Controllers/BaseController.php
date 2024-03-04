@@ -38,15 +38,7 @@ abstract class BaseController extends Controller
      */
     protected $helpers = [];
 
-    /**
-     * Be sure to declare properties for any property fetch you initialized.
-     * The creation of dynamic property is deprecated in PHP 8.2.
-     */
     // protected $session;
-
-    /**
-     * @return void
-     */
     public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger): void
     {
         // Do Not Edit This Line
@@ -68,7 +60,7 @@ abstract class BaseController extends Controller
             foreach ($partQuery as $row) {
                 if (!empty($row->governmentfromlong)) {
                     $affectedGovernment['types']['from'][$row->affectedgovernmentleveldisplayorder] = $row->affectedgovernmentlevellong;
-                    if (!empty($row->includelink) and $row->includelink == 't') {
+                    if (!empty($row->includelink) && $row->includelink == 't') {
                         $affectedGovernment['linkTypes']['from'][$row->affectedgovernmentleveldisplayorder] = $row->affectedgovernmentlevellong;
                     }
                     $affectedGovernment['rows'][$row->id]['From ' . $row->affectedgovernmentlevellong . ' Link'] = $row->governmentfrom;
@@ -77,7 +69,7 @@ abstract class BaseController extends Controller
                 }
                 if (!empty($row->governmenttolong)) {
                     $affectedGovernment['types']['to'][$row->affectedgovernmentleveldisplayorder] = $row->affectedgovernmentlevellong;
-                    if (!empty($row->includelink) and $row->includelink == 't') {
+                    if (!empty($row->includelink) && $row->includelink == 't') {
                         $affectedGovernment['linkTypes']['to'][$row->affectedgovernmentleveldisplayorder] = $row->affectedgovernmentlevellong;
                     }
                     $affectedGovernment['rows'][$row->id]['To ' . $row->affectedgovernmentlevellong . ' Link'] = $row->governmentto;
@@ -117,9 +109,7 @@ abstract class BaseController extends Controller
     {
         if (isset($_SERVER['HTTP_USER_AGENT'])) {
             $browser = strtolower($_SERVER['HTTP_USER_AGENT']);
-            return strpos($browser, 'msie') !== false
-                or strpos($browser, 'internet explorer') !== false
-                or strpos($browser, 'trident') !== false;
+            return str_contains($browser, 'msie') || str_contains($browser, 'internet explorer') || str_contains($browser, 'trident');
         } else {
             return false;
         }
@@ -127,8 +117,8 @@ abstract class BaseController extends Controller
 
     protected function getIdInt($id)
     {
-        if ($this->isLive() AND preg_match('/^\d{1,9}$/', $id)) {
-			$id = intval($id);
+        if (static::isLive() && preg_match('/^\d{1,9}$/', $id)) {
+			$id = (int) $id;
 		}
         return $id;
     }
@@ -156,7 +146,7 @@ abstract class BaseController extends Controller
 
     protected function isOnline(): bool
     {
-        if ($this->isLive() and gethostbyname('unpkg.com') == 'unpkg.com') {
+        if (static::isLive() && gethostbyname('unpkg.com') == 'unpkg.com') {
             return false;
         } else {
             return true;

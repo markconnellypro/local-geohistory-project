@@ -21,7 +21,7 @@
         <tbody>
             <?php foreach ($query as $row) { ?>
                 <tr>
-                    <td><?php if ($row->url <> '') { ?><a href="<?= $row->url ?>">View</a><?php } ?></td>
+                    <td><?php if ($row->url != '') { ?><a href="<?= $row->url ?>">View</a><?php } ?></td>
                     <?php if ($isMultiple) { ?>
                         <td><?= $row->governmentlong ?></td>
                     <?php } ?>

@@ -21,7 +21,7 @@ overlayMaps[element] = stateOverlayMaps[element];
 
 L.control.layers(baseMaps, overlayMaps).addTo(map);
 
-<?php foreach (array_reverse($layers) as $key => $layer) {
+<?php foreach (array_keys(array_reverse($layers)) as $key) {
     echo $key, "layer.bringToFront();\n";
 } ?>
 affectedgovernmentlayer.bringToFront();

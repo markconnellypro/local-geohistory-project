@@ -32,8 +32,7 @@ class Law extends BaseController
     public function view($state, $id): void
     {
         $this->data['state'] = $state;
-        $queryType = '';
-        if (substr($id, -10) == '-alternate') {
+        if (str_ends_with($id, '-alternate')) {
             $function = 'getByLawAlternateSection';
             $LawSectionModel = new \App\Models\LawAlternateSectionModel;
         } else {

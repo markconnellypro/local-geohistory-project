@@ -57,7 +57,7 @@ class Government extends BaseController
             $SourceCitationModel = new \App\Models\SourceCitationModel;
         }
         $query = $GovernmentModel->getDetail($id, $state);
-        if (count($query) != 1 or $query[0]->governmentlevel == 'placeholder') {
+        if (count($query) != 1 || $query[0]->governmentlevel == 'placeholder') {
             $this->noRecord($state);
         } elseif (!empty($query[0]->governmentsubstituteslug)) {
             header("HTTP/1.1 301 Moved Permanently");
@@ -70,10 +70,10 @@ class Government extends BaseController
             $this->data['isMultiple'] = ($query[0]->governmentsubstitutemultiple == 't');
             echo view('header', $this->data);
             $isMunicipalityOrLower = ($query[0]->governmentlevel == 'municipality or lower');
-            $isCountyOrLower = ($query[0]->governmentlevel == 'municipality or lower' or $query[0]->governmentlevel == 'county');
-            $isCountyOrState = ($query[0]->governmentlevel == 'state' or $query[0]->governmentlevel == 'county');
-            $isStateOrHigher = (($query[0]->governmentlevel == 'state' or $query[0]->governmentlevel == 'country'));
-            $hasMap = ($isCountyOrLower ? ($query[0]->hasmap == 't') : false);
+            $isCountyOrLower = ($query[0]->governmentlevel == 'municipality or lower' || $query[0]->governmentlevel == 'county');
+            $isCountyOrState = ($query[0]->governmentlevel == 'state' || $query[0]->governmentlevel == 'county');
+            $isStateOrHigher = (($query[0]->governmentlevel == 'state' || $query[0]->governmentlevel == 'country'));
+            $hasMap = ($isCountyOrLower && $query[0]->hasmap == 't');
             $showTimeline = ($query[0]->governmentmapstatustimelapse == 't');
             $statusQuery = $GovernmentMapStatusModel->getDetails();
             echo view('government_detail', ['live' => $this->data['live'], 'row' => $query[0], 'state' => $state, 'statuses' => $statusQuery]);
@@ -171,7 +171,7 @@ class Government extends BaseController
                 if (file_exists(APPPATH . 'Views/' . ENVIRONMENT . '/government_live.php')) {
                     echo view(ENVIRONMENT . '/government_live', ['id' => $id, 'state' => $state, 'isMunicipalityOrLower' => $isMunicipalityOrLower, 'isCountyOrLower' => $isCountyOrLower, 'isCountyOrState' => $isCountyOrState, 'isState' => $isStateOrHigher, 'includeGovernment' => false]);
                 }
-                if (isset($populationQuery) and count($populationQuery) > 0) {
+                if (isset($populationQuery) && count($populationQuery) > 0) {
                     echo view('general_chartjs', ['query' => $populationQuery, 'online' => $this->data['online'], 'xLabel' => 'Year', 'yLabel' => 'Population']);
                 }
             }

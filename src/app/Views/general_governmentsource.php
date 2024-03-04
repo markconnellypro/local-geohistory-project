@@ -6,7 +6,7 @@
                 <?php if ($type !== 'source') { ?>
                     <th>Detail</th>
                 <?php }
-                if ($type !== 'government' or !empty($isMultiple)) { ?>
+                if ($type !== 'government' || !empty($isMultiple)) { ?>
                     <th>Government</th>
                 <?php } ?>
                 <th>Action</th>
@@ -32,7 +32,7 @@
                             } ?>
                         </td>
                     <?php }
-                    if ($type !== 'government' or !empty($isMultiple)) { ?>
+                    if ($type !== 'government' || !empty($isMultiple)) { ?>
                         <td><?php echo view('general_link', ['link' => $row->government, 'text' => $row->governmentlong]); ?></td>
                     <?php } ?>
                     <td><span class="b">
@@ -44,12 +44,12 @@
                     <td data-sort="<?= $row->governmentsourcedatesort ?>"><?= $row->governmentsourcedate ?></td>
                     <td data-sort="<?= $row->governmentsourceapproveddatesort ?>">
                         <?= ($row->governmentsourceapproved == 't' ?
-                            (($row->governmentsourcetype == 'Election' and $row->governmentsourceapproveddate != '') ? 'Certified ' : '') . $row->governmentsourceapproveddate : ($row->governmentsourcetype == 'Election' ? 'Rejected' : ($row->governmentsourcetype == 'Bill' ? '' : 'Veto' . ($row->governmentsourceapproveddate != '' ? ' Overridden ' . $row->governmentsourceapproveddate : 'ed')))) ?>
+                            (($row->governmentsourcetype == 'Election' && $row->governmentsourceapproveddate != '') ? 'Certified ' : '') . $row->governmentsourceapproveddate : ($row->governmentsourcetype == 'Election' ? 'Rejected' : ($row->governmentsourcetype == 'Bill' ? '' : 'Veto' . ($row->governmentsourceapproveddate != '' ? ' Overridden ' . $row->governmentsourceapproveddate : 'ed')))) ?>
                     </td>
                     <td data-sort="<?= $row->governmentsourceeffectivedatesort ?>"><?= $row->governmentsourceeffectivedate ?></td>
                     <td><?=
                         $row->governmentsourcelocation .
-                            ((!empty($row->governmentsourcelocation) and !empty($row->sourcecitationlocation)) ? '; ' : '') .
+                            ((!empty($row->governmentsourcelocation) && !empty($row->sourcecitationlocation)) ? '; ' : '') .
                             $row->sourcecitationlocation ?></td>
                 </tr>
             <?php } ?>
