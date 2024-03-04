@@ -24,12 +24,12 @@
                             <?php if (!empty($row->governmentsourceslug)) { ?>
                                 <a href="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/governmentsource/<?= $row->governmentsourceslug ?>/">View</a>
                                 <?php } elseif (isset($row->eventslug)) {
-                                $i = 0;
-                                foreach (explode(',', str_replace(['{', '}'], '', $row->eventslug)) as $event) { ?>
+                                    $i = 0;
+                                    foreach (explode(',', str_replace(['{', '}'], '', $row->eventslug)) as $event) { ?>
                                     <?= ($i > 0 ? '<br>' : '') ?><a href="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/event/<?= $event ?>/">View</a>
                             <?php $i++;
-                                }
-                            } ?>
+                                    }
+                                } ?>
                         </td>
                     <?php }
                     if ($type !== 'government' || !empty($isMultiple)) { ?>

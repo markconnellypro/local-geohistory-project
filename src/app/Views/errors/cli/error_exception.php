@@ -41,7 +41,7 @@ if (defined('SHOW_DEBUG_BACKTRACE') && SHOW_DEBUG_BACKTRACE) {
             $function .= $padClass . $error['function'];
         }
 
-        $args = implode(', ', array_map(static fn($value) => match (true) {
+        $args = implode(', ', array_map(static fn ($value) => match (true) {
             is_object($value) => 'Object(' . $value::class . ')',
             is_array($value) => count($value) ? '[...]' : '[]',
             $value === null => 'null',

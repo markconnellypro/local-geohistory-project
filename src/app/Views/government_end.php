@@ -1,6 +1,6 @@
 var map = L.map("map", {
   layers: [baseMap, governmentOverlayMap<?php foreach ($layers as $key => $layer) {
-    echo ', ', $key, 'layer';
+      echo ', ', $key, 'layer';
   }?>]
 });
 
@@ -10,14 +10,14 @@ var overlayMaps = {
   "Approximate Current Boundaries": governmentOverlayMap,
 <?php
 $i = 0;
-foreach ($layers as $key => $layer) {
-  if ($i > 0) {
-    echo ",\n";
-  } else {
-    $i++;
-  }
-  echo "  ",'"', $layer, '": ', $key, 'layer';
-} ?>
+  foreach ($layers as $key => $layer) {
+      if ($i > 0) {
+          echo ",\n";
+      } else {
+          $i++;
+      }
+      echo "  ",'"', $layer, '": ', $key, 'layer';
+  } ?>
 
 };
 
@@ -28,7 +28,7 @@ Object.keys(stateOverlayMaps).forEach(function (element) {
 L.control.layers(baseMaps, overlayMaps).addTo(map);
 
 <?php foreach (array_keys(array_reverse($layers)) as $key) {
-  echo $key, "layer.bringToFront();\n";
+    echo $key, "layer.bringToFront();\n";
 } ?>
 
 var info = L.control({position: 'topright'});

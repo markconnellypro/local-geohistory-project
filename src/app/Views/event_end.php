@@ -1,7 +1,7 @@
 var map = L.map("map", {
 layers: [baseMap, governmentOverlayMap, affectedgovernmentlayer<?php foreach ($layers as $key => $layer) {
-                                                                    echo ', ', $key, 'layer';
-                                                                } ?>]
+    echo ', ', $key, 'layer';
+} ?>]
 });
 
 map.fitBounds(affectedgovernmentlayer.getBounds());

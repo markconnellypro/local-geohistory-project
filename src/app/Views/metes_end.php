@@ -1,15 +1,15 @@
 var map = L.map("map", {
 layers: [<?php
-            echo ($includeBase ? 'baseMap, ' : '');
-            if ($includeArea) {
-                $layerArray[] = 'arealayer';
-            }
-            if ($includeMetes) {
-                $layerArray[] = 'linelayer';
-                $layerArray[] = 'pointlayer';
-            }
-            echo implode(', ', $layerArray);
-            ?>]
+            echo($includeBase ? 'baseMap, ' : '');
+if ($includeArea) {
+    $layerArray[] = 'arealayer';
+}
+if ($includeMetes) {
+    $layerArray[] = 'linelayer';
+    $layerArray[] = 'pointlayer';
+}
+echo implode(', ', $layerArray);
+?>]
 });
 
 map.fitBounds(<?= ($includeMetes ? 'point' : 'area') ?>layer.getBounds());

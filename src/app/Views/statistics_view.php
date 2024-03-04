@@ -19,7 +19,7 @@
                     <li>Creation and dissolution events include changes in the names of municipalities, and may include certain changes in municipalities' forms of government.</li>
                     <li>If a parent jurisdiction boundary change occurred as part of a creation or dissolution event, the parent jurisdictions immediately before dissolution or after creation are used.</li>
             <?php }
-            } ?>
+                } ?>
         </ol>
     </section>
     <script>

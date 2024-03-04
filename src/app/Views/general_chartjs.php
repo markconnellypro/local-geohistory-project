@@ -6,7 +6,7 @@
                         foreach ($query as $row) {
                             echo $row->datarow . ",\r\n";
                         }
-                        ?>];
+?>];
 
     var xLabel = "<?= $xLabel ?>";
     var yLabel = "<?= $yLabel ?>";

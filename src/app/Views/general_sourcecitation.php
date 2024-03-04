@@ -10,8 +10,8 @@
                     <?php if (!$hasColor) { ?>
                         <th>Source</th>
                     <?php }
-                }
-                if ($hasColor || !$hasLink && $live) { ?>
+                    }
+    if ($hasColor || !$hasLink && $live) { ?>
                     <th>ID</th>
                 <?php } ?>
                 <th>Title</th>
@@ -27,15 +27,15 @@
                 if ($hasColor) {
                     $rowColor = ($row->citationcount > 0 ? (($row->citationeventnothandledcount > 0 || $row->sourcecitationnothandled == 't') ? 'preliminary' : 'complete') : 'incomplete');
                 }
-            ?>
+                ?>
                 <tr>
                     <?php if ($hasLink) { ?>
                         <td<?= ($hasColor ? ' class="folder' . $rowColor . '"' : '') ?>><a href="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/source/<?= $row->sourcecitationslug ?>/">View</a></td>
                             <?php if (!$hasColor) { ?>
                                 <td<?= ($hasColor ? ' class="folder' . $rowColor . '"' : '') ?>><?= $row->sourceabbreviation ?></td>
                                 <?php }
-                        }
-                        if ($hasColor || !$hasLink && $live) { ?>
+                            }
+                if ($hasColor || !$hasLink && $live) { ?>
                                 <td<?= ($hasColor ? ' class="folder' . $rowColor . '" data-sort="' . $rowColor . '"' : '') ?>><?= $row->sourcecitationid ?></td>
                                 <?php } ?>
                                 <td<?= ($hasColor ? ' class="folder' . $rowColor . '"' : '') ?>><?= $row->sourcecitationtypetitle ?></td>

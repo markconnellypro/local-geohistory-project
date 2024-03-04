@@ -17,7 +17,7 @@
         </thead>
         <tbody>
             <?php $i = 1;
-            foreach ($query as $row) { ?>
+    foreach ($query as $row) { ?>
                 <tr>
                     <td data-sort="<?= $row->eventsort ?>"><?= ($isHistory ? $i : '<a href="/' . \Config\Services::request()->getLocale() . '/' . $state . '/event/' . $row->eventslug . '/">View</a>') ?></td>
                     <?php if ($isMultiple) { ?>
@@ -29,7 +29,7 @@
                     <td data-sort="<?= $row->eventsort ?>"><?= (empty($row->eventeffective) ? $row->eventyear : $row->eventeffective) ?></td>
                 </tr>
             <?php $i++;
-            } ?>
+    } ?>
         </tbody>
     </table>
 </section>

@@ -31,7 +31,7 @@
             <div class="option_select">
                 <?php
                 echo view('search_form_eventtype', ['isRequired' => false, 'form' => '']);
-                ?>
+?>
             </div>
             <label class="forselectize" for="from">Year(s)</label><br>
             <input id="from" class="selectize-input" name="from" type="number" step="1" style="width: 100px;">
