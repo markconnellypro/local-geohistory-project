@@ -110,7 +110,6 @@ class AffectedGovernmentGroupModel extends Model
 
     // FUNCTION: extra.governmentformlong
     // FUNCTION: extra.governmentlong
-    // VIEW: extra.eventextracache
     // VIEW: extra.governmentsubstitute
 
     public function getByGovernmentForm($id, $state)
@@ -118,7 +117,7 @@ class AffectedGovernmentGroupModel extends Model
         $query = <<<QUERY
             SELECT DISTINCT event.eventsort,
                 event.eventid AS event,
-                eventextracache.eventslug,
+                event.eventslug,
                 extra.governmentformlong(affectedgovernmentpart.governmentformto, ?) governmentformlong,
                 event.eventyear,
                 event.eventeffectivetext AS eventeffective,
@@ -126,9 +125,6 @@ class AffectedGovernmentGroupModel extends Model
                 NOT eventgranted.eventgrantedcertainty AS eventreconstructed,
                 extra.governmentlong(affectedgovernmentpart.governmentto, ?) AS governmentaffectedlong
             FROM geohistory.event
-            JOIN extra.eventextracache
-                ON event.eventid = eventextracache.eventid
-                AND eventextracache.eventslugnew IS NULL
             JOIN geohistory.eventgranted
                 ON event.eventgranted = eventgranted.eventgrantedid
                 AND eventgranted.eventgrantedsuccess
@@ -160,7 +156,6 @@ class AffectedGovernmentGroupModel extends Model
     // FUNCTION: extra.governmentlong
     // FUNCTION: extra.governmentstatelink
     // FUNCTION: extra.governmentsubstitutedcache
-    // VIEW: extra.eventextracache
     // VIEW: extra.governmentsubstitutecache
 
     public function getByGovernmentGovernment($id, $state)
@@ -168,7 +163,7 @@ class AffectedGovernmentGroupModel extends Model
         $query = <<<QUERY
             SELECT DISTINCT event.eventsort,
                 affectedgovernment.event,
-                eventextracache.eventslug,
+                event.eventslug,
                 affectedtypesame.affectedtypeshort || CASE
                     WHEN affectedgovernment.affectedtypesamewithin THEN ' (Within)'
                     ELSE ''
@@ -280,9 +275,6 @@ class AffectedGovernmentGroupModel extends Model
             ) AS affectedgovernment
                 JOIN geohistory.event
                 ON affectedgovernment.event = event.eventid
-                JOIN extra.eventextracache
-                ON event.eventid = eventextracache.eventid
-                AND eventextracache.eventslugnew IS NULL
                 JOIN geohistory.eventgranted
                 ON event.eventgranted = eventgranted.eventgrantedid
                 AND eventgranted.eventgrantedsuccess
@@ -336,7 +328,7 @@ class AffectedGovernmentGroupModel extends Model
         $query = <<<QUERY
             WITH foundaffectedgovernment AS (
                 SELECT event.eventid,
-                eventextracache.eventslug,
+                event.eventslug,
                 extra.governmentstatelink(affectedgovernment_reconstructed.municipalityfrom, ?, ?) AS municipalityfrom,
                 extra.governmentlong(affectedgovernment_reconstructed.municipalityfrom, ?) AS municipalityfromlong,
                 extra.affectedtypeshort(affectedgovernment_reconstructed.affectedtypemunicipalityfrom) AS affectedtypemunicipalityfrom,
@@ -380,15 +372,12 @@ class AffectedGovernmentGroupModel extends Model
                 JOIN geohistory.eventgranted
                 ON event.eventgranted = eventgranted.eventgrantedid
                 AND eventgranted.eventgrantedsuccess
-                JOIN extra.eventextracache
-                ON event.eventid = eventextracache.eventid
-                AND eventextracache.eventslugnew IS NULL
                 JOIN extra.affectedgovernment_reconstructed
                 ON affectedgovernment_reconstructed.event = event.eventid
                 JOIN gis.affectedgovernmentgis
                 ON affectedgovernment_reconstructed.affectedgovernmentid = affectedgovernmentgis.affectedgovernment
                 WHERE affectedgovernmentgis.governmentshape = ?
-                GROUP BY 1, eventextracache.eventslug, municipalityfrom, municipalityfromlong, affectedtypemunicipalityfrom, countyfrom, countyfromshort, affectedtypecountyfrom, statefrom, statefromabbreviation, affectedtypestatefrom, municipalityto, municipalitytolong, affectedtypemunicipalityto, countyto, countytoshort, affectedtypecountyto, stateto, statetoabbreviation, affectedtypestateto, submunicipalityfrom, submunicipalityfromlong, affectedtypesubmunicipalityfrom, submunicipalityto, submunicipalitytolong, affectedtypesubmunicipalityto, subcountyfrom, subcountyfromshort, affectedtypesubcountyfrom, subcountyto, subcountytoshort, affectedtypesubcountyto, event.eventyear, event.eventeffectivetext, event.eventsort
+                GROUP BY 1, event.eventslug, municipalityfrom, municipalityfromlong, affectedtypemunicipalityfrom, countyfrom, countyfromshort, affectedtypecountyfrom, statefrom, statefromabbreviation, affectedtypestatefrom, municipalityto, municipalitytolong, affectedtypemunicipalityto, countyto, countytoshort, affectedtypecountyto, stateto, statetoabbreviation, affectedtypestateto, submunicipalityfrom, submunicipalityfromlong, affectedtypesubmunicipalityfrom, submunicipalityto, submunicipalitytolong, affectedtypesubmunicipalityto, subcountyfrom, subcountyfromshort, affectedtypesubcountyfrom, subcountyto, subcountytoshort, affectedtypesubcountyto, event.eventyear, event.eventeffectivetext, event.eventsort
             ), currentgovernment AS (
                 -- Taken from GovernmentShapeModel->getDetail
                 SELECT DISTINCT governmentshape.governmentshapeid,

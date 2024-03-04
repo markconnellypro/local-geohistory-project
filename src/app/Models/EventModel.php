@@ -103,12 +103,10 @@ class EventModel extends Model
 
     // extra.ci_model_adjudication_event(integer)
 
-    // VIEW: extra.eventextracache
-
     public function getByAdjudication($id)
     {
         $query = <<<QUERY
-            SELECT DISTINCT eventextracache.eventslug,
+            SELECT DISTINCT event.eventslug,
                 eventtype.eventtypeshort,
                 event.eventlong,
                 event.eventyear,
@@ -121,9 +119,6 @@ class EventModel extends Model
                 ON event.eventgranted = eventgranted.eventgrantedid
             JOIN geohistory.eventtype
                 ON event.eventtype = eventtype.eventtypeid
-            JOIN extra.eventextracache
-                ON event.eventid = eventextracache.eventid
-                AND eventextracache.eventslugnew IS NULL
             JOIN geohistory.adjudicationevent
                 ON event.eventid = adjudicationevent.event 
                 AND adjudicationevent.adjudication = ?
@@ -141,12 +136,10 @@ class EventModel extends Model
 
     // extra.ci_model_reporter_event(integer)
 
-    // VIEW: extra.eventextracache
-
     public function getByAdjudicationSourceCitation($id)
     {
         $query = <<<QUERY
-            SELECT DISTINCT eventextracache.eventslug,
+            SELECT DISTINCT event.eventslug,
                 eventtype.eventtypeshort,
                 event.eventlong,
                 event.eventyear,
@@ -158,9 +151,6 @@ class EventModel extends Model
                 ON event.eventgranted = eventgranted.eventgrantedid
             JOIN geohistory.eventtype
                 ON event.eventtype = eventtype.eventtypeid
-            JOIN extra.eventextracache
-                ON event.eventid = eventextracache.eventid
-                AND eventextracache.eventslugnew IS NULL
             JOIN geohistory.adjudicationevent
                 ON event.eventid = adjudicationevent.event
             JOIN geohistory.adjudicationsourcecitation
@@ -178,14 +168,13 @@ class EventModel extends Model
 
     // extra.ci_model_government_event_failure(integer, integer[])
 
-    // VIEW: extra.eventextracache
     // VIEW: extra.eventgovernmentcache
     // VIEW: extra.governmentsubstitutecache
 
     public function getByGovernmentFailure($id, $events)
     {
         $query = <<<QUERY
-            SELECT DISTINCT eventextracache.eventslug,
+            SELECT DISTINCT event.eventslug,
                 eventtype.eventtypeshort,
                 event.eventlong,
                 event.eventyear,
@@ -199,9 +188,6 @@ class EventModel extends Model
                 AND NOT eventgranted.eventgrantedplaceholder
             JOIN geohistory.eventtype
                 ON event.eventtype = eventtype.eventtypeid
-            JOIN extra.eventextracache
-                ON event.eventid = eventextracache.eventid
-                AND eventextracache.eventslugnew IS NULL
             JOIN extra.eventgovernmentcache
                 ON event.eventid = eventgovernmentcache.eventid
             JOIN extra.governmentsubstitutecache
@@ -221,12 +207,10 @@ class EventModel extends Model
 
     // extra.ci_model_area_event_failure(integer, integer[])
 
-    // VIEW: extra.eventextracache
-
     public function getByGovernmentShapeFailure($id, $events)
     {
         $query = <<<QUERY
-            SELECT DISTINCT eventextracache.eventslug,
+            SELECT DISTINCT event.eventslug,
                 eventtype.eventtypeshort,
                 event.eventlong,
                 event.eventyear,
@@ -238,9 +222,6 @@ class EventModel extends Model
                 ON event.eventgranted = eventgranted.eventgrantedid
             JOIN geohistory.eventtype
                 ON event.eventtype = eventtype.eventtypeid
-            JOIN extra.eventextracache
-                ON event.eventid = eventextracache.eventid
-                AND eventextracache.eventslugnew IS NULL
                 AND event.eventid <> ALL (?)
             WHERE (event.eventid IN ( SELECT event_1.eventid
                     FROM geohistory.event event_1,
@@ -271,12 +252,10 @@ class EventModel extends Model
 
     // extra.ci_model_governmentsource_event(integer)
 
-    // VIEW: extra.eventextracache
-
     public function getByGovernmentSource($id)
     {
         $query = <<<QUERY
-            SELECT DISTINCT eventextracache.eventslug,
+            SELECT DISTINCT event.eventslug,
                 eventtype.eventtypeshort,
                 event.eventlong,
                 event.eventyear,
@@ -288,9 +267,6 @@ class EventModel extends Model
                 ON event.eventgranted = eventgranted.eventgrantedid
             JOIN geohistory.eventtype
                 ON event.eventtype = eventtype.eventtypeid
-            JOIN extra.eventextracache
-                ON event.eventid = eventextracache.eventid
-                AND eventextracache.eventslugnew IS NULL
             JOIN geohistory.governmentsourceevent
                 ON event.eventid = governmentsourceevent.event 
                 AND governmentsourceevent.governmentsource = ?
@@ -306,14 +282,13 @@ class EventModel extends Model
 
     // extra.ci_model_government_event_success(integer, integer[])
 
-    // VIEW: extra.eventextracache
     // VIEW: extra.eventgovernmentcache
     // VIEW: extra.governmentsubstitutecache
 
     public function getByGovernmentSuccess($id, $events)
     {
         $query = <<<QUERY
-            SELECT DISTINCT eventextracache.eventslug,
+            SELECT DISTINCT event.eventslug,
                 eventtype.eventtypeshort,
                 event.eventlong,
                 event.eventyear,
@@ -326,9 +301,6 @@ class EventModel extends Model
                 AND eventgranted.eventgrantedsuccess   
             JOIN geohistory.eventtype
                 ON event.eventtype = eventtype.eventtypeid
-            JOIN extra.eventextracache
-                ON event.eventid = eventextracache.eventid
-                AND eventextracache.eventslugnew IS NULL
             JOIN extra.eventgovernmentcache
                 ON event.eventid = eventgovernmentcache.eventid
             JOIN extra.governmentsubstitutecache
@@ -348,12 +320,10 @@ class EventModel extends Model
     
     // extra.ci_model_lawalternate_event(integer)
 
-    // VIEW: extra.eventextracache
-
     public function getByLawAlternateSection($id)
     {
         $query = <<<QUERY
-            SELECT DISTINCT eventextracache.eventslug,
+            SELECT DISTINCT event.eventslug,
                 eventtype.eventtypeshort,
                 event.eventlong,
                 event.eventyear,
@@ -367,9 +337,6 @@ class EventModel extends Model
                 ON event.eventgranted = eventgranted.eventgrantedid
             JOIN geohistory.eventtype
                 ON event.eventtype = eventtype.eventtypeid
-            JOIN extra.eventextracache
-                ON event.eventid = eventextracache.eventid
-                AND eventextracache.eventslugnew IS NULL
             JOIN geohistory.lawsectionevent
                 ON event.eventid = lawsectionevent.event
             JOIN geohistory.eventrelationship
@@ -391,12 +358,10 @@ class EventModel extends Model
 
     // extra.ci_model_law_event(integer)
 
-    // VIEW: extra.eventextracache
-
     public function getByLawSection($id)
     {
         $query = <<<QUERY
-            SELECT DISTINCT eventextracache.eventslug,
+            SELECT DISTINCT event.eventslug,
                 eventtype.eventtypeshort,
                 event.eventlong,
                 event.eventyear,
@@ -410,9 +375,6 @@ class EventModel extends Model
                 ON event.eventgranted = eventgranted.eventgrantedid
             JOIN geohistory.eventtype
                 ON event.eventtype = eventtype.eventtypeid
-            JOIN extra.eventextracache
-                ON event.eventid = eventextracache.eventid
-                AND eventextracache.eventslugnew IS NULL
             JOIN geohistory.lawsectionevent
                 ON event.eventid = lawsectionevent.event
                 AND lawsectionevent.lawsection = ?
@@ -432,12 +394,10 @@ class EventModel extends Model
 
     // extra.ci_model_source_event(integer)
 
-    // VIEW: extra.eventextracache
-
     public function getBySourceCitation($id)
     {
         $query = <<<QUERY
-            SELECT DISTINCT eventextracache.eventslug,
+            SELECT DISTINCT event.eventslug,
                 eventtype.eventtypeshort,
                 event.eventlong,
                 event.eventyear,
@@ -449,9 +409,6 @@ class EventModel extends Model
                 ON event.eventgranted = eventgranted.eventgrantedid
             JOIN geohistory.eventtype
                 ON event.eventtype = eventtype.eventtypeid
-            JOIN extra.eventextracache
-                ON event.eventid = eventextracache.eventid
-                AND eventextracache.eventslugnew IS NULL
             JOIN geohistory.sourcecitationevent
                 ON event.eventid = sourcecitationevent.event 
                 AND sourcecitationevent.sourcecitation = ?
@@ -701,7 +658,6 @@ class EventModel extends Model
 
     // extra.ci_model_search_event_government(text, text, text, text, integer, integer)
 
-    // VIEW: extra.eventextracache
     // VIEW: extra.eventgovernmentcache
     // VIEW: extra.governmentextracache
     // VIEW: extra.governmentrelationcache
@@ -729,7 +685,7 @@ class EventModel extends Model
                     )
                     AND governmentrelationcache.governmentshort ILIKE ?
             )
-            SELECT DISTINCT eventextracache.eventslug,
+            SELECT DISTINCT event.eventslug,
                 eventtype.eventtypeshort,
                 event.eventlong,
                 event.eventyear,
@@ -755,9 +711,6 @@ class EventModel extends Model
                 JOIN extra.governmentextracache governmentparentextracache
                     ON lookupgovernment.governmentrelation = governmentparentextracache.governmentid
                     AND (? = ''::text OR governmentparentextracache.governmentshort ILIKE ?)
-                JOIN extra.eventextracache
-                    ON event.eventid = eventextracache.eventid
-                    AND eventextracache.eventslugnew IS NULL
                 WHERE (? = ''::text 
                     OR ? = 'Any Type'::text
                     OR (? = 'Only Border Changes'::text AND eventtype.eventtypeborders ~~ 'yes%')
@@ -796,34 +749,51 @@ class EventModel extends Model
         return $query ?? [];
     }
 
-    // extra.eventslugidreplacement(text)
-
-    // VIEW: extra.eventextracache
+    // extra.eventslugidreplacement(text) - SPLIT INTO TWO
 
     private function getSlugId($id, $state)
     {
         $query = <<<QUERY
-            SELECT eventextracache.eventid AS id,
-                eventextracache.eventslugnew
-            FROM extra.eventextracache
-            WHERE eventextracache.eventslug = ?
+            SELECT event.eventid AS id
+            FROM geohistory.event
+            WHERE event.eventslug = ?
         QUERY;
 
         $query = $this->db->query($query, [
             $id,
         ])->getResult();
 
-        $id = -1;
+        $output = -1;
 
         if (count($query) == 1) {
-            if (!empty($query[0]->eventslugnew)) {
-                header("HTTP/1.1 301 Moved Permanently");
-                header("Location: /" . \Config\Services::request()->getLocale() . "/" . $state . "/event/" . $query[0]->eventslugnew . "/");
-                exit();
-            }
-            $id = $query[0]->id;
+            $output = $query[0]->id;
+        } else {
+            $this->getRetiredSlugRedirect($id, $state);
         }
         
-        return $id;
+        return $output;
+    }
+
+    // extra.eventslugidreplacement(text) - SPLIT INTO TWO
+
+    private function getRetiredSlugRedirect($id, $state)
+    {
+        $query = <<<QUERY
+            SELECT DISTINCT event.eventslug
+            FROM geohistory.eventslugretired
+            JOIN geohistory.event
+            ON eventslugretired.eventid = event.eventid
+            WHERE eventslugretired.eventslug = ?
+        QUERY;
+
+        $query = $this->db->query($query, [
+            $id,
+        ])->getResult();
+
+        if (count($query) == 1) {
+            header("HTTP/1.1 301 Moved Permanently");
+            header("Location: /" . \Config\Services::request()->getLocale() . "/" . $state . "/event/" . $query[0]->eventslug . "/");
+            exit();
+        }
     }
 }

@@ -333,13 +333,13 @@ class GovernmentShapeModel extends Model
                         AND governmentsubstitutecache.governmentsubstitute = ?
             ), governmentshapeeventpartparts AS (
                     SELECT affectedgovernmentgis.governmentshape AS governmentshapeid,
-                    extra.eventdatetext,
+                    event.eventdatetext,
                     event.eventsort,
                     to_char(event.eventsortdate, 'Mon FMDD, YYYY') || CASE
                         WHEN event.eventeffective <> '' AND event.eventeffective NOT LIKE '%~%' THEN ''
                         ELSE ' (About)'
                     END AS eventtextsortdate,
-                    eventextracache.eventslug,
+                    event.eventslug,
                     array_agg(DISTINCT CASE
                         WHEN NOT eventgranted.eventgrantedsuccess THEN 'proposed'
                         WHEN affectedtype.affectedtypecreationdissolution IN ('end', 'alter', 'ascertain') AND affectedgovernmentsummary.fromto = 'from' THEN 'remove'
@@ -361,9 +361,6 @@ class GovernmentShapeModel extends Model
                         ON affectedgovernmentsummary.affectedgovernmentid = affectedgovernmentgis.affectedgovernment
                     JOIN geohistory.event
                         ON affectedgovernmentsummary.eventid = event.eventid
-                    JOIN extra.eventextracache
-                        ON event.eventid = eventextracache.eventid
-                        AND eventextracache.eventslugnew IS NULL
                     JOIN geohistory.eventgranted
                         ON event.eventgranted = eventgranted.eventgrantedid
                     GROUP BY 1, 2, 3, 4, 5

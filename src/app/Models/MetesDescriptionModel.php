@@ -10,7 +10,6 @@ class MetesDescriptionModel extends Model
     // extra.ci_model_metes_detail(text, character varying)
 
     // VIEW: extra.metesdescriptionextracache
-    // VIEW: extra.eventextracache
     // VIEW: extra.eventgovernmentcache
     // VIEW: extra.governmentrelationcache
 
@@ -32,7 +31,7 @@ class MetesDescriptionModel extends Model
                         WHEN metesdescription.metesdescriptionlongitude = 0::numeric AND metesdescription.metesdescriptionlatitude = 0::numeric THEN false
                         ELSE true
                     END AS hasbeginpoint,
-                eventextracache.eventslug,
+                event.eventslug,
                 eventtype.eventtypeshort,
                 event.eventlong,
                 event.eventyear,
@@ -46,9 +45,6 @@ class MetesDescriptionModel extends Model
                     ON metesdescription.event = event.eventid
                     JOIN geohistory.eventgranted
                     ON event.eventgranted = eventgranted.eventgrantedid
-                    LEFT JOIN extra.eventextracache
-                    ON event.eventid = eventextracache.eventid
-                    AND eventextracache.eventslugnew IS NULL
                     JOIN geohistory.eventtype
                     ON event.eventtype = eventtype.eventtypeid     
                     LEFT JOIN extra.eventgovernmentcache
@@ -105,7 +101,6 @@ class MetesDescriptionModel extends Model
 
     // extra.ci_model_area_metesdescription(integer)
 
-    // VIEW: extra.eventextracache
     // VIEW: extra.metesdescriptionextracache
 
     public function getByGovernmentShape($id)
@@ -118,15 +113,14 @@ class MetesDescriptionModel extends Model
                 metesdescriptionextracache.metesdescriptionlong,
                 metesdescription.metesdescriptionacres,
                 metesdescription.event,
-                eventextracache.eventslug
+                event.eventslug
             FROM geohistory.metesdescription
             JOIN extra.metesdescriptionextracache
                 ON metesdescription.metesdescriptionid = metesdescriptionextracache.metesdescriptionid
             JOIN gis.metesdescriptiongis
                 ON metesdescription.metesdescriptionid = metesdescriptiongis.metesdescription
-            JOIN extra.eventextracache
-                ON metesdescription.event = eventextracache.eventid
-                AND eventextracache.eventslugnew IS NULL
+            JOIN geohistory.event
+                ON metesdescription.event = event.eventid
             WHERE governmentshape = ?
             ORDER BY 5
         QUERY;

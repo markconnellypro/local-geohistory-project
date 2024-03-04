@@ -195,13 +195,12 @@ class GovernmentSourceModel extends Model
     // FUNCTION: extra.governmentlong
     // FUNCTION: extra.rangefix
     // FUNCTION: extra.shortdate
-    // VIEW: extra.eventextracache
     // VIEW: extra.governmentsubstitutecache
 
     public function getByGovernment($id, $state)
     {
         $query = <<<QUERY
-            SELECT DISTINCT array_agg(eventextracache.eventslug) AS eventslug,
+            SELECT DISTINCT array_agg(event.eventslug) AS eventslug,
                 governmentsource.governmentsourcetype,
                 governmentsource.governmentsourcenumber,
                     CASE
@@ -263,9 +262,8 @@ class GovernmentSourceModel extends Model
                 AND governmentsubstitutecache.governmentsubstitute = ?
             LEFT JOIN geohistory.governmentsourceevent
                 ON governmentsource.governmentsourceid = governmentsourceevent.governmentsource
-            LEFT JOIN extra.eventextracache
-                ON governmentsourceevent.event = eventextracache.eventid
-                AND eventextracache.eventslugnew IS NULL
+            LEFT JOIN geohistory.event
+                ON governmentsourceevent.event = event.eventid
             GROUP BY 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18
             ORDER BY 11
         QUERY;

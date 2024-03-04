@@ -9,7 +9,6 @@ class GovernmentModel extends Model
     // extra.ci_model_government_detail(integer, character varying, boolean)
     // extra.ci_model_government_detail(text, character varying, boolean)
 
-    // FUNCTION: extra.eventslug
     // FUNCTION: extra.governmentlevel
     // FUNCTION: extra.governmentlong
     // FUNCTION: extra.governmentsubstitutedcache
@@ -44,10 +43,7 @@ class GovernmentModel extends Model
                     AND governmentchangecountcache.altertotal = 0
                     AND governmentchangecountcache.dissolutionevent IS NULL
                     ) AS textflag,
-                    CASE
-                        WHEN governmentchangecountcache.creationevent IS NOT NULL THEN extra.eventslug(governmentchangecountcache.creationevent[1])
-                        ELSE NULL::text
-                    END AS governmentcreationevent,
+                    creationevent.eventslug AS governmentcreationevent,
                 governmentchangecountcache.creationtext AS governmentcreationtext,
                     CASE
                         WHEN governmentchangecountcache.creation = 1
@@ -57,10 +53,7 @@ class GovernmentModel extends Model
                         ELSE ''
                     END AS governmentcreationlong,
                 governmentchangecountcache.altertotal AS governmentaltercount,
-                    CASE
-                        WHEN governmentchangecountcache.dissolutionevent IS NOT NULL THEN extra.eventslug(governmentchangecountcache.dissolutionevent[1])
-                        ELSE NULL::text
-                    END AS governmentdissolutionevent,
+                dissolutionevent.eventslug AS governmentdissolutionevent,
                 governmentchangecountcache.dissolutiontext AS governmentdissolutiontext,
                     CASE
                         WHEN hasmaptable.hasmap IS NULL THEN false
@@ -81,6 +74,12 @@ class GovernmentModel extends Model
                 ON government.governmentcurrentform = governmentform.governmentformid
             LEFT JOIN extra.governmentchangecountcache
                 ON government.governmentid = governmentchangecountcache.governmentid
+            LEFT JOIN geohistory.event creationevent
+                ON governmentchangecountcache.creationevent IS NOT NULL
+                AND governmentchangecountcache.creationevent[1] = creationevent.eventid
+            LEFT JOIN geohistory.event dissolutionevent
+                ON governmentchangecountcache.dissolutionevent IS NOT NULL
+                AND governmentchangecountcache.dissolutionevent[1] = dissolutionevent.eventid
             JOIN extra.governmentrelationcache
                 ON government.governmentid = governmentrelationcache.governmentid
                 AND (governmentrelationcache.governmentrelationstate = ?
@@ -522,7 +521,6 @@ class GovernmentModel extends Model
 
     // FUNCTION: extra.governmentlong
     // FUNCTION: extra.governmentstatelink
-    // VIEW: extra.eventextracache
     // VIEW: extra.governmentparentcache
     // VIEW: extra.governmentsubstitutecache
 
@@ -592,7 +590,7 @@ class GovernmentModel extends Model
                     AND (government.governmentstatus <> ALL (ARRAY['proposed', 'unincorporated']))
                 WHERE governmentparentcache.governmentparentstatus <> 'placeholder'
                 UNION
-                SELECT DISTINCT '/en/' || ? || '/event/' || eventextracache.eventslug || '/' AS governmentstatelink,
+                SELECT DISTINCT '/en/' || ? || '/event/' || event.eventslug || '/' AS governmentstatelink,
                 extra.governmentlong(government.governmentid, ?) AS governmentlong,
                     CASE
                         WHEN government.governmentstatus = ANY (ARRAY['alternate', 'language']) THEN 'Variant'
@@ -611,9 +609,6 @@ class GovernmentModel extends Model
                     AND government.governmentid <> governmentsubstitutecache.governmentsubstitute
                     LEFT JOIN geohistory.event
                     ON government.governmentid = event.government
-                    LEFT JOIN extra.eventextracache
-                    ON event.eventid = eventextracache.eventid
-                    AND eventextracache.eventslugnew IS NULL
                 ), relationrank AS (
                     SELECT relationpart.governmentstatelink,
                     relationpart.governmentlong,
