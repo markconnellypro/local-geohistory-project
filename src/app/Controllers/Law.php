@@ -21,7 +21,7 @@ class Law extends BaseController
         ];
     }
 
-    public function noRecord($state)
+    public function noRecord($state): void
     {
         $this->data['state'] = $state;
         echo view('header', $this->data);
@@ -29,7 +29,7 @@ class Law extends BaseController
         echo view('footer');
     }
 
-    public function view($state, $id)
+    public function view($state, $id): void
     {
         $this->data['state'] = $state;
         $queryType = '';

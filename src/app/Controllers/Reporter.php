@@ -23,7 +23,7 @@ class Reporter extends BaseController
         ];
     }
 
-    public function noRecord($state)
+    public function noRecord($state): void
     {
         $this->data['state'] = $state;
         echo view('header', $this->data);
@@ -31,7 +31,7 @@ class Reporter extends BaseController
         echo view('footer');
     }
 
-    public function view($state, $id)
+    public function view($state, $id): void
     {
         $this->data['state'] = $state;
         $id = $this->getIdInt($id);

@@ -20,7 +20,7 @@ class Map extends BaseController
         ];
     }
 
-    public function baseStyle($maxZoom = 14, $response = NULL)
+    public function baseStyle($maxZoom = 14, $response = NULL): void
     {
         if (empty($response)) {
             $response = $this->response;
@@ -67,7 +67,7 @@ class Map extends BaseController
         echo json_encode($json);
     }
 
-    public function leaflet($state = '')
+    public function leaflet($state = ''): void
     {
         $this->data['state'] = ($state == 'zoom' ? '' : $state);
         $this->data['zoom'] = ($state == 'zoom');
@@ -86,7 +86,7 @@ class Map extends BaseController
         }
     }
 
-    public function overlayStyle($state = '')
+    public function overlayStyle($state = ''): void
     {
         $this->response->removeHeader('Cache-Control');
         $this->response->setHeader('Cache-Control', 'max-age=86400');
@@ -96,7 +96,7 @@ class Map extends BaseController
         echo json_encode($json);
     }
 
-    public function tile($z, $x, $y, $state = '')
+    public function tile($z, $x, $y, $state = ''): void
     {
         $this->response->setHeader('Content-Type', 'application/x-protobuf');
         $GovernmentShapeModel = new GovernmentShapeModel;

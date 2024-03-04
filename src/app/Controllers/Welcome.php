@@ -18,7 +18,7 @@ class Welcome extends BaseController
         ];
     }
 
-    public function index()
+    public function index(): void
     {
         $stateArray = $this->getJurisdictions();
         echo view('header', $this->data);

@@ -776,7 +776,7 @@ class EventModel extends Model
 
     // extra.eventslugidreplacement(text) - SPLIT INTO TWO
 
-    private function getRetiredSlugRedirect($id, $state)
+    private function getRetiredSlugRedirect($id, $state): void
     {
         $query = <<<QUERY
             SELECT DISTINCT event.eventslug

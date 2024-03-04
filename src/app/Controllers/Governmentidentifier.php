@@ -20,7 +20,7 @@ class Governmentidentifier extends BaseController
         ];
     }
 
-    public function noRecord()
+    public function noRecord(): void
     {
         echo view('header', $this->data);
         echo view('norecord');

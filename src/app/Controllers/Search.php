@@ -90,7 +90,7 @@ class Search extends BaseController
         }
     }
 
-    public function governmentlookup($state, $government = '', $type = '')
+    public function governmentlookup($state, $government = '', $type = ''): void
     {
         $this->data['state'] = $state;
         $GovernmentModel = new GovernmentModel;
@@ -100,7 +100,7 @@ class Search extends BaseController
         echo json_encode($this->data['query']);
     }
 
-    public function index($state = '')
+    public function index($state = ''): void
     {
         $stateArray = $this->getJurisdictions();
         $this->data['state'] = $state;
@@ -133,7 +133,7 @@ class Search extends BaseController
         echo view('footer');
     }
 
-    public function view($state, $category)
+    public function view($state, $category): void
     {
         $this->data['state'] = $state;
         $type = $this->request->getPost('type');

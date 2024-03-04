@@ -20,7 +20,7 @@ class About extends BaseController
         ];
     }
 
-    public function index($state = '')
+    public function index($state = ''): void
     {
         $this->data['state'] = $state;
         echo view('header', $this->data);

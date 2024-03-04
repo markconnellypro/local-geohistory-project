@@ -24,7 +24,7 @@ class Area extends BaseController
         ];
     }
 
-    public function address($state)
+    public function address($state): void
     {
         try {
             $addressText = $this->request->getPost('address', FILTER_SANITIZE_STRING);
@@ -42,7 +42,7 @@ class Area extends BaseController
         }
     }
 
-    public function addressCensusBureau($state, $addressText)
+    public function addressCensusBureau($state, $addressText): void
     {
         try {
             $data = file_get_contents('https://geocoding.geo.census.gov/geocoder/locations/onelineaddress?benchmark=9&format=json&address=' . $addressText);
@@ -59,7 +59,7 @@ class Area extends BaseController
         }
     }
 
-    public function noRecord($state)
+    public function noRecord($state): void
     {
         $this->data['state'] = $state;
         echo view('header', $this->data);
@@ -67,7 +67,7 @@ class Area extends BaseController
         echo view('footer');
     }
 
-    public function point($state, $y = 0, $x = 0, $addressText = '')
+    public function point($state, $y = 0, $x = 0, $addressText = ''): void
     {
         if (empty($y) and !empty($this->request->getPost('y', FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION))) {
             $y = $this->request->getPost('y', FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
@@ -90,7 +90,7 @@ class Area extends BaseController
         }
     }
 
-    public function view($state, $id, $y = 0, $x = 0, $addressText = '')
+    public function view($state, $id, $y = 0, $x = 0, $addressText = ''): void
     {
         $this->data['state'] = $state;
         if (($this->data['live'] or !empty($y) or !empty($x)) and preg_match('/^\d{1,9}$/', $id)) {

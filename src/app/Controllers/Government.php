@@ -27,7 +27,7 @@ class Government extends BaseController
         ];
     }
 
-    public function noRecord($state)
+    public function noRecord($state): void
     {
         $this->data['state'] = $state;
         echo view('header', $this->data);
@@ -35,7 +35,7 @@ class Government extends BaseController
         echo view('footer');
     }
 
-    public function view($state, $id, $isHistory = false)
+    public function view($state, $id, $isHistory = false): void
     {
         $this->data['state'] = $state;
         $id = $this->getIdInt($id);

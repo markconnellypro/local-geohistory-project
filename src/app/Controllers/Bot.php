@@ -18,7 +18,7 @@ class Bot extends BaseController
         ];
     }
 
-    public function index($state = '')
+    public function index($state = ''): void
     {
         $this->data['state'] = $state;
         echo view('header', $this->data);
@@ -26,7 +26,7 @@ class Bot extends BaseController
         echo view('footer');
     }
 
-    public function robotsTxt()
+    public function robotsTxt(): void
     {
         $this->response->setHeader('Content-Type', 'text/plain');
         if (file_exists(APPPATH . 'Views/' . ENVIRONMENT . '/bot_robotstxt.php')) {

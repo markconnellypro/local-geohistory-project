@@ -18,7 +18,7 @@ class Fourofour extends BaseController
         ];
     }
 
-    public function index($state = '')
+    public function index($state = ''): void
     {
         $this->response->setStatusCode(404);
         $this->data['state'] = $state;

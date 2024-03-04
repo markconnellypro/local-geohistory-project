@@ -36,7 +36,7 @@ class Statistics extends BaseController
         ];
     }
 
-    public function index($state = '')
+    public function index($state = ''): void
     {
         $this->data['state'] = $state;
         echo view('header', $this->data);
@@ -47,7 +47,7 @@ class Statistics extends BaseController
         echo view('footer');
     }
 
-    public function noRecord($state = '')
+    public function noRecord($state = ''): void
     {
         $this->data['state'] = $state;
         echo view('header', $this->data);
@@ -55,7 +55,7 @@ class Statistics extends BaseController
         echo view('footer');
     }
 
-    public function view($state = '')
+    public function view($state = ''): void
     {
         $this->data['state'] = $state;
         echo view('header', $this->data);

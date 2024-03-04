@@ -17,7 +17,7 @@
                     <td><?= $row->plssfirstdivisionpart ?></td>
                     <td><?= $row->plssrelationship ?></td>
                 </tr>
-            <?php } ?>
+<?php } ?>
         </tbody>
     </table>
 </section>
