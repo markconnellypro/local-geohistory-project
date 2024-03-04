@@ -538,7 +538,7 @@ class AffectedGovernmentGroupModel extends Model
         ])->getResult();
     }
 
-    protected function getProcess($query, $gisQuery = []): array
+    public function getProcess($query, $gisQuery = []): array
     {
         $linkTypes = [];
         $rows = [];
