@@ -25,8 +25,8 @@ class Area extends BaseController
 
     public function address($state): void
     {
+        $addressText = $this->request->getPost('address', FILTER_SANITIZE_STRING);
         try {
-            $addressText = $this->request->getPost('address', FILTER_SANITIZE_STRING);
             $data = file_get_contents('https://us1.locationiq.com/v1/search.php?key=' . getenv('locationiq_key') . '&format=json&countrycodes=us&dedupe=1&q=' . urlencode($addressText));
             if (($data = json_decode($data, true)) !== false) {
                 if (count($data) == 1) {
