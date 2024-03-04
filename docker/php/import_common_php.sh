@@ -5,11 +5,14 @@ sed -i '/<Directory \/var\/www\/>/,/<\/Directory>/ s/AllowOverride None/AllowOve
 sed -i "s/^\t<\/IfModule>/\t\tAddOutputFilterByType DEFLATE application\/geo+json\n\t\tAddOutputFilterByType DEFLATE application\/json\n\t\tAddOutputFilterByType DEFLATE application\/x-protobuf\n\t<\/IfModule>/" /etc/apache2/mods-available/deflate.conf
 echo 'application/x-protobuf                        mvt pbf' >> /etc/mime.types
 sed -i 's/;opcache.enable=1/opcache.enable=1/' /usr/local/etc/php/php.ini
+# Flag if composer should be run --no-dev
+COMPOSER_NO_DEV="--no-dev"
 if [[ -e "/usr/src/docker/import_development_php.sh" ]]; then
   /usr/src/docker/import_development_php.sh
+  COMPOSER_NO_DEV=""
 fi
 if [[ -e "/usr/src/docker/import_production_php.sh" ]]; then
   /usr/src/docker/import_production_php.sh
 fi
 # Modify entrypoint to run composer install and retrieve dependencies
-sed -i "s/#!\/bin\/sh/#!\/bin\/sh\ncomposer install --no-dev --working-dir=\/var\/www\n\/usr\/src\/docker\/import_dependency.sh\n/" /usr/local/bin/docker-php-entrypoint
+sed -i "s/#!\/bin\/sh/#!\/bin\/sh\ncomposer install ${COMPOSER_NO_DEV} --working-dir=\/var\/www\n\/usr\/src\/docker\/import_dependency.sh\n/" /usr/local/bin/docker-php-entrypoint

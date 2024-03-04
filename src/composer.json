@@ -1,5 +1,8 @@
 {
     "require": {
         "codeigniter4/framework": "4.4.6"
+    },
+    "require-dev": {
+        "rector/rector": "1.0.2"
     }
 }
