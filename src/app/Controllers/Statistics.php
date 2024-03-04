@@ -80,21 +80,20 @@ class Statistics extends BaseController
             $by .= $byExtra;
         }
 
-        $from = $this->request->getPost('from', FILTER_SANITIZE_NUMBER_INT);
-        $to = $this->request->getPost('to', FILTER_SANITIZE_NUMBER_INT);
-        if (empty($from) && empty($to)) {
-            $from = 0;
+        $from = (int) $this->request->getPost('from', FILTER_SANITIZE_NUMBER_INT);
+        $to = (int) $this->request->getPost('to', FILTER_SANITIZE_NUMBER_INT);
+        if ($from == 0 && $to == 0) {
             $to = (int) date('Y');
-        } elseif (empty($from)) {
+        } elseif ($from == 0) {
             $from = $to;
-        } elseif (empty($to)) {
+        } elseif ($to == 0) {
             $to = $from;
         } elseif ($from > $to) {
             $temporary = $to;
             $to = $from;
             $from = $temporary;
         }
-        if ($from == $to || $from == 0) {
+        if ($from === $to || $from == 0) {
             $dateRange = $from;
             $dateRangePlural = '';
         } else {

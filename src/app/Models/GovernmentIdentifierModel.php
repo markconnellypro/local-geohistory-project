@@ -25,13 +25,11 @@ class GovernmentIdentifierModel extends Model
             GROUP BY 1, 2, 3, 4;
         QUERY;
 
-        $query = $this->db->query($query, [
+        return $this->db->query($query, [
             \Config\Services::request()->getLocale(),
             $type,
             strtolower($id),
         ])->getResult();
-
-        return $query;
     }
 
     // extra.ci_model_government_identifier(integer, character varying, character varying)
@@ -57,13 +55,11 @@ class GovernmentIdentifierModel extends Model
                 AND governmentsubstitutecache.governmentsubstitute = ?
         QUERY;
 
-        $query = $this->db->query($query, [
+        return $this->db->query($query, [
             \Config\Services::request()->getLocale(),
             strtoupper($state),
             $id,
         ])->getResult();
-
-        return $query;
     }
 
     public function getCensus($ids): array
@@ -93,13 +89,11 @@ class GovernmentIdentifierModel extends Model
                 AND governmentidentifier.governmentidentifierid <> ALL (?);
         QUERY;
 
-        $query = $this->db->query($query, [
+        return $this->db->query($query, [
             \Config\Services::request()->getLocale(),
             $governments,
             $governmentidentifierids,
         ])->getResult();
-
-        return $query;
     }
 
     // extra.ci_model_search_governmentidentifier_identifier(character varying, character varying, character varying)
@@ -137,7 +131,7 @@ class GovernmentIdentifierModel extends Model
                 )
         QUERY;
 
-        $query = $this->db->query($query, [
+        return $this->db->query($query, [
             strtoupper($state),
             $type,
             strtolower($identifier),
@@ -146,7 +140,5 @@ class GovernmentIdentifierModel extends Model
             (int) $identifier,
             (int) $identifier,
         ])->getResult();
-
-        return $query;
     }
 }

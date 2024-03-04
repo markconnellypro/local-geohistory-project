@@ -78,7 +78,7 @@ class Government extends BaseController
             echo view('government_detail', ['live' => $this->data['live'], 'row' => $query[0], 'state' => $state, 'statuses' => $statusQuery]);
             if (!$isHistory) {
                 $query = $SourceCitationModel->getByGovernment($id, $state);
-                if (count($query) > 0) {
+                if ($query !== []) {
                     echo view(ENVIRONMENT . '/government_' . $state, ['query' => $query]);
                 }
             }
@@ -87,30 +87,30 @@ class Government extends BaseController
             }
             if (!$isHistory) {
                 $populationQuery = $GovernmentPopulationModel->getByGovernment($id, $state);
-                if (count($populationQuery) > 0) {
+                if ($populationQuery !== []) {
                     echo view('general_chart');
                 }
                 $query = $GovernmentModel->getRelated($id, $state);
-                if (count($query) > 0) {
+                if ($query !== []) {
                     echo view('government_related', ['query' => $query]);
                 }
                 $GovernmentIdentifierModel = new GovernmentIdentifierModel();
                 $query = $GovernmentIdentifierModel->getByGovernment($id, $state);
-                if (count($query) > 0) {
+                if ($query !== []) {
                     echo view('general_governmentidentifier', ['query' => $query, 'title' => 'Identifier', 'isMultiple' => $this->data['isMultiple']]);
                 }
             }
             $AffectedGovernmentGroupModel = new AffectedGovernmentGroupModel();
             $query = $AffectedGovernmentGroupModel->getByGovernmentGovernment($id, $state);
             $events = [];
-            if (count($query) > 0) {
+            if ($query !== []) {
                 echo view('government_affectedgovernment', ['query' => $query, 'isMultiple' => $this->data['isMultiple']]);
                 foreach ($query as $row) {
                     $events[] = $row->event;
                 }
             }
             $query = $AffectedGovernmentGroupModel->getByGovernmentForm($id, $state);
-            if (count($query) > 0) {
+            if ($query !== []) {
                 echo view('general_affectedgovernmentform', ['includeGovernment' => false, 'query' => $query]);
                 foreach ($query as $row) {
                     $events[] = $row->event;
@@ -122,62 +122,64 @@ class Government extends BaseController
             if (!$isHistory) {
                 if ($isCountyOrLower) {
                     $query = $EventModel->getByGovernmentSuccess($id, $events);
-                    if (count($query) > 0) {
+                    if ($query !== []) {
                         echo view('general_event', ['query' => $query, 'state' => $state, 'title' => 'Other Successful Event Links', 'tableId' => 'successfulevent']);
                     }
                 }
                 $GovernmentSourceModel = new GovernmentSourceModel();
                 $query = $GovernmentSourceModel->getByGovernment($id, $state);
-                if (count($query) > 0) {
+                if ($query !== []) {
                     echo view('general_governmentsource', ['query' => $query, 'state' => $state, 'type' => 'government', 'isMultiple' => $this->data['isMultiple']]);
                 }
                 $query = $GovernmentModel->getNote($id, $state);
-                if (count($query) > 0) {
+                if ($query !== []) {
                     echo view(ENVIRONMENT . '/government_note', ['query' => $query, 'isMultiple' => $this->data['isMultiple']]);
                 }
                 $query = $GovernmentFormGovernmentModel->getByGovernment($id, $state);
-                if (count($query) > 0) {
+                if ($query !== []) {
                     echo view(ENVIRONMENT . '/government_governmentform', ['query' => $query, 'isMultiple' => $this->data['isMultiple']]);
                 }
                 $query = $GovernmentModel->getSchoolDistrict($id, $state);
-                if (count($query) > 0) {
+                if ($query !== []) {
                     echo view(ENVIRONMENT . '/government_schooldistrict', ['query' => $query, 'isMultiple' => $this->data['isMultiple']]);
                 }
                 $query = $SourceModel->getByGovernment($id);
-                if (count($query) > 0) {
+                if ($query !== []) {
                     echo view('general_source', ['query' => $query, 'hasLink' => true]);
                 }
                 $ResearchLogModel = new ResearchLogModel();
                 $query = $ResearchLogModel->getByGovernment($id, $state);
-                if (count($query) > 0) {
+                if ($query !== []) {
                     echo view('government_researchlog', ['query' => $query, 'isMultiple' => $this->data['isMultiple']]);
                 }
                 $NationalArchivesModel = new NationalArchivesModel();
                 $query = $NationalArchivesModel->getByGovernment($id, $state);
-                if (count($query) > 0) {
+                if ($query !== []) {
                     echo view('government_nationalarchives', ['query' => $query, 'live' => $this->data['live'], 'isMultiple' => $this->data['isMultiple']]);
                 }
                 if ($isCountyOrLower) {
                     $query = $EventModel->getByGovernmentFailure($id, $events);
-                    if (count($query) > 0) {
+                    if ($query !== []) {
                         echo view('general_event', ['query' => $query, 'state' => $state, 'title' => 'Other Event Links', 'tableId' => 'otherevent']);
                     }
                 }
                 $query = $GovernmentModel->getOffice($id, $state);
-                if (count($query) > 0) {
+                if ($query !== []) {
                     echo view(ENVIRONMENT . '/government_office', ['query' => $query, 'isMultiple' => $this->data['isMultiple']]);
                 }
                 if (file_exists(APPPATH . 'Views/' . ENVIRONMENT . '/government_live.php')) {
                     echo view(ENVIRONMENT . '/government_live', ['id' => $id, 'state' => $state, 'isMunicipalityOrLower' => $isMunicipalityOrLower, 'isCountyOrLower' => $isCountyOrLower, 'isCountyOrState' => $isCountyOrState, 'isState' => $isStateOrHigher, 'includeGovernment' => false]);
                 }
-                if (isset($populationQuery) && count($populationQuery) > 0) {
+                if ($populationQuery !== []) {
                     echo view('general_chartjs', ['query' => $populationQuery, 'online' => $this->data['online'], 'xLabel' => 'Year', 'yLabel' => 'Population']);
                 }
             }
             if ($hasMap) {
                 echo view('leaflet_start', ['type' => 'government', 'includeBase' => true, 'needRotation' => false, 'online' => $this->data['online']]);
                 $query = $MetesDescriptionLineModel->getGeometryByGovernment($id);
-                if (count($query) > 0) {
+                $layers = [];
+                $primaryLayer = '';
+                if ($query !== []) {
                     echo view('general_gis', [
                         'query' => $query,
                         'element' => 'metesdescription',
@@ -192,7 +194,7 @@ class Government extends BaseController
                 }
                 $GovernmentShapeModel = new GovernmentShapeModel();
                 $query = $GovernmentShapeModel->getCurrentByGovernment($id);
-                if (count($query) > 0) {
+                if ($query !== []) {
                     echo view('general_gis', [
                         'query' => $query,
                         'element' => 'current',
@@ -205,7 +207,7 @@ class Government extends BaseController
                     $layers['current'] = 'Approximate Current Boundary';
                 }
                 $query = $GovernmentShapeModel->getPartByGovernment($id, $state);
-                if (count($query) > 0) {
+                if ($query !== []) {
                     echo view('general_gis', [
                         'query' => $query,
                         'element' => 'shape',

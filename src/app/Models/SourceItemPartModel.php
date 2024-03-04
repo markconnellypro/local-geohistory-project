@@ -34,11 +34,9 @@ class SourceItemPartModel extends Model
                 AND adjudicationsourcecitation.adjudicationsourcecitationid = ?
         QUERY;
 
-        $query = $this->db->query($query, [
+        return $this->db->query($query, [
             $id,
         ])->getResult();
-
-        return $query;
     }
 
     // extra.ci_model_governmentsource_url(integer)
@@ -76,11 +74,9 @@ class SourceItemPartModel extends Model
             AND governmentsource.governmentsourceid = ?
         QUERY;
 
-        $query = $this->db->query($query, [
+        return $this->db->query($query, [
             $id,
         ])->getResult();
-
-        return $query;
     }
 
     // extra.ci_model_lawalternate_url(integer, boolean)
@@ -133,12 +129,10 @@ class SourceItemPartModel extends Model
             AND (? OR NOT sourceitem.sourceitemlocal)
         QUERY;
 
-        $query = $this->db->query($query, [
+        return $this->db->query($query, [
             $id,
             \App\Controllers\BaseController::isLive(),
         ])->getResult();
-
-        return $query;
     }
 
     // extra.ci_model_law_url(integer, boolean)
@@ -189,12 +183,10 @@ class SourceItemPartModel extends Model
             AND (? OR NOT sourceitem.sourceitemlocal)
         QUERY;
 
-        $query = $this->db->query($query, [
+        return $this->db->query($query, [
             $id,
             \App\Controllers\BaseController::isLive(),
         ])->getResult();
-
-        return $query;
     }
 
     // extra.ci_model_source_url(integer)
@@ -230,10 +222,8 @@ class SourceItemPartModel extends Model
             AND sourcecitation.sourcecitationid = ?
         QUERY;
 
-        $query = $this->db->query($query, [
+        return $this->db->query($query, [
             $id,
         ])->getResult();
-
-        return $query;
     }
 }

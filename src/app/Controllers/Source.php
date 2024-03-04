@@ -49,17 +49,17 @@ class Source extends BaseController
             }
             $SourceCitationNoteModel = new SourceCitationNoteModel();
             $query = $SourceCitationNoteModel->getBySourceCitation($id);
-            if (count($query) > 0) {
+            if ($query !== []) {
                 echo view('source_note', ['query' => $query, 'state' => $state]);
             }
             $SourceItemPartModel = new SourceItemPartModel();
             $query = $SourceItemPartModel->getBySourceCitation($id);
-            if (count($query) > 0) {
+            if ($query !== []) {
                 echo view('general_url', ['query' => $query, 'state' => $state, 'title' => 'Calculated URL']);
             }
             $EventModel = new EventModel();
             $query = $EventModel->getBySourceCitation($id);
-            if (count($query) > 0) {
+            if ($query !== []) {
                 echo view('general_event', ['query' => $query, 'state' => $state, 'title' => 'Event Links']);
             }
             echo view('footer');

@@ -64,12 +64,10 @@ class MetesDescriptionModel extends Model
             GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
         QUERY;
 
-        $query = $this->db->query($query, [
+        return $this->db->query($query, [
             $id,
             strtoupper($state),
         ])->getResult();
-
-        return $query;
     }
 
     // extra.ci_model_event_metesdescription(integer)
@@ -92,11 +90,9 @@ class MetesDescriptionModel extends Model
             ORDER BY 5;
         QUERY;
 
-        $query = $this->db->query($query, [
+        return $this->db->query($query, [
             $id,
         ])->getResult();
-
-        return $query;
     }
 
     // extra.ci_model_area_metesdescription(integer)
@@ -125,11 +121,9 @@ class MetesDescriptionModel extends Model
             ORDER BY 5
         QUERY;
 
-        $query = $this->db->query($query, [
+        return $this->db->query($query, [
             $id,
         ])->getResult();
-
-        return $query;
     }
 
     // extra.metesdescriptionslugid(text)

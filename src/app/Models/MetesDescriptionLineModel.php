@@ -23,11 +23,9 @@ class MetesDescriptionLineModel extends Model
             ORDER BY metesdescriptionline.metesdescriptionline
         QUERY;
 
-        $query = $this->db->query($query, [
+        return $this->db->query($query, [
             $id,
         ])->getResult();
-
-        return $query;
     }
 
     public function getGeometryByEvent($id, $state): array

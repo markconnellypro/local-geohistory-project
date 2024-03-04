@@ -49,62 +49,6 @@ abstract class BaseController extends Controller
         // E.g.: $this->session = \Config\Services::session();
     }
 
-    protected function affectedGovernmentProcess($partQuery = [], $wholeQuery = [])
-    {
-        $affectedGovernment = [
-            'linkTypes' => [],
-            'rows' => [],
-            'types' => [],
-        ];
-        if (isset($partQuery)) {
-            foreach ($partQuery as $row) {
-                if (!empty($row->governmentfromlong)) {
-                    $affectedGovernment['types']['from'][$row->affectedgovernmentleveldisplayorder] = $row->affectedgovernmentlevellong;
-                    if (!empty($row->includelink) && $row->includelink == 't') {
-                        $affectedGovernment['linkTypes']['from'][$row->affectedgovernmentleveldisplayorder] = $row->affectedgovernmentlevellong;
-                    }
-                    $affectedGovernment['rows'][$row->id]['From ' . $row->affectedgovernmentlevellong . ' Link'] = $row->governmentfrom;
-                    $affectedGovernment['rows'][$row->id]['From ' . $row->affectedgovernmentlevellong . ' Long'] = $row->governmentfromlong;
-                    $affectedGovernment['rows'][$row->id]['From ' . $row->affectedgovernmentlevellong . ' Affected'] = $row->affectedtypefrom;
-                }
-                if (!empty($row->governmenttolong)) {
-                    $affectedGovernment['types']['to'][$row->affectedgovernmentleveldisplayorder] = $row->affectedgovernmentlevellong;
-                    if (!empty($row->includelink) && $row->includelink == 't') {
-                        $affectedGovernment['linkTypes']['to'][$row->affectedgovernmentleveldisplayorder] = $row->affectedgovernmentlevellong;
-                    }
-                    $affectedGovernment['rows'][$row->id]['To ' . $row->affectedgovernmentlevellong . ' Link'] = $row->governmentto;
-                    $affectedGovernment['rows'][$row->id]['To ' . $row->affectedgovernmentlevellong . ' Long'] = $row->governmenttolong;
-                    $affectedGovernment['rows'][$row->id]['To ' . $row->affectedgovernmentlevellong . ' Affected'] = $row->affectedtypeto;
-                }
-            }
-            foreach ($affectedGovernment['types'] as $fromTo => $levels) {
-                ksort($levels);
-                $affectedGovernment['types'][$fromTo] = $levels;
-            }
-            $kSort = $affectedGovernment['types'];
-            ksort($kSort);
-            $affectedGovernment['types'] = $kSort;
-            foreach ($affectedGovernment['linkTypes'] as $fromTo => $levels) {
-                ksort($levels);
-                $affectedGovernment['linkTypes'][$fromTo] = $levels;
-            }
-            $kSort = $affectedGovernment['linkTypes'];
-            ksort($kSort);
-            $affectedGovernment['linkTypes'] = $kSort;
-        }
-        if (isset($wholeQuery)) {
-            foreach ($wholeQuery as $row) {
-                foreach ($row as $key => $value) {
-                    $affectedGovernment['rows'][$row['id']][$key] = $value;
-                }
-            }
-        }
-        foreach ($affectedGovernment['rows'] as $key => $value) {
-            $affectedGovernment['rows'][$key] = (object) $value;
-        }
-        return $affectedGovernment;
-    }
-
     protected function isInternetExplorer(): bool
     {
         $agent = \Config\Services::request()->getUserAgent();

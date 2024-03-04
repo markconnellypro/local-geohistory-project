@@ -28,15 +28,13 @@ class AffectedGovernmentGroupModel extends Model
             ORDER BY 3, 2
         QUERY;
 
-        $query = $this->db->query($query, [
+        return $this->db->query($query, [
             $state,
             \Config\Services::request()->getLocale(),
             strtoupper($state),
             \App\Controllers\BaseController::isLive(),
             $id,
         ])->getResult();
-
-        return $query;
     }
 
     // extra.ci_model_event_affectedgovernment(integer)
@@ -56,11 +54,9 @@ class AffectedGovernmentGroupModel extends Model
             ORDER BY 1
         QUERY;
 
-        $query = $this->db->query($query, [
+        return $this->db->query($query, [
             $id,
         ])->getResultArray();
-
-        return $query;
     }
 
     // extra.ci_model_event_affectedgovernment_part(integer, character varying, character varying)
@@ -101,9 +97,11 @@ class AffectedGovernmentGroupModel extends Model
             \Config\Services::request()->getLocale(),
             strtoupper($state),
             $id,
-        ])->getResult();
+        ])->getResultArray();
 
-        return $query;
+        $gisQuery = $this->getByEventGeometry($id);
+
+        return $this->getProcess($query, $gisQuery);
     }
 
     // extra.ci_model_government_affectedgovernmentform(integer, character varying, boolean)
@@ -141,13 +139,11 @@ class AffectedGovernmentGroupModel extends Model
             ORDER BY 1, 4
         QUERY;
 
-        $query = $this->db->query($query, [
+        return $this->db->query($query, [
             \App\Controllers\BaseController::isLive(),
             strtoupper($state),
             $id,
         ])->getResult();
-
-        return $query;
     }
 
     // extra.ci_model_government_affectedgovernment(integer, character varying, character varying)
@@ -300,7 +296,7 @@ class AffectedGovernmentGroupModel extends Model
             ORDER BY 1, 4, 5, 7
         QUERY;
 
-        $query = $this->db->query($query, [
+        return $this->db->query($query, [
             strtoupper($state),
             $id,
             $state,
@@ -311,8 +307,6 @@ class AffectedGovernmentGroupModel extends Model
             $id,
             $id,
         ])->getResult();
-
-        return $query;
     }
 
     // extra.ci_model_area_affectedgovernment(v_governmentshape integer, v_state character varying, v_locale character varying)
@@ -498,7 +492,7 @@ class AffectedGovernmentGroupModel extends Model
             ORDER BY 37
         QUERY;
 
-        $query = $this->db->query($query, [
+        return $this->db->query($query, [
             $state,
             \Config\Services::request()->getLocale(),
             strtoupper($state),
@@ -542,7 +536,73 @@ class AffectedGovernmentGroupModel extends Model
             $id,
             strtoupper($state),
         ])->getResult();
+    }
 
-        return $query;
+    protected function getProcess($query, $gisQuery = []): array
+    {
+        $linkTypes = [];
+        $rows = [];
+        $types = [];
+
+        foreach ($query as $row) {
+            if (!empty($row['governmentfromlong'])) {
+                $types['from'][$row['affectedgovernmentleveldisplayorder']] = $row['affectedgovernmentlevellong'];
+                if (!empty($row['includelink']) && $row['includelink'] == 't') {
+                    $linkTypes['from'][$row['affectedgovernmentleveldisplayorder']] = $row['affectedgovernmentlevellong'];
+                }
+                $rows[$row['id']]['From ' . $row['affectedgovernmentlevellong'] . ' Link'] = $row['governmentfrom'];
+                $rows[$row['id']]['From ' . $row['affectedgovernmentlevellong'] . ' Long'] = $row['governmentfromlong'];
+                $rows[$row['id']]['From ' . $row['affectedgovernmentlevellong'] . ' Affected'] = $row['affectedtypefrom'];
+            }
+            if (!empty($row['governmenttolong'])) {
+                $types['to'][$row['affectedgovernmentleveldisplayorder']] = $row['affectedgovernmentlevellong'];
+                if (!empty($row['includelink']) && $row['includelink'] == 't') {
+                    $linkTypes['to'][$row['affectedgovernmentleveldisplayorder']] = $row['affectedgovernmentlevellong'];
+                }
+                $rows[$row['id']]['To ' . $row['affectedgovernmentlevellong'] . ' Link'] = $row['governmentto'];
+                $rows[$row['id']]['To ' . $row['affectedgovernmentlevellong'] . ' Long'] = $row['governmenttolong'];
+                $rows[$row['id']]['To ' . $row['affectedgovernmentlevellong'] . ' Affected'] = $row['affectedtypeto'];
+            }
+        }
+
+        foreach ($types as $fromTo => $levels) {
+            ksort($levels);
+            $types[$fromTo] = $levels;
+        }
+        $kSort = $types;
+        ksort($kSort);
+        $types = $kSort;
+
+        foreach ($linkTypes as $fromTo => $levels) {
+            ksort($levels);
+            $linkTypes[$fromTo] = $levels;
+        }
+        $kSort = $linkTypes;
+        ksort($kSort);
+        $linkTypes = $kSort;
+
+        $hasMap = false;
+
+        if ($gisQuery != []) {
+            $hasMap = true;
+            foreach ($gisQuery as $row) {
+                foreach ($row as $key => $value) {
+                    $rows[$row['id']][$key] = $value;
+                }
+            }
+        }
+
+        foreach ($rows as $key => $value) {
+            $rows[$key] = (object) $value;
+        }
+
+        return [
+            'affectedGovernment' => [
+                'linkTypes' => $linkTypes,
+                'rows' => $rows,
+                'types' => $types,
+            ],
+            'hasMap' => $hasMap,
+        ];
     }
 }

@@ -30,11 +30,9 @@ class SourceCitationNoteModel extends Model
             ORDER BY 1, 2;
         QUERY;
 
-        $query = $this->db->query($query, [
+        return $this->db->query($query, [
             $id,
             $id,
         ])->getResult();
-
-        return $query;
     }
 }

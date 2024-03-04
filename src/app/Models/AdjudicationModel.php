@@ -54,12 +54,10 @@ class AdjudicationModel extends Model
                 OR governmentrelationstate IS NULL
         QUERY;
 
-        $query = $this->db->query($query, [
+        return $this->db->query($query, [
             $id,
             strtoupper($state),
         ])->getResult();
-
-        return $query;
     }
 
     // extra.ci_model_reporter_adjudication(integer)
@@ -91,11 +89,9 @@ class AdjudicationModel extends Model
                 AND adjudicationsourcecitation.adjudicationsourcecitationid = ?
         QUERY;
 
-        $query = $this->db->query($query, [
+        return $this->db->query($query, [
             $id,
         ])->getResult();
-
-        return $query;
     }
 
     // extra.ci_model_event_adjudication(integer)
@@ -130,11 +126,9 @@ class AdjudicationModel extends Model
             WHERE adjudicationevent.event = ?
         QUERY;
 
-        $query = $this->db->query($query, [
+        return $this->db->query($query, [
             $id,
         ])->getResult();
-
-        return $query;
     }
 
     // extra.adjudicationslugid(text)

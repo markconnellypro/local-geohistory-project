@@ -32,10 +32,8 @@ class PlssModel extends Model
                 WHERE event = ?
         QUERY;
 
-        $query = $this->db->query($query, [
+        return $this->db->query($query, [
             $id,
         ])->getResult();
-
-        return $query;
     }
 }

@@ -45,13 +45,11 @@ class LawSectionModel extends Model
                 OR governmentrelationstate IS NULL
         QUERY;
 
-        $query = $this->db->query($query, [
+        return $this->db->query($query, [
             \App\Controllers\BaseController::isLive(),
             $id,
             strtoupper($state),
         ])->getResult();
-
-        return $query;
     }
 
     // extra.ci_model_event_law(integer)
@@ -83,11 +81,9 @@ class LawSectionModel extends Model
             ORDER BY 4, 2, 1
         QUERY;
 
-        $query = $this->db->query($query, [
+        return $this->db->query($query, [
             $id,
         ])->getResult();
-
-        return $query;
     }
 
     // extra.ci_model_law_related(integer)
@@ -159,14 +155,12 @@ class LawSectionModel extends Model
             ORDER BY 4, 3
         QUERY;
 
-        $query = $this->db->query($query, [
+        return $this->db->query($query, [
             $id,
             $id,
             $id,
             $id,
         ])->getResult();
-
-        return $query;
     }
 
     // extra.ci_model_search_law_dateevent(character varying, text, character varying)
@@ -215,7 +209,7 @@ class LawSectionModel extends Model
                 OR source.government IS NULL);
         QUERY;
 
-        $query = $this->db->query($query, [
+        return $this->db->query($query, [
             $eventType,
             $eventType,
             $eventType,
@@ -224,8 +218,6 @@ class LawSectionModel extends Model
             strtoupper($state),
             strtoupper($state),
         ])->getResult();
-
-        return $query;
     }
 
     // extra_removed.ci_model_search_law_reference(character varying, integer, integer, character varying)
@@ -273,7 +265,7 @@ class LawSectionModel extends Model
                AND (0 = ? OR law.lawnumberchapter = ?)
         QUERY;
 
-        $query = $this->db->query($query, [
+        return $this->db->query($query, [
             $yearVolume,
             $yearVolume,
             strtoupper($state),
@@ -285,8 +277,6 @@ class LawSectionModel extends Model
             $numberChapter,
             $numberChapter,
         ])->getResult();
-
-        return $query;
     }
 
     // extra.lawsectionslugid(text)

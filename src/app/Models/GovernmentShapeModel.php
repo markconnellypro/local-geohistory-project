@@ -41,7 +41,7 @@ class GovernmentShapeModel extends Model
             ORDER BY 8, 6, 4, 2
         QUERY;
 
-        $query = $this->db->query($query, [
+        return $this->db->query($query, [
             $state,
             \Config\Services::request()->getLocale(),
             strtoupper($state),
@@ -56,8 +56,6 @@ class GovernmentShapeModel extends Model
             $id,
             strtoupper($state),
         ])->getResult();
-
-        return $query;
     }
 
     // extra.ci_model_area_point(pointy double precision, pointx double precision)
@@ -71,12 +69,10 @@ class GovernmentShapeModel extends Model
             ORDER BY 1
         QUERY;
 
-        $query = $this->db->query($query, [
+        return $this->db->query($query, [
             $x,
             $y
         ])->getResult();
-
-        return $query;
     }
 
     // extra.ci_model_statistics_mapped_nation_part(character varying, integer, integer, character varying, boolean)
@@ -129,12 +125,10 @@ class GovernmentShapeModel extends Model
             ORDER BY 1
         QUERY;
 
-        $query = $this->db->query($query, [
+        return $this->db->query($query, [
             $by,
             $state,
         ])->getResult();
-
-        return $query;
     }
 
     // extra.ci_model_statistics_mapped_nation_whole(character varying, integer, integer, character varying, boolean)
@@ -170,12 +164,10 @@ class GovernmentShapeModel extends Model
                 ON xvalue.x = eventdata.x
         QUERY;
 
-        $query = $this->db->query($query, [
+        return $this->db->query($query, [
             $by,
             ENVIRONMENT,
         ])->getResult();
-
-        return $query;
     }
 
     // extra.ci_model_statistics_mapped_state_part(character varying, integer, integer, character varying, character varying)
@@ -218,12 +210,10 @@ class GovernmentShapeModel extends Model
             ORDER BY 1
         QUERY;
 
-        $query = $this->db->query($query, [
+        return $this->db->query($query, [
             $by,
             $state,
         ])->getResult();
-
-        return $query;
     }
 
     // extra.ci_model_statistics_mapped_state_whole(character varying, integer, integer, character varying, character varying)
@@ -260,13 +250,11 @@ class GovernmentShapeModel extends Model
                 ON xvalue.x = eventdata.x
         QUERY;
 
-        $query = $this->db->query($query, [
+        return $this->db->query($query, [
             $by,
             $state,
             $state,
         ])->getResult();
-
-        return $query;
     }
 
     // extra.ci_model_government_current(integer)
@@ -283,11 +271,9 @@ class GovernmentShapeModel extends Model
             GROUP BY 1, 2;
         QUERY;
 
-        $query = $this->db->query($query, [
+        return $this->db->query($query, [
             $id,
         ])->getResult();
-
-        return $query;
     }
 
     // extra.ci_model_government_shape(integer, character varying, character varying)
@@ -452,7 +438,7 @@ class GovernmentShapeModel extends Model
             ORDER BY 1
         QUERY;
 
-        $query = $this->db->query($query, [
+        return $this->db->query($query, [
             $id,
             $id,
             strtoupper($state),
@@ -475,8 +461,6 @@ class GovernmentShapeModel extends Model
             $id,
             $id,
         ])->getResult();
-
-        return $query;
     }
 
     // extra.governmentshapeslugid(text)
@@ -552,7 +536,7 @@ class GovernmentShapeModel extends Model
             FROM mvtgeometrysubmunicipality;
         QUERY;
 
-        $query = $this->db->query($query, [
+        return $this->db->query($query, [
             $z,
             $x,
             $y,
@@ -577,7 +561,5 @@ class GovernmentShapeModel extends Model
             $y,
             strtoupper($state),
         ])->getResult();
-
-        return $query;
     }
 }

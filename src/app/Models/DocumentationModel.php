@@ -19,11 +19,9 @@ class DocumentationModel extends Model
             ORDER BY 2, 1
         QUERY;
 
-        $query = $this->db->query($query, [
+        return $this->db->query($query, [
             'about_' . $state,
         ])->getResult();
-
-        return $query;
     }
 
     public function getKey($type): array
@@ -38,10 +36,8 @@ class DocumentationModel extends Model
             ORDER BY 2, 1
         QUERY;
 
-        $query = $this->db->query($query, [
+        return $this->db->query($query, [
             $type,
         ])->getResult();
-
-        return $query;
     }
 }

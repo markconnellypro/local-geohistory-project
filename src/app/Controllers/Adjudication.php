@@ -46,22 +46,22 @@ class Adjudication extends BaseController
             echo view('adjudication_detail', ['row' => $query[0]]);
             $AdjudicationLocationModel = new AdjudicationLocationModel();
             $query = $AdjudicationLocationModel->getByAdjudication($id);
-            if (count($query) > 0) {
+            if ($query !== []) {
                 echo view('adjudication_location', ['query' => $query]);
             }
             $FilingModel = new FilingModel();
             $query = $FilingModel->getByAdjudication($id);
-            if (count($query) > 0) {
+            if ($query !== []) {
                 echo view('adjudication_filing', ['query' => $query]);
             }
             $AdjudicationSourceCitationModel = new AdjudicationSourceCitationModel();
             $query = $AdjudicationSourceCitationModel->getByAdjudication($id);
-            if (count($query) > 0) {
+            if ($query !== []) {
                 echo view('general_reporter', ['query' => $query, 'state' => $state, 'hasLink' => true, 'title' => 'Reporter Links']);
             }
             $EventModel = new EventModel();
             $query = $EventModel->getByAdjudication($id);
-            if (count($query) > 0) {
+            if ($query !== []) {
                 echo view('general_event', ['query' => $query, 'state' => $state, 'title' => 'Event Links', 'eventRelationship' => true]);
             }
             echo view('footer');

@@ -78,13 +78,11 @@ class RecordingModel extends Model
             ORDER BY 1, 6
         QUERY;
 
-        $query = $this->db->query($query, [
+        return $this->db->query($query, [
             $state,
             \Config\Services::request()->getLocale(),
             strtoupper($state),
             $id,
         ])->getResult();
-
-        return $query;
     }
 }

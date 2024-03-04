@@ -47,11 +47,11 @@ class Governmentidentifier extends BaseController
             echo view('general_governmentidentifier', ['query' => $query, 'title' => 'Detail']);
             $GovernmentModel = new GovernmentModel();
             $query = $GovernmentModel->getByGovernmentIdentifier($governmentidentifierids);
-            if (count($query) > 0) {
+            if ($query !== []) {
                 echo view('general_government', ['query' => $query, 'title' => 'Government', 'type' => 'identifier']);
             }
             $query = $GovernmentIdentifierModel->getRelated($governments, $governmentidentifierids);
-            if (count($query) > 0) {
+            if ($query !== []) {
                 echo view('general_governmentidentifier', ['query' => $query, 'title' => 'Related']);
             }
             if ($type == 'us-census' || $type == 'usgs') {
@@ -60,7 +60,7 @@ class Governmentidentifier extends BaseController
                 } else {
                     $query = $GovernmentIdentifierModel->getUsgs($governmentidentifierids);
                 }
-                if (count($query) > 0) {
+                if ($query !== []) {
                     echo view('governmentidentifier_census', ['query' => $query, 'type' => $type]);
                 }
             }

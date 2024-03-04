@@ -52,12 +52,10 @@ class SourceCitationModel extends Model
                 OR governmentrelationstate IS NULL
         QUERY;
 
-        $query = $this->db->query($query, [
+        return $this->db->query($query, [
             $id,
             strtoupper($state),
         ])->getResult();
-
-        return $query;
     }
 
     // extra.ci_model_event_source(integer)
@@ -97,11 +95,9 @@ class SourceCitationModel extends Model
             ORDER BY 1, 6, 7, 10
         QUERY;
 
-        $query = $this->db->query($query, [
+        return $this->db->query($query, [
             $id,
         ])->getResult();
-
-        return $query;
     }
 
     public function getByGovernment($id, $state): array

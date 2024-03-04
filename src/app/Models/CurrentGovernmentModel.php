@@ -29,7 +29,7 @@ class CurrentGovernmentModel extends Model
             ORDER BY 8, 6, 4, 2
         QUERY;
 
-        $query = $this->db->query($query, [
+        return $this->db->query($query, [
             $state,
             \Config\Services::request()->getLocale(),
             strtoupper($state),
@@ -43,7 +43,5 @@ class CurrentGovernmentModel extends Model
             \Config\Services::request()->getLocale(),
             $id,
         ])->getResult();
-
-        return $query;
     }
 }

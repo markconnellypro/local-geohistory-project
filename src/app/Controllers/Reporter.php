@@ -49,17 +49,17 @@ class Reporter extends BaseController
             }
             $SourceItemPartModel = new SourceItemPartModel();
             $query = $SourceItemPartModel->getByAdjudicationSourceCitation($id);
-            if (count($query) > 0) {
+            if ($query !== []) {
                 echo view('general_url', ['query' => $query, 'state' => $state, 'title' => 'Calculated URL']);
             }
             $AdjudicationModel = new AdjudicationModel();
             $query = $AdjudicationModel->getByAdjudicationSourceCitation($id);
-            if (count($query) > 0) {
+            if ($query !== []) {
                 echo view('general_adjudication', ['query' => $query, 'state' => $state]);
             }
             $EventModel = new EventModel();
             $query = $EventModel->getByAdjudicationSourceCitation($id);
-            if (count($query) > 0) {
+            if ($query !== []) {
                 echo view('general_event', ['query' => $query, 'state' => $state, 'title' => 'Event Links']);
             }
             echo view('footer');

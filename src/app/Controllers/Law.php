@@ -59,19 +59,19 @@ class Law extends BaseController
                 $SourceCitationModel = new \App\Models\SourceCitationModel();
             }
             $query = $SourceCitationModel->getByLawNation($id);
-            if (!empty($query)) {
+            if ($query !== []) {
                 echo view(ENVIRONMENT . '/usa_newberrylaw', ['query' => $query]);
             }
             $query = $SourceCitationModel->getByLawState($id, $state);
-            if (!empty($query)) {
+            if ($query !== []) {
                 echo view(ENVIRONMENT . '/ny_law_detail', ['query' => $query]);
             }
             $query = $LawGroupSectionModel->getByLawSection($id, $state);
-            if (!empty($query)) {
+            if ($query !== []) {
                 echo view(ENVIRONMENT . '/general_lawgroup', ['query' => $query, 'includeForm' => false]);
             }
             $query = $LawSectionModel->getRelated($id);
-            if (count($query) > 0) {
+            if ($query !== []) {
                 echo view('general_law', ['query' => $query, 'state' => $state, 'title' => 'Related Law', 'type' => 'relationship']);
             }
             $SourceItemPartModel = new SourceItemPartModel();

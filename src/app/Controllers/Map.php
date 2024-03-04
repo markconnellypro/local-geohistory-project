@@ -36,7 +36,7 @@ class Map extends BaseController
             unset($json['sources']['street-tile']['url']);
         }
         $json['glyphs'] = getenv('map_glyph');
-        if (!(getenv('map_elevation') === [] || (getenv('map_elevation') === '' || getenv('map_elevation') === '0') || getenv('map_elevation') === false) && $maxZoom == 14 && !($this->data['live'] && !$this->data['online'])) {
+        if (getenv('map_elevation') != '' && $maxZoom == 14 && !($this->data['live'] && !$this->data['online'])) {
             $json['sources']['elevation-tile']['tiles'][] = getenv('map_elevation');
         } else {
             unset($json['sources']['elevation-tile']);

@@ -24,10 +24,8 @@ class GovernmentIdentifierTypeModel extends Model
             ORDER BY 1
         QUERY;
 
-        $query = $this->db->query($query, [
+        return $this->db->query($query, [
             strtoupper($state),
         ])->getResultArray();
-
-        return $query;
     }
 }

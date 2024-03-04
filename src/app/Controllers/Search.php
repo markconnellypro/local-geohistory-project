@@ -124,6 +124,7 @@ class Search extends BaseController
         $this->data['state'] = $state;
         $type = $this->request->getPost('type');
         $fields = [];
+        $model = '';
 
         switch ($category) {
             case 'event':
@@ -190,7 +191,7 @@ class Search extends BaseController
                 break;
         }
 
-        if ($fields !== []) {
+        if ($fields !== [] && $model != '') {
             echo view('header', $this->data);
             $model = "App\\Models\\" . $model;
             $model = new $model();

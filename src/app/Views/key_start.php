@@ -2,7 +2,7 @@
     <a href="#date">Date</a><br>
     <a href="#name-abbreviation">Name and Abbreviation</a><br>
     <?php foreach ($keys as $key => $value) { ?>
-        <a href="#<?= strtolower($key) ?>"><?= $value[0] ?></a><br>
+        <a href="#<?= strtolower($value) ?>"><?= $key ?></a><br>
     <?php } ?>
 </section>
 <section>

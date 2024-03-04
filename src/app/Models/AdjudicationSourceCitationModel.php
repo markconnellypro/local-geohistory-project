@@ -48,12 +48,10 @@ class AdjudicationSourceCitationModel extends Model
                 OR governmentrelationstate IS NULL
         QUERY;
 
-        $query = $this->db->query($query, [
+        return $this->db->query($query, [
             $id,
             strtoupper($state),
         ])->getResult();
-
-        return $query;
     }
 
     public function getByAdjudication($id): array
@@ -81,11 +79,9 @@ class AdjudicationSourceCitationModel extends Model
                 ON adjudicationsourcecitation.adjudicationsourcecitationid = adjudicationsourcecitationextracache.adjudicationsourcecitationid
         QUERY;
 
-        $query = $this->db->query($query, [
+        return $this->db->query($query, [
             $id,
         ])->getResult();
-
-        return $query;
     }
 
     private function getSlugId($id): int

@@ -25,9 +25,7 @@ class EventTypeModel extends Model
             ORDER BY 2, 1
         QUERY;
 
-        $query = $this->db->query($query)->getResult();
-
-        return $query;
+        return $this->db->query($query)->getResult();
     }
 
     // extra.ci_model_search_form_eventtype(character varying)
@@ -55,11 +53,9 @@ class EventTypeModel extends Model
             ORDER BY 3 DESC, 1, 2
         QUERY;
 
-        $query = $this->db->query($query, [
+        return $this->db->query($query, [
             strtoupper($state),
         ])->getResultArray();
-
-        return $query;
     }
 
     // extra.ci_model_statistics_eventtype_list(boolean)
@@ -85,11 +81,9 @@ class EventTypeModel extends Model
             ORDER BY 1, 2
         QUERY;
 
-        $query = $this->db->query($query, [
+        return $this->db->query($query, [
             $state,
         ])->getResultArray();
-
-        return $query;
     }
 
     // extra_removed.ci_model_statistics_eventtype(text)
@@ -105,10 +99,8 @@ class EventTypeModel extends Model
             ORDER BY 1, 2
         QUERY;
 
-        $query = $this->db->query($query, [
+        return $this->db->query($query, [
             $eventType,
         ])->getResult();
-
-        return $query;
     }
 }

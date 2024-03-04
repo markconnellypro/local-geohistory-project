@@ -58,13 +58,11 @@ class NationalArchivesModel extends Model
             ORDER BY 1, 3, 4
         QUERY;
 
-        $query = $this->db->query($query, [
+        return $this->db->query($query, [
             strtoupper($state),
             $id,
             strtoupper($state),
             $id,
         ])->getResult();
-
-        return $query;
     }
 }

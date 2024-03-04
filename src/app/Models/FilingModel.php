@@ -32,11 +32,9 @@ class FilingModel extends Model
             ORDER BY filing.filingid
         QUERY;
 
-        $query = $this->db->query($query, [
+        return $this->db->query($query, [
             \App\Controllers\BaseController::isLive(),
             $id,
         ])->getResult();
-
-        return $query;
     }
 }

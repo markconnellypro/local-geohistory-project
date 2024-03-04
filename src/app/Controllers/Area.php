@@ -127,7 +127,7 @@ class Area extends BaseController
             $AffectedGovernmentGroupModel = new AffectedGovernmentGroupModel();
             $query = $AffectedGovernmentGroupModel->getByGovernmentShape($id, $state);
             $events = [];
-            if (count($query) > 0) {
+            if ($query !== []) {
                 echo view('general_affectedgovernment', ['query' => $query, 'state' => $state, 'includeDate' => true, 'isComplete' => true]);
                 foreach ($query as $row) {
                     if (!empty($row->eventid)) {
@@ -137,14 +137,14 @@ class Area extends BaseController
             }
             $MetesDescriptionModel = new MetesDescriptionModel();
             $query = $MetesDescriptionModel->getByGovernmentShape($id);
-            if (count($query) > 0) {
+            if ($query !== []) {
                 echo view('general_metes', ['query' => $query, 'hasLink' => true, 'state' => $state, 'title' => 'Metes and Bounds Description']);
             }
             $events = array_unique($events);
             $events = '{' . implode(',', $events) . '}';
             $EventModel = new EventModel();
             $query = $EventModel->getByGovernmentShapeFailure($id, $events);
-            if (count($query) > 0) {
+            if ($query !== []) {
                 echo view('general_event', ['query' => $query, 'state' => $state, 'title' => 'Other Event Links']);
             }
             echo view('leaflet_start', ['type' => 'area', 'includeBase' => true, 'needRotation' => false, 'online' => $this->data['online']]);

@@ -47,7 +47,7 @@ class ResearchLogModel extends Model
             ORDER BY researchlogtype.researchlogtypelong, researchlog.researchlogfrom, researchlogdatesort    
         QUERY;
 
-        $query = $this->db->query($query, [
+        return $this->db->query($query, [
             \App\Controllers\BaseController::isLive(),
             \App\Controllers\BaseController::isLive(),
             \App\Controllers\BaseController::isLive(),
@@ -55,7 +55,5 @@ class ResearchLogModel extends Model
             $id,
             \App\Controllers\BaseController::isLive(),
         ])->getResult();
-
-        return $query;
     }
 }

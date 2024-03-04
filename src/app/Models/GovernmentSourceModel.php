@@ -92,15 +92,13 @@ class GovernmentSourceModel extends Model
             -- Add state filter
         QUERY;
 
-        $query = $this->db->query($query, [
+        return $this->db->query($query, [
             $state,
             \Config\Services::request()->getLocale(),
             strtoupper($state),
             \App\Controllers\BaseController::isLive(),
             $id
         ])->getResult();
-
-        return $query;
     }
 
     // extra.ci_model_event_governmentsource(integer, character varying, boolean, character varying)
@@ -179,15 +177,13 @@ class GovernmentSourceModel extends Model
             ORDER BY 12
         QUERY;
 
-        $query = $this->db->query($query, [
+        return $this->db->query($query, [
             $state,
             \Config\Services::request()->getLocale(),
             strtoupper($state),
             \App\Controllers\BaseController::isLive(),
             $id,
         ])->getResult();
-
-        return $query;
     }
 
     // extra.ci_model_government_governmentsource(integer, character varying, boolean)
@@ -268,13 +264,11 @@ class GovernmentSourceModel extends Model
             ORDER BY 11
         QUERY;
 
-        $query = $this->db->query($query, [
+        return $this->db->query($query, [
             \App\Controllers\BaseController::isLive(),
             strtoupper($state),
             $id,
         ])->getResult();
-
-        return $query;
     }
 
     // extra.governmentsourceslugid(text)

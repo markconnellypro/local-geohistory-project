@@ -47,13 +47,11 @@ class LawAlternateSectionModel extends Model
                 OR governmentrelationstate IS NULL
         QUERY;
 
-        $query = $this->db->query($query, [
+        return $this->db->query($query, [
             \App\Controllers\BaseController::isLive(),
             $id,
             strtoupper($state),
         ])->getResult();
-
-        return $query;
     }
 
     // extra.ci_model_lawalternate_related(integer)
@@ -131,14 +129,12 @@ class LawAlternateSectionModel extends Model
             ORDER BY 4, 3
         QUERY;
 
-        $query = $this->db->query($query, [
+        return $this->db->query($query, [
             $id,
             $id,
             $id,
             $id,
         ])->getResult();
-
-        return $query;
     }
 
     // extra.lawalternatesectionslugid(text)

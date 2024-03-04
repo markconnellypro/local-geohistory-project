@@ -21,8 +21,6 @@ class AffectedTypeModel extends Model
             ORDER BY 2, 1
         QUERY;
 
-        $query = $this->db->query($query)->getResult();
-
-        return $query;
+        return $this->db->query($query)->getResult();
     }
 }

@@ -48,10 +48,8 @@ class AdjudicationLocationModel extends Model
             ORDER BY adjudicationlocation.adjudicationlocationid
         QUERY;
 
-        $query = $this->db->query($query, [
+        return $this->db->query($query, [
             $id,
         ])->getResult();
-
-        return $query;
     }
 }
