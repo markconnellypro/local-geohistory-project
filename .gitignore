@@ -24,6 +24,7 @@ inpostgis/**
 outpostgis/**
 !outpostgis/.gitkeep
 src/.php-cs-fixer.cache
+src/build/**
 src/html/asset/dependency/*
 !src/html/asset/dependency/**/
 !src/html/asset/dependency/.gitkeep

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f863cf64f2713c6746d8a92a8f43da44",
+    "content-hash": "1260bd449ae82e867e2be5e3004053ee",
     "packages": [
         {
             "name": "codeigniter4/framework",
@@ -195,6 +195,80 @@
         }
     ],
     "packages-dev": [
+        {
+            "name": "codeigniter/phpstan-codeigniter",
+            "version": "v1.4.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/CodeIgniter/phpstan-codeigniter.git",
+                "reference": "bff4a7cfe251bb288223e95d6f588e956dfc0a93"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/CodeIgniter/phpstan-codeigniter/zipball/bff4a7cfe251bb288223e95d6f588e956dfc0a93",
+                "reference": "bff4a7cfe251bb288223e95d6f588e956dfc0a93",
+                "shasum": ""
+            },
+            "require": {
+                "codeigniter4/framework": "^4.4",
+                "php": "^8.1",
+                "phpstan/phpstan": "^1.10"
+            },
+            "conflict": {
+                "codeigniter/framework": "*"
+            },
+            "require-dev": {
+                "codeigniter/coding-standard": "^1.7",
+                "codeigniter4/shield": "^1.0@beta",
+                "friendsofphp/php-cs-fixer": "^3.20",
+                "nexusphp/cs-config": "^3.12",
+                "php-parallel-lint/php-parallel-lint": "^1.3",
+                "phpstan/extension-installer": "^1.3",
+                "phpstan/phpstan-deprecation-rules": "^1.1",
+                "phpstan/phpstan-phpunit": "^1.3",
+                "phpstan/phpstan-strict-rules": "^1.5",
+                "phpunit/phpunit": "^10.2",
+                "rector/rector": "^0.18.2"
+            },
+            "type": "phpstan-extension",
+            "extra": {
+                "phpstan": {
+                    "includes": [
+                        "extension.neon"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "CodeIgniter\\PHPStan\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "John Paul E. Balandan, CPA",
+                    "email": "paulbalandan@gmail.com"
+                }
+            ],
+            "description": "CodeIgniter extensions and rules for PHPStan",
+            "keywords": [
+                "PHPStan",
+                "codeigniter",
+                "codeigniter4",
+                "dev",
+                "static analysis"
+            ],
+            "support": {
+                "forum": "http://forum.codeigniter.com/",
+                "issues": "https://github.com/CodeIgniter/phpstan-codeigniter/issues",
+                "slack": "https://codeigniterchat.slack.com",
+                "source": "https://github.com/CodeIgniter/phpstan-codeigniter"
+            },
+            "time": "2023-12-21T03:39:48+00:00"
+        },
         {
             "name": "composer/pcre",
             "version": "3.1.1",
@@ -504,6 +578,50 @@
                 }
             ],
             "time": "2024-02-28T19:50:06+00:00"
+        },
+        {
+            "name": "phpstan/extension-installer",
+            "version": "1.3.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/phpstan/extension-installer.git",
+                "reference": "f45734bfb9984c6c56c4486b71230355f066a58a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/phpstan/extension-installer/zipball/f45734bfb9984c6c56c4486b71230355f066a58a",
+                "reference": "f45734bfb9984c6c56c4486b71230355f066a58a",
+                "shasum": ""
+            },
+            "require": {
+                "composer-plugin-api": "^2.0",
+                "php": "^7.2 || ^8.0",
+                "phpstan/phpstan": "^1.9.0"
+            },
+            "require-dev": {
+                "composer/composer": "^2.0",
+                "php-parallel-lint/php-parallel-lint": "^1.2.0",
+                "phpstan/phpstan-strict-rules": "^0.11 || ^0.12 || ^1.0"
+            },
+            "type": "composer-plugin",
+            "extra": {
+                "class": "PHPStan\\ExtensionInstaller\\Plugin"
+            },
+            "autoload": {
+                "psr-4": {
+                    "PHPStan\\ExtensionInstaller\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Composer plugin for automatic installation of PHPStan extensions",
+            "support": {
+                "issues": "https://github.com/phpstan/extension-installer/issues",
+                "source": "https://github.com/phpstan/extension-installer/tree/1.3.1"
+            },
+            "time": "2023-05-24T08:59:17+00:00"
         },
         {
             "name": "phpstan/phpstan",
