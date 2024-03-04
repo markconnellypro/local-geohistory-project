@@ -103,7 +103,6 @@ class EventModel extends Model
 
     // extra.ci_model_adjudication_event(integer)
 
-    // FUNCTION: extra.eventsortdate
     // VIEW: extra.eventextracache
 
     public function getByAdjudication($id)
@@ -115,7 +114,7 @@ class EventModel extends Model
                 event.eventyear,
                 eventgranted.eventgrantedshort AS eventgranted,
                 event.eventeffectivetext AS eventeffective,
-                extra.eventsortdate(event.eventid) AS eventsortdate,
+                event.eventsort,
                 eventrelationship.eventrelationshipshort AS eventrelationship
             FROM geohistory.event
             JOIN geohistory.eventgranted
@@ -130,7 +129,7 @@ class EventModel extends Model
                 AND adjudicationevent.adjudication = ?
             JOIN geohistory.eventrelationship
                 ON adjudicationevent.eventrelationship = eventrelationship.eventrelationshipid
-            ORDER BY (extra.eventsortdate(event.eventid)), event.eventlong
+            ORDER BY event.eventsort, event.eventlong
         QUERY;
 
         $query = $this->db->query($query, [
@@ -142,7 +141,6 @@ class EventModel extends Model
 
     // extra.ci_model_reporter_event(integer)
 
-    // FUNCTION: extra.eventsortdate
     // VIEW: extra.eventextracache
 
     public function getByAdjudicationSourceCitation($id)
@@ -154,7 +152,7 @@ class EventModel extends Model
                 event.eventyear,
                 eventgranted.eventgrantedshort AS eventgranted,
                 event.eventeffectivetext AS eventeffective,
-                extra.eventsortdate(event.eventid) AS eventsortdate
+                event.eventsort
             FROM geohistory.event
             JOIN geohistory.eventgranted
                 ON event.eventgranted = eventgranted.eventgrantedid
@@ -168,7 +166,7 @@ class EventModel extends Model
             JOIN geohistory.adjudicationsourcecitation
                 ON adjudicationevent.adjudication = adjudicationsourcecitation.adjudication
                 AND adjudicationsourcecitation.adjudicationsourcecitationid = ?
-            ORDER BY (extra.eventsortdate(event.eventid)), event.eventlong;
+            ORDER BY event.eventsort, event.eventlong;
         QUERY;
 
         $query = $this->db->query($query, [
@@ -180,7 +178,6 @@ class EventModel extends Model
 
     // extra.ci_model_government_event_failure(integer, integer[])
 
-    // FUNCTION: extra.eventsortdate
     // VIEW: extra.eventextracache
     // VIEW: extra.eventgovernmentcache
     // VIEW: extra.governmentsubstitutecache
@@ -194,7 +191,7 @@ class EventModel extends Model
                 event.eventyear,
                 eventgranted.eventgrantedshort AS eventgranted,
                 event.eventeffectivetext AS eventeffective,
-                extra.eventsortdate(event.eventid) AS eventsortdate
+                event.eventsort
             FROM geohistory.event
             JOIN geohistory.eventgranted
                 ON event.eventgranted = eventgranted.eventgrantedid
@@ -211,7 +208,7 @@ class EventModel extends Model
                 ON eventgovernmentcache.government = governmentsubstitutecache.governmentid
             WHERE event.eventid <> ALL (?)
                 AND governmentsubstitutecache.governmentsubstitute = ?
-            ORDER BY (extra.eventsortdate(event.eventid)), event.eventlong
+            ORDER BY event.eventsort, event.eventlong
         QUERY;
 
         $query = $this->db->query($query, [
@@ -224,7 +221,6 @@ class EventModel extends Model
 
     // extra.ci_model_area_event_failure(integer, integer[])
 
-    // FUNCTION: extra.eventsortdate
     // VIEW: extra.eventextracache
 
     public function getByGovernmentShapeFailure($id, $events)
@@ -236,7 +232,7 @@ class EventModel extends Model
                 event.eventyear,
                 eventgranted.eventgrantedshort AS eventgranted,
                 event.eventeffectivetext AS eventeffective,
-                extra.eventsortdate(event.eventid) AS eventsortdate
+                event.eventsort
             FROM geohistory.event
             JOIN geohistory.eventgranted
                 ON event.eventgranted = eventgranted.eventgrantedid
@@ -261,7 +257,7 @@ class EventModel extends Model
                     WHERE event_1.eventid = metesdescription.event 
                         AND metesdescription.metesdescriptionid = metesdescriptiongis.metesdescription
                         AND metesdescriptiongis.governmentshape = ?))
-            ORDER BY (extra.eventsortdate(event.eventid)), event.eventlong
+            ORDER BY event.eventsort, event.eventlong
         QUERY;
 
         $query = $this->db->query($query, [
@@ -275,7 +271,6 @@ class EventModel extends Model
 
     // extra.ci_model_governmentsource_event(integer)
 
-    // FUNCTION: extra.eventsortdate
     // VIEW: extra.eventextracache
 
     public function getByGovernmentSource($id)
@@ -287,7 +282,7 @@ class EventModel extends Model
                 event.eventyear,
                 eventgranted.eventgrantedshort AS eventgranted,
                 event.eventeffectivetext AS eventeffective,
-                extra.eventsortdate(event.eventid) AS eventsortdate
+                event.eventsort
             FROM geohistory.event
             JOIN geohistory.eventgranted
                 ON event.eventgranted = eventgranted.eventgrantedid
@@ -299,7 +294,7 @@ class EventModel extends Model
             JOIN geohistory.governmentsourceevent
                 ON event.eventid = governmentsourceevent.event 
                 AND governmentsourceevent.governmentsource = ?
-            ORDER BY (extra.eventsortdate(event.eventid)), event.eventlong
+            ORDER BY event.eventsort, event.eventlong
         QUERY;
 
         $query = $this->db->query($query, [
@@ -311,7 +306,6 @@ class EventModel extends Model
 
     // extra.ci_model_government_event_success(integer, integer[])
 
-    // FUNCTION: extra.eventsortdate
     // VIEW: extra.eventextracache
     // VIEW: extra.eventgovernmentcache
     // VIEW: extra.governmentsubstitutecache
@@ -325,7 +319,7 @@ class EventModel extends Model
                 event.eventyear,
                 eventgranted.eventgrantedshort AS eventgranted,
                 event.eventeffectivetext AS eventeffective,
-                extra.eventsortdate(event.eventid) AS eventsortdate
+                event.eventsort
             FROM geohistory.event
             JOIN geohistory.eventgranted
                 ON event.eventgranted = eventgranted.eventgrantedid
@@ -341,7 +335,7 @@ class EventModel extends Model
                 ON eventgovernmentcache.government = governmentsubstitutecache.governmentid
             WHERE event.eventid <> ALL (?)
                 AND governmentsubstitutecache.governmentsubstitute = ?
-            ORDER BY (extra.eventsortdate(event.eventid)), event.eventlong;
+            ORDER BY event.eventsort, event.eventlong;
         QUERY;
 
         $query = $this->db->query($query, [
@@ -354,7 +348,6 @@ class EventModel extends Model
     
     // extra.ci_model_lawalternate_event(integer)
 
-    // FUNCTION: extra.eventsortdate
     // VIEW: extra.eventextracache
 
     public function getByLawAlternateSection($id)
@@ -366,7 +359,7 @@ class EventModel extends Model
                 event.eventyear,
                 eventgranted.eventgrantedshort AS eventgranted,
                 event.eventeffectivetext AS eventeffective,
-                extra.eventsortdate(event.eventid) AS eventsortdate,
+                event.eventsort,
                 eventrelationship.eventrelationshipshort AS eventrelationship,
                 lawgroup.lawgrouplong
             FROM geohistory.event
@@ -386,7 +379,7 @@ class EventModel extends Model
                 AND lawalternatesection.lawalternatesectionid = ?
             LEFT JOIN geohistory.lawgroup
                 ON lawsectionevent.lawgroup = lawgroup.lawgroupid
-            ORDER BY (extra.eventsortdate(event.eventid)), event.eventlong
+            ORDER BY event.eventsort, event.eventlong
         QUERY;
 
         $query = $this->db->query($query, [
@@ -398,7 +391,6 @@ class EventModel extends Model
 
     // extra.ci_model_law_event(integer)
 
-    // FUNCTION: extra.eventsortdate
     // VIEW: extra.eventextracache
 
     public function getByLawSection($id)
@@ -410,7 +402,7 @@ class EventModel extends Model
                 event.eventyear,
                 eventgranted.eventgrantedshort AS eventgranted,
                 event.eventeffectivetext AS eventeffective,
-                extra.eventsortdate(event.eventid) AS eventsortdate,
+                event.eventsort,
                 eventrelationship.eventrelationshipshort AS eventrelationship,
                 lawgroup.lawgrouplong
             FROM geohistory.event
@@ -428,7 +420,7 @@ class EventModel extends Model
                 ON lawsectionevent.eventrelationship = eventrelationship.eventrelationshipid
             LEFT JOIN geohistory.lawgroup
                 ON lawsectionevent.lawgroup = lawgroup.lawgroupid
-            ORDER BY (extra.eventsortdate(event.eventid)), event.eventlong;
+            ORDER BY event.eventsort, event.eventlong;
         QUERY;
 
         $query = $this->db->query($query, [
@@ -440,7 +432,6 @@ class EventModel extends Model
 
     // extra.ci_model_source_event(integer)
 
-    // FUNCTION: extra.eventsortdate
     // VIEW: extra.eventextracache
 
     public function getBySourceCitation($id)
@@ -452,7 +443,7 @@ class EventModel extends Model
                 event.eventyear,
                 eventgranted.eventgrantedshort AS eventgranted,
                 event.eventeffectivetext AS eventeffective,
-                extra.eventsortdate(event.eventid) AS eventsortdate
+                event.eventsort
             FROM geohistory.event
             JOIN geohistory.eventgranted
                 ON event.eventgranted = eventgranted.eventgrantedid
@@ -464,7 +455,7 @@ class EventModel extends Model
             JOIN geohistory.sourcecitationevent
                 ON event.eventid = sourcecitationevent.event 
                 AND sourcecitationevent.sourcecitation = ?
-            ORDER BY (extra.eventsortdate(event.eventid)), event.eventlong
+            ORDER BY event.eventsort, event.eventlong
         QUERY;
 
         $query = $this->db->query($query, [
@@ -495,7 +486,7 @@ class EventModel extends Model
             WITH eventdata AS (
                 SELECT DISTINCT min(governmentidentifier.governmentidentifier) AS series,
                 statistics_eventtype.governmentstate AS actualseries,
-                statistics_eventtype.eventyear AS x,
+                statistics_eventtype.eventsortyear AS x,
                 statistics_eventtype.eventcount::integer AS y
                 FROM extra.statistics_eventtype
                 JOIN geohistory.eventtype
@@ -507,8 +498,8 @@ class EventModel extends Model
                 WHERE statistics_eventtype.governmenttype = 'state'
                 AND statistics_eventtype.grouptype = ?
                 AND statistics_eventtype.governmentstate = ANY (?)
-                AND statistics_eventtype.eventyear >= ?
-                AND statistics_eventtype.eventyear <= ?
+                AND statistics_eventtype.eventsortyear >= ?
+                AND statistics_eventtype.eventsortyear <= ?
                 GROUP BY 2, 3, 4
             ), xvalue AS (
                 SELECT DISTINCT eventdata.series,
@@ -556,7 +547,7 @@ class EventModel extends Model
 
         $query = <<<QUERY
             WITH eventdata AS (
-                SELECT DISTINCT statistics_eventtype.eventyear AS x,
+                SELECT DISTINCT statistics_eventtype.eventsortyear AS x,
                 statistics_eventtype.eventcount::text AS y
                 FROM extra.statistics_eventtype
                 JOIN geohistory.eventtype
@@ -565,8 +556,8 @@ class EventModel extends Model
                 WHERE statistics_eventtype.governmenttype = 'nation'
                 AND statistics_eventtype.grouptype = ?
                 AND statistics_eventtype.governmentstate = ?
-                AND statistics_eventtype.eventyear >= ?
-                AND statistics_eventtype.eventyear <= ?
+                AND statistics_eventtype.eventsortyear >= ?
+                AND statistics_eventtype.eventsortyear <= ?
             ), xvalue AS (
                 SELECT DISTINCT generate_series(min(eventdata.x),max(eventdata.x)) AS x
                 FROM eventdata
@@ -610,7 +601,7 @@ class EventModel extends Model
         $query = <<<QUERY
             WITH eventdata AS (
                 SELECT DISTINCT statistics_eventtype.governmentcounty AS series,
-                statistics_eventtype.eventyear AS x,
+                statistics_eventtype.eventsortyear AS x,
                 statistics_eventtype.eventcount::integer AS y
                 FROM extra.statistics_eventtype
                 JOIN geohistory.eventtype
@@ -619,8 +610,8 @@ class EventModel extends Model
                 WHERE statistics_eventtype.governmenttype = 'county'
                 AND statistics_eventtype.grouptype = ?
                 AND statistics_eventtype.governmentstate = ?
-                AND statistics_eventtype.eventyear >= ?
-                AND statistics_eventtype.eventyear <= ?
+                AND statistics_eventtype.eventsortyear >= ?
+                AND statistics_eventtype.eventsortyear <= ?
             ), xvalue AS (
                 SELECT DISTINCT eventdata.series,
                 generate_series(min(eventdata.x),max(eventdata.x)) AS x
@@ -668,7 +659,7 @@ class EventModel extends Model
 
         $query = <<<QUERY
             WITH eventdata AS (
-                SELECT DISTINCT statistics_eventtype.eventyear AS x,
+                SELECT DISTINCT statistics_eventtype.eventsortyear AS x,
                 statistics_eventtype.eventcount::text AS y
                 FROM extra.statistics_eventtype
                 JOIN geohistory.eventtype
@@ -677,8 +668,8 @@ class EventModel extends Model
                 WHERE statistics_eventtype.governmenttype = 'state'
                 AND statistics_eventtype.grouptype = ?
                 AND statistics_eventtype.governmentstate = ?
-                AND statistics_eventtype.eventyear >= ?
-                AND statistics_eventtype.eventyear <= ?
+                AND statistics_eventtype.eventsortyear >= ?
+                AND statistics_eventtype.eventsortyear <= ?
             ), xvalue AS (
                 SELECT DISTINCT generate_series(min(eventdata.x),max(eventdata.x)) AS x
                 FROM eventdata
@@ -710,7 +701,6 @@ class EventModel extends Model
 
     // extra.ci_model_search_event_government(text, text, text, text, integer, integer)
 
-    // FUNCTION: extra.eventsortdate
     // VIEW: extra.eventextracache
     // VIEW: extra.eventgovernmentcache
     // VIEW: extra.governmentextracache
@@ -745,7 +735,7 @@ class EventModel extends Model
                 event.eventyear,
                 eventgranted.eventgrantedshort AS eventgranted,
                 event.eventeffectivetext AS eventeffective,
-                extra.eventsortdate(event.eventid) AS eventsortdate
+                event.eventsort
                 FROM alternategovernment
                 JOIN extra.eventgovernmentcache      
                     ON alternategovernment.governmentid = eventgovernmentcache.government
@@ -775,8 +765,8 @@ class EventModel extends Model
                 AND (0 = ?
                     OR (event.eventfrom <= (? + ?) AND event.eventfrom >= (? - ?))
                     OR (event.eventto <= (? + ?) AND event.eventto >= (? - ?))
-                    OR (floor(extra.eventsortdate(event.eventid)) <= (? + ?) AND floor(extra.eventsortdate(event.eventid)) >= (? - ?)))
-                ORDER BY (extra.eventsortdate(event.eventid)), event.eventlong
+                    OR (floorevent.eventsort <= (? + ?) AND floorevent.eventsort >= (? - ?)))
+                ORDER BY event.eventsort, event.eventlong
         QUERY;
 
         $query = $this->db->query($query, [

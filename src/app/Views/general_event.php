@@ -22,7 +22,7 @@
                     <td><?= $row->eventtypeshort ?></td>
                     <td><?= $row->eventlong ?></td>
                     <td><?= $row->eventgranted ?></td>
-                    <td data-sort="<?= $row->eventsortdate ?>"><?= (empty($row->eventeffective) ? $row->eventyear : $row->eventeffective) ?></td>
+                    <td data-sort="<?= $row->eventsort ?>"><?= (empty($row->eventeffective) ? $row->eventyear : $row->eventeffective) ?></td>
                     <?php if (isset($includeLawGroup)) { ?>
                         <td><?= $row->lawgrouplong ?></td>
                     <?php } if (isset($eventRelationship)) { ?>

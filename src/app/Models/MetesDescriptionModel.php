@@ -9,7 +9,6 @@ class MetesDescriptionModel extends Model
     // extra.ci_model_metes_detail(integer, character varying)
     // extra.ci_model_metes_detail(text, character varying)
 
-    // FUNCTION: extra.eventsortdate
     // VIEW: extra.metesdescriptionextracache
     // VIEW: extra.eventextracache
     // VIEW: extra.eventgovernmentcache
@@ -39,7 +38,7 @@ class MetesDescriptionModel extends Model
                 event.eventyear,
                 eventgranted.eventgrantedshort AS eventgranted,
                 event.eventeffectivetext AS eventeffective,
-                extra.eventsortdate(event.eventid) AS eventsortdate
+                event.eventsort
                 FROM geohistory.metesdescription
                     LEFT JOIN extra.metesdescriptionextracache
                     ON metesdescription.metesdescriptionid = metesdescriptionextracache.metesdescriptionid

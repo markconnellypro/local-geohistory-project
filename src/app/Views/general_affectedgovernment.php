@@ -29,7 +29,7 @@
                 <tr>
                     <?php if ($includeDate) { ?>
                         <td data-sort="<?= $row->eventorder ?>"><?php echo view('general_link', ['link' => (empty($row->eventslug) ? '' : "/" . \Config\Services::request()->getLocale() . "/" . $state . "/event/" . $row->eventslug . "/"), 'text' => (empty($row->eventslug) ? 'Missing' : 'View')]) ?></td>
-                        <td data-sort="<?= $row->eventsortdate ?>"><?= (empty($row->eventeffective) ? $row->eventyear : $row->eventeffective) ?></td>
+                        <td data-sort="<?= $row->eventsort ?>"><?= (empty($row->eventeffective) ? $row->eventyear : $row->eventeffective) ?></td>
                     <?php } elseif ($live and $isComplete) { ?>
                         <td>
                             <?php echo view('general_link', ['link' => str_replace('government', 'governmentmap', $row->municipalityfrom) . $row->id . "/", 'text' => 'From']) ?><br>

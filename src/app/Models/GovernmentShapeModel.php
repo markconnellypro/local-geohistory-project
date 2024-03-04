@@ -293,9 +293,6 @@ class GovernmentShapeModel extends Model
     // extra.ci_model_government_shape(integer, character varying, character varying)
 
     // FUNCTION: extra.emptytonull
-    // FUNCTION: extra.eventsortdate
-    // FUNCTION: extra.eventsortdatedate
-    // FUNCTION: extra.eventtextshortdate
     // FUNCTION: extra.governmentshort
     // FUNCTION: extra.governmentlong
     // FUNCTION: extra.governmentstatelink
@@ -336,9 +333,9 @@ class GovernmentShapeModel extends Model
                         AND governmentsubstitutecache.governmentsubstitute = ?
             ), governmentshapeeventpartparts AS (
                     SELECT affectedgovernmentgis.governmentshape AS governmentshapeid,
-                    extra.eventtextshortdate(event.eventid) AS eventtextshortdate,
-                    extra.eventsortdate(event.eventid) AS eventsortdate,
-                    to_char(extra.eventsortdatedate(event.eventid), 'Mon FMDD, YYYY') || CASE
+                    extra.eventdatetext,
+                    event.eventsort,
+                    to_char(event.eventsortdate, 'Mon FMDD, YYYY') || CASE
                         WHEN event.eventeffective <> '' AND event.eventeffective NOT LIKE '%~%' THEN ''
                         ELSE ' (About)'
                     END AS eventtextsortdate,
@@ -372,8 +369,8 @@ class GovernmentShapeModel extends Model
                     GROUP BY 1, 2, 3, 4, 5
             ), governmentshapeeventparts AS (
                     SELECT governmentshapeeventpartparts.governmentshapeid,
-                    governmentshapeeventpartparts.eventtextshortdate,
-                    governmentshapeeventpartparts.eventsortdate,
+                    governmentshapeeventpartparts.eventdatetext,
+                    governmentshapeeventpartparts.eventsort,
                     governmentshapeeventpartparts.eventtextsortdate,
                     governmentshapeeventpartparts.eventslug,
                     CASE
@@ -387,22 +384,22 @@ class GovernmentShapeModel extends Model
                     (array_agg(governmentshapeeventparts.eventstatus ORDER BY CASE
                         WHEN governmentshapeeventparts.eventstatus IN ('add', 'remove') THEN 0
                         ELSE 1
-                    END ASC, governmentshapeeventparts.eventsortdate DESC))[1] AS eventstatus
+                    END ASC, governmentshapeeventparts.eventsort DESC))[1] AS eventstatus
                     FROM governmentshapeeventparts
                     GROUP BY 1
             ), governmentshapeeventearliest AS (
-                    SELECT min(governmentshapeeventparts.eventsortdate) AS mineventsortdate
+                    SELECT min(governmentshapeeventparts.eventsort) AS mineventsort
                     FROM governmentshapeeventparts
             ), governmentshapeeventjsonparts AS (
                     SELECT governmentshapeeventparts.governmentshapeid,
-                    governmentshapeeventparts.eventsortdate,
-                    json_strip_nulls(json_build_object('eventsortdate', governmentshapeeventparts.eventsortdate,
+                    governmentshapeeventparts.eventsort,
+                    json_strip_nulls(json_build_object('eventsort', governmentshapeeventparts.eventsort,
                         'eventslug', governmentshapeeventparts.eventslug,
                         'eventstatus', governmentshapeeventparts.eventstatus,
-                        'eventtextshortdate', governmentshapeeventparts.eventtextshortdate,
+                        'eventdatetext', governmentshapeeventparts.eventdatetext,
                         'eventtextsortdate', governmentshapeeventparts.eventtextsortdate,
                         'eventgovernmentlong', CASE
-                            WHEN governmentshapeeventearliest.mineventsortdate = governmentshapeeventparts.eventsortdate OR governmentshapeeventparts.eventstatus = 'name' THEN extra.governmentlong(governmentshapeeventparts.governmentto, ?)
+                            WHEN governmentshapeeventearliest.mineventsort = governmentshapeeventparts.eventsort OR governmentshapeeventparts.eventstatus = 'name' THEN extra.governmentlong(governmentshapeeventparts.governmentto, ?)
                             ELSE NULL
                         END)) AS eventjson
                     FROM governmentshapeeventparts,
@@ -410,7 +407,7 @@ class GovernmentShapeModel extends Model
             ), governmentshapeevent AS (
                     SELECT governmentshapeeventjsonparts.governmentshapeid,
                     lasteventstatus.eventstatus,
-                    json_agg(governmentshapeeventjsonparts.eventjson ORDER BY governmentshapeeventjsonparts.eventsortdate) AS eventjson
+                    json_agg(governmentshapeeventjsonparts.eventjson ORDER BY governmentshapeeventjsonparts.eventsort) AS eventjson
                     FROM governmentshapeeventjsonparts
                     JOIN lasteventstatus
                         ON governmentshapeeventjsonparts.governmentshapeid = lasteventstatus.governmentshapeid

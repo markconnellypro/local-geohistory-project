@@ -181,7 +181,7 @@ class GovernmentModel extends Model
             WITH eventdata AS (
                     SELECT DISTINCT min(governmentidentifier.governmentidentifier) AS series,
                     statistics_createddissolved.governmentstate AS actualseries,
-                    statistics_createddissolved.eventyear AS x,
+                    statistics_createddissolved.eventsortyear AS x,
                     CASE
                         WHEN ? = 'created' THEN statistics_createddissolved.created::integer
                         WHEN ? = 'dissolved' THEN statistics_createddissolved.dissolved::integer
@@ -195,8 +195,8 @@ class GovernmentModel extends Model
                     WHERE statistics_createddissolved.governmenttype = 'state'
                     AND statistics_createddissolved.grouptype = ?
                     AND statistics_createddissolved.governmentstate = ANY (?)
-                    AND statistics_createddissolved.eventyear >= ?
-                    AND statistics_createddissolved.eventyear <= ?
+                    AND statistics_createddissolved.eventsortyear >= ?
+                    AND statistics_createddissolved.eventsortyear <= ?
                     AND CASE
                         WHEN ? = 'created' THEN statistics_createddissolved.created > 0
                         WHEN ? = 'dissolved' THEN statistics_createddissolved.dissolved > 0
@@ -253,7 +253,7 @@ class GovernmentModel extends Model
 
         $query = <<<QUERY
             WITH eventdata AS (
-                SELECT DISTINCT statistics_createddissolved.eventyear AS x,
+                SELECT DISTINCT statistics_createddissolved.eventsortyear AS x,
                 (CASE
                     WHEN ? = 'created' THEN statistics_createddissolved.created::integer
                     WHEN ? = 'dissolved' THEN statistics_createddissolved.dissolved::integer
@@ -264,8 +264,8 @@ class GovernmentModel extends Model
                 WHERE statistics_createddissolved.governmenttype = 'nation'
                 AND statistics_createddissolved.grouptype = ?
                 AND statistics_createddissolved.governmentstate = ?
-                AND statistics_createddissolved.eventyear >= ?
-                AND statistics_createddissolved.eventyear <= ?
+                AND statistics_createddissolved.eventsortyear >= ?
+                AND statistics_createddissolved.eventsortyear <= ?
                 AND CASE
                     WHEN ? = 'created' THEN statistics_createddissolved.created > 0
                     WHEN ? = 'dissolved' THEN statistics_createddissolved.dissolved > 0
@@ -318,7 +318,7 @@ class GovernmentModel extends Model
         $query = <<<QUERY
             WITH eventdata AS (
                 SELECT DISTINCT statistics_createddissolved.governmentcounty AS series,
-                statistics_createddissolved.eventyear AS x,
+                statistics_createddissolved.eventsortyear AS x,
                 CASE
                     WHEN ? = 'created' THEN statistics_createddissolved.created::integer
                     WHEN ? = 'dissolved' THEN statistics_createddissolved.dissolved::integer
@@ -329,8 +329,8 @@ class GovernmentModel extends Model
                 WHERE statistics_createddissolved.governmenttype = 'county'
                 AND statistics_createddissolved.grouptype = ?
                 AND statistics_createddissolved.governmentstate = ?
-                AND statistics_createddissolved.eventyear >= ?
-                AND statistics_createddissolved.eventyear <= ?
+                AND statistics_createddissolved.eventsortyear >= ?
+                AND statistics_createddissolved.eventsortyear <= ?
                 AND CASE
                     WHEN ? = 'created' THEN statistics_createddissolved.created > 0
                     WHEN ? = 'dissolved' THEN statistics_createddissolved.dissolved > 0
@@ -387,7 +387,7 @@ class GovernmentModel extends Model
 
         $query = <<<QUERY
             WITH eventdata AS (
-                SELECT DISTINCT statistics_createddissolved.eventyear AS x,
+                SELECT DISTINCT statistics_createddissolved.eventsortyear AS x,
                 (CASE
                     WHEN ? = 'created' THEN statistics_createddissolved.created::integer
                     WHEN ? = 'dissolved' THEN statistics_createddissolved.dissolved::integer
@@ -398,8 +398,8 @@ class GovernmentModel extends Model
                 WHERE statistics_createddissolved.governmenttype = 'state'
                 AND statistics_createddissolved.grouptype = ?
                 AND statistics_createddissolved.governmentstate = ?
-                AND statistics_createddissolved.eventyear >= ?
-                AND statistics_createddissolved.eventyear <= ?
+                AND statistics_createddissolved.eventsortyear >= ?
+                AND statistics_createddissolved.eventsortyear <= ?
                 AND CASE
                     WHEN ? = 'created' THEN statistics_createddissolved.created > 0
                     WHEN ? = 'dissolved' THEN statistics_createddissolved.dissolved > 0

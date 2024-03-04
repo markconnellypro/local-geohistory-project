@@ -19,14 +19,14 @@
             <?php $i = 1;
             foreach ($query as $row) { ?>
                 <tr>
-                    <td data-sort="<?= $row->eventsortdate ?>"><?= ($isHistory ? $i : '<a href="/' . \Config\Services::request()->getLocale() . '/' . $state . '/event/' . $row->eventslug . '/">View</a>') ?></td>
+                    <td data-sort="<?= $row->eventsort ?>"><?= ($isHistory ? $i : '<a href="/' . \Config\Services::request()->getLocale() . '/' . $state . '/event/' . $row->eventslug . '/">View</a>') ?></td>
                     <?php if ($isMultiple) { ?>
                         <td><?= $row->governmentaffectedlong ?></td>
                     <?php } ?>
                     <td><?= $row->affectedtypesame . ($row->eventreconstructed == 't' ? '?' : '') ?></td>
                     <td><?php echo view('general_link', ['link' => $row->governmentstatelink, 'text' => $row->governmentlong]) ?></td>
                     <td><?= $row->affectedtypeother . ($row->eventreconstructed == 't' ? '?' : '') ?></td>
-                    <td data-sort="<?= $row->eventsortdate ?>"><?= (empty($row->eventeffective) ? $row->eventyear : $row->eventeffective) ?></td>
+                    <td data-sort="<?= $row->eventsort ?>"><?= (empty($row->eventeffective) ? $row->eventyear : $row->eventeffective) ?></td>
                 </tr>
             <?php $i++;
             } ?>

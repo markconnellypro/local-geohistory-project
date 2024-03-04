@@ -61,7 +61,7 @@ infoRegularUpdate = function(props) {
         t += '<div class="mapwidth2"></div>';
       }
       t += '<a href="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/event/' + props.event[i].eventslug + '/">'
-        + props.event[i].eventtextshortdate + '</a><br>';
+        + props.event[i].eventdatetext + '</a><br>';
     }
     t += '<div class="mapwidth2">Area: </div><a href="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/area/' + props.governmentshapeslug + '/">View</a>';
   } else {
@@ -117,18 +117,18 @@ function toTimeLine() {
   		shapelayer._layers[featureIndex].feature.properties.event.forEach(function(item) {
   			try {
   				if (item.eventstatus == 'add' || item.eventstatus == 'name' || item.eventstatus == 'remove' ) {
-  					if (!shapeTime.hasOwnProperty(item.eventsortdate)) {
-  						shapeTime[item.eventsortdate] = {};
-                        shapeTimeText[item.eventsortdate] = item.eventtextsortdate;
+  					if (!shapeTime.hasOwnProperty(item.eventsort)) {
+  						shapeTime[item.eventsort] = {};
+                        shapeTimeText[item.eventsort] = item.eventtextsortdate;
   					}
-  					if (!shapeNameText.hasOwnProperty(item.eventsortdate)) {
-                        shapeNameText[item.eventsortdate] = '';
+  					if (!shapeNameText.hasOwnProperty(item.eventsort)) {
+                        shapeNameText[item.eventsort] = '';
   					}
-                    if (item.eventgovernmentlong && shapeNameText[item.eventsortdate] != item.eventgovernmentlong) {
-                        shapeNameText[item.eventsortdate] = item.eventgovernmentlong;
+                    if (item.eventgovernmentlong && shapeNameText[item.eventsort] != item.eventgovernmentlong) {
+                        shapeNameText[item.eventsort] = item.eventgovernmentlong;
                         shapeNameCount++;
                     }
-  					shapeTime[item.eventsortdate][featureIndex] = item.eventstatus;
+  					shapeTime[item.eventsort][featureIndex] = item.eventstatus;
   				}
   			} catch (err1) {
   			}
