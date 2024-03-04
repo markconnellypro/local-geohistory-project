@@ -59,7 +59,7 @@ class AdjudicationSourceCitationModel extends Model
     public function getByAdjudication($id)
     {
         // extra.ci_model_adjudication_source(integer)
-        
+
         // FUNCTION: extra.rangefix
         // FUNCTION: extra.shortdate
         // VIEW: extra.adjudicationsourcecitationextracache
@@ -105,7 +105,7 @@ class AdjudicationSourceCitationModel extends Model
         if (count($query) == 1) {
             $id = $query[0]->id;
         }
-        
+
         return $id;
     }
 }

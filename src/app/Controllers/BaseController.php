@@ -118,8 +118,8 @@ abstract class BaseController extends Controller
     protected function getIdInt($id)
     {
         if (static::isLive() && preg_match('/^\d{1,9}$/', $id)) {
-			$id = (int) $id;
-		}
+            $id = (int) $id;
+        }
         return $id;
     }
 
@@ -156,7 +156,7 @@ abstract class BaseController extends Controller
     protected function lastUpdated()
     {
         date_default_timezone_set('America/New_York');
-        $AppModel = new AppModel;
+        $AppModel = new AppModel();
         return $AppModel->getLastUpdated();
     }
 }

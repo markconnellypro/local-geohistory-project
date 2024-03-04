@@ -17,7 +17,7 @@ class App extends BaseConfig
      *    http://example.com/
      */
     public string $baseURL;
-    
+
     public function __construct()
     {
         $this->baseURL = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . '/';

@@ -9,7 +9,6 @@ use App\Models\SourceItemPartModel;
 
 class Reporter extends BaseController
 {
-
     private $data;
 
     public function __construct()
@@ -35,7 +34,7 @@ class Reporter extends BaseController
     {
         $this->data['state'] = $state;
         $id = $this->getIdInt($id);
-        $AdjudicationSourceCitationModel = new AdjudicationSourceCitationModel;
+        $AdjudicationSourceCitationModel = new AdjudicationSourceCitationModel();
         $query = $AdjudicationSourceCitationModel->getDetail($id, $state);
         if (count($query) != 1) {
             $this->noRecord($state);
@@ -48,17 +47,17 @@ class Reporter extends BaseController
             if ($query[0]->url != '') {
                 echo view('general_url', ['query' => $query, 'title' => 'Actual URL']);
             }
-            $SourceItemPartModel = new SourceItemPartModel;
+            $SourceItemPartModel = new SourceItemPartModel();
             $query = $SourceItemPartModel->getByAdjudicationSourceCitation($id);
             if (count($query) > 0) {
                 echo view('general_url', ['query' => $query, 'state' => $state, 'title' => 'Calculated URL']);
             }
-            $AdjudicationModel = new AdjudicationModel;
+            $AdjudicationModel = new AdjudicationModel();
             $query = $AdjudicationModel->getByAdjudicationSourceCitation($id);
             if (count($query) > 0) {
                 echo view('general_adjudication', ['query' => $query, 'state' => $state]);
             }
-            $EventModel = new EventModel;
+            $EventModel = new EventModel();
             $query = $EventModel->getByAdjudicationSourceCitation($id);
             if (count($query) > 0) {
                 echo view('general_event', ['query' => $query, 'state' => $state, 'title' => 'Event Links']);

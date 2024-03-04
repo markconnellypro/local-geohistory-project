@@ -158,7 +158,7 @@ class AdjudicationModel extends Model
         if (count($query) == 1) {
             $id = $query[0]->id;
         }
-        
+
         return $id;
     }
 }

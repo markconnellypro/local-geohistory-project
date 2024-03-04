@@ -6,7 +6,6 @@ use App\Models\GovernmentModel;
 
 class Governmentidentifier extends BaseController
 {
-
     private $data;
 
     public function __construct()
@@ -34,9 +33,9 @@ class Governmentidentifier extends BaseController
             return redirect()->to("/" . $this->request->getLocale() . '/governmentidentifier/' . $type . '/' . strtolower($id) . '/');
         }
         if ($this->data['live']) {
-            $GovernmentIdentifierModel = new \App\Models\Development\GovernmentIdentifierModel;
+            $GovernmentIdentifierModel = new \App\Models\Development\GovernmentIdentifierModel();
         } else {
-            $GovernmentIdentifierModel = new \App\Models\GovernmentIdentifierModel;
+            $GovernmentIdentifierModel = new \App\Models\GovernmentIdentifierModel();
         }
         $query = $GovernmentIdentifierModel->getDetail($type, $id);
         if (count($query) != 1) {
@@ -46,7 +45,7 @@ class Governmentidentifier extends BaseController
             $governments = $query[0]->governments;
             echo view('header', $this->data);
             echo view('general_governmentidentifier', ['query' => $query, 'title' => 'Detail']);
-            $GovernmentModel = new GovernmentModel;
+            $GovernmentModel = new GovernmentModel();
             $query = $GovernmentModel->getByGovernmentIdentifier($governmentidentifierids);
             if (count($query) > 0) {
                 echo view('general_government', ['query' => $query, 'title' => 'Government', 'type' => 'identifier']);

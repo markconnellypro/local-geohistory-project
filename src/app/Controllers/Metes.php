@@ -6,7 +6,6 @@ use App\Models\MetesDescriptionModel;
 
 class Metes extends BaseController
 {
-
     private $data;
 
     public function __construct()
@@ -32,7 +31,7 @@ class Metes extends BaseController
     {
         $this->data['state'] = $state;
         $id = $this->getIdInt($id);
-        $MetesDescriptionModel = new MetesDescriptionModel;
+        $MetesDescriptionModel = new MetesDescriptionModel();
         $areaQuery = $MetesDescriptionModel->getDetail($id, $state);
         if (count($areaQuery) != 1) {
             $this->noRecord($state);
@@ -46,9 +45,9 @@ class Metes extends BaseController
             $hasArea = (!is_null($areaQuery[0]->geometry));
             $hasBegin = ($areaQuery[0]->hasbeginpoint == 't' || $hasArea);
             if ($this->data['live']) {
-                $MetesDescriptionLineModel = new \App\Models\Development\MetesDescriptionLineModel;
+                $MetesDescriptionLineModel = new \App\Models\Development\MetesDescriptionLineModel();
             } else {
-                $MetesDescriptionLineModel = new \App\Models\MetesDescriptionLineModel;
+                $MetesDescriptionLineModel = new \App\Models\MetesDescriptionLineModel();
             }
             $geometryQuery = $MetesDescriptionLineModel->getGeometryByMetesDescription($id);
             $hasMetes = (count($geometryQuery) > 1);

@@ -6,7 +6,6 @@ use App\Models\DocumentationModel;
 
 class About extends BaseController
 {
-
     private $data;
 
     public function __construct()
@@ -24,7 +23,7 @@ class About extends BaseController
     {
         $this->data['state'] = $state;
         echo view('header', $this->data);
-        $DocumentationModel = new DocumentationModel;
+        $DocumentationModel = new DocumentationModel();
         $query = $DocumentationModel->getAboutDetail($state);
         echo view('about', ['query' => $query]);
         echo view('footer');

@@ -6,7 +6,6 @@ use App\Models\GovernmentShapeModel;
 
 class Map extends BaseController
 {
-
     private $data;
 
     public function __construct()
@@ -20,7 +19,7 @@ class Map extends BaseController
         ];
     }
 
-    public function baseStyle($maxZoom = 14, $response = NULL): void
+    public function baseStyle($maxZoom = 14, $response = null): void
     {
         if (empty($response)) {
             $response = $this->response;
@@ -99,7 +98,7 @@ class Map extends BaseController
     public function tile($z, $x, $y, $state = ''): void
     {
         $this->response->setHeader('Content-Type', 'application/x-protobuf');
-        $GovernmentShapeModel = new GovernmentShapeModel;
+        $GovernmentShapeModel = new GovernmentShapeModel();
         $query = $GovernmentShapeModel->getTile($state, $z, $x, $y);
         foreach ($query as $row) {
             echo pg_unescape_bytea($row->mvt);

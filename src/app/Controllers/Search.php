@@ -9,7 +9,6 @@ use App\Models\SourceModel;
 
 class Search extends BaseController
 {
-
     private $data;
 
     private $categoryType = [
@@ -80,7 +79,7 @@ class Search extends BaseController
     public function governmentlookup($state, $government = '', $type = ''): void
     {
         $this->data['state'] = $state;
-        $GovernmentModel = new GovernmentModel;
+        $GovernmentModel = new GovernmentModel();
         $type = 'getLookupBy' . ucwords(str_replace('parent', 'Parent', $type));
         $this->data['query'] = $GovernmentModel->$type($state, $government);
         $this->response->setHeader('Content-Type', 'application/json');
@@ -95,9 +94,9 @@ class Search extends BaseController
         if (!$this->data['live'] && !in_array($state, $stateArray)) {
             echo view('search_unavailable');
         } else {
-            $GovernmentModel = new GovernmentModel;
+            $GovernmentModel = new GovernmentModel();
             $this->data['id'] = $GovernmentModel->getSlug($GovernmentModel->getAbbreviationId($state));
-            $EventTypeModel = new EventTypeModel;
+            $EventTypeModel = new EventTypeModel();
             $this->data['eventTypeQuery'] = $EventTypeModel->getSearch($state);
             $this->data['months'] = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
             foreach ($this->data['months'] as $k => $m) {
@@ -107,9 +106,9 @@ class Search extends BaseController
                 ];
             }
             $this->data['tribunalgovernmentshortQuery'] = $GovernmentModel->getSearch($state);
-            $GovernmentIdentifierTypeModel = new GovernmentIdentifierTypeModel;
+            $GovernmentIdentifierTypeModel = new GovernmentIdentifierTypeModel();
             $this->data['governmentIdentifierTypeQuery'] = $GovernmentIdentifierTypeModel->getSearch($state);
-            $SourceModel = new SourceModel;
+            $SourceModel = new SourceModel();
             $this->data['reporterQuery'] = $SourceModel->getSearch($state);
             echo view('general_ui', $this->data);
             echo view('search', $this->data);
@@ -194,7 +193,7 @@ class Search extends BaseController
         if ($fields !== []) {
             echo view('header', $this->data);
             $model = "App\\Models\\" . $model;
-            $model = new $model;
+            $model = new $model();
             $modelType = 'getSearchBy'. ucwords($type);
             $query = $model->$modelType($fields);
             $searchParameter = [

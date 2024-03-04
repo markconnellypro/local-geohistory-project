@@ -4,7 +4,6 @@ namespace App\Controllers;
 
 class Bot extends BaseController
 {
-
     private $data;
 
     public function __construct()

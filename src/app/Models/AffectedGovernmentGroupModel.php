@@ -68,7 +68,7 @@ class AffectedGovernmentGroupModel extends Model
     // FUNCTION: extra.governmentstatelink
     // FUNCTION: extra.governmentlong
     // FUNCTION: extra.affectedtypeshort
-    
+
     public function getByEventGovernment($id, $state)
     {
         $query = <<<QUERY
@@ -506,7 +506,7 @@ class AffectedGovernmentGroupModel extends Model
             \Config\Services::request()->getLocale(),
             strtoupper($state),
             $state,
-            \Config\Services::request()->getLocale(), 
+            \Config\Services::request()->getLocale(),
             $state,
             \Config\Services::request()->getLocale(),
             strtoupper($state),
@@ -514,7 +514,7 @@ class AffectedGovernmentGroupModel extends Model
             \Config\Services::request()->getLocale(),
             strtoupper($state),
             $state,
-            \Config\Services::request()->getLocale(), 
+            \Config\Services::request()->getLocale(),
             $state,
             \Config\Services::request()->getLocale(),
             strtoupper($state),

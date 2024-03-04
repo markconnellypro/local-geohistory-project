@@ -6,7 +6,6 @@ use App\Models\EventTypeModel;
 
 class Statistics extends BaseController
 {
-
     private $data;
 
     private $byType = [
@@ -41,7 +40,7 @@ class Statistics extends BaseController
         $this->data['state'] = $state;
         echo view('header', $this->data);
         echo view('general_ui', $this->data);
-        $EventTypeModel = new EventTypeModel;
+        $EventTypeModel = new EventTypeModel();
         $this->data['eventTypeQuery'] = $EventTypeModel->getManyByStatistics($state);
         echo view('statistics_index', $this->data);
         echo view('footer');
@@ -120,7 +119,7 @@ class Statistics extends BaseController
             if (empty($eventType)) {
                 $eventType = '';
             }
-            $EventTypeModel = new EventTypeModel;
+            $EventTypeModel = new EventTypeModel();
             $query = $EventTypeModel->getOneByStatistics($eventType);
             if (count($query) !== 1) {
                 echo view('error');
@@ -149,7 +148,7 @@ class Statistics extends BaseController
             'mapped' => 'GovernmentShape',
         ];
         $model = "App\\Models\\" . $types[$for] . 'Model';
-        $model = new $model;
+        $model = new $model();
         $type = 'getByStatistics' . (empty($state) ? 'Nation' : 'State') . 'Whole';
 
         $this->data['wholeQuery'] = $model->$type($fields);
@@ -161,7 +160,7 @@ class Statistics extends BaseController
             foreach ($this->data['query'] as $key => $row) {
                 $this->data['query'][$key] = '"' . $row->series . '":{"xrow":' . $row->xrow . ',"yrow":' . $row->yrow . ',"ysum":' . $row->ysum . '}';
             }
-            $this->data['query'] = '{' . implode(',',  $this->data['query']) . '}';
+            $this->data['query'] = '{' . implode(',', $this->data['query']) . '}';
         }
 
         $this->data['isContemporaneous'] = ($searchParameter['Grouped By'] == 'Contemporaneous Jurisdictions');

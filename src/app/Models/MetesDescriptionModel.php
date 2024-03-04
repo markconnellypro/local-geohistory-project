@@ -18,7 +18,7 @@ class MetesDescriptionModel extends Model
         if (!is_int($id)) {
             $id = $this->getSlugId($id);
         }
-        
+
         $query = <<<QUERY
             WITH metesdescriptionpart AS (
                 SELECT DISTINCT metesdescription.metesdescriptionid,
@@ -153,7 +153,7 @@ class MetesDescriptionModel extends Model
         if (count($query) == 1) {
             $id = $query[0]->id;
         }
-        
+
         return $id;
     }
 }

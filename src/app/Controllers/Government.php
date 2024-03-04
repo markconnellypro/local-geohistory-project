@@ -12,7 +12,6 @@ use App\Models\ResearchLogModel;
 
 class Government extends BaseController
 {
-
     private $data;
 
     public function __construct()
@@ -40,21 +39,21 @@ class Government extends BaseController
         $this->data['state'] = $state;
         $id = $this->getIdInt($id);
         if ($this->data['live']) {
-            $GovernmentFormGovernmentModel = new \App\Models\Development\GovernmentFormGovernmentModel;
-            $GovernmentMapStatusModel = new \App\Models\Development\GovernmentMapStatusModel;
-            $GovernmentModel = new \App\Models\Development\GovernmentModel;
-            $GovernmentPopulationModel = new \App\Models\Development\GovernmentPopulationModel;
-            $MetesDescriptionLineModel = new \App\Models\Development\MetesDescriptionLineModel;
-            $SourceModel = new \App\Models\Development\SourceModel;
-            $SourceCitationModel = new \App\Models\Development\SourceCitationModel;
+            $GovernmentFormGovernmentModel = new \App\Models\Development\GovernmentFormGovernmentModel();
+            $GovernmentMapStatusModel = new \App\Models\Development\GovernmentMapStatusModel();
+            $GovernmentModel = new \App\Models\Development\GovernmentModel();
+            $GovernmentPopulationModel = new \App\Models\Development\GovernmentPopulationModel();
+            $MetesDescriptionLineModel = new \App\Models\Development\MetesDescriptionLineModel();
+            $SourceModel = new \App\Models\Development\SourceModel();
+            $SourceCitationModel = new \App\Models\Development\SourceCitationModel();
         } else {
-            $GovernmentFormGovernmentModel = new \App\Models\GovernmentFormGovernmentModel;
-            $GovernmentMapStatusModel = new \App\Models\GovernmentMapStatusModel;
-            $GovernmentModel = new \App\Models\GovernmentModel;
-            $GovernmentPopulationModel = new \App\Models\GovernmentPopulationModel;
-            $MetesDescriptionLineModel = new \App\Models\MetesDescriptionLineModel;
-            $SourceModel = new \App\Models\SourceModel;
-            $SourceCitationModel = new \App\Models\SourceCitationModel;
+            $GovernmentFormGovernmentModel = new \App\Models\GovernmentFormGovernmentModel();
+            $GovernmentMapStatusModel = new \App\Models\GovernmentMapStatusModel();
+            $GovernmentModel = new \App\Models\GovernmentModel();
+            $GovernmentPopulationModel = new \App\Models\GovernmentPopulationModel();
+            $MetesDescriptionLineModel = new \App\Models\MetesDescriptionLineModel();
+            $SourceModel = new \App\Models\SourceModel();
+            $SourceCitationModel = new \App\Models\SourceCitationModel();
         }
         $query = $GovernmentModel->getDetail($id, $state);
         if (count($query) != 1 || $query[0]->governmentlevel == 'placeholder') {
@@ -95,13 +94,13 @@ class Government extends BaseController
                 if (count($query) > 0) {
                     echo view('government_related', ['query' => $query]);
                 }
-                $GovernmentIdentifierModel = new GovernmentIdentifierModel;
+                $GovernmentIdentifierModel = new GovernmentIdentifierModel();
                 $query = $GovernmentIdentifierModel->getByGovernment($id, $state);
                 if (count($query) > 0) {
                     echo view('general_governmentidentifier', ['query' => $query, 'title' => 'Identifier', 'isMultiple' => $this->data['isMultiple']]);
                 }
             }
-            $AffectedGovernmentGroupModel = new AffectedGovernmentGroupModel;
+            $AffectedGovernmentGroupModel = new AffectedGovernmentGroupModel();
             $query = $AffectedGovernmentGroupModel->getByGovernmentGovernment($id, $state);
             $events = [];
             if (count($query) > 0) {
@@ -119,7 +118,7 @@ class Government extends BaseController
             }
             $events = array_unique($events);
             $events = '{' . implode(',', $events) . '}';
-            $EventModel = new EventModel;
+            $EventModel = new EventModel();
             if (!$isHistory) {
                 if ($isCountyOrLower) {
                     $query = $EventModel->getByGovernmentSuccess($id, $events);
@@ -127,7 +126,7 @@ class Government extends BaseController
                         echo view('general_event', ['query' => $query, 'state' => $state, 'title' => 'Other Successful Event Links', 'tableId' => 'successfulevent']);
                     }
                 }
-                $GovernmentSourceModel = new GovernmentSourceModel;
+                $GovernmentSourceModel = new GovernmentSourceModel();
                 $query = $GovernmentSourceModel->getByGovernment($id, $state);
                 if (count($query) > 0) {
                     echo view('general_governmentsource', ['query' => $query, 'state' => $state, 'type' => 'government', 'isMultiple' => $this->data['isMultiple']]);
@@ -148,12 +147,12 @@ class Government extends BaseController
                 if (count($query) > 0) {
                     echo view('general_source', ['query' => $query, 'hasLink' => true]);
                 }
-                $ResearchLogModel = new ResearchLogModel;
+                $ResearchLogModel = new ResearchLogModel();
                 $query = $ResearchLogModel->getByGovernment($id, $state);
                 if (count($query) > 0) {
                     echo view('government_researchlog', ['query' => $query, 'isMultiple' => $this->data['isMultiple']]);
                 }
-                $NationalArchivesModel = new NationalArchivesModel;
+                $NationalArchivesModel = new NationalArchivesModel();
                 $query = $NationalArchivesModel->getByGovernment($id, $state);
                 if (count($query) > 0) {
                     echo view('government_nationalarchives', ['query' => $query, 'live' => $this->data['live'], 'isMultiple' => $this->data['isMultiple']]);
@@ -191,7 +190,7 @@ class Government extends BaseController
                     $layers['metesdescription'] = 'Descriptions';
                     $primaryLayer = 'metesdescription';
                 }
-                $GovernmentShapeModel = new GovernmentShapeModel;
+                $GovernmentShapeModel = new GovernmentShapeModel();
                 $query = $GovernmentShapeModel->getCurrentByGovernment($id);
                 if (count($query) > 0) {
                     echo view('general_gis', [

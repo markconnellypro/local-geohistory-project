@@ -317,7 +317,7 @@ class EventModel extends Model
 
         return $query ?? [];
     }
-    
+
     // extra.ci_model_lawalternate_event(integer)
 
     public function getByLawAlternateSection($id)
@@ -353,7 +353,7 @@ class EventModel extends Model
             $id,
         ])->getResult();
 
-        return $query ?? []; 
+        return $query ?? [];
     }
 
     // extra.ci_model_law_event(integer)
@@ -770,7 +770,7 @@ class EventModel extends Model
         } else {
             $this->getRetiredSlugRedirect($id, $state);
         }
-        
+
         return $output;
     }
 

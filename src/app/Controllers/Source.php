@@ -9,7 +9,6 @@ use App\Models\SourceItemPartModel;
 
 class Source extends BaseController
 {
-
     private $data;
 
     public function __construct()
@@ -35,7 +34,7 @@ class Source extends BaseController
     {
         $this->data['state'] = $state;
         $id = $this->getIdInt($id);
-        $SourceCitationModel = new SourceCitationModel;
+        $SourceCitationModel = new SourceCitationModel();
         $query = $SourceCitationModel->getDetail($id, $state);
         if (count($query) != 1) {
             $this->noRecord($state);
@@ -48,17 +47,17 @@ class Source extends BaseController
             if ($query[0]->url != '') {
                 echo view('general_url', ['query' => $query, 'title' => 'Actual URL']);
             }
-            $SourceCitationNoteModel = new SourceCitationNoteModel;
+            $SourceCitationNoteModel = new SourceCitationNoteModel();
             $query = $SourceCitationNoteModel->getBySourceCitation($id);
             if (count($query) > 0) {
                 echo view('source_note', ['query' => $query, 'state' => $state]);
             }
-            $SourceItemPartModel = new SourceItemPartModel;
+            $SourceItemPartModel = new SourceItemPartModel();
             $query = $SourceItemPartModel->getBySourceCitation($id);
             if (count($query) > 0) {
                 echo view('general_url', ['query' => $query, 'state' => $state, 'title' => 'Calculated URL']);
             }
-            $EventModel = new EventModel;
+            $EventModel = new EventModel();
             $query = $EventModel->getBySourceCitation($id);
             if (count($query) > 0) {
                 echo view('general_event', ['query' => $query, 'state' => $state, 'title' => 'Event Links']);

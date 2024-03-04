@@ -9,7 +9,6 @@ use App\Models\MetesDescriptionModel;
 
 class Area extends BaseController
 {
-
     private $data;
 
     public function __construct()
@@ -29,7 +28,7 @@ class Area extends BaseController
         try {
             $addressText = $this->request->getPost('address', FILTER_SANITIZE_STRING);
             $data = file_get_contents('https://us1.locationiq.com/v1/search.php?key=' . getenv('locationiq_key') . '&format=json&countrycodes=us&dedupe=1&q=' . urlencode($addressText));
-            if (($data = json_decode($data, TRUE)) !== FALSE) {
+            if (($data = json_decode($data, true)) !== false) {
                 if (count($data) == 1) {
                     $this->data['extraAttribution'] = 'Address searching courtesy of <a href="https://locationiq.com/attribution/">LocationIQ</a>.';
                     $this->point($state, $data[0]['lat'], $data[0]['lon'], $addressText);
@@ -46,7 +45,7 @@ class Area extends BaseController
     {
         try {
             $data = file_get_contents('https://geocoding.geo.census.gov/geocoder/locations/onelineaddress?benchmark=9&format=json&address=' . $addressText);
-            if (($data = json_decode($data, TRUE)) !== FALSE) {
+            if (($data = json_decode($data, true)) !== false) {
                 if (count($data['result']['addressMatches']) == 1 && strtolower($data['result']['addressMatches'][0]['addressComponents']['state']) == $state) {
                     $this->data['extraAttribution'] = 'Address searching courtesy of the <a href="https://geocoding.geo.census.gov/geocoder/">U.S. Census Bureau</a>.';
                     $this->point($state, $data['result']['addressMatches'][0]['coordinates']['y'], $data['result']['addressMatches'][0]['coordinates']['x'], $addressText);
@@ -81,7 +80,7 @@ class Area extends BaseController
             $y = $x;
             $x = $newX;
         }
-        $GovernmentShapeModel = new GovernmentShapeModel;
+        $GovernmentShapeModel = new GovernmentShapeModel();
         $query = $GovernmentShapeModel->getPointId($y, $x);
         if (count($query) != 1) {
             $this->noRecord($state);
@@ -96,7 +95,7 @@ class Area extends BaseController
         if (($this->data['live'] || !empty($y) || !empty($x)) && preg_match('/^\d{1,9}$/', $id)) {
             $id = (int) $id;
         }
-        $GovernmentShapeModel = new GovernmentShapeModel;
+        $GovernmentShapeModel = new GovernmentShapeModel();
         $currentQuery = $GovernmentShapeModel->getDetail($id, $state);
         if (count($currentQuery) != 1) {
             $this->noRecord($state);
@@ -125,7 +124,7 @@ class Area extends BaseController
             }
             echo view('general_currentgovernment', ['query' => $currentQuery, 'state' => $state]);
             echo view('general_map', ['live' => $this->data['live'], 'includeBase' => true]);
-            $AffectedGovernmentGroupModel = new AffectedGovernmentGroupModel;
+            $AffectedGovernmentGroupModel = new AffectedGovernmentGroupModel();
             $query = $AffectedGovernmentGroupModel->getByGovernmentShape($id, $state);
             $events = [];
             if (count($query) > 0) {
@@ -136,14 +135,14 @@ class Area extends BaseController
                     }
                 }
             }
-            $MetesDescriptionModel = new MetesDescriptionModel;
+            $MetesDescriptionModel = new MetesDescriptionModel();
             $query = $MetesDescriptionModel->getByGovernmentShape($id);
             if (count($query) > 0) {
                 echo view('general_metes', ['query' => $query, 'hasLink' => true, 'state' => $state, 'title' => 'Metes and Bounds Description']);
             }
             $events = array_unique($events);
             $events = '{' . implode(',', $events) . '}';
-            $EventModel = new EventModel;
+            $EventModel = new EventModel();
             $query = $EventModel->getByGovernmentShapeFailure($id, $events);
             if (count($query) > 0) {
                 echo view('general_event', ['query' => $query, 'state' => $state, 'title' => 'Other Event Links']);

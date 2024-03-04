@@ -166,7 +166,7 @@ class LawSectionModel extends Model
             $id,
         ])->getResult();
 
-        return $query ?? []; 
+        return $query ?? [];
     }
 
     // extra.ci_model_search_law_dateevent(character varying, text, character varying)
@@ -310,7 +310,7 @@ class LawSectionModel extends Model
         if (count($query) == 1) {
             $id = $query[0]->id;
         }
-        
+
         return $id;
     }
 }

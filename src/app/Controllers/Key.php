@@ -10,7 +10,6 @@ use App\Models\EventTypeModel;
 
 class Key extends BaseController
 {
-
     private $data;
 
     public function __construct()
@@ -40,11 +39,11 @@ class Key extends BaseController
             'EventGranted' => ['Successful?', 'table'],
         ];
         echo view('key_start', ['keys' => $keys]);
-        $DocumentationModel = new DocumentationModel;
+        $DocumentationModel = new DocumentationModel();
         foreach ($keys as $k => $v) {
             if ($v[1] == 'table') {
                 $model = "App\\Models\\" . $k . 'Model';
-                $model = new $model;
+                $model = new $model();
                 $query = $model->getKey();
             } else {
                 $query = $DocumentationModel->getKey($k);

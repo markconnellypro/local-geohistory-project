@@ -7,7 +7,6 @@ use App\Models\SourceItemPartModel;
 
 class Law extends BaseController
 {
-
     private $data;
 
     public function __construct()
@@ -34,10 +33,10 @@ class Law extends BaseController
         $this->data['state'] = $state;
         if (str_ends_with($id, '-alternate')) {
             $function = 'getByLawAlternateSection';
-            $LawSectionModel = new \App\Models\LawAlternateSectionModel;
+            $LawSectionModel = new \App\Models\LawAlternateSectionModel();
         } else {
             $function = 'getByLawSection';
-            $LawSectionModel = new \App\Models\LawSectionModel;
+            $LawSectionModel = new \App\Models\LawSectionModel();
         }
         $id = $this->getIdInt($id);
         $query = $LawSectionModel->getDetail($id, $state);
@@ -53,11 +52,11 @@ class Law extends BaseController
                 echo view('general_url', ['query' => $query, 'title' => 'Actual URL']);
             }
             if ($this->data['live']) {
-                $LawGroupSectionModel = new \App\Models\Development\LawGroupSectionModel;
-                $SourceCitationModel = new \App\Models\Development\SourceCitationModel;
+                $LawGroupSectionModel = new \App\Models\Development\LawGroupSectionModel();
+                $SourceCitationModel = new \App\Models\Development\SourceCitationModel();
             } else {
-                $LawGroupSectionModel = new \App\Models\LawGroupSectionModel;
-                $SourceCitationModel = new \App\Models\SourceCitationModel;
+                $LawGroupSectionModel = new \App\Models\LawGroupSectionModel();
+                $SourceCitationModel = new \App\Models\SourceCitationModel();
             }
             $query = $SourceCitationModel->getByLawNation($id);
             if (!empty($query)) {
@@ -75,12 +74,12 @@ class Law extends BaseController
             if (count($query) > 0) {
                 echo view('general_law', ['query' => $query, 'state' => $state, 'title' => 'Related Law', 'type' => 'relationship']);
             }
-            $SourceItemPartModel = new SourceItemPartModel;
+            $SourceItemPartModel = new SourceItemPartModel();
             $query = $SourceItemPartModel->$function($id);
             if (count($query) > 0) {
                 echo view('general_url', ['query' => $query, 'state' => $state, 'title' => 'Calculated URL']);
             }
-            $EventModel = new EventModel;
+            $EventModel = new EventModel();
             $query = $EventModel->$function($id);
             if (count($query) > 0) {
                 echo view('general_event', ['query' => $query, 'state' => $state, 'title' => 'Event Links', 'eventRelationship' => true, 'includeLawGroup' => true]);

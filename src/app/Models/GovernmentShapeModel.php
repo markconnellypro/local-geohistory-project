@@ -8,7 +8,7 @@ class GovernmentShapeModel extends Model
 {
     // extra.ci_model_area_currentgovernment(v_governmentshapeid integer, v_state character varying, v_locale character varying)
     // extra.ci_model_area_currentgovernment(v_governmentshapeid text, v_state character varying, v_locale character varying)
-    
+
     // FUNCTION: extra.governmentabbreviation
     // FUNCTION: extra.governmentlong
     // FUNCTION: extra.governmentshort
@@ -225,7 +225,7 @@ class GovernmentShapeModel extends Model
 
         return $query ?? [];
     }
-    
+
     // extra.ci_model_statistics_mapped_state_whole(character varying, integer, integer, character varying, character varying)
 
     // VIEW: extra.statistics_mapped
@@ -500,12 +500,12 @@ class GovernmentShapeModel extends Model
         if (count($query) == 1) {
             $id = $query[0]->id;
         }
-        
+
         return $id;
     }
 
     // extra.ci_model_map_tile(v_state character varying, v_z integer, v_x integer, v_y integer)
-    
+
     // FUNCTION: extra.governmentabbreviation
     // FUNCTION: extra.governmentcurrentleadstateid
     // FUNCTION: extra.governmentshort

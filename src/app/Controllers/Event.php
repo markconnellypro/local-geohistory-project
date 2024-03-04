@@ -15,7 +15,6 @@ use App\Models\SourceCitationModel;
 
 class Event extends BaseController
 {
-
     private $data;
 
     public function __construct()
@@ -41,7 +40,7 @@ class Event extends BaseController
     {
         $this->data['state'] = $state;
         $id = $this->getIdInt($id);
-        $EventModel = new EventModel;
+        $EventModel = new EventModel();
         $query = $EventModel->getDetail($id, $state);
         if (count($query) != 1 || $query[0]->eventgranted == 'placeholder' && !$this->data['live']) {
             $this->noRecord($state);
@@ -52,16 +51,16 @@ class Event extends BaseController
             $this->data['pageTitleType'] = $query[0]->eventtypeshort;
             echo view('header', $this->data);
             echo view('event_detail', ['row' => $query[0]]);
-            $AffectedGovernmentGroupModel = new AffectedGovernmentGroupModel;
+            $AffectedGovernmentGroupModel = new AffectedGovernmentGroupModel();
             $query = $AffectedGovernmentGroupModel->getByEventGovernment($id, $state);
             $affectedgovernmentgisquery = $AffectedGovernmentGroupModel->getByEventGeometry($id);
             $affectedGovernment = $this->affectedGovernmentProcess($query, $affectedgovernmentgisquery);
             $hasMap = (count($affectedgovernmentgisquery) > 0);
             $hasAffectedGovernmentMap = (count($affectedgovernmentgisquery) > 0);
             if ($this->data['live']) {
-                $MetesDescriptionLineModel = new \App\Models\Development\MetesDescriptionLineModel;
+                $MetesDescriptionLineModel = new \App\Models\Development\MetesDescriptionLineModel();
             } else {
-                $MetesDescriptionLineModel = new \App\Models\MetesDescriptionLineModel;
+                $MetesDescriptionLineModel = new \App\Models\MetesDescriptionLineModel();
             }
             $metesdescriptiongisquery = $MetesDescriptionLineModel->getGeometryByEvent($id, $state);
             if (count($metesdescriptiongisquery) > 0) {
@@ -80,42 +79,42 @@ class Event extends BaseController
             if (count($query) > 0) {
                 echo view('general_affectedgovernmentform', ['includeGovernment' => true, 'query' => $query]);
             }
-            $CurrentGovernmentModel = new CurrentGovernmentModel;
+            $CurrentGovernmentModel = new CurrentGovernmentModel();
             $query = $CurrentGovernmentModel->getByEvent($id, $state);
             if (count($query) > 0) {
                 echo view('general_currentgovernment', ['query' => $query, 'state' => $state]);
             }
-            $MetesDescriptionModel = new MetesDescriptionModel;
+            $MetesDescriptionModel = new MetesDescriptionModel();
             $query = $MetesDescriptionModel->getByEvent($id);
             if (count($query) > 0) {
                 echo view('general_metes', ['query' => $query, 'hasLink' => true, 'state' => $state, 'title' => 'Metes and Bounds Description']);
             }
-            $PlssModel = new PlssModel;
+            $PlssModel = new PlssModel();
             $query = $PlssModel->getByEvent($id);
             if (count($query) > 0) {
                 echo view('event_plss', ['query' => $query]);
             }
-            $AdjudicationModel = new AdjudicationModel;
+            $AdjudicationModel = new AdjudicationModel();
             $query = $AdjudicationModel->getByEvent($id);
             if (count($query) > 0) {
                 echo view('general_adjudication', ['query' => $query, 'state' => $state, 'eventRelationship' => true]);
             }
-            $LawSectionModel = new LawSectionModel;
+            $LawSectionModel = new LawSectionModel();
             $query = $LawSectionModel->getByEvent($id);
             if (count($query) > 0) {
                 echo view('general_law', ['query' => $query, 'state' => $state, 'title' => 'Law', 'type' => 'relationship', 'includeLawGroup' => true]);
             }
-            $RecordingModel = new RecordingModel;
+            $RecordingModel = new RecordingModel();
             $query = $RecordingModel->getByEvent($id, $state);
             if (count($query) > 0) {
                 echo view('event_recording', ['query' => $query]);
             }
-            $GovernmentSourceModel = new GovernmentSourceModel;
+            $GovernmentSourceModel = new GovernmentSourceModel();
             $query = $GovernmentSourceModel->getByEvent($id, $state);
             if (count($query) > 0) {
                 echo view('general_governmentsource', ['query' => $query, 'state' => $state, 'type' => 'event']);
             }
-            $SourceCitationModel = new SourceCitationModel;
+            $SourceCitationModel = new SourceCitationModel();
             $query = $SourceCitationModel->getByEvent($id);
             if (count($query) > 0) {
                 echo view('general_sourcecitation', ['query' => $query, 'state' => $state, 'hasColor' => false, 'hasLink' => true, 'title' => 'Source']);

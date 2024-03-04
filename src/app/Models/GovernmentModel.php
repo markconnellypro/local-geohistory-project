@@ -132,7 +132,7 @@ class GovernmentModel extends Model
         if (count($query) == 1) {
             $id = $query[0]->id;
         }
-        
+
         return $id;
     }
 
@@ -658,7 +658,7 @@ class GovernmentModel extends Model
     }
 
     // extra.ci_model_search_form_tribunalgovernmentshort(character varying)
-    
+
     // FUNCTION: extra.governmentabbreviationid
     // FUNCTION: extra.governmentcurrentleadparent
     // VIEW: governmentrelationcache
@@ -803,7 +803,7 @@ class GovernmentModel extends Model
         if (count($query) == 1) {
             $id = $query[0]->id;
         }
-        
+
         return $id;
     }
 
@@ -829,7 +829,7 @@ class GovernmentModel extends Model
         if (count($query) == 1) {
             $id = $query[0]->id;
         }
-        
+
         return $id;
     }
 }

@@ -4,7 +4,6 @@ namespace App\Controllers;
 
 class Fourofour extends BaseController
 {
-
     private $data;
 
     public function __construct()
