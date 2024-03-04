@@ -12,7 +12,7 @@ class AffectedGovernmentGroupModel extends Model
     // FUNCTION: extra.governmentlong
     // FUNCTION: extra.governmentstatelink
 
-    public function getByEventForm($id, $state)
+    public function getByEventForm($id, $state): array
     {
         $query = <<<QUERY
             SELECT DISTINCT extra.governmentstatelink(affectedgovernmentpart.governmentto, ?, ?) AS governmentstatelink,
@@ -36,12 +36,12 @@ class AffectedGovernmentGroupModel extends Model
             $id,
         ])->getResult();
 
-        return $query ?? [];
+        return $query;
     }
 
     // extra.ci_model_event_affectedgovernment(integer)
 
-    public function getByEventGeometry($id)
+    public function getByEventGeometry($id): array
     {
         $query = <<<QUERY
             SELECT DISTINCT affectedgovernmentgroup.affectedgovernmentgroupid AS id,
@@ -60,7 +60,7 @@ class AffectedGovernmentGroupModel extends Model
             $id,
         ])->getResultArray();
 
-        return $query ?? [];
+        return $query;
     }
 
     // extra.ci_model_event_affectedgovernment_part(integer, character varying, character varying)
@@ -69,7 +69,7 @@ class AffectedGovernmentGroupModel extends Model
     // FUNCTION: extra.governmentlong
     // FUNCTION: extra.affectedtypeshort
 
-    public function getByEventGovernment($id, $state)
+    public function getByEventGovernment($id, $state): array
     {
         $query = <<<QUERY
             SELECT DISTINCT affectedgovernmentgrouppart.affectedgovernmentgroup AS id,
@@ -103,7 +103,7 @@ class AffectedGovernmentGroupModel extends Model
             $id,
         ])->getResult();
 
-        return $query ?? [];
+        return $query;
     }
 
     // extra.ci_model_government_affectedgovernmentform(integer, character varying, boolean)
@@ -112,7 +112,7 @@ class AffectedGovernmentGroupModel extends Model
     // FUNCTION: extra.governmentlong
     // VIEW: extra.governmentsubstitute
 
-    public function getByGovernmentForm($id, $state)
+    public function getByGovernmentForm($id, $state): array
     {
         $query = <<<QUERY
             SELECT DISTINCT event.eventsort,
@@ -147,7 +147,7 @@ class AffectedGovernmentGroupModel extends Model
             $id,
         ])->getResult();
 
-        return $query ?? [];
+        return $query;
     }
 
     // extra.ci_model_government_affectedgovernment(integer, character varying, character varying)
@@ -158,7 +158,7 @@ class AffectedGovernmentGroupModel extends Model
     // FUNCTION: extra.governmentsubstitutedcache
     // VIEW: extra.governmentsubstitutecache
 
-    public function getByGovernmentGovernment($id, $state)
+    public function getByGovernmentGovernment($id, $state): array
     {
         $query = <<<QUERY
             SELECT DISTINCT event.eventsort,
@@ -312,7 +312,7 @@ class AffectedGovernmentGroupModel extends Model
             $id,
         ])->getResult();
 
-        return $query ?? [];
+        return $query;
     }
 
     // extra.ci_model_area_affectedgovernment(v_governmentshape integer, v_state character varying, v_locale character varying)
@@ -323,7 +323,7 @@ class AffectedGovernmentGroupModel extends Model
     // FUNCTION: extra.governmentshort
     // FUNCTION: extra.governmentstatelink
 
-    public function getByGovernmentShape($id, $state)
+    public function getByGovernmentShape($id, $state): array
     {
         $query = <<<QUERY
             WITH foundaffectedgovernment AS (
@@ -543,6 +543,6 @@ class AffectedGovernmentGroupModel extends Model
             strtoupper($state),
         ])->getResult();
 
-        return $query ?? [];
+        return $query;
     }
 }

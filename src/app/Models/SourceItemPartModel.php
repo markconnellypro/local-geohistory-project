@@ -8,7 +8,7 @@ class SourceItemPartModel extends Model
 {
     // extra.ci_model_reporter_url(integer)
 
-    public function getByAdjudicationSourceCitation($id)
+    public function getByAdjudicationSourceCitation($id): array
     {
         $query = <<<QUERY
             SELECT sourceitem.sourceitemurl ||
@@ -38,14 +38,14 @@ class SourceItemPartModel extends Model
             $id,
         ])->getResult();
 
-        return $query ?? [];
+        return $query;
     }
 
     // extra.ci_model_governmentsource_url(integer)
 
     // FUNCTION: extra.sourceurlid
 
-    public function getByGovernmentSource($id)
+    public function getByGovernmentSource($id): array
     {
         $query = <<<QUERY
             SELECT sourceitem.sourceitemurl ||
@@ -80,14 +80,14 @@ class SourceItemPartModel extends Model
             $id,
         ])->getResult();
 
-        return $query ?? [];
+        return $query;
     }
 
     // extra.ci_model_lawalternate_url(integer, boolean)
 
     // FUNCTION: extra.sourceurlid
 
-    public function getByLawAlternateSection($id)
+    public function getByLawAlternateSection($id): array
     {
         $query = <<<QUERY
             SELECT sourceitem.sourceitemurl ||
@@ -138,14 +138,14 @@ class SourceItemPartModel extends Model
             \App\Controllers\BaseController::isLive(),
         ])->getResult();
 
-        return $query ?? [];
+        return $query;
     }
 
     // extra.ci_model_law_url(integer, boolean)
 
     // FUNCTION: extra.sourceurlid
 
-    public function getByLawSection($id)
+    public function getByLawSection($id): array
     {
         $query = <<<QUERY
             SELECT sourceitem.sourceitemurl ||
@@ -194,14 +194,14 @@ class SourceItemPartModel extends Model
             \App\Controllers\BaseController::isLive(),
         ])->getResult();
 
-        return $query ?? [];
+        return $query;
     }
 
     // extra.ci_model_source_url(integer)
 
     // FUNCTION: extra.sourceurlid
 
-    public function getBySourceCitation($id)
+    public function getBySourceCitation($id): array
     {
         $query = <<<QUERY
             SELECT sourceitem.sourceitemurl ||
@@ -234,6 +234,6 @@ class SourceItemPartModel extends Model
             $id,
         ])->getResult();
 
-        return $query ?? [];
+        return $query;
     }
 }

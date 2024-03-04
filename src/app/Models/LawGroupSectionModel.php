@@ -6,7 +6,7 @@ use CodeIgniter\Model;
 
 class LawGroupSectionModel extends Model
 {
-    public function getByLawSection($id, $state)
+    public function getByLawSection($id, $state): array
     {
         return [];
     }

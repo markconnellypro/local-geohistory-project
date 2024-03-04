@@ -6,7 +6,7 @@ use CodeIgniter\Model;
 
 class GovernmentMapStatusModel extends Model
 {
-    public function getDetails()
+    public function getDetails(): array
     {
         return [];
     }

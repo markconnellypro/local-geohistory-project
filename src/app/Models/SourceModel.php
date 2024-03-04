@@ -6,7 +6,7 @@ use CodeIgniter\Model;
 
 class SourceModel extends Model
 {
-    public function getByGovernment($id)
+    public function getByGovernment($id): array
     {
         return [];
     }
@@ -15,7 +15,7 @@ class SourceModel extends Model
 
     // VIEW: extra.adjudicationsourcecitationsourcegovernmentcache
 
-    public function getSearch($state)
+    public function getSearch($state): array
     {
         $query = <<<QUERY
             SELECT DISTINCT adjudicationsourcecitationsourcegovernmentcache.sourceshort
@@ -29,6 +29,6 @@ class SourceModel extends Model
             strtoupper($state),
         ])->getResultArray();
 
-        return $query ?? [];
+        return $query;
     }
 }

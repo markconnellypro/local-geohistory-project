@@ -8,7 +8,7 @@ class GovernmentIdentifierModel extends Model
 {
     // extra.ci_model_governmentidentifier_detail(text, text, text)
 
-    public function getDetail($type, $id)
+    public function getDetail($type, $id): array
     {
         $query = <<<QUERY
             SELECT governmentidentifiertype.governmentidentifiertypetype,
@@ -31,7 +31,7 @@ class GovernmentIdentifierModel extends Model
             strtolower($id),
         ])->getResult();
 
-        return $query ?? [];
+        return $query;
     }
 
     // extra.ci_model_government_identifier(integer, character varying, character varying)
@@ -39,7 +39,7 @@ class GovernmentIdentifierModel extends Model
     // FUNCTION: extra.governmentlong
     // VIEW: extra.governmentsubstitutecache
 
-    public function getByGovernment($id, $state)
+    public function getByGovernment($id, $state): array
     {
         $query = <<<QUERY
             SELECT DISTINCT governmentidentifiertype.governmentidentifiertypetype,
@@ -63,22 +63,22 @@ class GovernmentIdentifierModel extends Model
             $id,
         ])->getResult();
 
-        return $query ?? [];
+        return $query;
     }
 
-    public function getCensus($ids)
+    public function getCensus($ids): array
     {
         return [];
     }
 
-    public function getUsgs($ids)
+    public function getUsgs($ids): array
     {
         return [];
     }
 
     // extra.ci_model_governmentidentifier_related(integer[], integer[], text)
 
-    public function getRelated($governments, $governmentidentifierids)
+    public function getRelated($governments, $governmentidentifierids): array
     {
         $query = <<<QUERY
             SELECT DISTINCT governmentidentifiertype.governmentidentifiertypetype,
@@ -99,14 +99,14 @@ class GovernmentIdentifierModel extends Model
             $governmentidentifierids,
         ])->getResult();
 
-        return $query ?? [];
+        return $query;
     }
 
     // extra.ci_model_search_governmentidentifier_identifier(character varying, character varying, character varying)
 
     // VIEW: extra.governmentrelationcache
 
-    public function getSearchByIdentifier($parameters)
+    public function getSearchByIdentifier($parameters): array
     {
         $type = $parameters[0];
         $identifier = $parameters[1];
@@ -147,6 +147,6 @@ class GovernmentIdentifierModel extends Model
             (int) $identifier,
         ])->getResult();
 
-        return $query ?? [];
+        return $query;
     }
 }

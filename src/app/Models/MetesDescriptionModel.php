@@ -13,7 +13,7 @@ class MetesDescriptionModel extends Model
     // VIEW: extra.eventgovernmentcache
     // VIEW: extra.governmentrelationcache
 
-    public function getDetail($id, $state)
+    public function getDetail($id, $state): array
     {
         if (!is_int($id)) {
             $id = $this->getSlugId($id);
@@ -69,14 +69,14 @@ class MetesDescriptionModel extends Model
             strtoupper($state),
         ])->getResult();
 
-        return $query ?? [];
+        return $query;
     }
 
     // extra.ci_model_event_metesdescription(integer)
 
     // VIEW: extra.metesdescriptionextracache
 
-    public function getByEvent($id)
+    public function getByEvent($id): array
     {
         $query = <<<QUERY
             SELECT metesdescriptionextracache.metesdescriptionslug,
@@ -96,14 +96,14 @@ class MetesDescriptionModel extends Model
             $id,
         ])->getResult();
 
-        return $query ?? [];
+        return $query;
     }
 
     // extra.ci_model_area_metesdescription(integer)
 
     // VIEW: extra.metesdescriptionextracache
 
-    public function getByGovernmentShape($id)
+    public function getByGovernmentShape($id): array
     {
         $query = <<<QUERY
             SELECT metesdescriptionextracache.metesdescriptionslug,
@@ -129,14 +129,14 @@ class MetesDescriptionModel extends Model
             $id,
         ])->getResult();
 
-        return $query ?? [];
+        return $query;
     }
 
     // extra.metesdescriptionslugid(text)
 
     // VIEW: extra.metesdescriptionextracache
 
-    private function getSlugId($id)
+    private function getSlugId($id): int
     {
         $query = <<<QUERY
             SELECT metesdescriptionextracache.metesdescriptionid AS id

@@ -12,7 +12,7 @@ class AdjudicationLocationModel extends Model
     // FUNCTION: extra.tribunallong
     // FUNCTION: extra.tribunalfilingoffice
 
-    public function getByAdjudication($id)
+    public function getByAdjudication($id): array
     {
         $query = <<<QUERY
             SELECT adjudicationlocationtype.adjudicationlocationtypelong,
@@ -52,6 +52,6 @@ class AdjudicationLocationModel extends Model
             $id,
         ])->getResult();
 
-        return $query ?? [];
+        return $query;
     }
 }

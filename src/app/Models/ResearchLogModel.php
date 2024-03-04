@@ -13,7 +13,7 @@ class ResearchLogModel extends Model
     // FUNCTION: extra.shortdate
     // VIEW: extra.governmentsubstitutecache
 
-    public function getByGovernment($id, $state)
+    public function getByGovernment($id, $state): array
     {
         $query = <<<QUERY
             SELECT researchlog.researchlogid,
@@ -56,18 +56,6 @@ class ResearchLogModel extends Model
             \App\Controllers\BaseController::isLive(),
         ])->getResult();
 
-        return $query ?? [];
-    }
-
-    public function getDetail($id)
-    {
-        $query = <<<QUERY
-        QUERY;
-
-        $query = $this->db->query($query, [
-            $id,
-        ])->getResult();
-
-        return $query ?? [];
+        return $query;
     }
 }

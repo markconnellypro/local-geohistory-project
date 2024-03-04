@@ -8,7 +8,7 @@ class EventRelationshipModel extends Model
 {
     // extra.ci_model_key_eventrelationship()
 
-    public function getKey()
+    public function getKey(): array
     {
         $query = <<<QUERY
             SELECT eventrelationship.eventrelationshipshort AS keyshort,
@@ -20,6 +20,6 @@ class EventRelationshipModel extends Model
 
         $query = $this->db->query($query)->getResult();
 
-        return $query ?? [];
+        return $query;
     }
 }

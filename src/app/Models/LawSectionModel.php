@@ -13,7 +13,7 @@ class LawSectionModel extends Model
     // VIEW: extra.lawsectiongovernmentcache
     // VIEW: extra.sourceextra
 
-    public function getDetail($id, $state)
+    public function getDetail($id, $state): array
     {
         if (!is_int($id)) {
             $id = $this->getSlugId($id);
@@ -51,14 +51,14 @@ class LawSectionModel extends Model
             strtoupper($state),
         ])->getResult();
 
-        return $query ?? [];
+        return $query;
     }
 
     // extra.ci_model_event_law(integer)
 
     // VIEW: extra.lawsectionextracache
 
-    public function getByEvent($id)
+    public function getByEvent($id): array
     {
         $query = <<<QUERY
             SELECT DISTINCT lawsectionextracache.lawsectionslug,
@@ -87,7 +87,7 @@ class LawSectionModel extends Model
             $id,
         ])->getResult();
 
-        return $query ?? [];
+        return $query;
     }
 
     // extra.ci_model_law_related(integer)
@@ -97,7 +97,7 @@ class LawSectionModel extends Model
     // VIEW: extra.lawalternatesectionextracache
     // VIEW: extra.lawsectionextracache
 
-    public function getRelated($id)
+    public function getRelated($id): array
     {
         $query = <<<QUERY
             SELECT DISTINCT lawsectionextracache.lawsectionslug,
@@ -166,7 +166,7 @@ class LawSectionModel extends Model
             $id,
         ])->getResult();
 
-        return $query ?? [];
+        return $query;
     }
 
     // extra.ci_model_search_law_dateevent(character varying, text, character varying)
@@ -176,7 +176,7 @@ class LawSectionModel extends Model
     // FUNCTION: extra.governmentcurrentleadparent
     // VIEW: extra.lawsectionextracache
 
-    public function getSearchByDateEvent($parameters)
+    public function getSearchByDateEvent($parameters): array
     {
         $date = $parameters[0];
         $eventType = $parameters[1];
@@ -225,7 +225,7 @@ class LawSectionModel extends Model
             strtoupper($state),
         ])->getResult();
 
-        return $query ?? [];
+        return $query;
     }
 
     // extra_removed.ci_model_search_law_reference(character varying, integer, integer, character varying)
@@ -235,7 +235,7 @@ class LawSectionModel extends Model
     // FUNCTION: extra.governmentcurrentleadparent
     // VIEW: extra.lawsectionextracache
 
-    public function getSearchByReference($parameters)
+    public function getSearchByReference($parameters): array
     {
         $yearVolume = $parameters[0];
         $page = $parameters[1];
@@ -286,14 +286,14 @@ class LawSectionModel extends Model
             $numberChapter,
         ])->getResult();
 
-        return $query ?? [];
+        return $query;
     }
 
     // extra.lawsectionslugid(text)
 
     // VIEW: extra.lawsectionextracache
 
-    private function getSlugId($id)
+    private function getSlugId($id): int
     {
         $query = <<<QUERY
             SELECT lawsectionextracache.lawsectionid AS id

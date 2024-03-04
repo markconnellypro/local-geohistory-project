@@ -8,7 +8,7 @@ class AffectedTypeModel extends Model
 {
     // extra.ci_model_key_affectedtype()
 
-    public function getKey()
+    public function getKey(): array
     {
         $query = <<<QUERY
             SELECT affectedtype.affectedtypeshort AS keyshort,
@@ -23,6 +23,6 @@ class AffectedTypeModel extends Model
 
         $query = $this->db->query($query)->getResult();
 
-        return $query ?? [];
+        return $query;
     }
 }

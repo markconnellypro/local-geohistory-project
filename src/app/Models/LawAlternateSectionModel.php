@@ -13,7 +13,7 @@ class LawAlternateSectionModel extends Model
     // VIEW: extra.lawsectiongovernmentcache
     // VIEW: extra.sourceextra
 
-    public function getDetail($id, $state)
+    public function getDetail($id, $state): array
     {
         if (!is_int($id)) {
             $id = $this->getSlugId($id);
@@ -53,7 +53,7 @@ class LawAlternateSectionModel extends Model
             strtoupper($state),
         ])->getResult();
 
-        return $query ?? [];
+        return $query;
     }
 
     // extra.ci_model_lawalternate_related(integer)
@@ -61,7 +61,7 @@ class LawAlternateSectionModel extends Model
     // VIEW: extra.lawalternatesectionextracache
     // VIEW: extra.lawsectionextracache
 
-    public function getRelated($id)
+    public function getRelated($id): array
     {
         $query = <<<QUERY
             SELECT DISTINCT lawsectionextracache.lawsectionslug,
@@ -138,14 +138,14 @@ class LawAlternateSectionModel extends Model
             $id,
         ])->getResult();
 
-        return $query ?? [];
+        return $query;
     }
 
     // extra.lawalternatesectionslugid(text)
 
     // VIEW: extra.lawalternatesectionextracache
 
-    private function getSlugId($id)
+    private function getSlugId($id): int
     {
         $query = <<<QUERY
             SELECT lawalternatesectionextracache.lawsectionid AS id

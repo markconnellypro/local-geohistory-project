@@ -13,7 +13,7 @@ class CurrentGovernmentModel extends Model
     // FUNCTION: extra.governmentshort
     // FUNCTION: extra.governmentstatelink
 
-    public function getByEvent($id, $state)
+    public function getByEvent($id, $state): array
     {
         $query = <<<QUERY
             SELECT extra.governmentstatelink(currentgovernment.governmentsubmunicipality, ?, ?) AS governmentsubmunicipality,
@@ -44,6 +44,6 @@ class CurrentGovernmentModel extends Model
             $id,
         ])->getResult();
 
-        return $query ?? [];
+        return $query;
     }
 }

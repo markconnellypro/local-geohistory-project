@@ -15,7 +15,7 @@ class AdjudicationModel extends Model
     // VIEW: extra.adjudicationextracache
     // VIEW: extra.adjudicationgovernmentcache
 
-    public function getDetail($id, $state)
+    public function getDetail($id, $state): array
     {
         if (!is_int($id)) {
             $id = $this->getSlugId($id);
@@ -59,7 +59,7 @@ class AdjudicationModel extends Model
             strtoupper($state),
         ])->getResult();
 
-        return $query ?? [];
+        return $query;
     }
 
     // extra.ci_model_reporter_adjudication(integer)
@@ -68,7 +68,7 @@ class AdjudicationModel extends Model
     // FUNCTION: extra.tribunallong
     // VIEW: extra.adjudicationextracache
 
-    public function getByAdjudicationSourceCitation($id)
+    public function getByAdjudicationSourceCitation($id): array
     {
         $query = <<<QUERY
             SELECT adjudicationextracache.adjudicationslug,
@@ -95,7 +95,7 @@ class AdjudicationModel extends Model
             $id,
         ])->getResult();
 
-        return $query ?? [];
+        return $query;
     }
 
     // extra.ci_model_event_adjudication(integer)
@@ -104,7 +104,7 @@ class AdjudicationModel extends Model
     // FUNCTION: extra.shortdate
     // VIEW: extra.adjudicationextracache
 
-    public function getByEvent($id)
+    public function getByEvent($id): array
     {
         $query = <<<QUERY
             SELECT adjudicationextracache.adjudicationslug,
@@ -134,14 +134,14 @@ class AdjudicationModel extends Model
             $id,
         ])->getResult();
 
-        return $query ?? [];
+        return $query;
     }
 
     // extra.adjudicationslugid(text)
 
     // VIEW: extra.adjudicationextracache
 
-    private function getSlugId($id)
+    private function getSlugId($id): int
     {
         $query = <<<QUERY
             SELECT adjudicationextracache.adjudicationid AS id

@@ -8,7 +8,7 @@ class EventTypeModel extends Model
 {
     // extra.ci_model_key_eventtype()
 
-    public function getKey()
+    public function getKey(): array
     {
         $query = <<<QUERY
             SELECT eventtype.eventtypeshort AS keyshort,
@@ -27,7 +27,7 @@ class EventTypeModel extends Model
 
         $query = $this->db->query($query)->getResult();
 
-        return $query ?? [];
+        return $query;
     }
 
     // extra.ci_model_search_form_eventtype(character varying)
@@ -35,7 +35,7 @@ class EventTypeModel extends Model
     // FUNCTION: extra.governmentabbreviationid
     // VIEW: extra.eventgovernmentcache
 
-    public function getSearch($state)
+    public function getSearch($state): array
     {
         $query = <<<QUERY
             SELECT DISTINCT eventtype.eventtypeshort,
@@ -59,7 +59,7 @@ class EventTypeModel extends Model
             strtoupper($state),
         ])->getResultArray();
 
-        return $query ?? [];
+        return $query;
     }
 
     // extra.ci_model_statistics_eventtype_list(boolean)
@@ -67,7 +67,7 @@ class EventTypeModel extends Model
 
     // VIEW: extra.statistics_eventtype
 
-    public function getManyByStatistics($state)
+    public function getManyByStatistics($state): array
     {
         if (empty($state)) {
             $state = str_replace('|', ',', getenv('app_jurisdiction'));
@@ -89,12 +89,12 @@ class EventTypeModel extends Model
             $state,
         ])->getResultArray();
 
-        return $query ?? [];
+        return $query;
     }
 
     // extra_removed.ci_model_statistics_eventtype(text)
 
-    public function getOneByStatistics($eventType)
+    public function getOneByStatistics($eventType): array
     {
         $query = <<<QUERY
             SELECT DISTINCT eventtype.eventtypeshort,
@@ -109,6 +109,6 @@ class EventTypeModel extends Model
             $eventType,
         ])->getResult();
 
-        return $query ?? [];
+        return $query;
     }
 }

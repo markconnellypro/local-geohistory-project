@@ -10,7 +10,7 @@ class FilingModel extends Model
 
     // FUNCTION: extra.shortdate
 
-    public function getByAdjudication($id)
+    public function getByAdjudication($id): array
     {
         $query = <<<QUERY
             SELECT filingtype.filingtypelong,
@@ -37,6 +37,6 @@ class FilingModel extends Model
             $id,
         ])->getResult();
 
-        return $query ?? [];
+        return $query;
     }
 }

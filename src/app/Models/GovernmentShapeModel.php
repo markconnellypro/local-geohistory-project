@@ -15,7 +15,7 @@ class GovernmentShapeModel extends Model
     // FUNCTION: extra.governmentstatelink
     // VIEW: extra.areagovernmentcache
 
-    public function getDetail($id, $state)
+    public function getDetail($id, $state): array
     {
         if (!is_int($id)) {
             $id = $this->getSlugId($id);
@@ -57,12 +57,12 @@ class GovernmentShapeModel extends Model
             strtoupper($state),
         ])->getResult();
 
-        return $query ?? [];
+        return $query;
     }
 
     // extra.ci_model_area_point(pointy double precision, pointx double precision)
 
-    public function getPointId($y, $x)
+    public function getPointId($y, $x): array
     {
         $query = <<<QUERY
             SELECT DISTINCT governmentshape.governmentshapeid
@@ -76,7 +76,7 @@ class GovernmentShapeModel extends Model
             $y
         ])->getResult();
 
-        return $query ?? [];
+        return $query;
     }
 
     // extra.ci_model_statistics_mapped_nation_part(character varying, integer, integer, character varying, boolean)
@@ -84,7 +84,7 @@ class GovernmentShapeModel extends Model
     // FUNCTION: extra.governmentabbreviation
     // VIEW: extra.statistics_mapped
 
-    public function getByStatisticsNationPart($parameters)
+    public function getByStatisticsNationPart($parameters): array
     {
         $by = $parameters[3];
         $state = $parameters[4];
@@ -134,14 +134,14 @@ class GovernmentShapeModel extends Model
             $state,
         ])->getResult();
 
-        return $query ?? [];
+        return $query;
     }
 
     // extra.ci_model_statistics_mapped_nation_whole(character varying, integer, integer, character varying, boolean)
 
     // VIEW: extra.statistics_mapped
 
-    public function getByStatisticsNationWhole($parameters)
+    public function getByStatisticsNationWhole($parameters): array
     {
         $by = $parameters[3];
 
@@ -175,14 +175,14 @@ class GovernmentShapeModel extends Model
             ENVIRONMENT,
         ])->getResult();
 
-        return $query ?? [];
+        return $query;
     }
 
     // extra.ci_model_statistics_mapped_state_part(character varying, integer, integer, character varying, character varying)
 
     // VIEW: extra.statistics_mapped
 
-    public function getByStatisticsStatePart($parameters)
+    public function getByStatisticsStatePart($parameters): array
     {
         $by = $parameters[3];
         $state = strtoupper($parameters[4]);
@@ -223,14 +223,14 @@ class GovernmentShapeModel extends Model
             $state,
         ])->getResult();
 
-        return $query ?? [];
+        return $query;
     }
 
     // extra.ci_model_statistics_mapped_state_whole(character varying, integer, integer, character varying, character varying)
 
     // VIEW: extra.statistics_mapped
 
-    public function getByStatisticsStateWhole($parameters)
+    public function getByStatisticsStateWhole($parameters): array
     {
         $by = $parameters[3];
         $state = strtoupper($parameters[4]);
@@ -266,14 +266,14 @@ class GovernmentShapeModel extends Model
             $state,
         ])->getResult();
 
-        return $query ?? [];
+        return $query;
     }
 
     // extra.ci_model_government_current(integer)
 
     // VIEW: extra.giscache
 
-    public function getCurrentByGovernment($id)
+    public function getCurrentByGovernment($id): array
     {
         $query = <<<QUERY
             SELECT giscache.government AS id,
@@ -287,7 +287,7 @@ class GovernmentShapeModel extends Model
             $id,
         ])->getResult();
 
-        return $query ?? [];
+        return $query;
     }
 
     // extra.ci_model_government_shape(integer, character varying, character varying)
@@ -300,7 +300,7 @@ class GovernmentShapeModel extends Model
     // VIEW: extra.governmentshapeextracache
     // VIEW: extra.governmentsubstitutecache
 
-    public function getPartByGovernment($id, $state)
+    public function getPartByGovernment($id, $state): array
     {
         $query = <<<QUERY
             WITH affectedgovernmentsummary AS (
@@ -476,14 +476,14 @@ class GovernmentShapeModel extends Model
             $id,
         ])->getResult();
 
-        return $query ?? [];
+        return $query;
     }
 
     // extra.governmentshapeslugid(text)
 
     // VIEW: extra.governmentshapeextracache
 
-    private function getSlugId($id)
+    private function getSlugId($id): int
     {
         $query = <<<QUERY
             SELECT governmentshapeextracache.governmentshapeid AS id
@@ -513,7 +513,7 @@ class GovernmentShapeModel extends Model
     // VIEW: extra.gismunicipalitycache
     // VIEW: extra.gissubmunicipalitycache
 
-    public function getTile($state, $z, $x, $y)
+    public function getTile($state, $z, $x, $y): array
     {
         $query = <<<QUERY
             WITH mvtgeometrycounty AS (
@@ -578,6 +578,6 @@ class GovernmentShapeModel extends Model
             strtoupper($state),
         ])->getResult();
 
-        return $query ?? [];
+        return $query;
     }
 }
