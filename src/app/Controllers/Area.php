@@ -24,7 +24,7 @@ class Area extends BaseController
         try {
             $data = file_get_contents('https://us1.locationiq.com/v1/search.php?key=' . getenv('locationiq_key') . '&format=json&countrycodes=us&dedupe=1&q=' . urlencode($addressText));
             if (($data = json_decode($data, true)) !== false) {
-                if (count($data) == 1) {
+                if (count($data) === 1) {
                     $this->data['extraAttribution'] = 'Address searching courtesy of <a href="https://locationiq.com/attribution/">LocationIQ</a>.';
                     $this->point($state, $data[0]['lat'], $data[0]['lon'], $addressText);
                 } else {
@@ -77,7 +77,7 @@ class Area extends BaseController
         }
         $GovernmentShapeModel = new GovernmentShapeModel();
         $query = $GovernmentShapeModel->getPointId($y, $x);
-        if (count($query) != 1) {
+        if (count($query) !== 1) {
             $this->noRecord($state);
         } else {
             $this->view($state, $query[0]->governmentshapeid, $y, $x, $addressText);
@@ -92,7 +92,7 @@ class Area extends BaseController
         }
         $GovernmentShapeModel = new GovernmentShapeModel();
         $currentQuery = $GovernmentShapeModel->getDetail($id, $state);
-        if (count($currentQuery) != 1) {
+        if (count($currentQuery) !== 1) {
             $this->noRecord($state);
         } else {
             $id = $currentQuery[0]->governmentshapeid;

@@ -31,7 +31,7 @@ class Reporter extends BaseController
         $id = $this->getIdInt($id);
         $AdjudicationSourceCitationModel = new AdjudicationSourceCitationModel();
         $query = $AdjudicationSourceCitationModel->getDetail($id, $state);
-        if (count($query) != 1) {
+        if (count($query) !== 1) {
             $this->noRecord($state);
         } else {
             $id = $query[0]->adjudicationsourcecitationid;

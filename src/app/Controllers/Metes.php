@@ -28,7 +28,7 @@ class Metes extends BaseController
         $id = $this->getIdInt($id);
         $MetesDescriptionModel = new MetesDescriptionModel();
         $areaQuery = $MetesDescriptionModel->getDetail($id, $state);
-        if (count($areaQuery) != 1) {
+        if (count($areaQuery) !== 1) {
             $this->noRecord($state);
         } else {
             $id = $areaQuery[0]->metesdescriptionid;

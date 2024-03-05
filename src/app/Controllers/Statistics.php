@@ -77,18 +77,18 @@ class Statistics extends BaseController
 
         $from = (int) $this->request->getPost('from', FILTER_SANITIZE_NUMBER_INT);
         $to = (int) $this->request->getPost('to', FILTER_SANITIZE_NUMBER_INT);
-        if ($from == 0 && $to == 0) {
+        if ($from === 0 && $to === 0) {
             $to = (int) date('Y');
-        } elseif ($from == 0) {
+        } elseif ($from === 0) {
             $from = $to;
-        } elseif ($to == 0) {
+        } elseif ($to === 0) {
             $to = $from;
         } elseif ($from > $to) {
             $temporary = $to;
             $to = $from;
             $from = $temporary;
         }
-        if ($from === $to || $from == 0) {
+        if ($from === $to || $from === 0) {
             $dateRange = $from;
             $dateRangePlural = '';
         } else {

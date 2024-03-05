@@ -35,7 +35,7 @@ class Governmentidentifier extends BaseController
             $GovernmentIdentifierModel = new \App\Models\GovernmentIdentifierModel();
         }
         $query = $GovernmentIdentifierModel->getDetail($type, $id);
-        if (count($query) != 1) {
+        if (count($query) !== 1) {
             $this->noRecord();
         } else {
             $governmentidentifierids = $query[0]->governmentidentifierids;

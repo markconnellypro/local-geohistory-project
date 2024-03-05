@@ -30,7 +30,7 @@ class Governmentsource extends BaseController
         $id = $this->getIdInt($id);
         $GovernmentSourceModel = new GovernmentSourceModel();
         $query = $GovernmentSourceModel->getDetail($id, $state);
-        if (count($query) != 1) {
+        if (count($query) !== 1) {
             $this->noRecord($state);
         } else {
             $id = $query[0]->governmentsourceid;

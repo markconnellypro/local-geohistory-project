@@ -32,7 +32,7 @@ class Adjudication extends BaseController
         $id = $this->getIdInt($id);
         $AdjudicationModel = new AdjudicationModel();
         $query = $AdjudicationModel->getDetail($id, $state);
-        if (count($query) != 1) {
+        if (count($query) !== 1) {
             $this->noRecord($state);
         } else {
             $id = $query[0]->adjudicationid;

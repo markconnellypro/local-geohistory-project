@@ -51,7 +51,7 @@ class Government extends BaseController
             $SourceCitationModel = new \App\Models\SourceCitationModel();
         }
         $query = $GovernmentModel->getDetail($id, $state);
-        if (count($query) != 1 || $query[0]->governmentlevel == 'placeholder') {
+        if (count($query) !== 1 || $query[0]->governmentlevel == 'placeholder') {
             $this->noRecord($state);
         } elseif (!empty($query[0]->governmentsubstituteslug)) {
             header("HTTP/1.1 301 Moved Permanently");

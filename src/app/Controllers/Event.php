@@ -37,7 +37,7 @@ class Event extends BaseController
         $id = $this->getIdInt($id);
         $EventModel = new EventModel();
         $query = $EventModel->getDetail($id, $state);
-        if (count($query) != 1 || $query[0]->eventgranted == 'placeholder' && !$this->isLive()) {
+        if (count($query) !== 1 || $query[0]->eventgranted == 'placeholder' && !$this->isLive()) {
             $this->noRecord($state);
         } else {
             $id = $query[0]->eventid;
