@@ -6,17 +6,12 @@ use App\Models\MetesDescriptionModel;
 
 class Metes extends BaseController
 {
-    private array $data;
+    private array $data = [
+        'title' => 'Metes and Bounds Description Detail',
+    ];
 
     public function __construct()
     {
-        $this->data = [
-            'title' => 'Metes and Bounds Description Detail',
-            'isInternetExplorer' => $this->isInternetExplorer(),
-            'live' => $this->isLive(),
-            'online' => $this->isOnline(),
-            'updated' => $this->lastUpdated()->fulldate,
-        ];
     }
 
     public function noRecord($state): void
@@ -44,7 +39,7 @@ class Metes extends BaseController
             $hasMetes = false;
             $hasArea = (!is_null($areaQuery[0]->geometry));
             $hasBegin = ($areaQuery[0]->hasbeginpoint == 't' || $hasArea);
-            if ($this->data['live']) {
+            if ($this->isLive()) {
                 $MetesDescriptionLineModel = new \App\Models\Development\MetesDescriptionLineModel();
             } else {
                 $MetesDescriptionLineModel = new \App\Models\MetesDescriptionLineModel();
@@ -53,7 +48,7 @@ class Metes extends BaseController
             $hasMetes = (count($geometryQuery) > 1);
             if ($hasArea || $hasMetes) {
                 $hasMap = true;
-                echo view('general_map', ['live' => $this->data['live'], 'includeBase' => $hasBegin, 'includeDisclaimer' => true]);
+                echo view('general_map', ['includeBase' => $hasBegin, 'includeDisclaimer' => true]);
             }
             $query = $MetesDescriptionLineModel->getByMetesDescription($id);
             if ($query !== []) {
@@ -61,7 +56,7 @@ class Metes extends BaseController
             }
             echo view('general_event', ['query' => $areaQuery, 'state' => $state, 'title' => 'Event Links']);
             if ($hasMap) {
-                echo view('leaflet_start', ['type' => 'metes', 'includeBase' => $hasBegin, 'needRotation' => false, 'online' => $this->data['online']]);
+                echo view('leaflet_start', ['type' => 'metes', 'includeBase' => $hasBegin, 'needRotation' => false]);
                 if ($hasArea) {
                     echo view('general_gis', [
                         'query' => $areaQuery,
@@ -95,7 +90,7 @@ class Metes extends BaseController
                     ]);
                 }
                 echo view('metes_end', ['includeBase' => $hasBegin, 'includeArea' => $hasArea, 'includeMetes' => $hasMetes]);
-                echo view('leaflet_end', ['includeBase' => $hasBegin, 'live' => $this->data['live']]);
+                echo view('leaflet_end', ['includeBase' => $hasBegin]);
             }
             echo view('footer');
         }

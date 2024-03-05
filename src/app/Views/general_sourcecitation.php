@@ -11,7 +11,7 @@
                         <th>Source</th>
                     <?php }
                     }
-    if ($hasColor || !$hasLink && $live) { ?>
+    if ($hasColor || !$hasLink && \App\Controllers\BaseController::isLive()) { ?>
                     <th>ID</th>
                 <?php } ?>
                 <th>Title</th>
@@ -35,7 +35,7 @@
                                 <td<?= ($hasColor ? ' class="folder' . $rowColor . '"' : '') ?>><?= $row->sourceabbreviation ?></td>
                                 <?php }
                             }
-                if ($hasColor || !$hasLink && $live) { ?>
+                if ($hasColor || !$hasLink && \App\Controllers\BaseController::isLive()) { ?>
                                 <td<?= ($hasColor ? ' class="folder' . $rowColor . '" data-sort="' . $rowColor . '"' : '') ?>><?= $row->sourcecitationid ?></td>
                                 <?php } ?>
                                 <td<?= ($hasColor ? ' class="folder' . $rowColor . '"' : '') ?>><?= $row->sourcecitationtypetitle ?></td>

@@ -6,17 +6,12 @@ use App\Models\GovernmentShapeModel;
 
 class Map extends BaseController
 {
-    private array $data;
+    private array $data = [
+        'title' => 'Map',
+    ];
 
     public function __construct()
     {
-        $this->data = [
-            'title' => 'Map',
-            'isInternetExplorer' => $this->isInternetExplorer(),
-            'live' => $this->isLive(),
-            'online' => $this->isOnline(),
-            'updated' => $this->lastUpdated()->fulldate,
-        ];
     }
 
     public function baseStyle($maxZoom = 14, $response = null): void
@@ -36,7 +31,7 @@ class Map extends BaseController
             unset($json['sources']['street-tile']['url']);
         }
         $json['glyphs'] = getenv('map_glyph');
-        if (getenv('map_elevation') != '' && $maxZoom == 14 && !($this->data['live'] && !$this->data['online'])) {
+        if (getenv('map_elevation') != '' && $maxZoom == 14 && !($this->isLive() && !$this->isOnline())) {
             $json['sources']['elevation-tile']['tiles'][] = getenv('map_elevation');
         } else {
             unset($json['sources']['elevation-tile']);

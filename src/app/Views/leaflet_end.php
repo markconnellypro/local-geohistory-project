@@ -8,7 +8,7 @@ this.update();
 return this._div;
 };
 downloadBox.update = function() {
-<?php if ($isInternetExplorer) { ?>
+<?php if (\App\Controllers\BaseController::isInternetExplorer()) { ?>
     var textToAdd = 'Sorry, downloads not supported in outdated browsers. <a href="https://browsehappy.com/?locale=<?= \Config\Services::request()->getLocale() ?>" target="_blank" rel="noopener noreferrer">More information »</a>';
 <?php } else { ?>
     var textToAdd = '<span class="b">Select a layer to download:</span>';
@@ -23,7 +23,7 @@ this._div.innerHTML = textToAdd;
 };
 downloadBox.addTo(map);
 map.addControl(new L.Control.Fullscreen());
-<?php if ($live && $includeBase) { ?>
+<?php if (\App\Controllers\BaseController::isLive() && $includeBase) { ?>
     map.on("click", function(e) {
     document.getElementById("coord").innerHTML = +e.latlng.lng.toFixed(7) + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + +e.latlng.lat.toFixed(7);
     });

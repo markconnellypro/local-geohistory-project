@@ -5,7 +5,7 @@
             <tr>
                 <?php if ($hasLink) { ?>
                     <th>Detail</th>
-                <?php } elseif ($live) { ?>
+                <?php } elseif (\App\Controllers\BaseController::isLive()) { ?>
                     <th>ID</th>
                 <?php } ?>
                 <th>Description</th>
@@ -20,7 +20,7 @@
                 <tr>
                     <?php if ($hasLink) { ?>
                         <td><a href="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/metes/<?= $row->metesdescriptionslug ?>/">View</a></td>
-                    <?php } elseif ($live) { ?>
+                    <?php } elseif (\App\Controllers\BaseController::isLive()) { ?>
                         <td><?= $row->metesdescriptionid ?></td>
                     <?php } ?>
                     <td><?= $row->metesdescriptionlong ?></td>

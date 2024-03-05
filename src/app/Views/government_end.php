@@ -73,7 +73,7 @@ info.update = infoRegularUpdate;
 
 info.addTo(map);
 
-<?php if ($live) { ?>
+<?php if (\App\Controllers\BaseController::isLive()) { ?>
 
 var info2 = L.control({position: 'topleft'});
 
@@ -92,7 +92,7 @@ info2.update = info2RegularUpdate;
 
 info2.addTo(map);
 
-<?php } if ($live || $showTimeline) { ?>
+<?php } if (\App\Controllers\BaseController::isLive() || $showTimeline) { ?>
 
 /* Timeline */
 
@@ -233,7 +233,7 @@ $('.leaflet-control-timelapse').bind('touchend mouseup', function () {
   map.dragging.enable();
 });
 
-$('.leaflet-control-timelapse-range').on("<?= ($isInternetExplorer ? 'change' : 'input') ?>", function () {
+$('.leaflet-control-timelapse-range').on("<?= (\App\Controllers\BaseController::isInternetExplorer() ? 'change' : 'input') ?>", function () {
   var newValue = parseInt($('.leaflet-control-timelapse-range').val());
   if (newValue > step) {
     for (stepValue = step; stepValue < newValue; stepValue++) {

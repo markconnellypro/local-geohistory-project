@@ -3,7 +3,7 @@
     <table class="normal cell-border compact stripe">
         <thead>
             <tr>
-                <?php if ($live) { ?>
+                <?php if (\App\Controllers\BaseController::isLive()) { ?>
                     <th>ID</th>
                 <?php } ?>
                 <th>Tribunal</th>
@@ -12,7 +12,7 @@
         </thead>
         <tbody>
             <tr>
-                <?php if ($live) { ?>
+                <?php if (\App\Controllers\BaseController::isLive()) { ?>
                     <td><?= $row->adjudicationid ?></td>
                 <?php } ?>
                 <td><?= $row->tribunallong ?></td>

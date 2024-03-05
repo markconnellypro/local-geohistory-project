@@ -9,18 +9,13 @@ use App\Models\MetesDescriptionModel;
 
 class Area extends BaseController
 {
-    private array $data;
+    private array $data = [
+        'title' => 'Area Detail',
+        'extraAttribution' => '',
+    ];
 
     public function __construct()
     {
-        $this->data = [
-            'title' => 'Area Detail',
-            'isInternetExplorer' => $this->isInternetExplorer(),
-            'live' => $this->isLive(),
-            'online' => $this->isOnline(),
-            'updated' => $this->lastUpdated()->fulldate,
-            'extraAttribution' => '',
-        ];
     }
 
     public function address($state): void
@@ -92,7 +87,7 @@ class Area extends BaseController
     public function view($state, $id, $y = 0, $x = 0, $addressText = ''): void
     {
         $this->data['state'] = $state;
-        if (($this->data['live'] || !empty($y) || !empty($x)) && preg_match('/^\d{1,9}$/', $id)) {
+        if (($this->isLive() || !empty($y) || !empty($x)) && preg_match('/^\d{1,9}$/', $id)) {
             $id = (int) $id;
         }
         $GovernmentShapeModel = new GovernmentShapeModel();
@@ -123,7 +118,7 @@ class Area extends BaseController
                 echo view('general_parameter', ['searchParameter' => $searchParameter, 'omitColon' => true]);
             }
             echo view('general_currentgovernment', ['query' => $currentQuery, 'state' => $state]);
-            echo view('general_map', ['live' => $this->data['live'], 'includeBase' => true]);
+            echo view('general_map', ['includeBase' => true]);
             $AffectedGovernmentGroupModel = new AffectedGovernmentGroupModel();
             $query = $AffectedGovernmentGroupModel->getByGovernmentShape($id, $state);
             $events = [];
@@ -147,7 +142,7 @@ class Area extends BaseController
             if ($query !== []) {
                 echo view('general_event', ['query' => $query, 'state' => $state, 'title' => 'Other Event Links']);
             }
-            echo view('leaflet_start', ['type' => 'area', 'includeBase' => true, 'needRotation' => false, 'online' => $this->data['online']]);
+            echo view('leaflet_start', ['type' => 'area', 'includeBase' => true, 'needRotation' => false]);
             echo view('general_gis', [
                 'query' => $currentQuery,
                 'element' => 'area',
@@ -178,7 +173,7 @@ class Area extends BaseController
                 ]);
             }
             echo view('area_end', ['includePoint' => $includePoint]);
-            echo view('leaflet_end', ['live' => $this->data['live']]);
+            echo view('leaflet_end');
             echo view('footer');
         }
     }

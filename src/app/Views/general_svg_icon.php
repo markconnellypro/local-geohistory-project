@@ -1,6 +1,6 @@
 <?php
 $iconPath = (in_array($iconName, array_merge(['about', 'key', 'home', 'search', 'statistics'], \App\Controllers\BaseController::getProductionJurisdictions())) ? '' : 'development/') . 'image/' . $iconName;
-if ($isInternetExplorer) { ?><img src="/asset/<?= $iconPath ?>.svg" class="<?= $iconType ?>" alt="<?= $iconLabel ?>"><?php } else {
+if (\App\Controllers\BaseController::isInternetExplorer()) { ?><img src="/asset/<?= $iconPath ?>.svg" class="<?= $iconType ?>" alt="<?= $iconLabel ?>"><?php } else {
     $iconSize = match ($iconType) {
         'bodyicon', 'headericon' => '128 85',
         'keyicon', 'keyiconlarge' => '24 24',

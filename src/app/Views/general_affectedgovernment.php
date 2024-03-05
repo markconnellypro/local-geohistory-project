@@ -9,7 +9,7 @@
                     <th>Detail</th>
                     <th>Date <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#date" aria-label="Date Key"><?= view('general_svg_icon', ['iconLabel' => 'key icon', 'iconName' => 'key', 'iconType' => 'keyicon']); ?></a>
                     </th>
-                <?php } elseif ($live && $isComplete) { ?>
+                <?php } elseif (\App\Controllers\BaseController::isLive() && $isComplete) { ?>
                     <th>Map<br>Link</th>
                 <?php }
                 if ($isComplete) { ?>
@@ -30,7 +30,7 @@
                     <?php if ($includeDate) { ?>
                         <td data-sort="<?= $row->eventorder ?>"><?php echo view('general_link', ['link' => (empty($row->eventslug) ? '' : "/" . \Config\Services::request()->getLocale() . "/" . $state . "/event/" . $row->eventslug . "/"), 'text' => (empty($row->eventslug) ? 'Missing' : 'View')]) ?></td>
                         <td data-sort="<?= $row->eventsort ?>"><?= (empty($row->eventeffective) ? $row->eventyear : $row->eventeffective) ?></td>
-                    <?php } elseif ($live && $isComplete) { ?>
+                    <?php } elseif (\App\Controllers\BaseController::isLive() && $isComplete) { ?>
                         <td>
                             <?php echo view('general_link', ['link' => str_replace('government', 'governmentmap', $row->municipalityfrom) . $row->id . "/", 'text' => 'From']) ?><br>
                             <?php if (!empty($row->submunicipalityfrom)) { ?>

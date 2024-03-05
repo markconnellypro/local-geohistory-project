@@ -7,7 +7,7 @@
 			        <a href="/<?= \Config\Services::request()->getLocale() ?>/disclaimer/"><?= lang('Template.disclaimers') ?></a> |
 					<a href="<?= getenv('app_compiler_link1_url') ?>"><?= getenv('app_compiler_link1_text') ?></a> |
                     <a href="<?= getenv('app_compiler_link2_url') ?>"><?= getenv('app_compiler_link2_text') ?></a> |
-			        <?= ($live ? 'LIVE as of' : 'Data updated') ?> <?= $updated ?>
+			        <?= (\App\Controllers\BaseController::isLive() ? 'LIVE as of' : 'Data updated') ?> <?= \App\Controllers\BaseController::lastUpdated() ?>
 			    </div>
 			</footer>
 			</div>

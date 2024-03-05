@@ -9,17 +9,12 @@ use App\Models\SourceItemPartModel;
 
 class Reporter extends BaseController
 {
-    private array $data;
+    private array $data = [
+        'title' => 'Reporter Details',
+    ];
 
     public function __construct()
     {
-        $this->data = [
-            'title' => 'Reporter Details',
-            'isInternetExplorer' => $this->isInternetExplorer(),
-            'live' => $this->isLive(),
-            'online' => $this->isOnline(),
-            'updated' => $this->lastUpdated()->fulldate,
-        ];
     }
 
     public function noRecord($state): void

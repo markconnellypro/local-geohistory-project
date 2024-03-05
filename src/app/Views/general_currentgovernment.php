@@ -3,7 +3,7 @@
     <table class="normal cell-border compact stripe">
         <thead>
             <tr>
-                <?php if ($live && isset($query[0]->governmentshapeid)) { ?>
+                <?php if (\App\Controllers\BaseController::isLive() && isset($query[0]->governmentshapeid)) { ?>
                     <th>ID</th>
                 <?php } ?>
                 <th>Sub-Municipality</th>
@@ -15,7 +15,7 @@
         <tbody>
             <?php foreach ($query as $row) { ?>
                 <tr>
-                    <?php if ($live && isset($row->governmentshapeid)) { ?>
+                    <?php if (\App\Controllers\BaseController::isLive() && isset($row->governmentshapeid)) { ?>
                         <td><?= $row->governmentshapeid ?></td>
                     <?php } ?>
                     <td>

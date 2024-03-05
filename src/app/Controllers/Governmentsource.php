@@ -8,17 +8,12 @@ use App\Models\SourceItemPartModel;
 
 class Governmentsource extends BaseController
 {
-    private array $data;
+    private array $data = [
+        'title' => 'Government Source Detail',
+    ];
 
     public function __construct()
     {
-        $this->data = [
-            'title' => 'Government Source Detail',
-            'isInternetExplorer' => $this->isInternetExplorer(),
-            'live' => $this->isLive(),
-            'online' => $this->isOnline(),
-            'updated' => $this->lastUpdated()->fulldate,
-        ];
     }
 
     public function noRecord($state): void
@@ -41,7 +36,7 @@ class Governmentsource extends BaseController
             $id = $query[0]->governmentsourceid;
             echo view('header', $this->data);
             echo view('general_governmentsource', ['query' => $query, 'state' => $state, 'type' => 'source']);
-            echo view('general_source', ['query' => $query, 'hasLink' => $this->data['live']]);
+            echo view('general_source', ['query' => $query, 'hasLink' => $this->isLive()]);
             $SourceItemPartModel = new SourceItemPartModel();
             $query = $SourceItemPartModel->getByGovernmentSource($id);
             if ($query !== []) {

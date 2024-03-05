@@ -10,17 +10,12 @@ use App\Models\FilingModel;
 
 class Adjudication extends BaseController
 {
-    private array $data;
+    private array $data = [
+        'title' => 'Adjudication Detail',
+    ];
 
     public function __construct()
     {
-        $this->data = [
-            'title' => 'Adjudication Detail',
-            'isInternetExplorer' => $this->isInternetExplorer(),
-            'live' => $this->isLive(),
-            'online' => $this->isOnline(),
-            'updated' => $this->lastUpdated()->fulldate,
-        ];
     }
 
     public function noRecord($state): void

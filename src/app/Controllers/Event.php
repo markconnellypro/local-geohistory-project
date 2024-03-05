@@ -15,17 +15,12 @@ use App\Models\SourceCitationModel;
 
 class Event extends BaseController
 {
-    private array $data;
+    private array $data = [
+        'title' => 'Event Detail',
+    ];
 
     public function __construct()
     {
-        $this->data = [
-            'title' => 'Event Detail',
-            'isInternetExplorer' => $this->isInternetExplorer(),
-            'live' => $this->isLive(),
-            'online' => $this->isOnline(),
-            'updated' => $this->lastUpdated()->fulldate,
-        ];
     }
 
     public function noRecord($state): void
@@ -42,7 +37,7 @@ class Event extends BaseController
         $id = $this->getIdInt($id);
         $EventModel = new EventModel();
         $query = $EventModel->getDetail($id, $state);
-        if (count($query) != 1 || $query[0]->eventgranted == 'placeholder' && !$this->data['live']) {
+        if (count($query) != 1 || $query[0]->eventgranted == 'placeholder' && !$this->isLive()) {
             $this->noRecord($state);
         } else {
             $id = $query[0]->eventid;
@@ -56,7 +51,7 @@ class Event extends BaseController
             $hasMap = $affectedGovernment['hasMap'];
             $hasAffectedGovernmentMap = $hasMap;
             $affectedGovernment = $affectedGovernment['affectedGovernment'];
-            if ($this->data['live']) {
+            if ($this->isLive()) {
                 $MetesDescriptionLineModel = new \App\Models\Development\MetesDescriptionLineModel();
             } else {
                 $MetesDescriptionLineModel = new \App\Models\MetesDescriptionLineModel();
@@ -65,14 +60,14 @@ class Event extends BaseController
             if ($metesdescriptiongisquery !== []) {
                 $hasMap = true;
             }
-            if (!$this->data['live'] && !$eventIsMapped) {
+            if (!$this->isLive() && !$eventIsMapped) {
                 $hasMap = false;
             }
             if ($hasMap) {
-                echo view('general_map', ['live' => $this->data['live'], 'includeBase' => true, 'eventIsMapped' => $eventIsMapped]);
+                echo view('general_map', ['includeBase' => true, 'eventIsMapped' => $eventIsMapped]);
             }
             if (count($affectedGovernment) > 0) {
-                echo view('general_affectedgovernment2', ['affectedGovernment' => $affectedGovernment, 'state' => $state, 'includeDate' => false, 'live' => $this->data['live'], 'isComplete' => true]);
+                echo view('general_affectedgovernment2', ['affectedGovernment' => $affectedGovernment, 'state' => $state, 'includeDate' => false, 'isComplete' => true]);
             }
             $query = $AffectedGovernmentGroupModel->getByEventForm($id, $state);
             if ($query !== []) {
@@ -120,7 +115,7 @@ class Event extends BaseController
             }
             if ($hasMap) {
                 $i = 0;
-                echo view('leaflet_start', ['type' => 'event', 'includeBase' => true, 'needRotation' => false, 'online' => $this->data['online']]);
+                echo view('leaflet_start', ['type' => 'event', 'includeBase' => true, 'needRotation' => false]);
                 echo view('event_affectedgovernmenttype', ['query' => $affectedGovernment['types']]);
                 if ($hasAffectedGovernmentMap) {
                     echo view('general_gis', [
@@ -134,7 +129,7 @@ class Event extends BaseController
                     ]);
                 }
                 $layers = [];
-                if ($this->data['live'] && $metesdescriptiongisquery !== []) {
+                if ($this->isLive() && $metesdescriptiongisquery !== []) {
                     echo view('general_gis', [
                         'query' => $metesdescriptiongisquery,
                         'element' => 'metesdescription',
@@ -151,7 +146,7 @@ class Event extends BaseController
                 } else {
                     echo view('event_end_metesdescription');
                 }
-                echo view('leaflet_end', ['live' => $this->data['live']]);
+                echo view('leaflet_end');
             }
             echo view('footer');
         }

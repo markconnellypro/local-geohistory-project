@@ -4,17 +4,12 @@ namespace App\Controllers;
 
 class Disclaimer extends BaseController
 {
-    private array $data;
+    private array $data = [
+        'title' => 'Disclaimers',
+    ];
 
     public function __construct()
     {
-        $this->data = [
-            'title' => 'Disclaimers',
-            'isInternetExplorer' => $this->isInternetExplorer(),
-            'live' => $this->isLive(),
-            'online' => $this->isOnline(),
-            'updated' => $this->lastUpdated()->fulldate,
-        ];
     }
 
     public function index($state = ''): void

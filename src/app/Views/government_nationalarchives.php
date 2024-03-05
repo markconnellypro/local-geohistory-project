@@ -13,7 +13,7 @@
                 <th>File Unit</th>
                 <th>From</th>
                 <th>To</th>
-                <?php if ($live) { ?>
+                <?php if (\App\Controllers\BaseController::isLive()) { ?>
                     <th>Examined?</th>
                 <?php } ?>
             </tr>
@@ -31,7 +31,7 @@
                     <td><?= $row->nationalarchivesunit ?></td>
                     <td><?= $row->nationalarchivesunitfrom ?></td>
                     <td><?= $row->nationalarchivesunitto ?></td>
-                    <?php if ($live) { ?>
+                    <?php if (\App\Controllers\BaseController::isLive()) { ?>
                         <td><?= ($row->nationalarchivesexamined == 't' ? 'yes' : 'no') ?></td>
                     <?php } ?>
                 </tr>

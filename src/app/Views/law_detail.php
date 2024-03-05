@@ -3,7 +3,7 @@
     <table class="normal cell-border compact stripe">
         <thead>
             <tr>
-                <?php if ($live) { ?>
+                <?php if (\App\Controllers\BaseController::isLive()) { ?>
                     <th>ID</th>
                 <?php } ?>
                 <th>Citation <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#law" aria-label="Law Key"><?= view('general_svg_icon', ['iconLabel' => 'key icon', 'iconName' => 'key', 'iconType' => 'keyicon']); ?></a></th>
@@ -13,7 +13,7 @@
         </thead>
         <tbody>
             <tr>
-                <?php if ($live) { ?>
+                <?php if (\App\Controllers\BaseController::isLive()) { ?>
                     <td><?= $query[0]->lawsectionid ?></td>
                 <?php } ?>
                 <td><?= $query[0]->lawsectioncitation ?></td>

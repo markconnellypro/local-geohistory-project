@@ -7,17 +7,12 @@ use App\Models\SourceItemPartModel;
 
 class Law extends BaseController
 {
-    private array $data;
+    private array $data = [
+        'title' => 'Law Detail',
+    ];
 
     public function __construct()
     {
-        $this->data = [
-            'title' => 'Law Detail',
-            'isInternetExplorer' => $this->isInternetExplorer(),
-            'live' => $this->isLive(),
-            'online' => $this->isOnline(),
-            'updated' => $this->lastUpdated()->fulldate,
-        ];
     }
 
     public function noRecord($state): void
@@ -51,7 +46,7 @@ class Law extends BaseController
             if ($query[0]->url != '') {
                 echo view('general_url', ['query' => $query, 'title' => 'Actual URL']);
             }
-            if ($this->data['live']) {
+            if ($this->isLive()) {
                 $LawGroupSectionModel = new \App\Models\Development\LawGroupSectionModel();
                 $SourceCitationModel = new \App\Models\Development\SourceCitationModel();
             } else {

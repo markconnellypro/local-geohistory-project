@@ -25,7 +25,7 @@
     <script>
         var mapPath = [
             <?php if ($state == 'ma' && (empty($dateRange) || substr($dateRange, 0, 4) < '1821')) { ?> '/asset/development/map/statistics/me.geojson',
-            <?php } ?> '/asset/<?= (($live && (empty($state) || !in_array($state, \App\Controllers\BaseController::getProductionJurisdictions()))) ? 'development/' : '') ?>map/statistics/<?= (empty($state) ? ($live ? 'development' : 'production') : $state) ?>.geojson'
+            <?php } ?> '/asset/<?= ((\App\Controllers\BaseController::isLive() && (empty($state) || !in_array($state, \App\Controllers\BaseController::getProductionJurisdictions()))) ? 'development/' : '') ?>map/statistics/<?= (empty($state) ? (\App\Controllers\BaseController::isLive() ? 'development' : 'production') : $state) ?>.geojson'
         ];
         var partData = <?= $query ?>;
         var lastLayer = "";
@@ -36,7 +36,7 @@
             background-color: rgba(255, 0, 0, 0.0);
         }
     </style>
-    <script src="/<?= ($online ? '/' . getenv('dependency_classybrew') : 'asset/dependency') ?>/classybrew.js"></script>
+    <script src="/<?= (\App\Controllers\BaseController::isOnline() ? '/' . getenv('dependency_classybrew') : 'asset/dependency') ?>/classybrew.js"></script>
     <script src="/asset/map/statistics.js"></script>
 <?php } else { ?>
     <br>No results found!

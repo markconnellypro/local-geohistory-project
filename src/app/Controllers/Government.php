@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Models\AffectedGovernmentGroupModel;
+use App\Models\AppModel;
 use App\Models\EventModel;
 use App\Models\GovernmentIdentifierModel;
 use App\Models\GovernmentShapeModel;
@@ -12,18 +13,12 @@ use App\Models\ResearchLogModel;
 
 class Government extends BaseController
 {
-    private array $data;
+    private array $data = [
+        'title' => 'Government Detail',
+    ];
 
     public function __construct()
     {
-        $this->data = [
-            'title' => 'Government Detail',
-            'isInternetExplorer' => $this->isInternetExplorer(),
-            'live' => $this->isLive(),
-            'online' => $this->isOnline(),
-            'updated' => $this->lastUpdated()->fulldate,
-            'updatedParts' => $this->lastUpdated(),
-        ];
     }
 
     public function noRecord($state): void
@@ -38,7 +33,7 @@ class Government extends BaseController
     {
         $this->data['state'] = $state;
         $id = $this->getIdInt($id);
-        if ($this->data['live']) {
+        if ($this->isLive()) {
             $GovernmentFormGovernmentModel = new \App\Models\Development\GovernmentFormGovernmentModel();
             $GovernmentMapStatusModel = new \App\Models\Development\GovernmentMapStatusModel();
             $GovernmentModel = new \App\Models\Development\GovernmentModel();
@@ -75,7 +70,7 @@ class Government extends BaseController
             $hasMap = ($isCountyOrLower && $query[0]->hasmap == 't');
             $showTimeline = ($query[0]->governmentmapstatustimelapse == 't');
             $statusQuery = $GovernmentMapStatusModel->getDetails();
-            echo view('government_detail', ['live' => $this->data['live'], 'row' => $query[0], 'state' => $state, 'statuses' => $statusQuery]);
+            echo view('government_detail', ['row' => $query[0], 'state' => $state, 'statuses' => $statusQuery]);
             if (!$isHistory) {
                 $query = $SourceCitationModel->getByGovernment($id, $state);
                 if ($query !== []) {
@@ -83,7 +78,7 @@ class Government extends BaseController
                 }
             }
             if ($hasMap) {
-                echo view('general_map', ['live' => $this->data['live'], 'includeBase' => true]);
+                echo view('general_map', ['includeBase' => true]);
             }
             if (!$isHistory) {
                 $populationQuery = $GovernmentPopulationModel->getByGovernment($id, $state);
@@ -155,7 +150,7 @@ class Government extends BaseController
                 $NationalArchivesModel = new NationalArchivesModel();
                 $query = $NationalArchivesModel->getByGovernment($id, $state);
                 if ($query !== []) {
-                    echo view('government_nationalarchives', ['query' => $query, 'live' => $this->data['live'], 'isMultiple' => $this->data['isMultiple']]);
+                    echo view('government_nationalarchives', ['query' => $query, 'isMultiple' => $this->data['isMultiple']]);
                 }
                 if ($isCountyOrLower) {
                     $query = $EventModel->getByGovernmentFailure($id, $events);
@@ -171,11 +166,11 @@ class Government extends BaseController
                     echo view(ENVIRONMENT . '/government_live', ['id' => $id, 'state' => $state, 'isMunicipalityOrLower' => $isMunicipalityOrLower, 'isCountyOrLower' => $isCountyOrLower, 'isCountyOrState' => $isCountyOrState, 'isState' => $isStateOrHigher, 'includeGovernment' => false]);
                 }
                 if ($populationQuery !== []) {
-                    echo view('general_chartjs', ['query' => $populationQuery, 'online' => $this->data['online'], 'xLabel' => 'Year', 'yLabel' => 'Population']);
+                    echo view('general_chartjs', ['query' => $populationQuery, 'xLabel' => 'Year', 'yLabel' => 'Population']);
                 }
             }
             if ($hasMap) {
-                echo view('leaflet_start', ['type' => 'government', 'includeBase' => true, 'needRotation' => false, 'online' => $this->data['online']]);
+                echo view('leaflet_start', ['type' => 'government', 'includeBase' => true, 'needRotation' => false]);
                 $query = $MetesDescriptionLineModel->getGeometryByGovernment($id);
                 $layers = [];
                 $primaryLayer = '';
@@ -218,8 +213,11 @@ class Government extends BaseController
                     $layers['shape'] = 'Government Area';
                     $primaryLayer = 'shape';
                 }
-                echo view('government_end', ['layers' => $layers, 'live' => $this->data['live'], 'primaryLayer' => $primaryLayer, 'state' => $state, 'updatedParts' => $this->data['updatedParts'], 'showTimeline' => $showTimeline]);
-                echo view('leaflet_end', ['live' => $this->data['live']]);
+                date_default_timezone_set('America/New_York');
+                $AppModel = new AppModel();
+                $this->data['updatedParts'] = $AppModel->getLastUpdated();
+                echo view('government_end', ['layers' => $layers, 'primaryLayer' => $primaryLayer, 'state' => $state, 'updatedParts' => $this->data['updatedParts'], 'showTimeline' => $showTimeline]);
+                echo view('leaflet_end');
             }
             echo view('footer');
         }

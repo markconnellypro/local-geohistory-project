@@ -5,7 +5,7 @@
     <table class="normal cell-border compact stripe">
         <thead>
             <tr>
-                <?php if ($live) { ?>
+                <?php if (\App\Controllers\BaseController::isLive()) { ?>
                     <th>ID</th>
                 <?php } ?>
                 <th>Name</th>
@@ -15,7 +15,7 @@
         </thead>
         <tbody>
             <tr>
-                <?php if ($live) { ?>
+                <?php if (\App\Controllers\BaseController::isLive()) { ?>
                     <td><?= $row->governmentid ?></td>
                 <?php } ?>
                 <td><?= $row->governmentlong ?></td>
@@ -37,7 +37,7 @@
                     <?php } ?>
                     <th>Boundary-Name Alteration Count</th>
                     <th>Dissolved <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#date" aria-label="Date Key"><?= view('general_svg_icon', ['iconLabel' => 'key icon', 'iconName' => 'key', 'iconType' => 'keyicon']); ?></a></th>
-                    <?php if ($live) { ?>
+                    <?php if (\App\Controllers\BaseController::isLive()) { ?>
                         <th>Mapping Complete?</th>
                     <?php } ?>
                 </tr>
@@ -50,7 +50,7 @@
                     <?php } ?>
                     <td><?= $row->governmentaltercount ?></td>
                     <td><?php if (!empty($row->governmentdissolutionevent)) { ?><a href="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/event/<?= $row->governmentdissolutionevent ?>/"><?= $row->governmentdissolutiontext ?></a><?php } ?></td>
-                    <?php if ($live) { ?>
+                    <?php if (\App\Controllers\BaseController::isLive()) { ?>
                         <td>
                             <form action="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/governmentmapcomplete/" method="post">
                                 <input type="hidden" name="id" value="<?= $row->governmentid ?>">

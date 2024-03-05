@@ -6,16 +6,12 @@ use App\Models\GovernmentModel;
 
 class Governmentidentifier extends BaseController
 {
-    private array $data;
+    private readonly array $data;
 
     public function __construct()
     {
         $this->data = [
             'title' => 'Government Identifier Detail',
-            'isInternetExplorer' => $this->isInternetExplorer(),
-            'live' => $this->isLive(),
-            'online' => $this->isOnline(),
-            'updated' => $this->lastUpdated()->fulldate,
         ];
     }
 
@@ -32,7 +28,7 @@ class Governmentidentifier extends BaseController
             $this->response->setStatusCode(301);
             return redirect()->to("/" . $this->request->getLocale() . '/governmentidentifier/' . $type . '/' . strtolower($id) . '/');
         }
-        if ($this->data['live']) {
+        if ($this->isLive()) {
             $GovernmentIdentifierModel = new \App\Models\Development\GovernmentIdentifierModel();
         } else {
             $GovernmentIdentifierModel = new \App\Models\GovernmentIdentifierModel();

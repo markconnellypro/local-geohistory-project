@@ -6,7 +6,7 @@
             <input type="radio" name="for" id="for_dissolved" value="dissolved"><label for="for_dissolved">Dissolved Municipalities</label><br>
             <input type="radio" name="for" id="for_net" value="net"><label for="for_net">Net Created-Dissolved Municipalities</label><br>
             <input type="radio" name="for" id="for_eventtype" value="eventtype"><label for="for_eventtype">Events by Event Type</label><br>
-            <?php if ($live) { ?>
+            <?php if (\App\Controllers\BaseController::isLive()) { ?>
                 <input type="radio" name="for" id="for_mapped_incorporated_review" value="mapped_incorporated_review"><label for="for_mapped_incorporated_review">Reviewed Incorporated Municipalities</label><br>
                 <input type="radio" name="for" id="for_mapped_incorporated" value="mapped_incorporated"><label for="for_mapped_incorporated">Mapped Incorporated Municipalities</label><br>
                 <input type="radio" name="for" id="for_mapped_total_review" value="mapped_total_review"><label for="for_mapped_total_review">Reviewed Total Municipalities</label><br>

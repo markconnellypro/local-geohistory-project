@@ -6,7 +6,9 @@ use App\Models\EventTypeModel;
 
 class Statistics extends BaseController
 {
-    private array $data;
+    private array $data = [
+        'title' => 'Statistics',
+    ];
 
     private $byType = [
         'current' => 'Modern-Day Jurisdictions',
@@ -26,13 +28,6 @@ class Statistics extends BaseController
 
     public function __construct()
     {
-        $this->data = [
-            'title' => 'Statistics',
-            'isInternetExplorer' => $this->isInternetExplorer(),
-            'live' => $this->isLive(),
-            'online' => $this->isOnline(),
-            'updated' => $this->lastUpdated()->fulldate,
-        ];
     }
 
     public function index($state = ''): void
@@ -167,7 +162,7 @@ class Statistics extends BaseController
         echo view('general_parameter', ['searchParameter' => $searchParameter]);
         echo view('statistics_view', $this->data);
         if (count($this->data['wholeQuery']) > 0) {
-            echo view('general_chartjs', ['query' => $this->data['wholeQuery'], 'online' => $this->data['online'], 'xLabel' => 'Year', 'yLabel' => ($for == 'createddissolved' ? 'Governments' : 'Events')]);
+            echo view('general_chartjs', ['query' => $this->data['wholeQuery'], 'xLabel' => 'Year', 'yLabel' => ($for == 'createddissolved' ? 'Governments' : 'Events')]);
         }
         echo view('footer');
     }

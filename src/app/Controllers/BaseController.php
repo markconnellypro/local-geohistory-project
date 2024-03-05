@@ -49,21 +49,13 @@ abstract class BaseController extends Controller
         // E.g.: $this->session = \Config\Services::session();
     }
 
-    protected function isInternetExplorer(): bool
+    public static function isInternetExplorer(): bool
     {
         $agent = \Config\Services::request()->getUserAgent();
         return $agent->getBrowser() == 'Internet Explorer';
     }
 
-    protected function getIdInt($id)
-    {
-        if (static::isLive() && preg_match('/^\d{1,9}$/', $id)) {
-            $id = (int) $id;
-        }
-        return $id;
-    }
-
-    public static function getJurisdictions()
+    public static function getJurisdictions(): array
     {
         $jurisdictions = trim(($_ENV['app_jurisdiction'] ?? '') . '|' . ($_ENV['app_jurisdiction_development'] ?? ''), '|');
         $jurisdictions = explode('|', $jurisdictions);
@@ -71,7 +63,7 @@ abstract class BaseController extends Controller
         return $jurisdictions;
     }
 
-    public static function getProductionJurisdictions()
+    public static function getProductionJurisdictions(): array
     {
         $jurisdictions = trim(($_ENV['app_jurisdiction'] ?? ''), '|');
         $jurisdictions = explode('|', $jurisdictions);
@@ -84,7 +76,7 @@ abstract class BaseController extends Controller
         return (ENVIRONMENT == 'development');
     }
 
-    protected function isOnline(): bool
+    public static function isOnline(): bool
     {
         if (static::isLive() && gethostbyname('unpkg.com') == 'unpkg.com') {
             return false;
@@ -93,10 +85,18 @@ abstract class BaseController extends Controller
         }
     }
 
-    protected function lastUpdated()
+    public static function lastUpdated()
     {
         date_default_timezone_set('America/New_York');
         $AppModel = new AppModel();
-        return $AppModel->getLastUpdated();
+        return $AppModel->getLastUpdated()->fulldate;
+    }
+
+    protected function getIdInt(int|string $id): int
+    {
+        if (static::isLive() && preg_match('/^\d{1,9}$/', $id)) {
+            $id = (int) $id;
+        }
+        return $id;
     }
 }

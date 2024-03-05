@@ -9,17 +9,12 @@ use App\Models\SourceItemPartModel;
 
 class Source extends BaseController
 {
-    private array $data;
+    private array $data = [
+        'title' => 'Source Detail',
+    ];
 
     public function __construct()
     {
-        $this->data = [
-            'title' => 'Source Detail',
-            'isInternetExplorer' => $this->isInternetExplorer(),
-            'live' => $this->isLive(),
-            'online' => $this->isOnline(),
-            'updated' => $this->lastUpdated()->fulldate,
-        ];
     }
 
     public function noRecord($state): void
@@ -43,7 +38,7 @@ class Source extends BaseController
             $this->data['pageTitle'] = $query[0]->sourceabbreviation . (empty($query[0]->sourcecitationpage) ? '' : ' ' . $query[0]->sourcecitationpage);
             echo view('header', $this->data);
             echo view('general_sourcecitation', ['query' => $query, 'state' => $state, 'hasColor' => false, 'hasLink' => false, 'title' => 'Detail']);
-            echo view('general_source', ['query' => $query, 'hasLink' => $this->data['live']]);
+            echo view('general_source', ['query' => $query, 'hasLink' => $this->isLive()]);
             if ($query[0]->url != '') {
                 echo view('general_url', ['query' => $query, 'title' => 'Actual URL']);
             }

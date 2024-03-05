@@ -9,7 +9,9 @@ use App\Models\SourceModel;
 
 class Search extends BaseController
 {
-    private array $data;
+    private array $data = [
+        'title' => 'Search',
+    ];
 
     private $categoryType = [
         'event' => 'Event',
@@ -43,13 +45,6 @@ class Search extends BaseController
 
     public function __construct()
     {
-        $this->data = [
-            'title' => 'Search',
-            'isInternetExplorer' => $this->isInternetExplorer(),
-            'live' => $this->isLive(),
-            'online' => $this->isOnline(),
-            'updated' => $this->lastUpdated()->fulldate,
-        ];
     }
 
     private function emptyToEmpty($a)
@@ -91,7 +86,7 @@ class Search extends BaseController
         $stateArray = $this->getJurisdictions();
         $this->data['state'] = $state;
         echo view('header', $this->data);
-        if (!$this->data['live'] && !in_array($state, $stateArray)) {
+        if (!$this->isLive() && !in_array($state, $stateArray)) {
             echo view('search_unavailable');
         } else {
             $GovernmentModel = new GovernmentModel();

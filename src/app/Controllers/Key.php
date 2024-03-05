@@ -6,17 +6,12 @@ use App\Models\DocumentationModel;
 
 class Key extends BaseController
 {
-    private array $data;
+    private array $data = [
+        'title' => 'Key',
+    ];
 
     public function __construct()
     {
-        $this->data = [
-            'title' => 'Key',
-            'isInternetExplorer' => $this->isInternetExplorer(),
-            'live' => $this->isLive(),
-            'online' => $this->isOnline(),
-            'updated' => $this->lastUpdated()->fulldate,
-        ];
     }
 
     public function index($state = ''): void

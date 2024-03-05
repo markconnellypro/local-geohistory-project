@@ -3,7 +3,7 @@
     <table class="normal cell-border compact stripe">
         <thead>
             <tr>
-                <?php if ($live) { ?>
+                <?php if (\App\Controllers\BaseController::isLive()) { ?>
                     <th>ID</th>
                 <?php } ?>
                 <th>Type <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#eventtype" aria-label="Type Key"><?= view('general_svg_icon', ['iconLabel' => 'key icon', 'iconName' => 'key', 'iconType' => 'keyicon']); ?></a></th>
@@ -20,7 +20,7 @@
         </thead>
         <tbody>
             <tr>
-                <?php if ($live) { ?>
+                <?php if (\App\Controllers\BaseController::isLive()) { ?>
                     <td><?= $row->eventid ?></td>
                 <?php } ?>
                 <td><?= $row->eventtypeshort ?></td>
