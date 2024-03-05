@@ -62,12 +62,12 @@ class GovernmentIdentifierModel extends Model
         ])->getResult();
     }
 
-    public function getCensus(array $ids): array
+    public function getCensus(string $ids): array
     {
         return [];
     }
 
-    public function getUsgs(array $ids): array
+    public function getUsgs(string $ids): array
     {
         return [];
     }
