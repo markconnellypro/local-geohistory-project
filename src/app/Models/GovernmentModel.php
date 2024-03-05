@@ -113,7 +113,7 @@ class GovernmentModel extends Model
     // extra.governmentabbreviationid(text)
     // NOT REMOVED
 
-    public function getAbbreviationId($id): array
+    public function getAbbreviationId($id): int
     {
         $query = <<<QUERY
             SELECT governmentid
