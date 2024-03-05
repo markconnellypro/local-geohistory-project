@@ -8,7 +8,7 @@ use App\Models\SourceItemPartModel;
 
 class Governmentsource extends BaseController
 {
-    private $data;
+    private array $data;
 
     public function __construct()
     {

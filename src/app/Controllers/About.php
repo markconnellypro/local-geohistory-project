@@ -6,7 +6,7 @@ use App\Models\DocumentationModel;
 
 class About extends BaseController
 {
-    private $data;
+    private array $data;
 
     public function __construct()
     {

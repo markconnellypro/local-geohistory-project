@@ -4,7 +4,7 @@ namespace App\Controllers;
 
 class Disclaimer extends BaseController
 {
-    private $data;
+    private array $data;
 
     public function __construct()
     {

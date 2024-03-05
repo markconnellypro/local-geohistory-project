@@ -6,7 +6,7 @@ use App\Models\EventTypeModel;
 
 class Statistics extends BaseController
 {
-    private $data;
+    private array $data;
 
     private $byType = [
         'current' => 'Modern-Day Jurisdictions',

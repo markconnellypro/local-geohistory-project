@@ -6,7 +6,7 @@ use App\Models\GovernmentShapeModel;
 
 class Map extends BaseController
 {
-    private $data;
+    private array $data;
 
     public function __construct()
     {

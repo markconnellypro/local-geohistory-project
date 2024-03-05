@@ -6,7 +6,7 @@ use App\Models\GovernmentModel;
 
 class Governmentidentifier extends BaseController
 {
-    private $data;
+    private array $data;
 
     public function __construct()
     {

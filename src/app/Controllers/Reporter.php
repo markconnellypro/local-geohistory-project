@@ -9,7 +9,7 @@ use App\Models\SourceItemPartModel;
 
 class Reporter extends BaseController
 {
-    private $data;
+    private array $data;
 
     public function __construct()
     {

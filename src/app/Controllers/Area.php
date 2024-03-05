@@ -9,7 +9,7 @@ use App\Models\MetesDescriptionModel;
 
 class Area extends BaseController
 {
-    private $data;
+    private array $data;
 
     public function __construct()
     {

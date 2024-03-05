@@ -12,7 +12,7 @@ use App\Models\ResearchLogModel;
 
 class Government extends BaseController
 {
-    private $data;
+    private array $data;
 
     public function __construct()
     {

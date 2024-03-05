@@ -7,7 +7,7 @@ use App\Models\SourceItemPartModel;
 
 class Law extends BaseController
 {
-    private $data;
+    private array $data;
 
     public function __construct()
     {

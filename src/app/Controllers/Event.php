@@ -15,7 +15,7 @@ use App\Models\SourceCitationModel;
 
 class Event extends BaseController
 {
-    private $data;
+    private array $data;
 
     public function __construct()
     {

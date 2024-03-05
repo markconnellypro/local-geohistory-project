@@ -9,7 +9,7 @@ use App\Models\SourceModel;
 
 class Search extends BaseController
 {
-    private $data;
+    private array $data;
 
     private $categoryType = [
         'event' => 'Event',

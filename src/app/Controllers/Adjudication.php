@@ -10,7 +10,7 @@ use App\Models\FilingModel;
 
 class Adjudication extends BaseController
 {
-    private $data;
+    private array $data;
 
     public function __construct()
     {
