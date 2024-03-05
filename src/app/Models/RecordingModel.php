@@ -13,7 +13,7 @@ class RecordingModel extends Model
     // FUNCTION: extra.rangefix
     // FUNCTION: extra.shortdate
 
-    public function getByEvent($id, $state): array
+    public function getByEvent(int $id, string $state): array
     {
         $query = <<<QUERY
             SELECT extra.governmentstatelink(recordingoffice.government, ?, ?) AS government,

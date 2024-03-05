@@ -8,7 +8,7 @@ class SourceItemPartModel extends Model
 {
     // extra.ci_model_reporter_url(integer)
 
-    public function getByAdjudicationSourceCitation($id): array
+    public function getByAdjudicationSourceCitation(int $id): array
     {
         $query = <<<QUERY
             SELECT sourceitem.sourceitemurl ||
@@ -43,7 +43,7 @@ class SourceItemPartModel extends Model
 
     // FUNCTION: extra.sourceurlid
 
-    public function getByGovernmentSource($id): array
+    public function getByGovernmentSource(int $id): array
     {
         $query = <<<QUERY
             SELECT sourceitem.sourceitemurl ||
@@ -83,7 +83,7 @@ class SourceItemPartModel extends Model
 
     // FUNCTION: extra.sourceurlid
 
-    public function getByLawAlternateSection($id): array
+    public function getByLawAlternateSection(int $id): array
     {
         $query = <<<QUERY
             SELECT sourceitem.sourceitemurl ||
@@ -139,7 +139,7 @@ class SourceItemPartModel extends Model
 
     // FUNCTION: extra.sourceurlid
 
-    public function getByLawSection($id): array
+    public function getByLawSection(int $id): array
     {
         $query = <<<QUERY
             SELECT sourceitem.sourceitemurl ||
@@ -193,7 +193,7 @@ class SourceItemPartModel extends Model
 
     // FUNCTION: extra.sourceurlid
 
-    public function getBySourceCitation($id): array
+    public function getBySourceCitation(int $id): array
     {
         $query = <<<QUERY
             SELECT sourceitem.sourceitemurl ||

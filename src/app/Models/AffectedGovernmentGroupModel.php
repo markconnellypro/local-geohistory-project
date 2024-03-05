@@ -12,7 +12,7 @@ class AffectedGovernmentGroupModel extends Model
     // FUNCTION: extra.governmentlong
     // FUNCTION: extra.governmentstatelink
 
-    public function getByEventForm($id, $state): array
+    public function getByEventForm(int $id, string $state): array
     {
         $query = <<<QUERY
             SELECT DISTINCT extra.governmentstatelink(affectedgovernmentpart.governmentto, ?, ?) AS governmentstatelink,
@@ -39,7 +39,7 @@ class AffectedGovernmentGroupModel extends Model
 
     // extra.ci_model_event_affectedgovernment(integer)
 
-    public function getByEventGeometry($id): array
+    public function getByEventGeometry(int $id): array
     {
         $query = <<<QUERY
             SELECT DISTINCT affectedgovernmentgroup.affectedgovernmentgroupid AS id,
@@ -65,7 +65,7 @@ class AffectedGovernmentGroupModel extends Model
     // FUNCTION: extra.governmentlong
     // FUNCTION: extra.affectedtypeshort
 
-    public function getByEventGovernment($id, $state): array
+    public function getByEventGovernment(int $id, string $state): array
     {
         $query = <<<QUERY
             SELECT DISTINCT affectedgovernmentgrouppart.affectedgovernmentgroup AS id,
@@ -110,7 +110,7 @@ class AffectedGovernmentGroupModel extends Model
     // FUNCTION: extra.governmentlong
     // VIEW: extra.governmentsubstitute
 
-    public function getByGovernmentForm($id, $state): array
+    public function getByGovernmentForm(int $id, string $state): array
     {
         $query = <<<QUERY
             SELECT DISTINCT event.eventsort,
@@ -154,7 +154,7 @@ class AffectedGovernmentGroupModel extends Model
     // FUNCTION: extra.governmentsubstitutedcache
     // VIEW: extra.governmentsubstitutecache
 
-    public function getByGovernmentGovernment($id, $state): array
+    public function getByGovernmentGovernment(int $id, string $state): array
     {
         $query = <<<QUERY
             SELECT DISTINCT event.eventsort,
@@ -317,7 +317,7 @@ class AffectedGovernmentGroupModel extends Model
     // FUNCTION: extra.governmentshort
     // FUNCTION: extra.governmentstatelink
 
-    public function getByGovernmentShape($id, $state): array
+    public function getByGovernmentShape(int $id, string $state): array
     {
         $query = <<<QUERY
             WITH foundaffectedgovernment AS (
@@ -538,7 +538,7 @@ class AffectedGovernmentGroupModel extends Model
         ])->getResult();
     }
 
-    public function getProcess($query, $gisQuery = []): array
+    public function getProcess(array $query, array $gisQuery = []): array
     {
         $linkTypes = [];
         $rows = [];

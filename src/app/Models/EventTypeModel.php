@@ -33,7 +33,7 @@ class EventTypeModel extends Model
     // FUNCTION: extra.governmentabbreviationid
     // VIEW: extra.eventgovernmentcache
 
-    public function getSearch($state): array
+    public function getSearch(string $state): array
     {
         $query = <<<QUERY
             SELECT DISTINCT eventtype.eventtypeshort,
@@ -63,9 +63,9 @@ class EventTypeModel extends Model
 
     // VIEW: extra.statistics_eventtype
 
-    public function getManyByStatistics($state): array
+    public function getManyByStatistics(string $state): array
     {
-        if (empty($state)) {
+        if ($state === '') {
             $state = str_replace('|', ',', getenv('app_jurisdiction'));
         }
         $state = '{' . strtoupper($state) . '}';
@@ -88,7 +88,7 @@ class EventTypeModel extends Model
 
     // extra_removed.ci_model_statistics_eventtype(text)
 
-    public function getOneByStatistics($eventType): array
+    public function getOneByStatistics(string $eventType): array
     {
         $query = <<<QUERY
             SELECT DISTINCT eventtype.eventtypeshort,

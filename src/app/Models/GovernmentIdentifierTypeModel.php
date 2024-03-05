@@ -10,7 +10,7 @@ class GovernmentIdentifierTypeModel extends Model
 
     // VIEW: extra.governmentrelationcache
 
-    public function getSearch($state): array
+    public function getSearch(string $state): array
     {
         $query = <<<QUERY
             SELECT DISTINCT split_part(governmentidentifiertype.governmentidentifiertypeshort, ':', 1) AS governmentidentifiertypeshort,

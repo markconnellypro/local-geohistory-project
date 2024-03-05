@@ -8,7 +8,7 @@ class MetesDescriptionLineModel extends Model
 {
     // extra.ci_model_metes_row(integer)
 
-    public function getByMetesDescription($id): array
+    public function getByMetesDescription(int $id): array
     {
         $query = <<<QUERY
             SELECT metesdescriptionline.metesdescriptionline,
@@ -28,17 +28,17 @@ class MetesDescriptionLineModel extends Model
         ])->getResult();
     }
 
-    public function getGeometryByEvent($id, $state): array
+    public function getGeometryByEvent(int $id, string $state): array
     {
         return [];
     }
 
-    public function getGeometryByGovernment($id): array
+    public function getGeometryByGovernment(int $id): array
     {
         return [];
     }
 
-    public function getGeometryByMetesDescription($id): array
+    public function getGeometryByMetesDescription(int $id): array
     {
         return [];
     }

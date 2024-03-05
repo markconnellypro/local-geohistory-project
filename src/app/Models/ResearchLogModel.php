@@ -13,7 +13,7 @@ class ResearchLogModel extends Model
     // FUNCTION: extra.shortdate
     // VIEW: extra.governmentsubstitutecache
 
-    public function getByGovernment($id, $state): array
+    public function getByGovernment(int $id, string $state): array
     {
         $query = <<<QUERY
             SELECT researchlog.researchlogid,

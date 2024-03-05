@@ -13,7 +13,7 @@ class MetesDescriptionModel extends Model
     // VIEW: extra.eventgovernmentcache
     // VIEW: extra.governmentrelationcache
 
-    public function getDetail($id, $state): array
+    public function getDetail(int|string $id, string $state): array
     {
         if (!is_int($id)) {
             $id = $this->getSlugId($id);
@@ -74,7 +74,7 @@ class MetesDescriptionModel extends Model
 
     // VIEW: extra.metesdescriptionextracache
 
-    public function getByEvent($id): array
+    public function getByEvent(int $id): array
     {
         $query = <<<QUERY
             SELECT metesdescriptionextracache.metesdescriptionslug,
@@ -99,7 +99,7 @@ class MetesDescriptionModel extends Model
 
     // VIEW: extra.metesdescriptionextracache
 
-    public function getByGovernmentShape($id): array
+    public function getByGovernmentShape(int $id): array
     {
         $query = <<<QUERY
             SELECT metesdescriptionextracache.metesdescriptionslug,
@@ -130,7 +130,7 @@ class MetesDescriptionModel extends Model
 
     // VIEW: extra.metesdescriptionextracache
 
-    private function getSlugId($id): int
+    private function getSlugId(string $id): int
     {
         $query = <<<QUERY
             SELECT metesdescriptionextracache.metesdescriptionid AS id

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use CodeIgniter\Model;
+use stdClass;
 
 class AppModel extends Model
 {
@@ -10,7 +11,7 @@ class AppModel extends Model
 
     // FUNCTION: extra.fulldate
 
-    public function getLastUpdated()
+    public function getLastUpdated(): array|stdClass
     {
         $query = <<<QUERY
             SELECT extra.fulldate(lastrefreshdate::text) AS fulldate,
@@ -22,7 +23,7 @@ class AppModel extends Model
         $query = $this->db->query($query)->getResult();
 
         if (count($query) == 1) {
-            return $query[0];
+            return $query;
         }
 
         return [];

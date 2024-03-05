@@ -8,7 +8,7 @@ class DocumentationModel extends Model
 {
     // extra.ci_model_about(character varying)
 
-    public function getAboutDetail($state): array
+    public function getAboutDetail(string $state): array
     {
         $query = <<<QUERY
             SELECT documentation.documentationshort AS keyshort,
@@ -24,7 +24,7 @@ class DocumentationModel extends Model
         ])->getResult();
     }
 
-    public function getKey($type): array
+    public function getKey(string $type): array
     {
         $query = <<<QUERY
             SELECT documentation.documentationshort AS keyshort,

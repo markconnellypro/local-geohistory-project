@@ -19,7 +19,7 @@ class GovernmentModel extends Model
     // VIEW: extra.governmentrelationcache
     // VIEW: extra.governmentsubstitutecache
 
-    public function getDetail($id, $state): array
+    public function getDetail(int|string $id, string $state): array
     {
         if (!is_int($id)) {
             $id = $this->getSlugId($id);
@@ -113,7 +113,7 @@ class GovernmentModel extends Model
     // extra.governmentabbreviationid(text)
     // NOT REMOVED
 
-    public function getAbbreviationId($id): int
+    public function getAbbreviationId(string $id): int
     {
         $query = <<<QUERY
             SELECT governmentid
@@ -139,7 +139,7 @@ class GovernmentModel extends Model
     // FUNCTION: extra.governmentlong
     // FUNCTION: extra.governmentstatelink
 
-    public function getByGovernmentIdentifier($ids): array
+    public function getByGovernmentIdentifier(array $ids): array
     {
         $query = <<<QUERY
             SELECT extra.governmentstatelink(governmentidentifier.government, '--', ?) governmentstatelink,
@@ -160,7 +160,7 @@ class GovernmentModel extends Model
     // FUNCTION: extra.governmentabbreviation
     // VIEW: extra.statistics_createddissolved
 
-    public function getByStatisticsNationPart($parameters): array
+    public function getByStatisticsNationPart(array $parameters): array
     {
         $for = $parameters[0];
         $from = $parameters[1];
@@ -237,7 +237,7 @@ class GovernmentModel extends Model
 
     // VIEW: extra.statistics_createddissolved
 
-    public function getByStatisticsNationWhole($parameters): array
+    public function getByStatisticsNationWhole(array $parameters): array
     {
         $for = $parameters[0];
         $from = $parameters[1];
@@ -298,7 +298,7 @@ class GovernmentModel extends Model
 
     // VIEW: extra.statistics_createddissolved
 
-    public function getByStatisticsStatePart($parameters): array
+    public function getByStatisticsStatePart(array $parameters): array
     {
         $for = $parameters[0];
         $from = $parameters[1];
@@ -366,7 +366,7 @@ class GovernmentModel extends Model
 
     // VIEW: extra.statistics_createddissolved
 
-    public function getByStatisticsStateWhole($parameters): array
+    public function getByStatisticsStateWhole(array $parameters): array
     {
         $for = $parameters[0];
         $from = $parameters[1];
@@ -432,7 +432,7 @@ class GovernmentModel extends Model
     // VIEW: extra.governmentextracache
     // VIEW: extra.governmentrelationcache
 
-    public function getLookupByGovernment($state, $government): array
+    public function getLookupByGovernment(string $state, string $government): array
     {
         if (strlen($government) < 3) {
             return [];
@@ -465,7 +465,7 @@ class GovernmentModel extends Model
     // VIEW: extra.governmentextracache
     // VIEW: extra.governmentrelationcache
 
-    public function getLookupByGovernmentParent($state, $government): array
+    public function getLookupByGovernmentParent(string $state, string $government): array
     {
         $query = <<<QUERY
             SELECT DISTINCT governmentextracache.governmentshort,
@@ -491,12 +491,12 @@ class GovernmentModel extends Model
         ])->getResultArray();
     }
 
-    public function getNote($id, $state): array
+    public function getNote(int $id, string $state): array
     {
         return [];
     }
 
-    public function getOffice($id, $state): array
+    public function getOffice(int $id, string $state): array
     {
         return [];
     }
@@ -508,7 +508,7 @@ class GovernmentModel extends Model
     // VIEW: extra.governmentparentcache
     // VIEW: extra.governmentsubstitutecache
 
-    public function getRelated($id, $state): array
+    public function getRelated(int $id, string $state): array
     {
         $query = <<<QUERY
             WITH relationpart AS (
@@ -645,7 +645,7 @@ class GovernmentModel extends Model
     // FUNCTION: extra.governmentcurrentleadparent
     // VIEW: governmentrelationcache
 
-    public function getSearch($state): array
+    public function getSearch(string $state): array
     {
         $query = <<<QUERY
             SELECT DISTINCT governmentrelationcache.governmentshort,
@@ -676,7 +676,7 @@ class GovernmentModel extends Model
     // VIEW: extra.governmentextracache
     // VIEW: extra.governmentrelationcache
 
-    public function getSearchByGovernment($parameters): array
+    public function getSearchByGovernment(array $parameters): array
     {
         $state = $parameters[0];
         $government = $parameters[1];
@@ -749,7 +749,7 @@ class GovernmentModel extends Model
         ])->getResult();
     }
 
-    public function getSchoolDistrict($id, $state): array
+    public function getSchoolDistrict(int $id, string $state): array
     {
         return [];
     }
@@ -761,7 +761,7 @@ class GovernmentModel extends Model
 
     // VIEW: extra.governmentextracache
 
-    public function getSlug($id): string
+    public function getSlug(int $id): string
     {
         $query = <<<QUERY
             SELECT CASE
@@ -790,7 +790,7 @@ class GovernmentModel extends Model
 
     // VIEW: extra.governmentextracache
 
-    protected function getSlugId($id): int
+    protected function getSlugId(string $id): int
     {
         $query = <<<QUERY
             SELECT governmentextracache.governmentid AS id

@@ -12,7 +12,7 @@ class NationalArchivesModel extends Model
     // VIEW: extra.governmentsubstitutecache
     // VIEW: extra.sourceextra
 
-    public function getByGovernment($id, $state): array
+    public function getByGovernment(int $id, string $state): array
     {
         $query = <<<QUERY
             SELECT DISTINCT sourceextra.sourceabbreviation,

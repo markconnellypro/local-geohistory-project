@@ -8,7 +8,7 @@ class GovernmentIdentifierModel extends Model
 {
     // extra.ci_model_governmentidentifier_detail(text, text, text)
 
-    public function getDetail($type, $id): array
+    public function getDetail(string $type, string $id): array
     {
         $query = <<<QUERY
             SELECT governmentidentifiertype.governmentidentifiertypetype,
@@ -37,7 +37,7 @@ class GovernmentIdentifierModel extends Model
     // FUNCTION: extra.governmentlong
     // VIEW: extra.governmentsubstitutecache
 
-    public function getByGovernment($id, $state): array
+    public function getByGovernment(int $id, string $state): array
     {
         $query = <<<QUERY
             SELECT DISTINCT governmentidentifiertype.governmentidentifiertypetype,
@@ -62,19 +62,19 @@ class GovernmentIdentifierModel extends Model
         ])->getResult();
     }
 
-    public function getCensus($ids): array
+    public function getCensus(array $ids): array
     {
         return [];
     }
 
-    public function getUsgs($ids): array
+    public function getUsgs(array $ids): array
     {
         return [];
     }
 
     // extra.ci_model_governmentidentifier_related(integer[], integer[], text)
 
-    public function getRelated($governments, $governmentidentifierids): array
+    public function getRelated(array $governments, array $governmentidentifierids): array
     {
         $query = <<<QUERY
             SELECT DISTINCT governmentidentifiertype.governmentidentifiertypetype,
@@ -100,7 +100,7 @@ class GovernmentIdentifierModel extends Model
 
     // VIEW: extra.governmentrelationcache
 
-    public function getSearchByIdentifier($parameters): array
+    public function getSearchByIdentifier(array $parameters): array
     {
         $type = $parameters[0];
         $identifier = $parameters[1];

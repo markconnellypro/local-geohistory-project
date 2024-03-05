@@ -14,7 +14,7 @@ class SourceCitationModel extends Model
     // VIEW: extra.sourcecitationgovernmentcache
     // VIEW: extra.sourceextra
 
-    public function getDetail($id, $state): array
+    public function getDetail(int|string $id, string $state): array
     {
         if (!is_int($id)) {
             $id = $this->getSlugId($id);
@@ -65,7 +65,7 @@ class SourceCitationModel extends Model
     // VIEW: extra.sourcecitationextracache
     // VIEW: extra.sourceextra
 
-    public function getByEvent($id): array
+    public function getByEvent(int $id): array
     {
         $query = <<<QUERY
             SELECT sourcecitationextracache.sourcecitationslug,
@@ -100,17 +100,17 @@ class SourceCitationModel extends Model
         ])->getResult();
     }
 
-    public function getByGovernment($id, $state): array
+    public function getByGovernment(int $id, string $state): array
     {
         return [];
     }
 
-    public function getByLawNation($id): array
+    public function getByLawNation(int $id): array
     {
         return [];
     }
 
-    public function getByLawState($id, $state): array
+    public function getByLawState(int $id, string $state): array
     {
         return [];
     }
@@ -119,7 +119,7 @@ class SourceCitationModel extends Model
 
     // VIEW: extra.sourcecitationextracache
 
-    private function getSlugId($id): int
+    private function getSlugId(string $id): int
     {
         $query = <<<QUERY
             SELECT sourcecitationextracache.sourcecitationid AS id

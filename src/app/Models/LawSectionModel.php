@@ -13,7 +13,7 @@ class LawSectionModel extends Model
     // VIEW: extra.lawsectiongovernmentcache
     // VIEW: extra.sourceextra
 
-    public function getDetail($id, $state): array
+    public function getDetail(int|string $id, string $state): array
     {
         if (!is_int($id)) {
             $id = $this->getSlugId($id);
@@ -56,7 +56,7 @@ class LawSectionModel extends Model
 
     // VIEW: extra.lawsectionextracache
 
-    public function getByEvent($id): array
+    public function getByEvent(int $id): array
     {
         $query = <<<QUERY
             SELECT DISTINCT lawsectionextracache.lawsectionslug,
@@ -93,7 +93,7 @@ class LawSectionModel extends Model
     // VIEW: extra.lawalternatesectionextracache
     // VIEW: extra.lawsectionextracache
 
-    public function getRelated($id): array
+    public function getRelated(int $id): array
     {
         $query = <<<QUERY
             SELECT DISTINCT lawsectionextracache.lawsectionslug,
@@ -170,7 +170,7 @@ class LawSectionModel extends Model
     // FUNCTION: extra.governmentcurrentleadparent
     // VIEW: extra.lawsectionextracache
 
-    public function getSearchByDateEvent($parameters): array
+    public function getSearchByDateEvent(array $parameters): array
     {
         $date = $parameters[0];
         $eventType = $parameters[1];
@@ -227,7 +227,7 @@ class LawSectionModel extends Model
     // FUNCTION: extra.governmentcurrentleadparent
     // VIEW: extra.lawsectionextracache
 
-    public function getSearchByReference($parameters): array
+    public function getSearchByReference(array $parameters): array
     {
         $yearVolume = $parameters[0];
         $page = $parameters[1];
@@ -283,7 +283,7 @@ class LawSectionModel extends Model
 
     // VIEW: extra.lawsectionextracache
 
-    private function getSlugId($id): int
+    private function getSlugId(string $id): int
     {
         $query = <<<QUERY
             SELECT lawsectionextracache.lawsectionid AS id

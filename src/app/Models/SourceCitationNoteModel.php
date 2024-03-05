@@ -8,7 +8,7 @@ class SourceCitationNoteModel extends Model
 {
     // extra.ci_model_source_note(integer)
 
-    public function getBySourceCitation($id): array
+    public function getBySourceCitation(int $id): array
     {
         $query = <<<QUERY
             SELECT

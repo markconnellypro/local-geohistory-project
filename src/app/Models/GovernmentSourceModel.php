@@ -15,7 +15,7 @@ class GovernmentSourceModel extends Model
     // FUNCTION: extra.shortdate
     // VIEW: extra.sourceextra
 
-    public function getDetail($id, $state): array
+    public function getDetail(int|string $id, string $state): array
     {
         if (!is_int($id)) {
             $id = $this->getSlugId($id);
@@ -109,7 +109,7 @@ class GovernmentSourceModel extends Model
     // FUNCTION: extra.shortdate
     // VIEW: extra.governmentsourceextracache
 
-    public function getByEvent($id, $state): array
+    public function getByEvent(int $id, string $state): array
     {
         $query = <<<QUERY
             SELECT DISTINCT extra.governmentstatelink(governmentsource.government, ?, ?) AS government,
@@ -193,7 +193,7 @@ class GovernmentSourceModel extends Model
     // FUNCTION: extra.shortdate
     // VIEW: extra.governmentsubstitutecache
 
-    public function getByGovernment($id, $state): array
+    public function getByGovernment(int $id, string $state): array
     {
         $query = <<<QUERY
             SELECT DISTINCT array_agg(event.eventslug) AS eventslug,
@@ -275,7 +275,7 @@ class GovernmentSourceModel extends Model
 
     // VIEW: extra.governmentsourceextracache
 
-    private function getSlugId($id): int
+    private function getSlugId(string $id): int
     {
         $query = <<<QUERY
             SELECT governmentsourceextracache.governmentsourceid AS id

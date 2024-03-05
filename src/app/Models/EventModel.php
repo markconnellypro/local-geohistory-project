@@ -14,7 +14,7 @@ class EventModel extends Model
     // FUNCTION: extra.eventgovernmentcache
     // FUNCTION: extra.governmentrelationcache
 
-    public function getDetail($id, $state): array
+    public function getDetail(int|string $id, string $state): array
     {
         if (!is_int($id)) {
             $id = $this->getSlugId($id, $state);
@@ -101,7 +101,7 @@ class EventModel extends Model
 
     // extra.ci_model_adjudication_event(integer)
 
-    public function getByAdjudication($id): array
+    public function getByAdjudication(int $id): array
     {
         $query = <<<QUERY
             SELECT DISTINCT event.eventslug,
@@ -132,7 +132,7 @@ class EventModel extends Model
 
     // extra.ci_model_reporter_event(integer)
 
-    public function getByAdjudicationSourceCitation($id): array
+    public function getByAdjudicationSourceCitation(int $id): array
     {
         $query = <<<QUERY
             SELECT DISTINCT event.eventslug,
@@ -165,7 +165,7 @@ class EventModel extends Model
     // VIEW: extra.eventgovernmentcache
     // VIEW: extra.governmentsubstitutecache
 
-    public function getByGovernmentFailure($id, $events): array
+    public function getByGovernmentFailure(int $id, array $events): array
     {
         $query = <<<QUERY
             SELECT DISTINCT event.eventslug,
@@ -199,7 +199,7 @@ class EventModel extends Model
 
     // extra.ci_model_area_event_failure(integer, integer[])
 
-    public function getByGovernmentShapeFailure($id, $events): array
+    public function getByGovernmentShapeFailure(int $id, array $events): array
     {
         $query = <<<QUERY
             SELECT DISTINCT event.eventslug,
@@ -242,7 +242,7 @@ class EventModel extends Model
 
     // extra.ci_model_governmentsource_event(integer)
 
-    public function getByGovernmentSource($id): array
+    public function getByGovernmentSource(int $id): array
     {
         $query = <<<QUERY
             SELECT DISTINCT event.eventslug,
@@ -273,7 +273,7 @@ class EventModel extends Model
     // VIEW: extra.eventgovernmentcache
     // VIEW: extra.governmentsubstitutecache
 
-    public function getByGovernmentSuccess($id, $events): array
+    public function getByGovernmentSuccess(int $id, array $events): array
     {
         $query = <<<QUERY
             SELECT DISTINCT event.eventslug,
@@ -306,7 +306,7 @@ class EventModel extends Model
 
     // extra.ci_model_lawalternate_event(integer)
 
-    public function getByLawAlternateSection($id): array
+    public function getByLawAlternateSection(int $id): array
     {
         $query = <<<QUERY
             SELECT DISTINCT event.eventslug,
@@ -342,7 +342,7 @@ class EventModel extends Model
 
     // extra.ci_model_law_event(integer)
 
-    public function getByLawSection($id): array
+    public function getByLawSection(int $id): array
     {
         $query = <<<QUERY
             SELECT DISTINCT event.eventslug,
@@ -376,7 +376,7 @@ class EventModel extends Model
 
     // extra.ci_model_source_event(integer)
 
-    public function getBySourceCitation($id): array
+    public function getBySourceCitation(int $id): array
     {
         $query = <<<QUERY
             SELECT DISTINCT event.eventslug,
@@ -407,7 +407,7 @@ class EventModel extends Model
     // FUNCTION: extra.governmentabbreviation
     // VIEW: extra.statistics_eventtype
 
-    public function getByStatisticsNationPart($parameters): array
+    public function getByStatisticsNationPart(array $parameters): array
     {
         $for = $parameters[0];
         $from = $parameters[1];
@@ -473,7 +473,7 @@ class EventModel extends Model
 
     // VIEW: extra.statistics_eventtype
 
-    public function getByStatisticsNationWhole($parameters): array
+    public function getByStatisticsNationWhole(array $parameters): array
     {
         $for = $parameters[0];
         $from = $parameters[1];
@@ -523,7 +523,7 @@ class EventModel extends Model
 
     // VIEW: extra.statistics_eventtype
 
-    public function getByStatisticsStatePart($parameters): array
+    public function getByStatisticsStatePart(array $parameters): array
     {
         $for = $parameters[0];
         $from = $parameters[1];
@@ -580,7 +580,7 @@ class EventModel extends Model
 
     // VIEW: extra.statistics_eventtype
 
-    public function getByStatisticsStateWhole($parameters): array
+    public function getByStatisticsStateWhole(array $parameters): array
     {
         $for = $parameters[0];
         $from = $parameters[1];
@@ -634,7 +634,7 @@ class EventModel extends Model
     // VIEW: extra.governmentextracache
     // VIEW: extra.governmentrelationcache
 
-    public function getSearchByGovernment($parameters): array
+    public function getSearchByGovernment(array $parameters): array
     {
         $state = $parameters[0];
         $government = $parameters[1];
@@ -721,7 +721,7 @@ class EventModel extends Model
 
     // extra.eventslugidreplacement(text) - SPLIT INTO TWO
 
-    private function getSlugId($id, $state): int
+    private function getSlugId(string $id, string $state): int
     {
         $query = <<<QUERY
             SELECT event.eventid AS id
@@ -746,7 +746,7 @@ class EventModel extends Model
 
     // extra.eventslugidreplacement(text) - SPLIT INTO TWO
 
-    private function getRetiredSlugRedirect($id, $state): void
+    private function getRetiredSlugRedirect(int|string $id, string $state): void
     {
         $query = <<<QUERY
             SELECT DISTINCT event.eventslug

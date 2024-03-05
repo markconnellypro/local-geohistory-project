@@ -14,7 +14,7 @@ class AdjudicationSourceCitationModel extends Model
     // VIEW: extra.sourceextra
     // VIEW: extra.adjudicationgovernmentcache
 
-    public function getDetail($id, $state): array
+    public function getDetail(int|string $id, string $state): array
     {
         if (!is_int($id)) {
             $id = $this->getSlugId($id);
@@ -54,7 +54,7 @@ class AdjudicationSourceCitationModel extends Model
         ])->getResult();
     }
 
-    public function getByAdjudication($id): array
+    public function getByAdjudication(int $id): array
     {
         // extra.ci_model_adjudication_source(integer)
 
@@ -84,7 +84,7 @@ class AdjudicationSourceCitationModel extends Model
         ])->getResult();
     }
 
-    private function getSlugId($id): int
+    private function getSlugId(string $id): int
     {
         $query = <<<QUERY
             SELECT adjudicationsourcecitationextracache.adjudicationsourcecitationid AS id

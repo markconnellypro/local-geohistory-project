@@ -10,7 +10,7 @@ class PlssModel extends Model
 
     // FUNCTION: extra.plsstownshiplong
 
-    public function getByEvent($id): array
+    public function getByEvent(int $id): array
     {
         $query = <<<QUERY
             -- Need to add support for second division and special survey
