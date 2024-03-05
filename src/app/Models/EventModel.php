@@ -690,7 +690,7 @@ class EventModel extends Model
                 AND (0 = ?
                     OR (event.eventfrom <= (? + ?) AND event.eventfrom >= (? - ?))
                     OR (event.eventto <= (? + ?) AND event.eventto >= (? - ?))
-                    OR (floorevent.eventsort <= (? + ?) AND floorevent.eventsort >= (? - ?)))
+                    OR (floor(event.eventsort) <= (? + ?) AND floor(event.eventsort) >= (? - ?)))
                 ORDER BY event.eventsort, event.eventlong
         QUERY;
 
