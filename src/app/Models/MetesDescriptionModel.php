@@ -144,7 +144,7 @@ class MetesDescriptionModel extends Model
 
         $id = -1;
 
-        if (count($query) == 1) {
+        if (count($query) === 1) {
             $id = $query[0]->id;
         }
 

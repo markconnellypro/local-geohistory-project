@@ -735,7 +735,7 @@ class EventModel extends Model
 
         $output = -1;
 
-        if (count($query) == 1) {
+        if (count($query) === 1) {
             $output = $query[0]->id;
         } else {
             $this->getRetiredSlugRedirect($id, $state);
@@ -760,7 +760,7 @@ class EventModel extends Model
             $id,
         ])->getResult();
 
-        if (count($query) == 1) {
+        if (count($query) === 1) {
             header("HTTP/1.1 301 Moved Permanently");
             header("Location: /" . \Config\Services::request()->getLocale() . "/" . $state . "/event/" . $query[0]->eventslug . "/");
             exit();

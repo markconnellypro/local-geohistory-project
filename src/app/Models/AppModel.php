@@ -22,7 +22,7 @@ class AppModel extends Model
 
         $query = $this->db->query($query)->getResult();
 
-        if (count($query) == 1) {
+        if (count($query) === 1) {
             return $query;
         }
 
