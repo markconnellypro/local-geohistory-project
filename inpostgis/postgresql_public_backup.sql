@@ -1334,8 +1334,6 @@ RAISE INFO '%', clock_timestamp();
 RAISE INFO '%', clock_timestamp();
     REFRESH MATERIALIZED VIEW extra.adjudicationsourcecitationextracache;
 RAISE INFO '%', clock_timestamp();
-    REFRESH MATERIALIZED VIEW extra.eventextracache;
-RAISE INFO '%', clock_timestamp();
     REFRESH MATERIALIZED VIEW extra.governmentextracache;
 RAISE INFO '%', clock_timestamp();
     REFRESH MATERIALIZED VIEW extra.governmenthasmappedeventcache;
