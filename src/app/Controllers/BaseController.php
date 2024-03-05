@@ -52,7 +52,7 @@ abstract class BaseController extends Controller
     public static function isInternetExplorer(): bool
     {
         $agent = \Config\Services::request()->getUserAgent();
-        return $agent->getBrowser() == 'Internet Explorer';
+        return $agent->getBrowser() === 'Internet Explorer';
     }
 
     public static function getJurisdictions(): array
@@ -73,12 +73,12 @@ abstract class BaseController extends Controller
 
     public static function isLive(): bool
     {
-        return (ENVIRONMENT == 'development');
+        return (ENVIRONMENT === 'development');
     }
 
     public static function isOnline(): bool
     {
-        if (static::isLive() && gethostbyname('unpkg.com') == 'unpkg.com') {
+        if (static::isLive() && gethostbyname('unpkg.com') === 'unpkg.com') {
             return false;
         } else {
             return true;
