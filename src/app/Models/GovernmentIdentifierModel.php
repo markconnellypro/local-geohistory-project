@@ -74,7 +74,7 @@ class GovernmentIdentifierModel extends Model
 
     // extra.ci_model_governmentidentifier_related(integer[], integer[], text)
 
-    public function getRelated(array $governments, array $governmentidentifierids): array
+    public function getRelated(string $governments, string $governmentidentifierids): array
     {
         $query = <<<QUERY
             SELECT DISTINCT governmentidentifiertype.governmentidentifiertypetype,

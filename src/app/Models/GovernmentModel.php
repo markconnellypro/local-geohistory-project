@@ -139,7 +139,7 @@ class GovernmentModel extends Model
     // FUNCTION: extra.governmentlong
     // FUNCTION: extra.governmentstatelink
 
-    public function getByGovernmentIdentifier(array $ids): array
+    public function getByGovernmentIdentifier(string $ids): array
     {
         $query = <<<QUERY
             SELECT extra.governmentstatelink(governmentidentifier.government, '--', ?) governmentstatelink,

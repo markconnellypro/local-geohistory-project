@@ -21,7 +21,7 @@ class Government extends BaseController
     {
     }
 
-    public function noRecord($state): void
+    public function noRecord(string $state): void
     {
         $this->data['state'] = $state;
         echo view('header', $this->data);
@@ -29,7 +29,7 @@ class Government extends BaseController
         echo view('footer');
     }
 
-    public function view($state, $id, $isHistory = false): void
+    public function view(string $state, int|string $id, bool $isHistory = false): void
     {
         $this->data['state'] = $state;
         $id = $this->getIdInt($id);
@@ -112,7 +112,6 @@ class Government extends BaseController
                 }
             }
             $events = array_unique($events);
-            $events = '{' . implode(',', $events) . '}';
             $EventModel = new EventModel();
             if (!$isHistory) {
                 if ($isCountyOrLower) {
@@ -215,8 +214,8 @@ class Government extends BaseController
                 }
                 date_default_timezone_set('America/New_York');
                 $AppModel = new AppModel();
-                $this->data['updatedParts'] = $AppModel->getLastUpdated();
-                echo view('government_end', ['layers' => $layers, 'primaryLayer' => $primaryLayer, 'state' => $state, 'updatedParts' => $this->data['updatedParts'], 'showTimeline' => $showTimeline]);
+                $updatedParts = $AppModel->getLastUpdated()[0];
+                echo view('government_end', ['layers' => $layers, 'primaryLayer' => $primaryLayer, 'state' => $state, 'updatedParts' => $updatedParts, 'showTimeline' => $showTimeline]);
                 echo view('leaflet_end');
             }
             echo view('footer');

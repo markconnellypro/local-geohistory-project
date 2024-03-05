@@ -2,6 +2,8 @@
 
 namespace App\Controllers;
 
+use CodeIgniter\HTTP\RedirectResponse;
+
 class Welcome extends BaseController
 {
     private readonly array $data;
@@ -21,7 +23,7 @@ class Welcome extends BaseController
         echo view('footer');
     }
 
-    public function language()
+    public function language(): RedirectResponse
     {
         $this->response->setStatusCode(301);
         return redirect()->to("/en");

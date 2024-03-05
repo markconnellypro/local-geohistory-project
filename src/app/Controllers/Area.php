@@ -18,7 +18,7 @@ class Area extends BaseController
     {
     }
 
-    public function address($state): void
+    public function address(string $state): void
     {
         $addressText = $this->request->getPost('address', FILTER_SANITIZE_STRING);
         try {
@@ -36,12 +36,12 @@ class Area extends BaseController
         }
     }
 
-    public function addressCensusBureau($state, $addressText): void
+    public function addressCensusBureau(string $state, string $addressText): void
     {
         try {
             $data = file_get_contents('https://geocoding.geo.census.gov/geocoder/locations/onelineaddress?benchmark=9&format=json&address=' . $addressText);
             if (($data = json_decode($data, true)) !== false) {
-                if (count($data['result']['addressMatches']) == 1 && strtolower($data['result']['addressMatches'][0]['addressComponents']['state']) == $state) {
+                if (count($data['result']['addressMatches']) == 1 && strtolower($data['result']['addressMatches'][0]['addressComponents']['state']) === $state) {
                     $this->data['extraAttribution'] = 'Address searching courtesy of the <a href="https://geocoding.geo.census.gov/geocoder/">U.S. Census Bureau</a>.';
                     $this->point($state, $data['result']['addressMatches'][0]['coordinates']['y'], $data['result']['addressMatches'][0]['coordinates']['x'], $addressText);
                 } else {
@@ -53,7 +53,7 @@ class Area extends BaseController
         }
     }
 
-    public function noRecord($state): void
+    public function noRecord(string $state): void
     {
         $this->data['state'] = $state;
         echo view('header', $this->data);
@@ -61,13 +61,13 @@ class Area extends BaseController
         echo view('footer');
     }
 
-    public function point($state, $y = 0, $x = 0, $addressText = ''): void
+    public function point(string $state, float $y = 0, float $x = 0, string $addressText = ''): void
     {
         if (empty($y) && !empty($this->request->getPost('y', FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION))) {
-            $y = $this->request->getPost('y', FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
+            $y = (float) $this->request->getPost('y', FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
         }
         if (empty($x) && !empty($this->request->getPost('x', FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION))) {
-            $x = $this->request->getPost('x', FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
+            $x = (float) $this->request->getPost('x', FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
         }
         // Only applies in US
         if ($y < 0 || $x > 0) {
@@ -84,7 +84,7 @@ class Area extends BaseController
         }
     }
 
-    public function view($state, $id, $y = 0, $x = 0, $addressText = ''): void
+    public function view(string $state, int|string $id, float $y = 0, float $x = 0, string $addressText = ''): void
     {
         $this->data['state'] = $state;
         if (($this->isLive() || !empty($y) || !empty($x)) && preg_match('/^\d{1,9}$/', $id)) {
@@ -109,7 +109,7 @@ class Area extends BaseController
                 }
             }
             echo view('header', $this->data);
-            if (!empty($addressText)) {
+            if ($addressText !== '') {
                 $searchParameter['Address'] = $addressText;
             } elseif (!empty($x) || !empty($y)) {
                 $searchParameter['Coordinates'] = $y . ', ' . $x;
@@ -136,7 +136,6 @@ class Area extends BaseController
                 echo view('general_metes', ['query' => $query, 'hasLink' => true, 'state' => $state, 'title' => 'Metes and Bounds Description']);
             }
             $events = array_unique($events);
-            $events = '{' . implode(',', $events) . '}';
             $EventModel = new EventModel();
             $query = $EventModel->getByGovernmentShapeFailure($id, $events);
             if ($query !== []) {

@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Models\GovernmentShapeModel;
+use CodeIgniter\HTTP\Response;
 
 class Map extends BaseController
 {
@@ -14,9 +15,9 @@ class Map extends BaseController
     {
     }
 
-    public function baseStyle($maxZoom = 14, $response = null): void
+    public function baseStyle(int $maxZoom = 14, Response $response = null): void
     {
-        if (empty($response)) {
+        if (!$response instanceof \CodeIgniter\HTTP\Response) {
             $response = $this->response;
         }
         $response->removeHeader('Cache-Control');
@@ -61,7 +62,7 @@ class Map extends BaseController
         echo json_encode($json);
     }
 
-    public function leaflet($state = ''): void
+    public function leaflet(string $state = ''): void
     {
         $this->data['state'] = ($state == 'zoom' ? '' : $state);
         $this->data['zoom'] = ($state == 'zoom');
@@ -80,7 +81,7 @@ class Map extends BaseController
         }
     }
 
-    public function overlayStyle($state = ''): void
+    public function overlayStyle(string $state = ''): void
     {
         $this->response->removeHeader('Cache-Control');
         $this->response->setHeader('Cache-Control', 'max-age=86400');
@@ -90,7 +91,7 @@ class Map extends BaseController
         echo json_encode($json);
     }
 
-    public function tile($z, $x, $y, $state = ''): void
+    public function tile(float $z, float $x, float $y, string $state = ''): void
     {
         $this->response->setHeader('Content-Type', 'application/x-protobuf');
         $GovernmentShapeModel = new GovernmentShapeModel();

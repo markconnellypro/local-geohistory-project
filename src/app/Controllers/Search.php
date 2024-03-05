@@ -13,14 +13,14 @@ class Search extends BaseController
         'title' => 'Search',
     ];
 
-    private $categoryType = [
+    private array $categoryType = [
         'event' => 'Event',
         'government' => 'Government',
         'governmentidentifier' => 'Government',
         'law' => 'Law',
     ];
 
-    private $parameterType = [
+    private array $parameterType = [
         'date' => 'Date',
         'eventtype' => 'Event Type',
         'government' => 'Government',
@@ -35,7 +35,7 @@ class Search extends BaseController
         'yearvolume' => 'Year/Volume',
     ];
 
-    private $typeType = [
+    private array $typeType = [
         'dateEvent' => 'Date and Event Type',
         'government' => 'Government',
         'identifier' => 'Identifier',
@@ -47,21 +47,7 @@ class Search extends BaseController
     {
     }
 
-    private function emptyToEmpty($a)
-    {
-        if (empty($a)) {
-            return '';
-        } else {
-            return $a;
-        }
-    }
-
-    private function emptyToZero($a): int
-    {
-        return (empty($a) ? 0 : (int) $a);
-    }
-
-    private function governmentLevel($a): int
+    private function governmentLevel(string $a): int
     {
         return match ($a) {
             'State' => 2,
@@ -71,7 +57,7 @@ class Search extends BaseController
         };
     }
 
-    public function governmentlookup($state, $government = '', $type = ''): void
+    public function governmentlookup(string $state, string $government = '', string $type = ''): void
     {
         $this->data['state'] = $state;
         $GovernmentModel = new GovernmentModel();
@@ -81,7 +67,7 @@ class Search extends BaseController
         echo json_encode($this->data['query']);
     }
 
-    public function index($state = ''): void
+    public function index(string $state = ''): void
     {
         $stateArray = $this->getJurisdictions();
         $this->data['state'] = $state;
@@ -114,7 +100,7 @@ class Search extends BaseController
         echo view('footer');
     }
 
-    public function view($state, $category): void
+    public function view(string $state, string $category): void
     {
         $this->data['state'] = $state;
         $type = $this->request->getPost('type');
@@ -128,8 +114,8 @@ class Search extends BaseController
                     $this->request->getPost('government'),
                     $this->request->getPost('governmentparent'),
                     $this->request->getPost('eventtype'),
-                    $this->emptyToZero($this->request->getPost('year', FILTER_SANITIZE_NUMBER_INT)),
-                    $this->emptyToZero($this->request->getPost('plusminus', FILTER_SANITIZE_NUMBER_INT)),
+                    (int) $this->request->getPost('year', FILTER_SANITIZE_NUMBER_INT),
+                    (int) $this->request->getPost('plusminus', FILTER_SANITIZE_NUMBER_INT),
                 ];
                 $model = 'EventModel';
                 break;
@@ -140,7 +126,7 @@ class Search extends BaseController
                         $fields = [
                             $state,
                             ($type == 'statewide' ? $state : $this->request->getPost('government')),
-                            $this->emptyToEmpty($this->request->getPost('governmentparent')),
+                            $this->request->getPost('governmentparent'),
                             $this->governmentLevel($this->request->getPost('governmentlevel')),
                             $type,
                         ];
@@ -166,8 +152,8 @@ class Search extends BaseController
                     case 'reference':
                         $fields = [
                             $this->request->getPost('yearvolume'),
-                            $this->emptyToZero($this->request->getPost('page')),
-                            $this->emptyToZero($this->request->getPost('numberchapter')),
+                            (int) $this->request->getPost('page'),
+                            (int) $this->request->getPost('numberchapter'),
                             $state,
                         ];
                         break;

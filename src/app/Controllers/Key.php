@@ -14,7 +14,7 @@ class Key extends BaseController
     {
     }
 
-    public function index($state = ''): void
+    public function index(string $state = ''): void
     {
         $this->data['state'] = $state;
         echo view('header', $this->data);

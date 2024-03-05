@@ -17,7 +17,7 @@ class Source extends BaseController
     {
     }
 
-    public function noRecord($state): void
+    public function noRecord(string $state): void
     {
         $this->data['state'] = $state;
         echo view('header', $this->data);
@@ -25,7 +25,7 @@ class Source extends BaseController
         echo view('footer');
     }
 
-    public function view($state, $id): void
+    public function view(string $state, int|string $id): void
     {
         $this->data['state'] = $state;
         $id = $this->getIdInt($id);

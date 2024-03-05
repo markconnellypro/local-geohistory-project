@@ -192,7 +192,7 @@ class EventModel extends Model
         QUERY;
 
         return $this->db->query($query, [
-            $events,
+            '{' . implode(',', $events) . '}',
             $id,
         ])->getResult();
     }
@@ -234,7 +234,7 @@ class EventModel extends Model
         QUERY;
 
         return $this->db->query($query, [
-            $events,
+            '{' . implode(',', $events) . '}',
             $id,
             $id,
         ])->getResult();
@@ -299,7 +299,7 @@ class EventModel extends Model
         QUERY;
 
         return $this->db->query($query, [
-            $events,
+            '{' . implode(',', $events) . '}',
             $id,
         ])->getResult();
     }

@@ -6,7 +6,7 @@ use App\Models\DocumentationModel;
 
 class About extends BaseController
 {
-    private $data = [
+    private array $data = [
         'title' => 'About',
     ];
 
@@ -14,7 +14,7 @@ class About extends BaseController
     {
     }
 
-    public function index($state = ''): void
+    public function index(string $state = ''): void
     {
         $this->data['state'] = $state;
         echo view('header', $this->data);

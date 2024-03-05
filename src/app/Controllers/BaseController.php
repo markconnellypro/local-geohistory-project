@@ -85,14 +85,14 @@ abstract class BaseController extends Controller
         }
     }
 
-    public static function lastUpdated()
+    public static function lastUpdated(): string
     {
         date_default_timezone_set('America/New_York');
         $AppModel = new AppModel();
-        return $AppModel->getLastUpdated()->fulldate;
+        return $AppModel->getLastUpdated()[0]->fulldate ?? '';
     }
 
-    protected function getIdInt(int|string $id): int
+    protected function getIdInt(int|string $id): int|string
     {
         if (static::isLive() && preg_match('/^\d{1,9}$/', $id)) {
             $id = (int) $id;

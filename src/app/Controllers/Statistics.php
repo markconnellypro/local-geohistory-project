@@ -10,14 +10,14 @@ class Statistics extends BaseController
         'title' => 'Statistics',
     ];
 
-    private $byType = [
+    private array $byType = [
         'current' => 'Modern-Day Jurisdictions',
         'historic' => 'Contemporaneous Jurisdictions',
         'incorporated' => 'Incorporated Municipalities',
         'total' => 'Total Municipalities',
     ];
 
-    private $forType = [
+    private array $forType = [
         'eventtype' => 'Events by Event Type',
         'created' => 'Created Municipalities',
         'dissolved' => 'Dissolved Municipalities',
@@ -30,7 +30,7 @@ class Statistics extends BaseController
     {
     }
 
-    public function index($state = ''): void
+    public function index(string $state = ''): void
     {
         $this->data['state'] = $state;
         echo view('header', $this->data);
@@ -41,7 +41,7 @@ class Statistics extends BaseController
         echo view('footer');
     }
 
-    public function noRecord($state = ''): void
+    public function noRecord(string $state = ''): void
     {
         $this->data['state'] = $state;
         echo view('header', $this->data);
@@ -49,7 +49,7 @@ class Statistics extends BaseController
         echo view('footer');
     }
 
-    public function view($state = ''): void
+    public function view(string $state = ''): void
     {
         $this->data['state'] = $state;
         echo view('header', $this->data);
@@ -143,7 +143,7 @@ class Statistics extends BaseController
         ];
         $model = "App\\Models\\" . $types[$for] . 'Model';
         $model = new $model();
-        $type = 'getByStatistics' . (empty($state) ? 'Nation' : 'State') . 'Whole';
+        $type = 'getByStatistics' . ($state === '' ? 'Nation' : 'State') . 'Whole';
 
         $this->data['wholeQuery'] = $model->$type($fields);
         if ($this->data['wholeQuery'][0]->datarow == '["x"]') {

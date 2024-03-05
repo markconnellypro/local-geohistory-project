@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Models\GovernmentModel;
+use CodeIgniter\HTTP\RedirectResponse;
 
 class Governmentidentifier extends BaseController
 {
@@ -22,9 +23,9 @@ class Governmentidentifier extends BaseController
         echo view('footer');
     }
 
-    public function view($type, $id)
+    public function view(string $type, string $id): null|RedirectResponse
     {
-        if ($id != strtolower($id)) {
+        if ($id !== strtolower($id)) {
             $this->response->setStatusCode(301);
             return redirect()->to("/" . $this->request->getLocale() . '/governmentidentifier/' . $type . '/' . strtolower($id) . '/');
         }
@@ -62,5 +63,6 @@ class Governmentidentifier extends BaseController
             }
             echo view('footer');
         }
+        return null;
     }
 }
