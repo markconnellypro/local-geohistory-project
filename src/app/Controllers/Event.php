@@ -37,11 +37,11 @@ class Event extends BaseController
         $id = $this->getIdInt($id);
         $EventModel = new EventModel();
         $query = $EventModel->getDetail($id, $state);
-        if (count($query) !== 1 || $query[0]->eventgranted == 'placeholder' && !$this->isLive()) {
+        if (count($query) !== 1 || $query[0]->eventgranted === 'placeholder' && !$this->isLive()) {
             $this->noRecord($state);
         } else {
             $id = $query[0]->eventid;
-            $eventIsMapped = ($query[0]->eventismapped == 't');
+            $eventIsMapped = ($query[0]->eventismapped === 't');
             $this->data['pageTitle'] = $query[0]->eventlong;
             $this->data['pageTitleType'] = $query[0]->eventtypeshort;
             echo view('header', $this->data);

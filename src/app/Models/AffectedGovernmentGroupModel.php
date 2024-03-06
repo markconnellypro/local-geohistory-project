@@ -545,18 +545,18 @@ class AffectedGovernmentGroupModel extends Model
         $types = [];
 
         foreach ($query as $row) {
-            if (!empty($row['governmentfromlong'])) {
+            if ($row['governmentfromlong'] !== '') {
                 $types['from'][$row['affectedgovernmentleveldisplayorder']] = $row['affectedgovernmentlevellong'];
-                if (!empty($row['includelink']) && $row['includelink'] == 't') {
+                if ($row['includelink']  === 't') {
                     $linkTypes['from'][$row['affectedgovernmentleveldisplayorder']] = $row['affectedgovernmentlevellong'];
                 }
                 $rows[$row['id']]['From ' . $row['affectedgovernmentlevellong'] . ' Link'] = $row['governmentfrom'];
                 $rows[$row['id']]['From ' . $row['affectedgovernmentlevellong'] . ' Long'] = $row['governmentfromlong'];
                 $rows[$row['id']]['From ' . $row['affectedgovernmentlevellong'] . ' Affected'] = $row['affectedtypefrom'];
             }
-            if (!empty($row['governmenttolong'])) {
+            if ($row['governmenttolong'] !== '') {
                 $types['to'][$row['affectedgovernmentleveldisplayorder']] = $row['affectedgovernmentlevellong'];
-                if (!empty($row['includelink']) && $row['includelink'] == 't') {
+                if ($row['includelink']  === 't') {
                     $linkTypes['to'][$row['affectedgovernmentleveldisplayorder']] = $row['affectedgovernmentlevellong'];
                 }
                 $rows[$row['id']]['To ' . $row['affectedgovernmentlevellong'] . ' Link'] = $row['governmentto'];
@@ -583,7 +583,7 @@ class AffectedGovernmentGroupModel extends Model
 
         $hasMap = false;
 
-        if ($gisQuery != []) {
+        if ($gisQuery !== []) {
             $hasMap = true;
             foreach ($gisQuery as $row) {
                 foreach ($row as $key => $value) {

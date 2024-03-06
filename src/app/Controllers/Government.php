@@ -51,9 +51,9 @@ class Government extends BaseController
             $SourceCitationModel = new \App\Models\SourceCitationModel();
         }
         $query = $GovernmentModel->getDetail($id, $state);
-        if (count($query) !== 1 || $query[0]->governmentlevel == 'placeholder') {
+        if (count($query) !== 1 || $query[0]->governmentlevel === 'placeholder') {
             $this->noRecord($state);
-        } elseif (!empty($query[0]->governmentsubstituteslug)) {
+        } elseif (!is_null($query[0]->governmentsubstituteslug)) {
             header("HTTP/1.1 301 Moved Permanently");
             header("Location: /" . $this->request->getLocale() . "/" . $state . "/government/" . $query[0]->governmentsubstituteslug . "/");
             exit();
@@ -61,14 +61,14 @@ class Government extends BaseController
             $id = $query[0]->governmentid;
             $this->data['isHistory'] = $isHistory;
             $this->data['pageTitle'] = $query[0]->governmentlong;
-            $this->data['isMultiple'] = ($query[0]->governmentsubstitutemultiple == 't');
+            $this->data['isMultiple'] = ($query[0]->governmentsubstitutemultiple === 't');
             echo view('header', $this->data);
-            $isMunicipalityOrLower = ($query[0]->governmentlevel == 'municipality or lower');
-            $isCountyOrLower = ($query[0]->governmentlevel == 'municipality or lower' || $query[0]->governmentlevel == 'county');
-            $isCountyOrState = ($query[0]->governmentlevel == 'state' || $query[0]->governmentlevel == 'county');
-            $isStateOrHigher = (($query[0]->governmentlevel == 'state' || $query[0]->governmentlevel == 'country'));
-            $hasMap = ($isCountyOrLower && $query[0]->hasmap == 't');
-            $showTimeline = ($query[0]->governmentmapstatustimelapse == 't');
+            $isMunicipalityOrLower = ($query[0]->governmentlevel === 'municipality or lower');
+            $isCountyOrLower = ($query[0]->governmentlevel === 'municipality or lower' || $query[0]->governmentlevel === 'county');
+            $isCountyOrState = ($query[0]->governmentlevel === 'state' || $query[0]->governmentlevel === 'county');
+            $isStateOrHigher = (($query[0]->governmentlevel === 'state' || $query[0]->governmentlevel === 'country'));
+            $hasMap = ($isCountyOrLower && $query[0]->hasmap === 't');
+            $showTimeline = ($query[0]->governmentmapstatustimelapse === 't');
             $statusQuery = $GovernmentMapStatusModel->getDetails();
             echo view('government_detail', ['row' => $query[0], 'state' => $state, 'statuses' => $statusQuery]);
             if (!$isHistory) {

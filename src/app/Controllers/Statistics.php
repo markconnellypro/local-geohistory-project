@@ -66,6 +66,7 @@ class Statistics extends BaseController
         }
         $for = $for[0];
 
+        $searchParameter = [];
         if (!isset($this->byType[$by])) {
             echo view('error');
             echo view('footer');
@@ -88,8 +89,8 @@ class Statistics extends BaseController
             $to = $from;
             $from = $temporary;
         }
-        if ($from === $to || $from === 0) {
-            $dateRange = $from;
+        if ($from === $to) {
+            $dateRange = $from === 0 ? '' : (string) $from;
             $dateRangePlural = '';
         } else {
             $dateRange = $from . '&ndash;' . $to;
@@ -108,11 +109,8 @@ class Statistics extends BaseController
         }
 
         $fields = [$from, $to, $by];
-        if ($for == 'eventtype') {
-            $eventType = $this->request->getPost('eventtype');
-            if (empty($eventType)) {
-                $eventType = '';
-            }
+        if ($for === 'eventtype') {
+            $eventType = (string) $this->request->getPost('eventtype');
             $EventTypeModel = new EventTypeModel();
             $query = $EventTypeModel->getOneByStatistics($eventType);
             if (count($query) !== 1) {
@@ -125,12 +123,12 @@ class Statistics extends BaseController
         } else {
             $eventType = '';
             array_unshift($fields, $for);
-            if ($for != 'mapped') {
+            if ($for !== 'mapped') {
                 $for = 'createddissolved';
             }
         }
 
-        if (!empty($dateRange)) {
+        if ($dateRange !== '') {
             $searchParameter['Year' . $dateRangePlural] = $dateRange;
         }
 
@@ -146,7 +144,7 @@ class Statistics extends BaseController
         $type = 'getByStatistics' . ($state === '' ? 'Nation' : 'State') . 'Whole';
 
         $this->data['wholeQuery'] = $model->$type($fields);
-        if ($this->data['wholeQuery'][0]->datarow == '["x"]') {
+        if ($this->data['wholeQuery'][0]->datarow === '["x"]') {
             $this->data['wholeQuery'] = [];
         } else {
             $type = str_replace('Whole', 'Part', $type);
@@ -157,12 +155,12 @@ class Statistics extends BaseController
             $this->data['query'] = '{' . implode(',', $this->data['query']) . '}';
         }
 
-        $this->data['isContemporaneous'] = ($searchParameter['Grouped By'] == 'Contemporaneous Jurisdictions');
-        $this->data['notEvent'] = ($searchParameter['Metric'] == 'Events by Event Type');
+        $this->data['isContemporaneous'] = ($searchParameter['Grouped By'] === 'Contemporaneous Jurisdictions');
+        $this->data['notEvent'] = ($searchParameter['Metric'] === 'Events by Event Type');
         echo view('general_parameter', ['searchParameter' => $searchParameter]);
         echo view('statistics_view', $this->data);
         if (count($this->data['wholeQuery']) > 0) {
-            echo view('general_chartjs', ['query' => $this->data['wholeQuery'], 'xLabel' => 'Year', 'yLabel' => ($for == 'createddissolved' ? 'Governments' : 'Events')]);
+            echo view('general_chartjs', ['query' => $this->data['wholeQuery'], 'xLabel' => 'Year', 'yLabel' => ($for === 'createddissolved' ? 'Governments' : 'Events')]);
         }
         echo view('footer');
     }

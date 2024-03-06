@@ -51,8 +51,8 @@ class Governmentidentifier extends BaseController
             if ($query !== []) {
                 echo view('general_governmentidentifier', ['query' => $query, 'title' => 'Related']);
             }
-            if ($type == 'us-census' || $type == 'usgs') {
-                if ($type == 'us-census') {
+            if ($type === 'us-census' || $type === 'usgs') {
+                if ($type === 'us-census') {
                     $query = $GovernmentIdentifierModel->getCensus($governmentidentifierids);
                 } else {
                     $query = $GovernmentIdentifierModel->getUsgs($governmentidentifierids);

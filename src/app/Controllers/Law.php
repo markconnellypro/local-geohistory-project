@@ -43,7 +43,7 @@ class Law extends BaseController
             echo view('header', $this->data);
             echo view('law_detail', ['query' => $query]);
             echo view('general_source', ['query' => $query, 'hasLink' => false]);
-            if ($query[0]->url != '') {
+            if ($query[0]->url !== '') {
                 echo view('general_url', ['query' => $query, 'title' => 'Actual URL']);
             }
             if ($this->isLive()) {

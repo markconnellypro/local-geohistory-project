@@ -32,19 +32,19 @@ class Map extends BaseController
             unset($json['sources']['street-tile']['url']);
         }
         $json['glyphs'] = getenv('map_glyph');
-        if (getenv('map_elevation') != '' && $maxZoom == 14 && !($this->isLive() && !$this->isOnline())) {
+        if (getenv('map_elevation') !== '' && $maxZoom === 14 && !($this->isLive() && !$this->isOnline())) {
             $json['sources']['elevation-tile']['tiles'][] = getenv('map_elevation');
         } else {
             unset($json['sources']['elevation-tile']);
             for ($i = count($json['layers']) - 1; $i >= 0; $i--) {
-                if ($json['layers'][$i]['id'] == 'hillshading') {
+                if ($json['layers'][$i]['id'] === 'hillshading') {
                     unset($json['layers'][$i]);
                     break;
                 }
             }
         }
         foreach ($json['layers'] as $layerNumber => $layerContent) {
-            if (!empty($layerContent['layout']['text-field']) && $layerContent['layout']['text-field'] == '{name}') {
+            if (($layerContent['layout']['text-field'] ?? '') === '{name}') {
                 $json['layers'][$layerNumber]['layout']['text-field'] = [
                     'coalesce',
                     ['get', 'name_' . \Config\Services::request()->getLocale()],
@@ -64,8 +64,8 @@ class Map extends BaseController
 
     public function leaflet(string $state = ''): void
     {
-        $this->data['state'] = ($state == 'zoom' ? '' : $state);
-        $this->data['zoom'] = ($state == 'zoom');
+        $this->data['state'] = ($state === 'zoom' ? '' : $state);
+        $this->data['zoom'] = ($state === 'zoom');
         $this->response->removeHeader('Cache-Control');
         $this->response->setHeader('Cache-Control', 'max-age=86400');
         $this->response->setHeader('Content-Type', 'application/javascript');

@@ -167,7 +167,7 @@ class GovernmentModel extends Model
         $to = $parameters[2];
         $by = $parameters[3];
         $state = $parameters[4];
-        if (empty($state)) {
+        if ($state === '') {
             $state = implode(',', \App\Controllers\BaseController::getJurisdictions());
         }
         $state = '{' . strtoupper($state) . '}';

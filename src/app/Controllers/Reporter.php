@@ -39,7 +39,7 @@ class Reporter extends BaseController
             echo view('general_reporter', ['query' => $query, 'state' => $state, 'hasLink' => false, 'title' => 'Detail']);
             echo view('general_source', ['query' => $query, 'hasLink' => false]);
             echo view('reporter_authorship', ['query' => $query]);
-            if ($query[0]->url != '') {
+            if ($query[0]->url !== '') {
                 echo view('general_url', ['query' => $query, 'title' => 'Actual URL']);
             }
             $SourceItemPartModel = new SourceItemPartModel();

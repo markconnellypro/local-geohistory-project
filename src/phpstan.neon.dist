@@ -32,7 +32,9 @@ parameters:
 	treatPhpDocTypesAsCertain: false
 	strictRules:
 		allRules: false
+		disallowedLooseComparison: true
 		booleansInConditions: true
+		disallowedConstructs: true
 		matchingInheritedMethodNames: true
 	universalObjectCratesClasses:
 		- CodeIgniter\Entity

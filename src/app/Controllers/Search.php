@@ -125,7 +125,7 @@ class Search extends BaseController
                     case 'government':
                         $fields = [
                             $state,
-                            ($type == 'statewide' ? $state : $this->request->getPost('government')),
+                            ($type === 'statewide' ? $state : $this->request->getPost('government')),
                             $this->request->getPost('governmentparent'),
                             $this->governmentLevel($this->request->getPost('governmentlevel')),
                             $type,
@@ -172,7 +172,7 @@ class Search extends BaseController
                 break;
         }
 
-        if ($fields !== [] && $model != '') {
+        if ($fields !== [] && $model !== '') {
             echo view('header', $this->data);
             $model = "App\\Models\\" . $model;
             $model = new $model();
@@ -183,7 +183,7 @@ class Search extends BaseController
                 'Search By' => $this->typeType[$this->request->getPost('type')],
             ];
             foreach ($this->request->getPost() as $key => $value) {
-                if (!empty($value) && $key != 'type') {
+                if ($value !== '' && $key !== 'type') {
                     $searchParameter[$this->parameterType[$key]] = $value;
                 }
             }
