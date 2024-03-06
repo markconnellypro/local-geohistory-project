@@ -124,11 +124,9 @@ class Area extends BaseController
             $query = $AffectedGovernmentGroupModel->getByGovernmentShape($id, $state);
             $events = [];
             echo view('general_affectedgovernment', ['query' => $query, 'state' => $state, 'includeDate' => true, 'isComplete' => true]);
-            if ($query !== []) {
-                foreach ($query as $row) {
-                    if (!is_null($row->eventid)) {
-                        $events[] = $row->eventid;
-                    }
+            foreach ($query as $row) {
+                if (!is_null($row->eventid)) {
+                    $events[] = $row->eventid;
                 }
             }
             $MetesDescriptionModel = new MetesDescriptionModel();

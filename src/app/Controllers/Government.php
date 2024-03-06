@@ -95,17 +95,13 @@ class Government extends BaseController
             $query = $AffectedGovernmentGroupModel->getByGovernmentGovernment($id, $state);
             $events = [];
             echo view('government_affectedgovernment', ['query' => $query, 'isMultiple' => $this->data['isMultiple']]);
-            if ($query !== []) {
-                foreach ($query as $row) {
-                    $events[] = $row->event;
-                }
+            foreach ($query as $row) {
+                $events[] = $row->event;
             }
             $query = $AffectedGovernmentGroupModel->getByGovernmentForm($id, $state);
             echo view('general_affectedgovernmentform', ['includeGovernment' => false, 'query' => $query]);
-            if ($query !== []) {
-                foreach ($query as $row) {
-                    $events[] = $row->event;
-                }
+            foreach ($query as $row) {
+                $events[] = $row->event;
             }
             $events = array_unique($events);
             $EventModel = new EventModel();
