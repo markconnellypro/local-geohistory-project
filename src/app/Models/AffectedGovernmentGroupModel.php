@@ -547,7 +547,7 @@ class AffectedGovernmentGroupModel extends Model
         foreach ($query as $row) {
             if ($row['governmentfromlong'] !== '') {
                 $types['from'][$row['affectedgovernmentleveldisplayorder']] = $row['affectedgovernmentlevellong'];
-                if ($row['includelink']  === 't') {
+                if (isset($row['includelink']) && $row['includelink']  === 't') {
                     $linkTypes['from'][$row['affectedgovernmentleveldisplayorder']] = $row['affectedgovernmentlevellong'];
                 }
                 $rows[$row['id']]['From ' . $row['affectedgovernmentlevellong'] . ' Link'] = $row['governmentfrom'];
@@ -556,7 +556,7 @@ class AffectedGovernmentGroupModel extends Model
             }
             if ($row['governmenttolong'] !== '') {
                 $types['to'][$row['affectedgovernmentleveldisplayorder']] = $row['affectedgovernmentlevellong'];
-                if ($row['includelink']  === 't') {
+                if (isset($row['includelink']) && $row['includelink']  === 't') {
                     $linkTypes['to'][$row['affectedgovernmentleveldisplayorder']] = $row['affectedgovernmentlevellong'];
                 }
                 $rows[$row['id']]['To ' . $row['affectedgovernmentlevellong'] . ' Link'] = $row['governmentto'];
