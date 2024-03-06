@@ -54,9 +54,7 @@ class Reporter extends BaseController
             }
             $EventModel = new EventModel();
             $query = $EventModel->getByAdjudicationSourceCitation($id);
-            if ($query !== []) {
-                echo view('general_event', ['query' => $query, 'state' => $state, 'title' => 'Event Links']);
-            }
+            echo view('general_event', ['query' => $query, 'state' => $state, 'title' => 'Event Links']);
             echo view('footer');
         }
     }

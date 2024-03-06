@@ -116,9 +116,7 @@ class Government extends BaseController
             if (!$isHistory) {
                 if ($isCountyOrLower) {
                     $query = $EventModel->getByGovernmentSuccess($id, $events);
-                    if ($query !== []) {
-                        echo view('general_event', ['query' => $query, 'state' => $state, 'title' => 'Other Successful Event Links', 'tableId' => 'successfulevent']);
-                    }
+                    echo view('general_event', ['query' => $query, 'state' => $state, 'title' => 'Other Successful Event Links', 'tableId' => 'successfulevent']);
                 }
                 $GovernmentSourceModel = new GovernmentSourceModel();
                 $query = $GovernmentSourceModel->getByGovernment($id, $state);
@@ -153,9 +151,7 @@ class Government extends BaseController
                 }
                 if ($isCountyOrLower) {
                     $query = $EventModel->getByGovernmentFailure($id, $events);
-                    if ($query !== []) {
-                        echo view('general_event', ['query' => $query, 'state' => $state, 'title' => 'Other Event Links', 'tableId' => 'otherevent']);
-                    }
+                    echo view('general_event', ['query' => $query, 'state' => $state, 'title' => 'Other Event Links', 'tableId' => 'otherevent']);
                 }
                 $query = $GovernmentModel->getOffice($id, $state);
                 if ($query !== []) {

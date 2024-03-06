@@ -76,9 +76,7 @@ class Law extends BaseController
             }
             $EventModel = new EventModel();
             $query = $EventModel->$function($id);
-            if (count($query) > 0) {
-                echo view('general_event', ['query' => $query, 'state' => $state, 'title' => 'Event Links', 'eventRelationship' => true, 'includeLawGroup' => true]);
-            }
+            echo view('general_event', ['query' => $query, 'state' => $state, 'title' => 'Event Links', 'eventRelationship' => true, 'includeLawGroup' => true]);
             echo view('footer');
         }
     }
