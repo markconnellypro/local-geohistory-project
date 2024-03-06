@@ -44,22 +44,16 @@ class Governmentidentifier extends BaseController
             echo view('general_governmentidentifier', ['query' => $query, 'title' => 'Detail']);
             $GovernmentModel = new GovernmentModel();
             $query = $GovernmentModel->getByGovernmentIdentifier($governmentidentifierids);
-            if ($query !== []) {
-                echo view('general_government', ['query' => $query, 'title' => 'Government', 'type' => 'identifier']);
-            }
+            echo view('general_government', ['query' => $query, 'title' => 'Government', 'type' => 'identifier']);
             $query = $GovernmentIdentifierModel->getRelated($governments, $governmentidentifierids);
-            if ($query !== []) {
-                echo view('general_governmentidentifier', ['query' => $query, 'title' => 'Related']);
-            }
+            echo view('general_governmentidentifier', ['query' => $query, 'title' => 'Related']);
             if ($type === 'us-census' || $type === 'usgs') {
                 if ($type === 'us-census') {
                     $query = $GovernmentIdentifierModel->getCensus($governmentidentifierids);
                 } else {
                     $query = $GovernmentIdentifierModel->getUsgs($governmentidentifierids);
                 }
-                if ($query !== []) {
-                    echo view('governmentidentifier_census', ['query' => $query, 'type' => $type]);
-                }
+                echo view('governmentidentifier_census', ['query' => $query, 'type' => $type]);
             }
             echo view('footer');
         }

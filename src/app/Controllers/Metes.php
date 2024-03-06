@@ -51,9 +51,7 @@ class Metes extends BaseController
                 echo view('general_map', ['includeBase' => $hasBegin, 'includeDisclaimer' => true]);
             }
             $query = $MetesDescriptionLineModel->getByMetesDescription($id);
-            if ($query !== []) {
-                echo view('metes_row', ['query' => $query]);
-            }
+            echo view('metes_row', ['query' => $query]);
             echo view('general_event', ['query' => $areaQuery, 'state' => $state, 'title' => 'Event Links']);
             if ($hasMap) {
                 echo view('leaflet_start', ['type' => 'metes', 'includeBase' => $hasBegin, 'needRotation' => false]);

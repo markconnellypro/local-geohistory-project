@@ -123,8 +123,8 @@ class Area extends BaseController
             $AffectedGovernmentGroupModel = new AffectedGovernmentGroupModel();
             $query = $AffectedGovernmentGroupModel->getByGovernmentShape($id, $state);
             $events = [];
+            echo view('general_affectedgovernment', ['query' => $query, 'state' => $state, 'includeDate' => true, 'isComplete' => true]);
             if ($query !== []) {
-                echo view('general_affectedgovernment', ['query' => $query, 'state' => $state, 'includeDate' => true, 'isComplete' => true]);
                 foreach ($query as $row) {
                     if (!is_null($row->eventid)) {
                         $events[] = $row->eventid;
@@ -133,9 +133,7 @@ class Area extends BaseController
             }
             $MetesDescriptionModel = new MetesDescriptionModel();
             $query = $MetesDescriptionModel->getByGovernmentShape($id);
-            if ($query !== []) {
-                echo view('general_metes', ['query' => $query, 'hasLink' => true, 'state' => $state, 'title' => 'Metes and Bounds Description']);
-            }
+            echo view('general_metes', ['query' => $query, 'hasLink' => true, 'state' => $state, 'title' => 'Metes and Bounds Description']);
             $events = array_unique($events);
             $EventModel = new EventModel();
             $query = $EventModel->getByGovernmentShapeFailure($id, $events);

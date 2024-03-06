@@ -70,49 +70,31 @@ class Event extends BaseController
                 echo view('general_affectedgovernment2', ['affectedGovernment' => $affectedGovernment, 'state' => $state, 'includeDate' => false, 'isComplete' => true]);
             }
             $query = $AffectedGovernmentGroupModel->getByEventForm($id, $state);
-            if ($query !== []) {
-                echo view('general_affectedgovernmentform', ['includeGovernment' => true, 'query' => $query]);
-            }
+            echo view('general_affectedgovernmentform', ['includeGovernment' => true, 'query' => $query]);
             $CurrentGovernmentModel = new CurrentGovernmentModel();
             $query = $CurrentGovernmentModel->getByEvent($id, $state);
-            if ($query !== []) {
-                echo view('general_currentgovernment', ['query' => $query, 'state' => $state]);
-            }
+            echo view('general_currentgovernment', ['query' => $query, 'state' => $state]);
             $MetesDescriptionModel = new MetesDescriptionModel();
             $query = $MetesDescriptionModel->getByEvent($id);
-            if ($query !== []) {
-                echo view('general_metes', ['query' => $query, 'hasLink' => true, 'state' => $state, 'title' => 'Metes and Bounds Description']);
-            }
+            echo view('general_metes', ['query' => $query, 'hasLink' => true, 'state' => $state, 'title' => 'Metes and Bounds Description']);
             $PlssModel = new PlssModel();
             $query = $PlssModel->getByEvent($id);
-            if ($query !== []) {
-                echo view('event_plss', ['query' => $query]);
-            }
+            echo view('event_plss', ['query' => $query]);
             $AdjudicationModel = new AdjudicationModel();
             $query = $AdjudicationModel->getByEvent($id);
-            if ($query !== []) {
-                echo view('general_adjudication', ['query' => $query, 'state' => $state, 'eventRelationship' => true]);
-            }
+            echo view('general_adjudication', ['query' => $query, 'state' => $state, 'eventRelationship' => true]);
             $LawSectionModel = new LawSectionModel();
             $query = $LawSectionModel->getByEvent($id);
-            if ($query !== []) {
-                echo view('general_law', ['query' => $query, 'state' => $state, 'title' => 'Law', 'type' => 'relationship', 'includeLawGroup' => true]);
-            }
+            echo view('general_law', ['query' => $query, 'state' => $state, 'title' => 'Law', 'type' => 'relationship', 'includeLawGroup' => true]);
             $RecordingModel = new RecordingModel();
             $query = $RecordingModel->getByEvent($id, $state);
-            if ($query !== []) {
-                echo view('event_recording', ['query' => $query]);
-            }
+            echo view('event_recording', ['query' => $query]);
             $GovernmentSourceModel = new GovernmentSourceModel();
             $query = $GovernmentSourceModel->getByEvent($id, $state);
-            if ($query !== []) {
-                echo view('general_governmentsource', ['query' => $query, 'state' => $state, 'type' => 'event']);
-            }
+            echo view('general_governmentsource', ['query' => $query, 'state' => $state, 'type' => 'event']);
             $SourceCitationModel = new SourceCitationModel();
             $query = $SourceCitationModel->getByEvent($id);
-            if ($query !== []) {
-                echo view('general_sourcecitation', ['query' => $query, 'state' => $state, 'hasColor' => false, 'hasLink' => true, 'title' => 'Source']);
-            }
+            echo view('general_sourcecitation', ['query' => $query, 'state' => $state, 'hasColor' => false, 'hasLink' => true, 'title' => 'Source']);
             if ($hasMap) {
                 $i = 0;
                 echo view('leaflet_start', ['type' => 'event', 'includeBase' => true, 'needRotation' => false]);

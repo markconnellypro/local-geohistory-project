@@ -44,14 +44,10 @@ class Reporter extends BaseController
             }
             $SourceItemPartModel = new SourceItemPartModel();
             $query = $SourceItemPartModel->getByAdjudicationSourceCitation($id);
-            if ($query !== []) {
-                echo view('general_url', ['query' => $query, 'state' => $state, 'title' => 'Calculated URL']);
-            }
+            echo view('general_url', ['query' => $query, 'state' => $state, 'title' => 'Calculated URL']);
             $AdjudicationModel = new AdjudicationModel();
             $query = $AdjudicationModel->getByAdjudicationSourceCitation($id);
-            if ($query !== []) {
-                echo view('general_adjudication', ['query' => $query, 'state' => $state]);
-            }
+            echo view('general_adjudication', ['query' => $query, 'state' => $state]);
             $EventModel = new EventModel();
             $query = $EventModel->getByAdjudicationSourceCitation($id);
             echo view('general_event', ['query' => $query, 'state' => $state, 'title' => 'Event Links']);

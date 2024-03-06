@@ -86,27 +86,23 @@ class Government extends BaseController
                     echo view('general_chart');
                 }
                 $query = $GovernmentModel->getRelated($id, $state);
-                if ($query !== []) {
-                    echo view('government_related', ['query' => $query]);
-                }
+                echo view('government_related', ['query' => $query]);
                 $GovernmentIdentifierModel = new GovernmentIdentifierModel();
                 $query = $GovernmentIdentifierModel->getByGovernment($id, $state);
-                if ($query !== []) {
-                    echo view('general_governmentidentifier', ['query' => $query, 'title' => 'Identifier', 'isMultiple' => $this->data['isMultiple']]);
-                }
+                echo view('general_governmentidentifier', ['query' => $query, 'title' => 'Identifier', 'isMultiple' => $this->data['isMultiple']]);
             }
             $AffectedGovernmentGroupModel = new AffectedGovernmentGroupModel();
             $query = $AffectedGovernmentGroupModel->getByGovernmentGovernment($id, $state);
             $events = [];
+            echo view('government_affectedgovernment', ['query' => $query, 'isMultiple' => $this->data['isMultiple']]);
             if ($query !== []) {
-                echo view('government_affectedgovernment', ['query' => $query, 'isMultiple' => $this->data['isMultiple']]);
                 foreach ($query as $row) {
                     $events[] = $row->event;
                 }
             }
             $query = $AffectedGovernmentGroupModel->getByGovernmentForm($id, $state);
+            echo view('general_affectedgovernmentform', ['includeGovernment' => false, 'query' => $query]);
             if ($query !== []) {
-                echo view('general_affectedgovernmentform', ['includeGovernment' => false, 'query' => $query]);
                 foreach ($query as $row) {
                     $events[] = $row->event;
                 }
@@ -120,9 +116,7 @@ class Government extends BaseController
                 }
                 $GovernmentSourceModel = new GovernmentSourceModel();
                 $query = $GovernmentSourceModel->getByGovernment($id, $state);
-                if ($query !== []) {
-                    echo view('general_governmentsource', ['query' => $query, 'state' => $state, 'type' => 'government', 'isMultiple' => $this->data['isMultiple']]);
-                }
+                echo view('general_governmentsource', ['query' => $query, 'state' => $state, 'type' => 'government', 'isMultiple' => $this->data['isMultiple']]);
                 $query = $GovernmentModel->getNote($id, $state);
                 if ($query !== []) {
                     echo view(ENVIRONMENT . '/government_note', ['query' => $query, 'isMultiple' => $this->data['isMultiple']]);
@@ -136,19 +130,13 @@ class Government extends BaseController
                     echo view(ENVIRONMENT . '/government_schooldistrict', ['query' => $query, 'isMultiple' => $this->data['isMultiple']]);
                 }
                 $query = $SourceModel->getByGovernment($id);
-                if ($query !== []) {
-                    echo view('general_source', ['query' => $query, 'hasLink' => true]);
-                }
+                echo view('general_source', ['query' => $query, 'hasLink' => true]);
                 $ResearchLogModel = new ResearchLogModel();
                 $query = $ResearchLogModel->getByGovernment($id, $state);
-                if ($query !== []) {
-                    echo view('government_researchlog', ['query' => $query, 'isMultiple' => $this->data['isMultiple']]);
-                }
+                echo view('government_researchlog', ['query' => $query, 'isMultiple' => $this->data['isMultiple']]);
                 $NationalArchivesModel = new NationalArchivesModel();
                 $query = $NationalArchivesModel->getByGovernment($id, $state);
-                if ($query !== []) {
-                    echo view('government_nationalarchives', ['query' => $query, 'isMultiple' => $this->data['isMultiple']]);
-                }
+                echo view('government_nationalarchives', ['query' => $query, 'isMultiple' => $this->data['isMultiple']]);
                 if ($isCountyOrLower) {
                     $query = $EventModel->getByGovernmentFailure($id, $events);
                     echo view('general_event', ['query' => $query, 'state' => $state, 'title' => 'Other Event Links', 'tableId' => 'otherevent']);
