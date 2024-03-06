@@ -19,7 +19,7 @@
         <tbody>
             <?php foreach ($query as $row) { ?>
                 <tr>
-                    <td><a href="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?? 'usa' ?>/event/<?= $row->eventslug ?>/">View</a></td>
+                    <td><a href="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/event/<?= $row->eventslug ?>/">View</a></td>
                     <td><?= $row->eventtypeshort ?></td>
                     <td><?= $row->eventlong ?></td>
                     <td><?= $row->eventgranted ?></td>

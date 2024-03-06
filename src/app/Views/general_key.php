@@ -1,3 +1,4 @@
+<?php if (is_array($query ?? '') && $query !== []) { ?>
 <section>
     <h2 id="<?= $type ?>"><?= $title ?></h2>
     <?php if ($type == 'law') {
@@ -26,3 +27,4 @@
         </tbody>
     </table>
 </section>
+<?php } ?>

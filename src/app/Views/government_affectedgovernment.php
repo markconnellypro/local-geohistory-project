@@ -1,3 +1,4 @@
+<?php if (is_array($query ?? '') && $query !== []) { ?>
 <section>
     <?php if (!$isHistory) { ?>
         <h2>Affected Government</h2>
@@ -33,3 +34,4 @@
         </tbody>
     </table>
 </section>
+<?php } ?>

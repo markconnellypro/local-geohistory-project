@@ -1,3 +1,4 @@
+<?php if (is_array($query ?? '') && $query !== []) { ?>
 <section>
     <h2>Courses and Distances</h2>
     <p><span class="b">Note: </span>
@@ -48,3 +49,4 @@
     </form>
 </section>
 <script src="/asset/tool/metes.js"></script>
+<?php } ?>

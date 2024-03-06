@@ -1,4 +1,4 @@
-<?php if (count($wholeQuery) > 0) { ?>
+<?php if (is_array($wholeQuery ?? '') && $wholeQuery !== []) { ?>
     <section>
         <h2>By Jurisdiction:</h2>
         <div id="map" class="map"></div>

@@ -1,3 +1,4 @@
+<?php if (is_array($query ?? '') && $query !== []) { ?>
 <section>
     <h2>Authorship</h2>
     <table class="normal cell-border compact stripe">
@@ -19,3 +20,4 @@
         </tbody>
     </table>
 </section>
+<?php } ?>

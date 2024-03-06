@@ -1,3 +1,4 @@
+<?php if (is_array($query ?? '') && $query !== []) { ?>
 <section>
     <?php if ($isComplete) { ?>
         <h2>Affected Government</h2>
@@ -95,3 +96,4 @@
         </tbody>
     </table>
 </section>
+<?php } ?>

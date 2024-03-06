@@ -1,3 +1,4 @@
+<?php if (is_array($query ?? '') && $query !== []) { ?>
 <section>
     <h2>Recorded Document</h2>
     <table class="normal cell-border compact stripe">
@@ -25,11 +26,11 @@
                     <td><?= $row->recordinglocation . ($row->hasbothtype == 't' ? '<br>' : '') . $row->recordingnumberlocation ?></td>
                     <td><?= (
                         empty($row->recordingrepositoryshort) ? '' : $row->recordingrepositoryshort .
-                                (empty($row->recordingrepositoryseries) ? '' : ', series ' . $row->recordingrepositoryseries) .
-                                (empty($row->recordingrepositorycontainer) ? '' : ', container ' . $row->recordingrepositorycontainer) .
-                                (empty($row->recordingrepositoryitemlocation) ? '' : ', location ' . $row->recordingrepositoryitemlocation) .
-                                (empty($row->recordingrepositoryitemnumber) ? '' : ', folder ' . $row->recordingrepositoryitemnumber) .
-                                (empty($row->recordingrepositoryitemrange) ? '' : ', part ' . $row->recordingrepositoryitemrange)
+                                    (empty($row->recordingrepositoryseries) ? '' : ', series ' . $row->recordingrepositoryseries) .
+                                    (empty($row->recordingrepositorycontainer) ? '' : ', container ' . $row->recordingrepositorycontainer) .
+                                    (empty($row->recordingrepositoryitemlocation) ? '' : ', location ' . $row->recordingrepositoryitemlocation) .
+                                    (empty($row->recordingrepositoryitemnumber) ? '' : ', folder ' . $row->recordingrepositoryitemnumber) .
+                                    (empty($row->recordingrepositoryitemrange) ? '' : ', part ' . $row->recordingrepositoryitemrange)
                     ) ?></td>
                     <td data-sort="<?= $row->recordingdatesort ?>"><?= $row->recordingdate ?></td>
                     <td><?= $row->recordingeventrelationship ?></td>
@@ -38,3 +39,4 @@
         </tbody>
     </table>
 </section>
+<?php } ?>

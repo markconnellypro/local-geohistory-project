@@ -1,3 +1,4 @@
+<?php if (is_array($query ?? '') && $query !== []) { ?>
 <section>
     <h2>Affected Government Form</h2>
     <table class="normal cell-border compact stripe">
@@ -19,7 +20,7 @@
         </thead>
         <tbody>
             <?php $i = 1;
-                foreach ($query as $row) { ?>
+    foreach ($query as $row) { ?>
                 <tr>
                     <?php if ($includeGovernment) { ?>
                         <td><?php echo view('general_link', ['link' => $row->governmentstatelink, 'text' => $row->governmentlong]) ?></td>
@@ -35,7 +36,8 @@
                     <?php } ?>
                 </tr>
             <?php $i++;
-                } ?>
+    } ?>
         </tbody>
     </table>
 </section>
+<?php } ?>

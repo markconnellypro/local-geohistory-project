@@ -1,3 +1,4 @@
+<?php if (is_array($query ?? '') && $query !== []) { ?>
 <section>
     <?php if (!isset($omitTitle)) { ?>
         <h2><?= $title ?></h2>
@@ -31,3 +32,4 @@
         </tbody>
     </table>
 </section>
+<?php } ?>
