@@ -38,27 +38,19 @@ class Adjudication extends BaseController
             $id = $query[0]->adjudicationid;
             $this->data['pageTitle'] = $query[0]->adjudicationtitle;
             echo view('header', $this->data);
-            echo view('adjudication_detail', ['row' => $query[0]]);
+            echo view('adjudication_detail', ['query' => $query]);
             $AdjudicationLocationModel = new AdjudicationLocationModel();
             $query = $AdjudicationLocationModel->getByAdjudication($id);
-            if ($query !== []) {
-                echo view('adjudication_location', ['query' => $query]);
-            }
+            echo view('adjudication_location', ['query' => $query]);
             $FilingModel = new FilingModel();
             $query = $FilingModel->getByAdjudication($id);
-            if ($query !== []) {
-                echo view('adjudication_filing', ['query' => $query]);
-            }
+            echo view('adjudication_filing', ['query' => $query]);
             $AdjudicationSourceCitationModel = new AdjudicationSourceCitationModel();
             $query = $AdjudicationSourceCitationModel->getByAdjudication($id);
-            if ($query !== []) {
-                echo view('general_reporter', ['query' => $query, 'state' => $state, 'hasLink' => true, 'title' => 'Reporter Links']);
-            }
+            echo view('general_reporter', ['query' => $query, 'state' => $state, 'hasLink' => true, 'title' => 'Reporter Links']);
             $EventModel = new EventModel();
             $query = $EventModel->getByAdjudication($id);
-            if ($query !== []) {
-                echo view('general_event', ['query' => $query, 'state' => $state, 'title' => 'Event Links', 'eventRelationship' => true]);
-            }
+            echo view('general_event', ['query' => $query, 'state' => $state, 'title' => 'Event Links', 'eventRelationship' => true]);
             echo view('footer');
         }
 

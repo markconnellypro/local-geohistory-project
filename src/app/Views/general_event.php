@@ -1,5 +1,6 @@
+<?php if (is_array($query ?? '') && $query !== []) { ?>
 <section>
-    <?= ($title == '' ? '' : '<h2>' . $title . '</h2>') ?>
+    <?= (isset($title) && $title !== '' ? '<h2>' . $title . '</h2>' : '') ?>
     <table id="<?= ($tableId ?? 'event') ?>" class="normal cell-border compact stripe">
         <thead>
             <tr>
@@ -18,11 +19,11 @@
         <tbody>
             <?php foreach ($query as $row) { ?>
                 <tr>
-                    <td><a href="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/event/<?= $row->eventslug ?>/">View</a></td>
+                    <td><a href="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?? 'usa' ?>/event/<?= $row->eventslug ?>/">View</a></td>
                     <td><?= $row->eventtypeshort ?></td>
                     <td><?= $row->eventlong ?></td>
                     <td><?= $row->eventgranted ?></td>
-                    <td data-sort="<?= $row->eventsort ?>"><?= (empty($row->eventeffective) ? $row->eventyear : $row->eventeffective) ?></td>
+                    <td data-sort="<?= $row->eventsort ?>"><?= ($row->eventeffective === '' ? $row->eventyear : $row->eventeffective) ?></td>
                     <?php if (isset($includeLawGroup)) { ?>
                         <td><?= $row->lawgrouplong ?></td>
                     <?php } if (isset($eventRelationship)) { ?>
@@ -33,3 +34,4 @@
         </tbody>
     </table>
 </section>
+<?php } ?>

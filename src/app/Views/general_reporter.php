@@ -1,9 +1,10 @@
+<?php if (is_array($query ?? '') && $query !== []) { ?>
 <section>
-    <h2><?= $title ?></h2>
+    <h2><?= $title ?? '' ?></h2>
     <table class="normal cell-border compact stripe">
         <thead>
             <tr>
-                <?php if ($hasLink) { ?>
+                <?php if ($hasLink ?? true) { ?>
                     <th>Detail</th>
                 <?php } ?>
                 <th>Citation</th>
@@ -14,8 +15,8 @@
         <tbody>
             <?php foreach ($query as $row) { ?>
                 <tr>
-                    <?php if ($hasLink) { ?>
-                        <td><a href="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/reporter/<?= $row->adjudicationsourcecitationslug ?>/">View</a></td>
+                    <?php if ($hasLink ?? true) { ?>
+                        <td><a href="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?? 'usa' ?>/reporter/<?= $row->adjudicationsourcecitationslug ?>/">View</a></td>
                     <?php } ?>
                     <td><?= $row->adjudicationsourcecitationvolume . ' ' . $row->sourceshort . ' ' . $row->adjudicationsourcecitationpage .
                             ($row->adjudicationsourcecitationyear != '' ? ' (' . $row->adjudicationsourcecitationyear . ')' : '') ?></td>
@@ -26,3 +27,4 @@
         </tbody>
     </table>
 </section>
+<?php } ?>

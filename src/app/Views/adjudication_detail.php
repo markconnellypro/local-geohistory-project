@@ -1,3 +1,5 @@
+<?php if (is_array($query ?? '') && $query !== []) {
+    $row = $query[0]; ?>
 <section>
     <h2>Tribunal</h2>
     <table class="normal cell-border compact stripe">
@@ -60,4 +62,5 @@
             </tbody>
         </table>
     </section>
-<?php } ?>
+<?php }
+} ?>
