@@ -40,15 +40,15 @@
                         <td><?php echo view('general_link', ['link' => $row->government, 'text' => $row->governmentlong]); ?></td>
                     <?php } ?>
                     <td><span class="b">
-                            <?= ($row->governmentsourcebody == '' ? '' : $row->governmentsourcebody . ' ') . $row->governmentsourcetype .
-                                ($row->governmentsourcenumber == '' ? '' : ' ' . $row->governmentsourcenumber) .
-                                ($row->governmentsourceterm == '' ? '' : ', ' . $row->governmentsourceterm) .
-                                ($row->governmentsourcetitle == '' ? '</span>' : ':</span> ' . $row->governmentsourcetitle) ?>
+                            <?= ($row->governmentsourcebody === '' ? '' : $row->governmentsourcebody . ' ') . $row->governmentsourcetype .
+                                ($row->governmentsourcenumber === '' ? '' : ' ' . $row->governmentsourcenumber) .
+                                ($row->governmentsourceterm === '' ? '' : ', ' . $row->governmentsourceterm) .
+                                ($row->governmentsourcetitle === '' ? '</span>' : ':</span> ' . $row->governmentsourcetitle) ?>
                     </td>
                     <td data-sort="<?= $row->governmentsourcedatesort ?>"><?= $row->governmentsourcedate ?></td>
                     <td data-sort="<?= $row->governmentsourceapproveddatesort ?>">
-                        <?= ($row->governmentsourceapproved == 't' ?
-                            (($row->governmentsourcetype == 'Election' && $row->governmentsourceapproveddate != '') ? 'Certified ' : '') . $row->governmentsourceapproveddate : ($row->governmentsourcetype == 'Election' ? 'Rejected' : ($row->governmentsourcetype == 'Bill' ? '' : 'Veto' . ($row->governmentsourceapproveddate != '' ? ' Overridden ' . $row->governmentsourceapproveddate : 'ed')))) ?>
+                        <?= ($row->governmentsourceapproved === 't' ?
+                            (($row->governmentsourcetype === 'Election' && $row->governmentsourceapproveddate !== '') ? 'Certified ' : '') . $row->governmentsourceapproveddate : ($row->governmentsourcetype === 'Election' ? 'Rejected' : ($row->governmentsourcetype === 'Bill' ? '' : 'Veto' . ($row->governmentsourceapproveddate !== '' ? ' Overridden ' . $row->governmentsourceapproveddate : 'ed')))) ?>
                     </td>
                     <td data-sort="<?= $row->governmentsourceeffectivedatesort ?>"><?= $row->governmentsourceeffectivedate ?></td>
                     <td><?=

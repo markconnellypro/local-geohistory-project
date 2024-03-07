@@ -5,7 +5,7 @@
     <table class="normal cell-border compact stripe">
         <thead>
             <tr>
-                <?php if ($type == 'usgs') { ?>
+                <?php if ($type === 'usgs') { ?>
                     <th>Type</th>
                 <?php } ?>
                 <th>From</th>
@@ -17,7 +17,7 @@
         <tbody>
             <?php foreach ($query as $row) { ?>
                 <tr>
-                    <?php if ($type == 'usgs') { ?>
+                    <?php if ($type === 'usgs') { ?>
                         <td><?= $row->gazetteertype ?></td>
                     <?php } ?>
                     <td><?= $row->gazetteerfrom ?></td>

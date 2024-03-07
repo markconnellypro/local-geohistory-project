@@ -13,8 +13,8 @@
         </thead>
         <tbody>
             <?php foreach ($query as $row) { ?>
-                <tr<?= ($row->filingnotpresent == 't' ? ' style="color: red;"' : '') ?>>
-                    <td><span class="b"><?= $row->filingtypelong . ($row->filingspecific != '' ?
+                <tr<?= ($row->filingnotpresent === 't' ? ' style="color: red;"' : '') ?>>
+                    <td><span class="b"><?= $row->filingtypelong . ($row->filingspecific !== '' ?
                                             ':</span> ' . $row->filingspecific :
                                             '</span>') ?></td>
                     <td data-sort="<?= $row->filingdatesort ?>"><?= $row->filingdate ?></td>

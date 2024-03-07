@@ -9,7 +9,7 @@ use CodeIgniter\Router\RouteCollection;
 $routes->add('robots.txt', 'Bot::robotsTxt');
 
 if (mb_strpos(base_url(), $_ENV['app_baseLocalGeohistoryProjectUrl']) !== false) {
-    if (ENVIRONMENT == 'development') {
+    if (ENVIRONMENT === 'development') {
         // Includes all US and Canadian provinces, states, and territories
         $stateProvinceRegex = '{locale}/(a[bklrsz]|bc|c[aot]|d[ce]|f[l]|g[au]|h[i]|i[adln]|k[sy]|l[a]|m[abdeinopst]|n[bcdehjlmstuvy]|o[hknr]|p[aer]|qc|r[i]|s[cdk]|t[nx]|u[t]|v[ait]|w[aivy]|yt)';
 

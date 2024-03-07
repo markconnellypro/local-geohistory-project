@@ -9,11 +9,11 @@
                     <th>ID</th>
                 <?php } ?>
                 <th>Type <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#eventtype" aria-label="Type Key"><?= view('general_svg_icon', ['iconLabel' => 'key icon', 'iconName' => 'key', 'iconType' => 'keyicon']); ?></a></th>
-                <?php if ($row->eventgranted != 'government') { ?>
+                <?php if ($row->eventgranted !== 'government') { ?>
                     <th>Method</th>
                 <?php } ?>
                 <th>Description</th>
-                <?php if ($row->eventgranted != 'government') { ?>
+                <?php if ($row->eventgranted !== 'government') { ?>
                     <th>Successful? <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#eventgranted" aria-label="Successful? Key"><?= view('general_svg_icon', ['iconLabel' => 'key icon', 'iconName' => 'key', 'iconType' => 'keyicon']); ?></a></th>
                 <?php } else { ?>
                     <th>Government</th>
@@ -26,11 +26,11 @@
                     <td><?= $row->eventid ?></td>
                 <?php } ?>
                 <td><?= $row->eventtypeshort ?></td>
-                <?php if ($row->eventgranted != 'government') { ?>
+                <?php if ($row->eventgranted !== 'government') { ?>
                     <td><?= $row->eventmethodlong ?></td>
                 <?php } ?>
                 <td><?= $row->eventlong ?></td>
-                <?php if ($row->eventgranted != 'government') { ?>
+                <?php if ($row->eventgranted !== 'government') { ?>
                     <td><?= $row->eventgranted ?></td>
                 <?php } else { ?>
                     <td><?php echo view('general_link', ['link' => $row->government, 'text' => 'View']) ?></td>
@@ -39,7 +39,7 @@
         </tbody>
     </table>
 </section>
-<?php if ($row->textflag == 't') { ?>
+<?php if ($row->textflag === 't') { ?>
     <section>
         <h2>Dates</h2>
         <table class="normal cell-border compact stripe">

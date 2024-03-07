@@ -5,7 +5,7 @@
     <table class="normal cell-border compact stripe">
         <thead>
             <tr>
-                <?php if ($title != 'Detail') { ?>
+                <?php if ($title !== 'Detail') { ?>
                     <th>Detail</th>
                 <?php }
                 if (!empty($isMultiple)) { ?>
@@ -14,7 +14,7 @@
                 <th>Type</th>
                 <th>Source</th>
                 <th>Identifier</th>
-                <?php if ($title == 'Identifier') { ?>
+                <?php if ($title === 'Identifier') { ?>
                     <th>Relationship</th>
                 <?php } ?>
                 <th>Web Link</th>
@@ -23,7 +23,7 @@
         <tbody>
             <?php foreach ($query as $row) { ?>
                 <tr>
-                    <?php if ($title != 'Detail') { ?>
+                    <?php if ($title !== 'Detail') { ?>
                         <td><a href="/<?= \Config\Services::request()->getLocale() ?>/governmentidentifier/<?= $row->governmentidentifiertypeslug . '/' . strtolower($row->governmentidentifier) ?>/">View</a></td>
                     <?php }
                     if (!empty($isMultiple)) { ?>
@@ -32,10 +32,10 @@
                     <td><?= $row->governmentidentifiertypetype ?></td>
                     <td><?= $row->governmentidentifiertypeshort ?></td>
                     <td><?= $row->governmentidentifier ?></td>
-                    <?php if ($title == 'Identifier') { ?>
+                    <?php if ($title === 'Identifier') { ?>
                         <td><?= $row->governmentidentifierstatus ?></td>
                     <?php } ?>
-                    <td><?= ($row->governmentidentifiertypeurl == '' ? '' : '<a href="' . $row->governmentidentifiertypeurl . '">View</a>') ?></td>
+                    <td><?= ($row->governmentidentifiertypeurl === '' ? '' : '<a href="' . $row->governmentidentifiertypeurl . '">View</a>') ?></td>
                 </tr>
             <?php } ?>
         </tbody>

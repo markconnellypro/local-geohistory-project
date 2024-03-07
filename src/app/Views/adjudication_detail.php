@@ -42,7 +42,7 @@
         </tbody>
     </table>
 </section>
-<?php if ($row->textflag == 't') { ?>
+<?php if ($row->textflag === 't') { ?>
     <section>
         <h2>Detail</h2>
         <table class="normal cell-border compact stripe">

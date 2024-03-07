@@ -13,7 +13,7 @@ var <?= $element ?>data = {
 	<?php $i = 0;
 if (is_array($query) && $query !== []) {
     foreach ($query as $row) {
-        if ($element == 'line') {
+        if ($element === 'line') {
             $geometry = $row->linegeometry;
             unset($row->linegeometry);
             $row = [
@@ -21,7 +21,7 @@ if (is_array($query) && $query !== []) {
                 'line' => $row->line,
                 'description' => $row->linedescription
             ];
-        } elseif ($element == 'point') {
+        } elseif ($element === 'point') {
             $geometry = $row->pointgeometry;
             $row = [
                 'type' => 'Point',
@@ -43,7 +43,7 @@ if (is_array($query) && $query !== []) {
         } else {
             $eventJson = '';
         }
-        echo ($i == 0 ? '' : ',') ?>
+        echo ($i === 0 ? '' : ',') ?>
 	    {
 	    "type": "Feature",
 	    "properties":
@@ -63,7 +63,7 @@ if (is_array($query) && $query !== []) {
 	    title: '<?= $element ?>',
 	    <?= ($onEachFeature ? 'onEachFeature: onEachFeature,' : '') ?>
 	    <?= ($onEachFeature2 ? 'onEachFeature: onEachFeature2,' : '') ?>
-	    <?= ($element == 'point' ? 'pointToLayer: function(feature, latlng) {
+	    <?= ($element === 'point' ? 'pointToLayer: function(feature, latlng) {
 					return L.circleMarker(latlng,' : 'style:') ?> <?php if (!isset($customStyle)) { ?>{
 	    weight: <?= $weight ?>,
 	    color: "#<?= $color ?>",
@@ -71,7 +71,7 @@ if (is_array($query) && $query !== []) {
 	    fillOpacity: <?= $fillOpacity ?>
 	    <?= (isset($radius) ? ', radius:' . $radius : '') ?>
 	    <?= ((isset($attribution) && !empty($attribution)) ? ", attribution: '" . $attribution . "'" : '') ?>
-	    <?= ($element == 'point' ? '});' : '') ?>
+	    <?= ($element === 'point' ? '});' : '') ?>
 	    }<?php } else {
 	        echo $customStyle;
 	    } ?>

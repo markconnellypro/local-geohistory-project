@@ -1,4 +1,5 @@
 <?php
+$state ??= 'usa';
 $title ??= '';
 ?>
 <!DOCTYPE html>
@@ -7,14 +8,14 @@ $title ??= '';
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta charset="UTF-8">
-    <title><?= (isset($pageTitle) ? $pageTitle . ' | ' : '') . (isset($pageTitleType) ? $pageTitleType . ' | ' : '') . $title . ' | ' . (empty($state) ? '' : strtoupper($state) . ' | ') ?><?= lang('Template.projectName') ?></title>
+    <title><?= (isset($pageTitle) ? $pageTitle . ' | ' : '') . (isset($pageTitleType) ? $pageTitleType . ' | ' : '') . $title . ' | ' . ($state !== '' ? '' : strtoupper($state) . ' | ') ?><?= lang('Template.projectName') ?></title>
     <link rel="preload" href="/asset/font/lora-regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
     <link rel="preload" href="/asset/font/lora-semibold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
     <link rel="preload" href="/asset/font/lora-italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
     <link rel="preload" href="/asset/font/lora-semibolditalic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
     <link rel="preload" href="/asset/font/frederickathegreat.woff2" as="font" type="font/woff2" crossorigin="anonymous">
     <link rel="stylesheet" href="/asset/css/geohistory.css" media="all">
-    <?php if (ENVIRONMENT == 'development') { ?>
+    <?php if (\App\Controllers\BaseController::isLive()) { ?>
         <link rel="stylesheet" href="/asset/development/css/development.css" media="all">
     <?php } ?>
     <link rel="icon" href="/asset/image/favicon.png" type="image/png">
@@ -25,16 +26,16 @@ $title ??= '';
 </head>
 
 <body>
-    <?php if ($title == 'Welcome') { ?>
+    <?php if ($title === 'Welcome') { ?>
         <img src="/asset/image/ct001800.jpg" id="welcome" alt="Map of annexations to Los Angeles from 1916">
     <?php } ?>
-    <div class="wrapper" <?= ($title == 'Welcome' ? ' id="welcomewrapper"' : '') ?>>
+    <div class="wrapper" <?= ($title === 'Welcome' ? ' id="welcomewrapper"' : '') ?>>
         <header class="headerfooter">
             <div id="headertext">
                 <div id="headertitle"><a href="/<?= \Config\Services::request()->getLocale() ?>/"><?= lang('Template.projectName') ?></a></div>
                 <div id="headerimagenavigation">
                     <div class="headerimageblock">
-                        <?php if (!empty($state) && $state != 'usa') { ?>
+                        <?php if ($state !== '' && $state !== 'usa') { ?>
                             <a href="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/" aria-label="<?= strtoupper($state) ?>">
                                 <?= view('general_svg_icon', ['iconLabel' => strtoupper($state) . ' map icon', 'iconName' => $state, 'iconType' => 'headericon']); ?>
                                 <br><?= strtoupper($state) ?>
@@ -49,7 +50,7 @@ $title ??= '';
                                         <?= view('general_svg_icon', ['iconLabel' => 'home icon', 'iconName' => 'home', 'iconType' => 'keyiconlarge']); ?>
                                     </a>
                                 </div>
-                                <?php if (!empty($state)) { ?>
+                                <?php if ($state !== '') { ?>
                                     <div class="keyiconcontainer">
                                         <a href="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/" aria-label="Search">
                                             <?= view('general_svg_icon', ['iconLabel' => 'magnifying glass icon', 'iconName' => 'search', 'iconType' => 'keyiconlarge']); ?>
@@ -57,7 +58,7 @@ $title ??= '';
                                     </div>
                                 <?php } ?>
                                 <div class="keyiconcontainer">
-                                    <a href="/<?= \Config\Services::request()->getLocale() ?><?= ((!empty($state) && $state != 'usa') ? '/' . $state : '') ?>/about/" aria-label="About">
+                                    <a href="/<?= \Config\Services::request()->getLocale() ?><?= (($state !== '' && $state !== 'usa') ? '/' . $state : '') ?>/about/" aria-label="About">
                                         <?= view('general_svg_icon', ['iconLabel' => 'about icon', 'iconName' => 'about', 'iconType' => 'keyiconlarge']); ?>
                                     </a>
                                 </div>
@@ -67,7 +68,7 @@ $title ??= '';
                                     </a>
                                 </div>
                                 <div class="keyiconcontainer">
-                                    <a href="/<?= \Config\Services::request()->getLocale() ?><?= ((!empty($state) && $state != 'usa') ? '/' . $state : '') ?>/statistics/" aria-label="Statistics">
+                                    <a href="/<?= \Config\Services::request()->getLocale() ?><?= (($state !== '' && $state !== 'usa') ? '/' . $state : '') ?>/statistics/" aria-label="Statistics">
                                         <?= view('general_svg_icon', ['iconLabel' => 'statistics icon', 'iconName' => 'statistics', 'iconType' => 'keyiconlarge']); ?>
                                     </a>
                                 </div>

@@ -28,9 +28,9 @@
                     <?php if ($isMultiple) { ?>
                         <td><?= $row->governmentaffectedlong ?></td>
                     <?php } ?>
-                    <td><?= $row->affectedtypesame . ($row->eventreconstructed == 't' ? '?' : '') ?></td>
+                    <td><?= $row->affectedtypesame . ($row->eventreconstructed === 't' ? '?' : '') ?></td>
                     <td><?php echo view('general_link', ['link' => $row->governmentstatelink, 'text' => $row->governmentlong]) ?></td>
-                    <td><?= $row->affectedtypeother . ($row->eventreconstructed == 't' ? '?' : '') ?></td>
+                    <td><?= $row->affectedtypeother . ($row->eventreconstructed === 't' ? '?' : '') ?></td>
                     <td data-sort="<?= $row->eventsort ?>"><?= (empty($row->eventeffective) ? $row->eventyear : $row->eventeffective) ?></td>
                 </tr>
             <?php $i++;

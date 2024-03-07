@@ -30,7 +30,7 @@
         </tbody>
     </table>
 </section>
-<?php if ($row->textflag == 't' && !$isHistory) { ?>
+<?php if ($row->textflag === 't' && !$isHistory) { ?>
     <section>
         <h2>Detail</h2>
         <table class="normal cell-border compact stripe">
@@ -62,7 +62,7 @@
                                 <select name="mapcomplete">
                                 <?php if (is_array($statuses ?? '') && $statuses !== []) {
                                     foreach ($statuses as $status) { ?>
-                                        <option value="<?= $status->governmentmapstatusid ?>" <?= (($status->governmentmapstatusid == $row->governmentmapstatus) ? ' selected="selected"' : '') ?>><?= $status->governmentmapstatusshort ?></option>
+                                        <option value="<?= $status->governmentmapstatusid ?>" <?= (($status->governmentmapstatusid === $row->governmentmapstatus) ? ' selected="selected"' : '') ?>><?= $status->governmentmapstatusshort ?></option>
                                     <?php }
                                     } ?>
                                 </select>

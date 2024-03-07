@@ -31,7 +31,7 @@
         <tbody>
             <?php foreach ($query as $row) {
                 if ($hasColor) {
-                    $rowColor = ($row->citationcount > 0 ? (($row->citationeventnothandledcount > 0 || $row->sourcecitationnothandled == 't') ? 'preliminary' : 'complete') : 'incomplete');
+                    $rowColor = ($row->citationcount > 0 ? (($row->citationeventnothandledcount > 0 || $row->sourcecitationnothandled === 't') ? 'preliminary' : 'complete') : 'incomplete');
                 } else {
                     $rowColor = '';
                 }

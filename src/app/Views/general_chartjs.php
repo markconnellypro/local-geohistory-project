@@ -14,7 +14,7 @@
 
     var xLabel = "<?= $xLabel ?>";
     var yLabel = "<?= $yLabel ?>";
-    var showLegend = <?= (count($query) == 2 ? 'false' : 'true') ?>;
+    var showLegend = <?= (count($query) === 2 ? 'false' : 'true') ?>;
 </script>
 <script src="/asset/map/chart.js"></script>
 <?php } ?>

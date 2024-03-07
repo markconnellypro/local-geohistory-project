@@ -12,11 +12,11 @@
             <?php foreach ($query as $row) { ?>
                 <tr>
                     <td><?= $row->adjudicationlocationtypelong . ' ' . $row->adjudicationlocationtypetype .
-                            ($row->tribunallong != '' ? ' <span class="i"><span class="b">(Tribunal: </span>' . $row->tribunallong .
+                            ($row->tribunallong !== '' ? ' <span class="i"><span class="b">(Tribunal: </span>' . $row->tribunallong .
                                 '<span class="b">; Current Filing Office: </span>' . $row->tribunalfilingoffice . '<span class="b">)</span></span>' : '') ?></td>
-                    <td><?= ($row->adjudicationlocationpage == 'electronic' ? 'electronic' : ($row->adjudicationlocationtypearchiveseries != '' ? $row->adjudicationlocationtypearchivetype . ' archives series ' . $row->adjudicationlocationtypearchiveseries . ', ' : '') .
-                            ($row->adjudicationlocationtypevolumetype == 'Volume' ? 'v.' : strtolower($row->adjudicationlocationtypevolumetype)) . ' ' . $row->adjudicationlocationvolume . ', ' .
-                            ($row->adjudicationlocationtypepagetype == 'Page' ? 'p.' : strtolower($row->adjudicationlocationtypepagetype)) . ' ' . $row->adjudicationlocationpage) ?></td>
+                    <td><?= ($row->adjudicationlocationpage === 'electronic' ? 'electronic' : ($row->adjudicationlocationtypearchiveseries !== '' ? $row->adjudicationlocationtypearchivetype . ' archives series ' . $row->adjudicationlocationtypearchiveseries . ', ' : '') .
+                            ($row->adjudicationlocationtypevolumetype === 'Volume' ? 'v.' : strtolower($row->adjudicationlocationtypevolumetype)) . ' ' . $row->adjudicationlocationvolume . ', ' .
+                            ($row->adjudicationlocationtypepagetype === 'Page' ? 'p.' : strtolower($row->adjudicationlocationtypepagetype)) . ' ' . $row->adjudicationlocationpage) ?></td>
                 </tr>
             <?php } ?>
         </tbody>
