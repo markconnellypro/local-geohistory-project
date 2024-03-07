@@ -1,3 +1,9 @@
+<?php
+$affectedGovernment ??= ['linkTypes' => [], 'rows' => [], 'types' => []];
+$includeDate ??= false;
+$isComplete ??= true;
+$state ??= 'usa';
+?>
 <section>
     <?php if ($isComplete) { ?>
         <h2>Affected Government</h2>
@@ -20,7 +26,8 @@
             </tr>
         </thead>
         <tbody>
-            <?php foreach ($affectedGovernment['rows'] as $id => $row) { ?>
+            <?php if (is_array($affectedGovernment['rows'] ?? '') && $affectedGovernment['rows'] !== []) {
+                foreach ($affectedGovernment['rows'] as $id => $row) { ?>
                 <tr>
                     <?php if ($includeDate) { ?>
                         <td data-sort="<?= $row->eventorder ?>"><?php echo view('general_link', ['link' => (empty($row->eventslug) ? '' : "/" . \Config\Services::request()->getLocale() . "/" . $state . "/event/" . $row->eventslug . "/"), 'text' => (empty($row->eventslug) ? 'Missing' : 'View')]) ?></td>
@@ -28,18 +35,21 @@
                     <?php } elseif (\App\Controllers\BaseController::isLive() && $isComplete) { ?>
                         <td>
 
-                            <?php foreach ($affectedGovernment['linkTypes'] as $fromTo => $levels) {
-                                foreach ($levels as $level) {
-                                    if (isset($row->{ucfirst($fromTo) . ' ' . $level . ' Long'})) { ?>
+                            <?php if (is_array($affectedGovernment['linkTypes'] ?? '') && $affectedGovernment['linkTypes'] !== []) {
+                                foreach ($affectedGovernment['linkTypes'] as $fromTo => $levels) {
+                                    foreach ($levels as $level) {
+                                        if (isset($row->{ucfirst($fromTo) . ' ' . $level . ' Long'})) { ?>
                                         <?php echo view('general_link', ['link' => str_replace('government', 'governmentmap', $row->{ucfirst($fromTo) . ' ' . $level . ' Link'}) . $id . "/", 'text' => ucfirst($fromTo)]) ?><br>
                             <?php
+                                        }
                                     }
                                 }
                             } ?>
                         </td>
                         <?php }
-                    foreach ($affectedGovernment['types'] as $fromTo => $levels) {
-                        foreach ($levels as $level) { ?>
+                    if (is_array($affectedGovernment['types'] ?? '') && $affectedGovernment['types'] !== []) {
+                        foreach ($affectedGovernment['types'] as $fromTo => $levels) {
+                            foreach ($levels as $level) { ?>
                             <td>
                                 <?php if (isset($row->{ucfirst($fromTo) . ' ' . $level . ' Long'})) { ?>
                                     <?php echo view('general_link', ['link' => $row->{ucfirst($fromTo) . ' ' . $level . ' Link'}, 'text' => $row->{ucfirst($fromTo) . ' ' . $level . ' Long'}]) ?>
@@ -47,9 +57,11 @@
                                 <?php } ?>
                             </td>
                     <?php }
-                        } ?>
+                            }
+                    } ?>
                 </tr>
-            <?php } ?>
+            <?php }
+                } ?>
         </tbody>
     </table>
 </section>

@@ -70,7 +70,7 @@ class Government extends BaseController
             $hasMap = ($isCountyOrLower && $query[0]->hasmap === 't');
             $showTimeline = ($query[0]->governmentmapstatustimelapse === 't');
             $statusQuery = $GovernmentMapStatusModel->getDetails();
-            echo view('government_detail', ['row' => $query[0], 'state' => $state, 'statuses' => $statusQuery]);
+            echo view('government_detail', ['query' => $query, 'state' => $state, 'statuses' => $statusQuery]);
             if (!$isHistory) {
                 $query = $SourceCitationModel->getByGovernment($id, $state);
                 if ($query !== []) {
@@ -144,9 +144,7 @@ class Government extends BaseController
                 if (file_exists(APPPATH . 'Views/' . ENVIRONMENT . '/government_live.php')) {
                     echo view(ENVIRONMENT . '/government_live', ['id' => $id, 'state' => $state, 'isMunicipalityOrLower' => $isMunicipalityOrLower, 'isCountyOrLower' => $isCountyOrLower, 'isCountyOrState' => $isCountyOrState, 'isState' => $isStateOrHigher, 'includeGovernment' => false]);
                 }
-                if ($populationQuery !== []) {
-                    echo view('general_chartjs', ['query' => $populationQuery, 'xLabel' => 'Year', 'yLabel' => 'Population']);
-                }
+                echo view('general_chartjs', ['query' => $populationQuery, 'xLabel' => 'Year', 'yLabel' => 'Population']);
             }
             if ($hasMap) {
                 echo view('leaflet_start', ['type' => 'government', 'includeBase' => true, 'needRotation' => false]);

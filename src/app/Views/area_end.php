@@ -1,3 +1,7 @@
+<?php
+$includeBase ??= true;
+$includePoint ??= false;
+?>
 var map = L.map("map", {
 layers: [<?php
             echo($includeBase ? 'baseMap, ' : '');

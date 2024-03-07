@@ -1,3 +1,7 @@
+<?php
+$form ??= '';
+$type ??= '';
+?>
 <label class="forselectize" for="<?= $form ?>_governmentlevel"> Level</label>
 <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#governmentlevel" class="forselectize" aria-label="Level Key"><?= view('general_svg_icon', ['iconLabel' => 'key icon', 'iconName' => 'key', 'iconType' => 'keyicontext']); ?></a>
 <br>

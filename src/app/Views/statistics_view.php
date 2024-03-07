@@ -1,4 +1,10 @@
-<?php if (is_array($wholeQuery ?? '') && $wholeQuery !== []) { ?>
+<?php if (is_array($wholeQuery ?? '') && $wholeQuery !== []) {
+    $dateRange ??= '';
+    $isContemporaneous ??= true;
+    $notEvent ??= true;
+    $query ??= '{}';
+    $state ??= 'usa';
+    ?>
     <section>
         <h2>By Jurisdiction:</h2>
         <div id="map" class="map"></div>
@@ -24,7 +30,7 @@
     </section>
     <script>
         var mapPath = [
-            <?php if ($state == 'ma' && (empty($dateRange) || substr($dateRange, 0, 4) < '1821')) { ?> '/asset/development/map/statistics/me.geojson',
+            <?php if ($state == 'ma' && ($dateRange === '' || substr($dateRange, 0, 4) < '1821')) { ?> '/asset/development/map/statistics/me.geojson',
             <?php } ?> '/asset/<?= ((\App\Controllers\BaseController::isLive() && (empty($state) || !in_array($state, \App\Controllers\BaseController::getProductionJurisdictions()))) ? 'development/' : '') ?>map/statistics/<?= (empty($state) ? (\App\Controllers\BaseController::isLive() ? 'development' : 'production') : $state) ?>.geojson'
         ];
         var partData = <?= $query ?>;

@@ -1,4 +1,7 @@
-<?php if (is_array($query ?? '') && $query !== []) { ?>
+<?php if (is_array($query ?? '') && $query !== []) {
+    $state ??= 'usa';
+    $type ??= '';
+    ?>
 <section>
     <h2>Government Action</h2>
     <table class="normal cell-border compact stripe">

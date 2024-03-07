@@ -1,4 +1,6 @@
-<?php if (is_array($query ?? '') && $query !== []) { ?>
+<?php if (is_array($query ?? '') && $query !== []) {
+    $state ??= 'usa';
+    ?>
 <section>
     <?= (isset($title) && $title !== '' ? '<h2>' . $title . '</h2>' : '') ?>
     <table id="<?= ($tableId ?? 'event') ?>" class="normal cell-border compact stripe">

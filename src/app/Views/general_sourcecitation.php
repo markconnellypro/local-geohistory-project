@@ -1,4 +1,9 @@
-<?php if (is_array($query ?? '') && $query !== []) { ?>
+<?php if (is_array($query ?? '') && $query !== []) {
+    $hasColor ??= false;
+    $hasLink ??= false;
+    $state ??= 'usa';
+    $title ??= '';
+    ?>
 <section>
     <?php if (!isset($omitTitle)) { ?>
         <h2><?= $title ?></h2>
@@ -27,13 +32,15 @@
             <?php foreach ($query as $row) {
                 if ($hasColor) {
                     $rowColor = ($row->citationcount > 0 ? (($row->citationeventnothandledcount > 0 || $row->sourcecitationnothandled == 't') ? 'preliminary' : 'complete') : 'incomplete');
+                } else {
+                    $rowColor = '';
                 }
                 ?>
                 <tr>
                     <?php if ($hasLink) { ?>
                         <td<?= ($hasColor ? ' class="folder' . $rowColor . '"' : '') ?>><a href="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/source/<?= $row->sourcecitationslug ?>/">View</a></td>
                             <?php if (!$hasColor) { ?>
-                                <td<?= ($hasColor ? ' class="folder' . $rowColor . '"' : '') ?>><?= $row->sourceabbreviation ?></td>
+                                <td><?= $row->sourceabbreviation ?></td>
                                 <?php }
                             }
                 if ($hasColor || !$hasLink && \App\Controllers\BaseController::isLive()) { ?>

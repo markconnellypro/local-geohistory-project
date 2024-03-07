@@ -1,4 +1,8 @@
-<?php if (is_array($query ?? '') && $query !== []) { ?>
+<?php if (is_array($query ?? '') && $query !== []) {
+    $hasLink ??= false;
+    $state ??= 'usa';
+    $title ??= '';
+    ?>
 <section>
     <h2><?= $title ?></h2>
     <table class="normal cell-border compact stripe">

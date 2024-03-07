@@ -1,3 +1,10 @@
+<?php
+$includeArea ??= false;
+$includeBase ??= true;
+$includeMetes ??= false;
+$layerArray ??= ['layer'];
+$overlayArray ??= ['overlay'];
+?>
 var map = L.map("map", {
 layers: [<?php
             echo($includeBase ? 'baseMap, ' : '');

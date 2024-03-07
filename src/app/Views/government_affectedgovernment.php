@@ -1,4 +1,8 @@
-<?php if (is_array($query ?? '') && $query !== []) { ?>
+<?php if (is_array($query ?? '') && $query !== []) {
+    $isHistory ??= false;
+    $isMultiple ??= false;
+    $state ??= 'usa';
+    ?>
 <section>
     <?php if (!$isHistory) { ?>
         <h2>Affected Government</h2>

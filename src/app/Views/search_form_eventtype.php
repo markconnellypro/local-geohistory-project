@@ -1,3 +1,7 @@
+<?php
+$form ??= '';
+$isRequired ??= false;
+?>
 <label class="forselectize" for="<?= $form ?>_eventtype"> Event Type</label>
 <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#eventtype" class="forselectize" aria-label="Event Type Key"><?= view('general_svg_icon', ['iconLabel' => 'key icon', 'iconName' => 'key', 'iconType' => 'keyicontext']); ?></a>
 <br>

@@ -1,4 +1,8 @@
-<?php if (is_array($query ?? '') && $query !== []) { ?>
+<?php if (is_array($query ?? '') && $query !== []) {
+    $state ??= 'usa';
+    $title ??= '';
+    $type ??= '';
+    ?>
 <section>
     <?php if (!isset($omitTitle)) { ?>
         <h2><?= $title ?></h2>

@@ -45,7 +45,7 @@ class Event extends BaseController
             $this->data['pageTitle'] = $query[0]->eventlong;
             $this->data['pageTitleType'] = $query[0]->eventtypeshort;
             echo view('header', $this->data);
-            echo view('event_detail', ['row' => $query[0]]);
+            echo view('event_detail', ['query' => $query]);
             $AffectedGovernmentGroupModel = new AffectedGovernmentGroupModel();
             $affectedGovernment = $AffectedGovernmentGroupModel->getByEventGovernment($id, $state);
             $hasMap = $affectedGovernment['hasMap'];

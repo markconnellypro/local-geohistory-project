@@ -1,4 +1,8 @@
-<?php if (is_array($query ?? '') && $query !== []) { ?>
+<?php if (is_array($query ?? '') && $query !== []) {
+    $includeDate ??= false;
+    $isComplete ??= true;
+    $state ??= 'usa';
+    ?>
 <section>
     <?php if ($isComplete) { ?>
         <h2>Affected Government</h2>
@@ -10,8 +14,6 @@
                     <th>Detail</th>
                     <th>Date <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#date" aria-label="Date Key"><?= view('general_svg_icon', ['iconLabel' => 'key icon', 'iconName' => 'key', 'iconType' => 'keyicon']); ?></a>
                     </th>
-                <?php } elseif (\App\Controllers\BaseController::isLive() && $isComplete) { ?>
-                    <th>Map<br>Link</th>
                 <?php }
                 if ($isComplete) { ?>
                     <th>From<br>Municipality</th>
@@ -31,17 +33,6 @@
                     <?php if ($includeDate) { ?>
                         <td data-sort="<?= $row->eventorder ?>"><?php echo view('general_link', ['link' => (empty($row->eventslug) ? '' : "/" . \Config\Services::request()->getLocale() . "/" . $state . "/event/" . $row->eventslug . "/"), 'text' => (empty($row->eventslug) ? 'Missing' : 'View')]) ?></td>
                         <td data-sort="<?= $row->eventsort ?>"><?= (empty($row->eventeffective) ? $row->eventyear : $row->eventeffective) ?></td>
-                    <?php } elseif (\App\Controllers\BaseController::isLive() && $isComplete) { ?>
-                        <td>
-                            <?php echo view('general_link', ['link' => str_replace('government', 'governmentmap', $row->municipalityfrom) . $row->id . "/", 'text' => 'From']) ?><br>
-                            <?php if (!empty($row->submunicipalityfrom)) { ?>
-                                <?php echo view('general_link', ['link' => str_replace('government', 'governmentmap', $row->submunicipalityfrom) . $row->id . "/", 'text' => 'Sub From']) ?><br>
-                            <?php } ?>
-                            <?php echo view('general_link', ['link' => str_replace('government', 'governmentmap', $row->municipalityto) . $row->id . "/", 'text' => 'To']) ?><br>
-                            <?php if (!empty($row->submunicipalityto)) { ?>
-                                <?php echo view('general_link', ['link' => str_replace('government', 'governmentmap', $row->submunicipalityto) . $row->id . "/", 'text' => 'Sub To']) ?><br>
-                            <?php } ?>
-                        </td>
                     <?php }
                     if ($isComplete) { ?>
                         <td>

@@ -1,3 +1,6 @@
+<?php $eventTypeQuery ??= [];
+$state ??= 'usa';
+?>
 <form method="post" action="/<?= \Config\Services::request()->getLocale() ?>/<?= $state . (empty($state) ? '' : '/') ?>statistics/report/">
     <fieldset>
         <legend>Metric:</legend>
@@ -14,7 +17,7 @@
             <?php } ?>
         </div>
     </fieldset>
-    <?php if (0 == 1) { ?>
+    <?php /*
         <fieldset>
             <legend>Group By:</legend>
             <div class="option_radio_indent">
@@ -22,9 +25,8 @@
                 <input type="radio" name="by" id="by_historic" value="historic"><label for="by_historic">Historic Jurisdictions</label>
             </div>
         </fieldset>
-    <?php } else { ?>
+    <?php */ ?>
         <input type="hidden" name="by" value="historic">
-    <?php } ?>
     <fieldset>
         <legend>Filters:</legend>
         <div class="option_indent">

@@ -1,1 +1,9 @@
-<?= ((empty($link) || empty($text)) ? $text : '<a href="' . $link . '">' . $text . '</a>');
+<?php
+
+$link ??= '';
+$text ??= '';
+if ($link === '' || $text === '') {
+    echo $text;
+} else {
+    echo '<a href="' . $link . '">' . $text . '</a>';
+}

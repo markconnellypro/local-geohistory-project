@@ -1,3 +1,8 @@
+<?php if (is_array($query ?? '') && $query !== []) {
+    $isHistory ??= false;
+    $row = $query[0];
+    $state ??= 'usa';
+    ?>
 <section>
     <?php if (!$isHistory) { ?>
         <h2>Summary</h2>
@@ -44,20 +49,22 @@
             </thead>
             <tbody>
                 <tr>
-                    <td><?php if (!empty($row->governmentcreationevent)) { ?><a href="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/event/<?= $row->governmentcreationevent ?>/"><?= $row->governmentcreationtext ?></a><?php } ?></td>
+                    <td><?php if (!is_null($row->governmentcreationevent)) { ?><a href="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/event/<?= $row->governmentcreationevent ?>/"><?= $row->governmentcreationtext ?></a><?php } ?></td>
                     <?php if (!empty($row->governmentcreationlong)) { ?>
                         <td><?= $row->governmentcreationlong ?></td>
                     <?php } ?>
                     <td><?= $row->governmentaltercount ?></td>
-                    <td><?php if (!empty($row->governmentdissolutionevent)) { ?><a href="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/event/<?= $row->governmentdissolutionevent ?>/"><?= $row->governmentdissolutiontext ?></a><?php } ?></td>
+                    <td><?php if (!is_null($row->governmentdissolutionevent)) { ?><a href="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/event/<?= $row->governmentdissolutionevent ?>/"><?= $row->governmentdissolutiontext ?></a><?php } ?></td>
                     <?php if (\App\Controllers\BaseController::isLive()) { ?>
                         <td>
                             <form action="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/governmentmapcomplete/" method="post">
                                 <input type="hidden" name="id" value="<?= $row->governmentid ?>">
                                 <select name="mapcomplete">
-                                    <?php foreach ($statuses as $status) { ?>
+                                <?php if (is_array($statuses ?? '') && $statuses !== []) {
+                                    foreach ($statuses as $status) { ?>
                                         <option value="<?= $status->governmentmapstatusid ?>" <?= (($status->governmentmapstatusid == $row->governmentmapstatus) ? ' selected="selected"' : '') ?>><?= $status->governmentmapstatusshort ?></option>
-                                    <?php } ?>
+                                    <?php }
+                                    } ?>
                                 </select>
                                 <button type="submit">Change</button>
                             </form>
@@ -67,4 +74,5 @@
             </tbody>
         </table>
     </section>
-<?php } ?>
+<?php }
+} ?>

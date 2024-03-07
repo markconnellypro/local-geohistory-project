@@ -1,3 +1,6 @@
+<?php
+$includeBase ??= true;
+?>
 // Add DownloadButton control to map
 var downloadButtonControl = new L.Control.DownloadButton();
 map.addControl(downloadButtonControl);

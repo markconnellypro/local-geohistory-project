@@ -1,4 +1,8 @@
-<?php if (is_array($query ?? '') && $query !== []) { ?>
+<?php if (is_array($query ?? '') && $query !== []) {
+    $hasLink ??= false;
+    $state ??= 'usa';
+    $title ??= '';
+    ?>
 <section>
     <h2><?= $title ?></h2>
     <table class="normal cell-border compact stripe">
@@ -19,7 +23,7 @@
                         <td><a href="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/reporter/<?= $row->adjudicationsourcecitationslug ?>/">View</a></td>
                     <?php } ?>
                     <td><?= $row->adjudicationsourcecitationvolume . ' ' . $row->sourceshort . ' ' . $row->adjudicationsourcecitationpage .
-                            ($row->adjudicationsourcecitationyear != '' ? ' (' . $row->adjudicationsourcecitationyear . ')' : '') ?></td>
+                    ($row->adjudicationsourcecitationyear != '' ? ' (' . $row->adjudicationsourcecitationyear . ')' : '') ?></td>
                     <td data-sort="<?= $row->adjudicationsourcecitationdatesort ?>"><?= $row->adjudicationsourcecitationdate ?></td>
                     <td><?= $row->adjudicationsourcecitationtitle ?></td>
                 </tr>

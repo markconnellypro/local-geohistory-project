@@ -1,3 +1,4 @@
+<?php $form ??= ''; ?>
 <label class="forselectize" for="<?= $form ?>_tribunalgovernment">Government: </label>
 <select id="<?= $form ?>_tribunalgovernment" name="tribunalgovernment" style="width: 300px;" required="required">
 </select>

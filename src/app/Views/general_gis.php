@@ -1,39 +1,49 @@
+<?php
+$color ??= 'ffffff';
+$element ??= '';
+$fillOpacity ??= 0.5;
+$onEachFeature ??= true;
+$onEachFeature2 ??= false;
+$query ??= [];
+$weight ??= 1;
+?>
 var <?= $element ?>data = {
 	"type": "FeatureCollection",
 	"features": [
 	<?php $i = 0;
-foreach ($query as $row) {
-    if ($element == 'line') {
-        $geometry = $row->linegeometry;
-        unset($row->linegeometry);
-        $row = [
-            'type' => 'Line',
-            'line' => $row->line,
-            'description' => $row->linedescription
-        ];
-    } elseif ($element == 'point') {
-        $geometry = $row->pointgeometry;
-        $row = [
-            'type' => 'Point',
-            'line' => $row->line,
-            'description' => $row->pointdescription
-        ];
-    } elseif (empty($row->geometry)) {
-        $geometry = null;
-    } else {
-        $geometry = $row->geometry;
-    }
-    if (is_null($geometry)) {
-        continue;
-    }
-    unset($row->geometry);
-    if (isset($row->eventjson)) {
-        $eventJson = $row->eventjson;
-        $row->eventjson = 'REPLACE_EVENT_JSON';
-    } else {
-        $eventJson = '';
-    }
-    echo ($i == 0 ? '' : ',') ?>
+if (is_array($query) && $query !== []) {
+    foreach ($query as $row) {
+        if ($element == 'line') {
+            $geometry = $row->linegeometry;
+            unset($row->linegeometry);
+            $row = [
+                'type' => 'Line',
+                'line' => $row->line,
+                'description' => $row->linedescription
+            ];
+        } elseif ($element == 'point') {
+            $geometry = $row->pointgeometry;
+            $row = [
+                'type' => 'Point',
+                'line' => $row->line,
+                'description' => $row->pointdescription
+            ];
+        } elseif (empty($row->geometry)) {
+            $geometry = null;
+        } else {
+            $geometry = $row->geometry;
+        }
+        if (is_null($geometry)) {
+            continue;
+        }
+        unset($row->geometry);
+        if (isset($row->eventjson)) {
+            $eventJson = $row->eventjson;
+            $row->eventjson = 'REPLACE_EVENT_JSON';
+        } else {
+            $eventJson = '';
+        }
+        echo ($i == 0 ? '' : ',') ?>
 	    {
 	    "type": "Feature",
 	    "properties":
@@ -43,6 +53,7 @@ foreach ($query as $row) {
 	    <?= $geometry ?>
 
 	    }<?php $i++;
+    }
 } ?>
 
 	    ]

@@ -1,3 +1,6 @@
+<?php
+$includeBase ??= true;
+?>
 <section>
     <h2>Map</h2>
     <?php if (isset($includeDisclaimer)) { ?>

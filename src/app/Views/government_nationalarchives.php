@@ -1,4 +1,5 @@
-<?php if (is_array($query ?? '') && $query !== []) { ?>
+<?php if (is_array($query ?? '') && $query !== []) {
+    $isMultiple ??= false; ?>
 <section>
     <h2>National Archives</h2>
     <table class="normal cell-border compact stripe">

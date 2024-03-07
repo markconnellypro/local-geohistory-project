@@ -1,3 +1,13 @@
+<?php
+$layers ??= ['default' => 'default'];
+$primaryLayer ??= '';
+$showTimeline ??= false;
+$state ??= 'usa';
+$updatedParts ??= (object)[
+    'sortdate' => '',
+    'sortdatetext' => ''
+];
+?>
 var map = L.map("map", {
   layers: [baseMap, governmentOverlayMap<?php foreach ($layers as $key => $layer) {
       echo ', ', $key, 'layer';
@@ -10,14 +20,16 @@ var overlayMaps = {
   "Approximate Current Boundaries": governmentOverlayMap,
 <?php
 $i = 0;
-  foreach ($layers as $key => $layer) {
-      if ($i > 0) {
-          echo ",\n";
-      } else {
-          $i++;
-      }
-      echo "  ",'"', $layer, '": ', $key, 'layer';
-  } ?>
+if (is_array($layers) && $layers !== []) {
+    foreach ($layers as $key => $layer) {
+        if ($i > 0) {
+            echo ",\n";
+        } else {
+            $i++;
+        }
+        echo "  ",'"', $layer, '": ', $key, 'layer';
+    }
+} ?>
 
 };
 

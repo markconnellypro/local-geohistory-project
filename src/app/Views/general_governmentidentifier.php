@@ -1,4 +1,5 @@
-<?php if (is_array($query ?? '') && $query !== []) { ?>
+<?php if (is_array($query ?? '') && $query !== []) {
+    $title ??= ''; ?>
 <section>
     <h2><?= $title ?></h2>
     <table class="normal cell-border compact stripe">

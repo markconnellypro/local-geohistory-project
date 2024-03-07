@@ -1,4 +1,7 @@
-<?php if (is_array($query ?? '') && $query !== []) { ?>
+<?php if (is_array($query ?? '') && $query !== []) {
+    $title ??= '';
+    $type ??= '';
+    ?>
 <section>
     <h2 id="<?= $type ?>"><?= $title ?></h2>
     <?php if ($type == 'law') {

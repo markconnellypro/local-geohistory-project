@@ -1,3 +1,4 @@
+<?php if (is_array($searchParameter ?? '') && $searchParameter !== []) { ?>
 <section>
     <h2>Requested Information<?= (isset($omitColon) ? '' : ':') ?></h2>
     <div class="parameter">
@@ -9,3 +10,4 @@
         <?php } ?>
     </div>
 </section>
+<?php } ?>

@@ -1,3 +1,6 @@
+<?php
+$layers ??= ['default' => 'default'];
+?>
 var map = L.map("map", {
 layers: [baseMap, governmentOverlayMap, affectedgovernmentlayer<?php foreach ($layers as $key => $layer) {
     echo ', ', $key, 'layer';
@@ -21,8 +24,10 @@ overlayMaps[element] = stateOverlayMaps[element];
 
 L.control.layers(baseMaps, overlayMaps).addTo(map);
 
-<?php foreach (array_keys(array_reverse($layers)) as $key) {
-    echo $key, "layer.bringToFront();\n";
+<?php if (is_array($layers) && $layers !== []) {
+    foreach (array_keys(array_reverse($layers)) as $key) {
+        echo $key, "layer.bringToFront();\n";
+    }
 } ?>
 affectedgovernmentlayer.bringToFront();
 

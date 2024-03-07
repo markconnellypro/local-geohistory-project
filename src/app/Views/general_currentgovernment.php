@@ -20,7 +20,7 @@
                         <td><?= $row->governmentshapeid ?></td>
                     <?php } ?>
                     <td>
-                        <?php if (!empty($row->governmentsubmunicipality)) {
+                        <?php if ($row->governmentsubmunicipality !== '') {
                             echo view('general_link', ['link' => $row->governmentsubmunicipality, 'text' => $row->governmentsubmunicipalitylong]);
                         } ?>
                     </td>

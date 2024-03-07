@@ -89,7 +89,7 @@ class Statistics extends BaseController
             $to = $from;
             $from = $temporary;
         }
-        if ($from === $to) {
+        if ($from === 0 || $from === $to) {
             $dateRange = $from === 0 ? '' : (string) $from;
             $dateRangePlural = '';
         } else {
@@ -159,9 +159,7 @@ class Statistics extends BaseController
         $this->data['notEvent'] = ($searchParameter['Metric'] === 'Events by Event Type');
         echo view('general_parameter', ['searchParameter' => $searchParameter]);
         echo view('statistics_view', $this->data);
-        if (count($this->data['wholeQuery']) > 0) {
-            echo view('general_chartjs', ['query' => $this->data['wholeQuery'], 'xLabel' => 'Year', 'yLabel' => ($for === 'createddissolved' ? 'Governments' : 'Events')]);
-        }
+        echo view('general_chartjs', ['query' => $this->data['wholeQuery'], 'xLabel' => 'Year', 'yLabel' => ($for === 'createddissolved' ? 'Governments' : 'Events')]);
         echo view('footer');
     }
 }

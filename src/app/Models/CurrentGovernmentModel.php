@@ -16,8 +16,8 @@ class CurrentGovernmentModel extends Model
     public function getByEvent(int $id, string $state): array
     {
         $query = <<<QUERY
-            SELECT extra.governmentstatelink(currentgovernment.governmentsubmunicipality, ?, ?) AS governmentsubmunicipality,
-                extra.governmentlong(currentgovernment.governmentsubmunicipality, ?) AS governmentsubmunicipalitylong,
+            SELECT COALESCE(extra.governmentstatelink(currentgovernment.governmentsubmunicipality, ?, ?), '') AS governmentsubmunicipality,
+                COALESCE(extra.governmentlong(currentgovernment.governmentsubmunicipality, ?), '') AS governmentsubmunicipalitylong,
                 extra.governmentstatelink(currentgovernment.governmentmunicipality, ?, ?) AS governmentmunicipality,
                 extra.governmentlong(currentgovernment.governmentmunicipality, ?) AS governmentmunicipalitylong,
                 extra.governmentstatelink(currentgovernment.governmentcounty, ?, ?) AS governmentcounty,

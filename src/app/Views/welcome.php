@@ -1,3 +1,4 @@
+<?php if (is_array($stateArray ?? '') && $stateArray !== []) { ?>
 <div class="push">&nbsp;</div>
 <div id="welcomecontainer">
     <div id="welcometext" class="welcomecontent">The <?= getenv('app_title_en') ?> aims to educate users and disseminate information concerning the geographic history and structure of political subdivisions and local government. Select a state to begin.</div>
@@ -10,3 +11,4 @@
         <?php } ?>
     </div>
 </div>
+<?php } ?>

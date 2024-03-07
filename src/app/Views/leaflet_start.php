@@ -1,4 +1,7 @@
 <?php
+$needRotation ??= false;
+$state ??= 'usa';
+$type ??= '';
 echo view('leaflet_source');
 if (file_exists(APPPATH . 'Views/' . ENVIRONMENT . '/leaflet_rotation.php') && $needRotation) {
     echo view(ENVIRONMENT . '/leaflet_rotation');

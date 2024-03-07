@@ -1,4 +1,6 @@
-<?php if (is_array($query ?? '') && $query !== []) { ?>
+<?php if (is_array($query ?? '') && $query !== []) {
+    $state ??= 'usa';
+    ?>
 <section>
     <h2>Adjudication</h2>
     <table class="normal cell-border compact stripe">

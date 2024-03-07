@@ -1,4 +1,8 @@
-<?php if (is_array($query ?? '') && $query !== []) { ?>
+<?php if (is_array($query ?? '') && $query !== []) {
+    $includeGovernment ??= false;
+    $isHistory ??= false;
+    $state ??= 'usa';
+    ?>
 <section>
     <h2>Affected Government Form</h2>
     <table class="normal cell-border compact stripe">

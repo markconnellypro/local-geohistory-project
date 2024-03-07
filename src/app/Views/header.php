@@ -1,3 +1,6 @@
+<?php
+$title ??= '';
+?>
 <!DOCTYPE html>
 <html lang="<?= \Config\Services::request()->getLocale() ?>">
 

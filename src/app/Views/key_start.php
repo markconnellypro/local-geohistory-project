@@ -1,9 +1,11 @@
 <section>
     <a href="#date">Date</a><br>
     <a href="#name-abbreviation">Name and Abbreviation</a><br>
-    <?php foreach ($keys as $key => $value) { ?>
+    <?php if (is_array($keys ?? '') && $keys !== []) {
+        foreach ($keys as $key => $value) { ?>
         <a href="#<?= strtolower($value) ?>"><?= $key ?></a><br>
-    <?php } ?>
+    <?php }
+        } ?>
 </section>
 <section>
     <h2 id="date">Date</h2>
