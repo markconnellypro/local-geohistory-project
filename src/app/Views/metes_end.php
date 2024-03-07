@@ -2,8 +2,8 @@
 $includeArea ??= false;
 $includeBase ??= true;
 $includeMetes ??= false;
-$layerArray ??= ['layer'];
-$overlayArray ??= ['overlay'];
+$layerArray = [];
+$overlayArray = [];
 ?>
 var map = L.map("map", {
 layers: [<?php

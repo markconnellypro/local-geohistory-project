@@ -1,5 +1,4 @@
 <?php if (is_array($query ?? '') && $query !== []) {
-    $isMultiple ??= false;
     $title ??= ''; ?>
 <section>
     <h2><?= $title ?></h2>
@@ -9,7 +8,7 @@
                 <?php if ($title !== 'Detail') { ?>
                     <th>Detail</th>
                 <?php }
-                if (!$isMultiple) { ?>
+                if (isset($isMultiple) && !$isMultiple) { ?>
                     <th>Government</th>
                 <?php } ?>
                 <th>Type</th>
@@ -27,7 +26,7 @@
                     <?php if ($title !== 'Detail') { ?>
                         <td><a href="/<?= \Config\Services::request()->getLocale() ?>/governmentidentifier/<?= $row->governmentidentifiertypeslug . '/' . strtolower($row->governmentidentifier) ?>/">View</a></td>
                     <?php }
-                    if (!$isMultiple) { ?>
+                    if (isset($isMultiple) && !$isMultiple) { ?>
                         <td><?= $row->governmentlong ?></td>
                     <?php } ?>
                     <td><?= $row->governmentidentifiertypetype ?></td>

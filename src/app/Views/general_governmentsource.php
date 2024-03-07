@@ -26,7 +26,7 @@
                 <tr>
                     <?php if ($type !== 'source') { ?>
                         <td data-sort="<?= $row->governmentsourcesort ?>">
-                            <?php if ($row->governmentsourceslug !== '') { ?>
+                            <?php if (isset($row->governmentsourceslug) && $row->governmentsourceslug !== '') { ?>
                                 <a href="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/governmentsource/<?= $row->governmentsourceslug ?>/">View</a>
                                 <?php } elseif (isset($row->eventslug)) {
                                     $i = 0;
