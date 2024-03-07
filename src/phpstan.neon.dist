@@ -23,12 +23,9 @@ parameters:
 		- app/Config/Toolbar.php
 		- app/Config/View.php
 		- app/Controllers/Development
-		- app/Controllers/Production
 		- app/Models/Development
-		- app/Models/Production
 		- app/Views/development
 		- app/Views/errors
-		- app/Views/production
 	checkMissingIterableValueType: false
 	checkGenericClassInNonGenericObjectType: false
 	checkMissingCallableSignature: true

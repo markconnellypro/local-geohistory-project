@@ -3,7 +3,7 @@
 namespace App\Controllers;
 
 use App\Models\GovernmentShapeModel;
-use CodeIgniter\HTTP\Response;
+use CodeIgniter\HTTP\ResponseInterface;
 
 class Map extends BaseController
 {
@@ -15,9 +15,9 @@ class Map extends BaseController
     {
     }
 
-    public function baseStyle(int $maxZoom = 14, Response $response = null): void
+    public function baseStyle(int $maxZoom = 14, ResponseInterface $response = null): void
     {
-        if (!$response instanceof \CodeIgniter\HTTP\Response) {
+        if (!$response instanceof \CodeIgniter\HTTP\ResponseInterface) {
             $response = $this->response;
         }
         $response->removeHeader('Cache-Control');
