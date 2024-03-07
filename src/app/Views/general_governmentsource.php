@@ -1,4 +1,5 @@
 <?php if (is_array($query ?? '') && $query !== []) {
+    $isMultiple ??= false;
     $state ??= 'usa';
     $type ??= '';
     ?>
@@ -10,7 +11,7 @@
                 <?php if ($type !== 'source') { ?>
                     <th>Detail</th>
                 <?php }
-                if ($type !== 'government' || !empty($isMultiple)) { ?>
+                if ($type !== 'government' || !$isMultiple) { ?>
                     <th>Government</th>
                 <?php } ?>
                 <th>Action</th>
@@ -25,7 +26,7 @@
                 <tr>
                     <?php if ($type !== 'source') { ?>
                         <td data-sort="<?= $row->governmentsourcesort ?>">
-                            <?php if (!empty($row->governmentsourceslug)) { ?>
+                            <?php if ($row->governmentsourceslug !== '') { ?>
                                 <a href="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/governmentsource/<?= $row->governmentsourceslug ?>/">View</a>
                                 <?php } elseif (isset($row->eventslug)) {
                                     $i = 0;
@@ -36,7 +37,7 @@
                                 } ?>
                         </td>
                     <?php }
-                    if ($type !== 'government' || !empty($isMultiple)) { ?>
+                    if ($type !== 'government' || !$isMultiple) { ?>
                         <td><?php echo view('general_link', ['link' => $row->government, 'text' => $row->governmentlong]); ?></td>
                     <?php } ?>
                     <td><span class="b">
@@ -53,7 +54,7 @@
                     <td data-sort="<?= $row->governmentsourceeffectivedatesort ?>"><?= $row->governmentsourceeffectivedate ?></td>
                     <td><?=
                         $row->governmentsourcelocation .
-                            ((!empty($row->governmentsourcelocation) && !empty($row->sourcecitationlocation)) ? '; ' : '') .
+                            (($row->governmentsourcelocation !== '' && $row->sourcecitationlocation !== '') ? '; ' : '') .
                             $row->sourcecitationlocation ?></td>
                 </tr>
             <?php } ?>

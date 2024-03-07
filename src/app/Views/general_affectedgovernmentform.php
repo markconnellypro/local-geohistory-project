@@ -1,6 +1,7 @@
 <?php if (is_array($query ?? '') && $query !== []) {
     $includeGovernment ??= false;
     $isHistory ??= false;
+    $isMultiple ??= false;
     $state ??= 'usa';
     ?>
 <section>
@@ -13,7 +14,7 @@
                 <?php } else { ?>
                     <th>Detail</th>
                 <?php }
-                if (!empty($isMultiple)) { ?>
+                if (!$isMultiple) { ?>
                     <th>Government</th>
                 <?php } ?>
                 <th>Government Form</th>
@@ -31,12 +32,12 @@
                     <?php } else { ?>
                         <td data-sort="<?= $row->eventsort ?>"><?= ($isHistory ? $i : '<a href="/' . \Config\Services::request()->getLocale() . '/' . $state . '/event/' . $row->eventslug . '/">View</a>') ?></td>
                     <?php }
-                    if (!empty($isMultiple)) { ?>
+                    if (!$isMultiple) { ?>
                         <td><?= $row->governmentaffectedlong ?></td>
                     <?php } ?>
                     <td><?= $row->governmentformlong . ((!$includeGovernment && $row->eventreconstructed === 't') ? '?' : '') ?></td>
                     <?php if (!$includeGovernment) { ?>
-                        <td data-sort="<?= $row->eventsort ?>"><?= (empty($row->eventeffective) ? $row->eventyear : $row->eventeffective) ?></td>
+                        <td data-sort="<?= $row->eventsort ?>"><?= ($row->eventeffective === '' ? $row->eventyear : $row->eventeffective) ?></td>
                     <?php } ?>
                 </tr>
             <?php $i++;

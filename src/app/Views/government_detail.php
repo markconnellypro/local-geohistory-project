@@ -37,7 +37,7 @@
             <thead>
                 <tr>
                     <th>Created <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#date" aria-label="Date Key"><?= view('general_svg_icon', ['iconLabel' => 'key icon', 'iconName' => 'key', 'iconType' => 'keyicon']); ?></a></th>
-                    <?php if (!empty($row->governmentcreationlong)) { ?>
+                    <?php if ($row->governmentcreationlong !== '') { ?>
                         <th>Created As</th>
                     <?php } ?>
                     <th>Boundary-Name Alteration Count</th>
@@ -50,7 +50,7 @@
             <tbody>
                 <tr>
                     <td><?php if (!is_null($row->governmentcreationevent)) { ?><a href="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/event/<?= $row->governmentcreationevent ?>/"><?= $row->governmentcreationtext ?></a><?php } ?></td>
-                    <?php if (!empty($row->governmentcreationlong)) { ?>
+                    <?php if ($row->governmentcreationlong !== '') { ?>
                         <td><?= $row->governmentcreationlong ?></td>
                     <?php } ?>
                     <td><?= $row->governmentaltercount ?></td>

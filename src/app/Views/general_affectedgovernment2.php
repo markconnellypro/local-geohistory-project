@@ -30,8 +30,8 @@ $state ??= 'usa';
                 foreach ($affectedGovernment['rows'] as $id => $row) { ?>
                 <tr>
                     <?php if ($includeDate) { ?>
-                        <td data-sort="<?= $row->eventorder ?>"><?php echo view('general_link', ['link' => (empty($row->eventslug) ? '' : "/" . \Config\Services::request()->getLocale() . "/" . $state . "/event/" . $row->eventslug . "/"), 'text' => (empty($row->eventslug) ? 'Missing' : 'View')]) ?></td>
-                        <td data-sort="<?= $row->eventsort ?>"><?= (empty($row->eventeffective) ? $row->eventyear : $row->eventeffective) ?></td>
+                        <td data-sort="<?= $row->eventorder ?>"><?php echo view('general_link', ['link' => ($row->eventslug  === '' ? '' : "/" . \Config\Services::request()->getLocale() . "/" . $state . "/event/" . $row->eventslug . "/"), 'text' => ($row->eventslug  === '' ? 'Missing' : 'View')]) ?></td>
+                        <td data-sort="<?= $row->eventsort ?>"><?= ($row->eventeffective === '' ? $row->eventyear : $row->eventeffective) ?></td>
                     <?php } elseif (\App\Controllers\BaseController::isLive() && $isComplete) { ?>
                         <td>
 

@@ -1,7 +1,7 @@
 <?php $eventTypeQuery ??= [];
 $state ??= 'usa';
 ?>
-<form method="post" action="/<?= \Config\Services::request()->getLocale() ?>/<?= $state . (empty($state) ? '' : '/') ?>statistics/report/">
+<form method="post" action="/<?= \Config\Services::request()->getLocale() ?>/<?= $state . ($state === '' ? '' : '/') ?>statistics/report/">
     <fieldset>
         <legend>Metric:</legend>
         <div class="option_radio_indent">

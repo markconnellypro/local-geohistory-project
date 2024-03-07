@@ -1,6 +1,7 @@
 <?php
 $includeBase ??= true;
 $includePoint ??= false;
+$layerArray = [];
 ?>
 var map = L.map("map", {
 layers: [<?php

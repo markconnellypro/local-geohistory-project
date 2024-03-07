@@ -25,7 +25,7 @@
         <tbody>
             <?php foreach ($query as $row) { ?>
                 <tr>
-                    <td><a href="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/law/<?= $row->lawsectionslug ?>/"><?= (empty($row->lawsectionslug) ? '' : 'View') ?></a></td>
+                    <td><a href="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/law/<?= $row->lawsectionslug ?>/"><?= ($row->lawsectionslug === '' ? '' : 'View') ?></a></td>
                     <td data-sort="<?= $row->lawapproved ?>"><?= $row->lawsectioncitation ?></td>
                     <?php if ($type === 'relationship' && isset($includeLawGroup)) { ?>
                         <td><?= $row->lawgrouplong ?></td>

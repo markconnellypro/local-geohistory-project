@@ -14,7 +14,7 @@
         </thead>
         <tbody>
             <?php foreach ($query as $row) {
-                if (empty($row->recordingtype)) {
+                if ($row->recordingtype === '') {
                     $row->recordingtype = $row->recordingnumbertype;
                     $row->recordinglocation = $row->recordingnumberlocation;
                     $row->recordingnumbertype = null;
@@ -24,14 +24,14 @@
                     <td><a href="<?= $row->government ?>"><?= $row->governmentshort ?></a></td>
                     <td><?= $row->recordingtype . ($row->hasbothtype === 't' ? '<br>' : '') . $row->recordingnumbertype ?></td>
                     <td><?= $row->recordinglocation . ($row->hasbothtype === 't' ? '<br>' : '') . $row->recordingnumberlocation ?></td>
-                    <td><?= (
-                        empty($row->recordingrepositoryshort) ? '' : $row->recordingrepositoryshort .
-                                        (empty($row->recordingrepositoryseries) ? '' : ', series ' . $row->recordingrepositoryseries) .
-                                        (empty($row->recordingrepositorycontainer) ? '' : ', container ' . $row->recordingrepositorycontainer) .
-                                        (empty($row->recordingrepositoryitemlocation) ? '' : ', location ' . $row->recordingrepositoryitemlocation) .
-                                        (empty($row->recordingrepositoryitemnumber) ? '' : ', folder ' . $row->recordingrepositoryitemnumber) .
-                                        (empty($row->recordingrepositoryitemrange) ? '' : ', part ' . $row->recordingrepositoryitemrange)
-                    ) ?></td>
+                    <td><?=
+                        $row->recordingrepositoryshort .
+                                        ($row->recordingrepositoryseries === '' ? '' : ', series ' . $row->recordingrepositoryseries) .
+                                        ($row->recordingrepositorycontainer === '' ? '' : ', container ' . $row->recordingrepositorycontainer) .
+                                        ($row->recordingrepositoryitemlocation === '' ? '' : ', location ' . $row->recordingrepositoryitemlocation) .
+                                        ($row->recordingrepositoryitemnumber === '' ? '' : ', folder ' . $row->recordingrepositoryitemnumber) .
+                                        ($row->recordingrepositoryitemrange === '' ? '' : ', part ' . $row->recordingrepositoryitemrange)
+                ?></td>
                     <td data-sort="<?= $row->recordingdatesort ?>"><?= $row->recordingdate ?></td>
                     <td><?= $row->recordingeventrelationship ?></td>
                 </tr>

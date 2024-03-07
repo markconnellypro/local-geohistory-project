@@ -6,6 +6,7 @@ parameters:
 		- app/Controllers
 		- app/Libraries
 		- app/Models
+		- app/Views
 	bootstrapFiles:
 		- vendor/codeigniter4/framework/system/Test/bootstrap.php
 	excludePaths:
@@ -25,6 +26,9 @@ parameters:
 		- app/Controllers/Production
 		- app/Models/Development
 		- app/Models/Production
+		- app/Views/development
+		- app/Views/errors
+		- app/Views/production
 	checkMissingIterableValueType: false
 	checkGenericClassInNonGenericObjectType: false
 	checkMissingCallableSignature: true

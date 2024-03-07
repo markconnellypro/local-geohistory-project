@@ -1,4 +1,5 @@
 <?php
+$attribution ??= '';
 $color ??= 'ffffff';
 $element ??= '';
 $fillOpacity ??= 0.5;
@@ -28,7 +29,7 @@ if (is_array($query) && $query !== []) {
                 'line' => $row->line,
                 'description' => $row->pointdescription
             ];
-        } elseif (empty($row->geometry)) {
+        } elseif ($row->geometry === '') {
             $geometry = null;
         } else {
             $geometry = $row->geometry;
@@ -70,7 +71,7 @@ if (is_array($query) && $query !== []) {
 	    opacity: <?= ($opacity ?? '1') ?>,
 	    fillOpacity: <?= $fillOpacity ?>
 	    <?= (isset($radius) ? ', radius:' . $radius : '') ?>
-	    <?= ((isset($attribution) && !empty($attribution)) ? ", attribution: '" . $attribution . "'" : '') ?>
+	    <?= ($attribution !== '' ? ", attribution: '" . $attribution . "'" : '') ?>
 	    <?= ($element === 'point' ? '});' : '') ?>
 	    }<?php } else {
 	        echo $customStyle;
