@@ -29,10 +29,10 @@ if (is_array($query) && $query !== []) {
                 'line' => $row->line,
                 'description' => $row->pointdescription
             ];
-        } elseif ($row->geometry === '') {
+        } elseif (isset($row->geometry) and (is_null($row->geometry) or $row->geometry === '')) {
             $geometry = null;
         } else {
-            $geometry = $row->geometry;
+            $geometry = $row->geometry ?? null;
         }
         if (is_null($geometry)) {
             continue;
