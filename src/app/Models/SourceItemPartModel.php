@@ -17,7 +17,7 @@ class SourceItemPartModel extends Model
                 ELSE
                 CASE
                     WHEN sourceitempart.sourceitempartisbypage THEN sourceitempart.sourceitempartsequencecharacter::text || (sourceitempart.sourceitempartsequence + adjudicationsourcecitation.adjudicationsourcecitationpagefrom)
-                    ELSE lpad((sourceitempart.sourceitempartsequence + 0)::text, 4, '0'::text) || sourceitempart.sourceitempartsequencecharacter::text
+                    ELSE replace(format('%04s', (sourceitempart.sourceitempartsequence)::text), ' ', '0') || sourceitempart.sourceitempartsequencecharacter::text
                 END || sourceitempart.sourceitempartsequencecharacterafter::text
             END AS url
             FROM geohistory.sourceitempart,
@@ -52,7 +52,7 @@ class SourceItemPartModel extends Model
                 ELSE
                 CASE
                     WHEN sourcecitationpagefrom ~ '^\d+$' THEN sourceitempart.sourceitempartsequencecharacter::text || (sourceitempart.sourceitempartsequence + sourcecitationpagefrom::integer)
-                    ELSE lpad((sourceitempart.sourceitempartsequence + 0)::text, 4, '0'::text) || sourceitempart.sourceitempartsequencecharacter::text
+                    ELSE replace(format('%04s', (sourceitempart.sourceitempartsequence)::text), ' ', '0') || || sourceitempart.sourceitempartsequencecharacter::text
                 END || sourceitempart.sourceitempartsequencecharacterafter::text
             END AS url
             FROM geohistory.governmentsource
@@ -89,11 +89,11 @@ class SourceItemPartModel extends Model
             SELECT sourceitem.sourceitemurl ||
                 CASE
                     WHEN sourceitem.sourceitemurlcomplete THEN ''
-                    ELSE (sourceitempart.sourceitempartsequencecharacter || lpad((sourceitempart.sourceitempartsequence +
+                    ELSE sourceitempart.sourceitempartsequencecharacter || replace(format('%0' || sourceitempart.sourceitempartzeropad::text || 's', (sourceitempart.sourceitempartsequence +
                     CASE
                         WHEN sourceitempart.sourceitempartisbypage THEN lawalternatesection.lawalternatesectionpagefrom
                         ELSE lawalternate.lawalternatenumberchapter
-                    END)::text, sourceitempart.sourceitempartzeropad, '0')) || sourceitempart.sourceitempartsequencecharacterafter
+                    END)::text), ' ', '0') || sourceitempart.sourceitempartsequencecharacterafter
                 END AS url
         FROM geohistory.lawalternatesection
         JOIN geohistory.lawalternate
@@ -145,11 +145,11 @@ class SourceItemPartModel extends Model
             SELECT sourceitem.sourceitemurl ||
                 CASE
                     WHEN sourceitem.sourceitemurlcomplete THEN ''
-                    ELSE (sourceitempart.sourceitempartsequencecharacter || lpad((sourceitempart.sourceitempartsequence +
+                    ELSE sourceitempart.sourceitempartsequencecharacter || replace(format('%0' || sourceitempart.sourceitempartzeropad::text || 's', (sourceitempart.sourceitempartsequence +
                     CASE
                         WHEN sourceitempart.sourceitempartisbypage THEN lawsection.lawsectionpagefrom
                         ELSE law.lawnumberchapter
-                    END)::text, sourceitempart.sourceitempartzeropad, '0')) || sourceitempart.sourceitempartsequencecharacterafter
+                    END)::text), ' ', '0') || sourceitempart.sourceitempartsequencecharacterafter
                 END AS url
         FROM geohistory.lawsection
         JOIN geohistory.law
@@ -202,7 +202,7 @@ class SourceItemPartModel extends Model
                     ELSE
                     CASE
                         WHEN sourceitempart.sourceitempartisbypage AND sourcecitationpagefrom ~ '^\d+$' THEN sourceitempart.sourceitempartsequencecharacter::text || (sourceitempart.sourceitempartsequence + sourcecitation.sourcecitationpagefrom::integer)
-                        ELSE lpad((sourceitempart.sourceitempartsequence + 0)::text, 4, '0'::text) || sourceitempart.sourceitempartsequencecharacter::text
+                        ELSE replace(format('%04s', (sourceitempart.sourceitempartsequence)::text), ' ', '0') || sourceitempart.sourceitempartsequencecharacter::text
                     END || sourceitempart.sourceitempartsequencecharacterafter::text
                 END AS url
             FROM geohistory.sourcecitation
