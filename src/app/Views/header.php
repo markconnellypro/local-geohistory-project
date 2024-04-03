@@ -21,7 +21,7 @@ $title ??= '';
     <link rel="icon" href="/asset/image/favicon.png" type="image/png">
     <script src="/<?= (\App\Controllers\BaseController::isOnline() ? '/' . getenv('dependency_jquery') : 'asset/dependency') ?>/jquery.min.js"></script>
     <script src="/<?= (\App\Controllers\BaseController::isOnline() ? '/' . getenv('dependency_datatables') : 'asset/dependency') ?>/js/dataTables.min.js"></script>
-    <link rel="stylesheet" href="/<?= (\App\Controllers\BaseController::isOnline() ? '/' . getenv('dependency_datatables') : 'asset/dependency') ?>/css/dataTables.dataTables.min.css" crossorigin="anonymous">
+    <link rel="stylesheet" href="/<?= (\App\Controllers\BaseController::isOnline() ? '/' . getenv('dependency_datatables') : 'asset/dependency') ?>/css/dataTables.dataTables.min.css">
     <script src="/asset/tool/table.js"></script>
 </head>
 
