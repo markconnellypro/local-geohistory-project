@@ -41,7 +41,7 @@ curl -s -S --output-dir ${asset_folder} -O "https:/${dependency_maplibre_gl}/map
 curl -s -S -o "${license_folder}/MapLibre GL JS.txt" "https:/${dependency_maplibre_gl}/../LICENSE.txt"
 
 curl -s -S --output-dir ${asset_folder} -O "https:/${dependency_maplibre_gl_leaflet}/leaflet-maplibre-gl.js"
-curl -s -S -o "${license_folder}/Leaflet MapLibre GL.txt" "https:/${dependency_maplibre_gl}/LICENSE"
+curl -s -S -o "${license_folder}/Leaflet MapLibre GL.txt" "https:/${dependency_maplibre_gl_leaflet}/LICENSE"
 
 curl -s -S --output-dir ${asset_folder} -O "https:/${dependency_pmtiles}/pmtiles.js"
 curl -s -S -o "${license_folder}/PMTiles.txt" "https://raw.githubusercontent.com/protomaps/PMTiles/main/LICENSE"
