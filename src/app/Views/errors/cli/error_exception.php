@@ -3,17 +3,26 @@
 use CodeIgniter\CLI\CLI;
 
 // The main Exception
-CLI::newLine();
 CLI::write('[' . $exception::class . ']', 'light_gray', 'red');
-CLI::newLine();
 CLI::write($message);
-CLI::newLine();
 CLI::write('at ' . CLI::color(clean_path($exception->getFile()) . ':' . $exception->getLine(), 'green'));
 CLI::newLine();
 
+$last = $exception;
+
+while ($prevException = $last->getPrevious()) {
+    $last = $prevException;
+
+    CLI::write('  Caused by:');
+    CLI::write('  [' . $prevException::class . ']', 'red');
+    CLI::write('  ' . $prevException->getMessage());
+    CLI::write('  at ' . CLI::color(clean_path($prevException->getFile()) . ':' . $prevException->getLine(), 'green'));
+    CLI::newLine();
+}
+
 // The backtrace
 if (defined('SHOW_DEBUG_BACKTRACE') && SHOW_DEBUG_BACKTRACE) {
-    $backtraces = $exception->getTrace();
+    $backtraces = $last->getTrace();
 
     if ($backtraces) {
         CLI::write('Backtrace:', 'green');
@@ -43,9 +52,9 @@ if (defined('SHOW_DEBUG_BACKTRACE') && SHOW_DEBUG_BACKTRACE) {
 
         $args = implode(', ', array_map(static fn ($value) => match (true) {
             is_object($value) => 'Object(' . $value::class . ')',
-            is_array($value) => count($value) ? '[...]' : '[]',
-            $value === null => 'null',
-            default => var_export($value, true),
+            is_array($value)  => count($value) ? '[...]' : '[]',
+            $value === null   => 'null', // return the lowercased version
+            default           => var_export($value, true),
         }, array_values($error['args'] ?? [])));
 
         $function .= '(' . $args . ')';

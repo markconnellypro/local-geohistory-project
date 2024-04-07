@@ -11,7 +11,7 @@ class LanguageRedirect implements FilterInterface
 {
     public function before(RequestInterface $request, $arguments = null): null|RedirectResponse
     {
-        $segments = $request->uri->getSegments();
+        $segments = $request->getUri()->getSegments();
         $locale = $request->getLocale();
         if (isset($segments[0]) && $segments[0] !== $locale && $segments !== ['robots.txt']) {
             $segments[0] = $locale;
