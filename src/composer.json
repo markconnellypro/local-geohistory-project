@@ -1,6 +1,6 @@
 {
     "require": {
-        "codeigniter4/framework": "4.4.6"
+        "codeigniter4/framework": "4.4.8"
     },
     "require-dev": {
         "codeigniter/phpstan-codeigniter": "1.4.3",
