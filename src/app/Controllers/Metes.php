@@ -51,7 +51,7 @@ class Metes extends BaseController
                 echo view('core/map', ['includeBase' => $hasBegin, 'includeDisclaimer' => true]);
             }
             $query = $MetesDescriptionLineModel->getByMetesDescription($id);
-            echo view('metes_row', ['query' => $query]);
+            echo view('metes/row', ['query' => $query]);
             echo view('core/event', ['query' => $areaQuery, 'state' => $state, 'title' => 'Event Links']);
             if ($hasMap) {
                 echo view('leaflet/start', ['type' => 'metes', 'includeBase' => $hasBegin, 'needRotation' => false]);
@@ -87,7 +87,7 @@ class Metes extends BaseController
                         'radius' => 6
                     ]);
                 }
-                echo view('metes_end', ['includeBase' => $hasBegin, 'includeArea' => $hasArea, 'includeMetes' => $hasMetes]);
+                echo view('metes/end', ['includeBase' => $hasBegin, 'includeArea' => $hasArea, 'includeMetes' => $hasMetes]);
                 echo view('leaflet/end', ['includeBase' => $hasBegin]);
             }
             echo view('footer');
