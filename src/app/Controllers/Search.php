@@ -188,7 +188,7 @@ class Search extends BaseController
                 }
             }
             echo view('core/parameter', ['searchParameter' => $searchParameter]);
-            echo view('core/' . $category, ['query' => $query, 'state' => $state, 'title' => 'Results:', 'type' => $type]);
+            echo view($category . '/table', ['query' => $query, 'state' => $state, 'title' => 'Results:', 'type' => $type]);
             echo view('core/footer');
         } else {
             $this->response->setHeader('Content-Type', 'application/json');
