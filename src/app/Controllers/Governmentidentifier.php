@@ -53,7 +53,7 @@ class Governmentidentifier extends BaseController
                 } else {
                     $query = $GovernmentIdentifierModel->getUsgs($governmentidentifierids);
                 }
-                echo view('governmentidentifier_census', ['query' => $query, 'type' => $type]);
+                echo view('governmentidentifier/census', ['query' => $query, 'type' => $type]);
             }
             echo view('footer');
         }
