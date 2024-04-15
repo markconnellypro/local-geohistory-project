@@ -38,13 +38,13 @@ class Adjudication extends BaseController
             $id = $query[0]->adjudicationid;
             $this->data['pageTitle'] = $query[0]->adjudicationtitle;
             echo view('header', $this->data);
-            echo view('adjudication_detail', ['query' => $query]);
+            echo view('adjudication/detail', ['query' => $query]);
             $AdjudicationLocationModel = new AdjudicationLocationModel();
             $query = $AdjudicationLocationModel->getByAdjudication($id);
-            echo view('adjudication_location', ['query' => $query]);
+            echo view('adjudication/location', ['query' => $query]);
             $FilingModel = new FilingModel();
             $query = $FilingModel->getByAdjudication($id);
-            echo view('adjudication_filing', ['query' => $query]);
+            echo view('adjudication/filing', ['query' => $query]);
             $AdjudicationSourceCitationModel = new AdjudicationSourceCitationModel();
             $query = $AdjudicationSourceCitationModel->getByAdjudication($id);
             echo view('core/reporter', ['query' => $query, 'state' => $state, 'hasLink' => true, 'title' => 'Reporter Links']);
