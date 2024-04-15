@@ -16,7 +16,7 @@ class Bot extends BaseController
     {
         $this->data['state'] = $state;
         echo view('core/header', $this->data);
-        echo view('bot');
+        echo view('bot/index');
         echo view('core/footer');
     }
 
@@ -26,8 +26,8 @@ class Bot extends BaseController
         if (file_exists(APPPATH . 'Views/' . ENVIRONMENT . '/bot_robotstxt.php')) {
             echo view(ENVIRONMENT . '/bot_robotstxt');
         } else {
-            echo view('bot_robotstxt_localgeohistory');
+            echo view('bot/robotstxt_localgeohistory');
         }
-        echo view('bot_robotstxt');
+        echo view('bot/robotstxt');
     }
 }
