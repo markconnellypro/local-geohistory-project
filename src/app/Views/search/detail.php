@@ -39,27 +39,27 @@ $tribunalgovernmentshortQuery ??= [];
     <div id="forms_event" class="option_select option_indent">
         <form method="post" action="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/search/event/" class="form_select" id="form_event_government">
             <?php
-            echo view('search_form_government', ['form' => 'form_event_government']);
-echo view('search_form_governmentparent', ['form' => 'form_event_government']);
-echo view('search_form_eventtype', ['isRequired' => false, 'form' => 'form_event_government']);
-echo view('search_form_year', ['form' => 'form_event_government']);
-echo view('search_submit', ['type' => 'government']);
+            echo view('search/form_government', ['form' => 'form_event_government']);
+echo view('search/form_governmentparent', ['form' => 'form_event_government']);
+echo view('search/form_eventtype', ['isRequired' => false, 'form' => 'form_event_government']);
+echo view('search/form_year', ['form' => 'form_event_government']);
+echo view('search/submit', ['type' => 'government']);
 ?>
         </form>
     </div>
     <div id="forms_government" class="option_select option_indent">
         <form method="post" action="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/search/government/" class="form_select" id="form_government_government">
             <?php
-echo view('search_form_government', ['form' => 'form_government_government']);
-echo view('search_form_governmentparent', ['form' => 'form_government_government']);
-echo view('search_form_governmentlevel', ['type' => 'countymunicipality', 'form' => 'form_government_government']);
-echo view('search_submit', ['type' => 'government']);
+echo view('search/form_government', ['form' => 'form_government_government']);
+echo view('search/form_governmentparent', ['form' => 'form_government_government']);
+echo view('search/form_governmentlevel', ['type' => 'countymunicipality', 'form' => 'form_government_government']);
+echo view('search/submit', ['type' => 'government']);
 ?>
         </form>
         <form method="post" action="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/search/government/" class="form_select" id="form_government_statewide">
             <?php
-echo view('search_form_governmentlevel', ['type' => 'statewide', 'form' => 'form_government_statewide']);
-echo view('search_submit', ['type' => 'statewide']);
+echo view('search/form_governmentlevel', ['type' => 'statewide', 'form' => 'form_government_statewide']);
+echo view('search/submit', ['type' => 'statewide']);
 ?>
         </form>
         <form method="post" action="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/search/government/" class="form_select" id="form_government_identifier">
@@ -71,7 +71,7 @@ echo view('search_submit', ['type' => 'statewide']);
             <input id="form_government_identifier_identifier" class="selectize-input forselectize stringcheck required" name="identifier" type="text" style="width: 200px;" required="required">
             <br><br>
             <?php
-echo view('search_submit', ['type' => 'identifier']);
+echo view('search/submit', ['type' => 'identifier']);
 ?>
         </form>
     </div>
@@ -81,7 +81,7 @@ echo view('search_submit', ['type' => 'identifier']);
             <input id="form_location_address_address" class="selectize-input forselectize stringcheck required" name="address" type="text" style="width: 300px;" required="required"><br>
             <br>
             <?php
-echo view('search_submit', ['type' => 'address']);
+echo view('search/submit', ['type' => 'address']);
 ?>
         </form>
         <form method="post" action="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/point/" class="form_select" id="form_location_point">
@@ -91,7 +91,7 @@ echo view('search_submit', ['type' => 'address']);
             <input id="form_location_point_x" class="selectize-input forselectize stringcheck required" name="x" type="number" min="-90" max="90" step="any" style="width: 150px;" required="required"><br>
             <br>
             <?php
-echo view('search_submit', ['type' => 'point']);
+echo view('search/submit', ['type' => 'point']);
 ?>
         </form>
     </div>
@@ -107,7 +107,7 @@ echo view('search_submit', ['type' => 'point']);
             <input id="form_law_reference_numberchapter" class="selectize-input forselectize" name="numberchapter" type="number" style="width: 100px;">
             <br><br>
             <?php
-echo view('search_submit', ['type' => 'reference']);
+echo view('search/submit', ['type' => 'reference']);
 ?>
         </form>
         <form method="post" action="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/search/law/" class="form_select" id="form_law_dateevent">
@@ -115,11 +115,11 @@ echo view('search_submit', ['type' => 'reference']);
             <input id="form_law_dateevent_date" class="selectize-input required stringcheck forselectize" name="date" type="date" required="required" pattern="\d{4}-\d{2}-\d{2}" title="Date should be formatted as YYYY-MM-DD." style="width: 150px;">
             <br>
             <?php
-echo view('search_form_eventtype', ['isRequired' => true, 'form' => 'form_law_dateevent']);
+echo view('search/form_eventtype', ['isRequired' => true, 'form' => 'form_law_dateevent']);
 ?>
             <br>
             <?php
-echo view('search_submit', ['type' => 'dateEvent']);
+echo view('search/submit', ['type' => 'dateEvent']);
 ?>
         </form>
     </div>

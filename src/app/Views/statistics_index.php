@@ -32,7 +32,7 @@ $state ??= 'usa';
         <div class="option_indent">
             <div class="option_select">
                 <?php
-                echo view('search_form_eventtype', ['isRequired' => false, 'form' => '']);
+                echo view('search/form_eventtype', ['isRequired' => false, 'form' => '']);
 ?>
             </div>
             <label class="forselectize" for="from">Year(s)</label><br>

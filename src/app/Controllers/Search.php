@@ -73,7 +73,7 @@ class Search extends BaseController
         $this->data['state'] = $state;
         echo view('header', $this->data);
         if (!$this->isLive() && !in_array($state, $stateArray)) {
-            echo view('search_unavailable');
+            echo view('search/unavailable');
         } else {
             $GovernmentModel = new GovernmentModel();
             $this->data['id'] = $GovernmentModel->getSlug($GovernmentModel->getAbbreviationId($state));
@@ -92,7 +92,7 @@ class Search extends BaseController
             $SourceModel = new SourceModel();
             $this->data['reporterQuery'] = $SourceModel->getSearch($state);
             echo view('core/ui', $this->data);
-            echo view('search', $this->data);
+            echo view('search/detail', $this->data);
             if (file_exists(APPPATH . 'Views/' . ENVIRONMENT . '/government_live.php')) {
                 echo view(ENVIRONMENT . '/government_live', ['id' => $this->data['id'], 'state' => $state, 'isMunicipalityOrLower' => false, 'isCountyOrLower' => false, 'isCountyOrState' => false, 'isState' => true, 'includeGovernment' => true]);
             }
