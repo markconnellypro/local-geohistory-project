@@ -56,9 +56,9 @@ class Area extends BaseController
     public function noRecord(string $state): void
     {
         $this->data['state'] = $state;
-        echo view('header', $this->data);
-        echo view('norecord');
-        echo view('footer');
+        echo view('core/header', $this->data);
+        echo view('core/norecord');
+        echo view('core/footer');
     }
 
     public function point(string $state, float $y = 0, float $x = 0, string $addressText = ''): void
@@ -108,7 +108,7 @@ class Area extends BaseController
                     break;
                 }
             }
-            echo view('header', $this->data);
+            echo view('core/header', $this->data);
             $searchParameter = [];
             if ($addressText !== '') {
                 $searchParameter['Address'] = $addressText;
@@ -168,7 +168,7 @@ class Area extends BaseController
             }
             echo view('area/end', ['includePoint' => $includePoint]);
             echo view('leaflet/end');
-            echo view('footer');
+            echo view('core/footer');
         }
     }
 }

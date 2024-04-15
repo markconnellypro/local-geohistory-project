@@ -24,9 +24,9 @@ class Government extends BaseController
     public function noRecord(string $state): void
     {
         $this->data['state'] = $state;
-        echo view('header', $this->data);
-        echo view('norecord');
-        echo view('footer');
+        echo view('core/header', $this->data);
+        echo view('core/norecord');
+        echo view('core/footer');
     }
 
     public function view(string $state, int|string $id, bool $isHistory = false): void
@@ -62,7 +62,7 @@ class Government extends BaseController
             $this->data['isHistory'] = $isHistory;
             $this->data['pageTitle'] = $query[0]->governmentlong;
             $this->data['isMultiple'] = ($query[0]->governmentsubstitutemultiple === 't');
-            echo view('header', $this->data);
+            echo view('core/header', $this->data);
             $isMunicipalityOrLower = ($query[0]->governmentlevel === 'municipality or lower');
             $isCountyOrLower = ($query[0]->governmentlevel === 'municipality or lower' || $query[0]->governmentlevel === 'county');
             $isCountyOrState = ($query[0]->governmentlevel === 'state' || $query[0]->governmentlevel === 'county');
@@ -196,7 +196,7 @@ class Government extends BaseController
                 echo view('government/end', ['layers' => $layers, 'primaryLayer' => $primaryLayer, 'state' => $state, 'updatedParts' => $updatedParts, 'showTimeline' => $showTimeline]);
                 echo view('leaflet/end');
             }
-            echo view('footer');
+            echo view('core/footer');
         }
     }
 }

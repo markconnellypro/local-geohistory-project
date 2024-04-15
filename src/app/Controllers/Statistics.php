@@ -33,26 +33,26 @@ class Statistics extends BaseController
     public function index(string $state = ''): void
     {
         $this->data['state'] = $state;
-        echo view('header', $this->data);
+        echo view('core/header', $this->data);
         echo view('core/ui', $this->data);
         $EventTypeModel = new EventTypeModel();
         $this->data['eventTypeQuery'] = $EventTypeModel->getManyByStatistics($state);
         echo view('statistics/index', $this->data);
-        echo view('footer');
+        echo view('core/footer');
     }
 
     public function noRecord(string $state = ''): void
     {
         $this->data['state'] = $state;
-        echo view('header', $this->data);
-        echo view('norecord');
-        echo view('footer');
+        echo view('core/header', $this->data);
+        echo view('core/norecord');
+        echo view('core/footer');
     }
 
     public function view(string $state = ''): void
     {
         $this->data['state'] = $state;
-        echo view('header', $this->data);
+        echo view('core/header', $this->data);
 
         $by = $this->request->getPost('by');
         $for = $this->request->getPost('for');
@@ -68,8 +68,8 @@ class Statistics extends BaseController
 
         $searchParameter = [];
         if (!isset($this->byType[$by])) {
-            echo view('error');
-            echo view('footer');
+            echo view('core/error');
+            echo view('core/footer');
             die();
         } else {
             $searchParameter['byType'] = $this->byType[$by];
@@ -98,8 +98,8 @@ class Statistics extends BaseController
         }
 
         if (!isset($this->forType[$for])) {
-            echo view('error');
-            echo view('footer');
+            echo view('core/error');
+            echo view('core/footer');
             die();
         } else {
             $searchParameter = [
@@ -114,8 +114,8 @@ class Statistics extends BaseController
             $EventTypeModel = new EventTypeModel();
             $query = $EventTypeModel->getOneByStatistics($eventType);
             if (count($query) !== 1) {
-                echo view('error');
-                echo view('footer');
+                echo view('core/error');
+                echo view('core/footer');
                 die();
             }
             array_unshift($fields, $eventType);
@@ -160,6 +160,6 @@ class Statistics extends BaseController
         echo view('core/parameter', ['searchParameter' => $searchParameter]);
         echo view('statistics/view', $this->data);
         echo view('core/chartjs', ['query' => $this->data['wholeQuery'], 'xLabel' => 'Year', 'yLabel' => ($for === 'createddissolved' ? 'Governments' : 'Events')]);
-        echo view('footer');
+        echo view('core/footer');
     }
 }

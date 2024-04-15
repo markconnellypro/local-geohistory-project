@@ -19,9 +19,9 @@ class Governmentsource extends BaseController
     public function noRecord(string $state): void
     {
         $this->data['state'] = $state;
-        echo view('header', $this->data);
-        echo view('norecord');
-        echo view('footer');
+        echo view('core/header', $this->data);
+        echo view('core/norecord');
+        echo view('core/footer');
     }
 
     public function view(string $state, int|string $id): void
@@ -34,7 +34,7 @@ class Governmentsource extends BaseController
             $this->noRecord($state);
         } else {
             $id = $query[0]->governmentsourceid;
-            echo view('header', $this->data);
+            echo view('core/header', $this->data);
             echo view('core/governmentsource', ['query' => $query, 'state' => $state, 'type' => 'source']);
             echo view('core/source', ['query' => $query, 'hasLink' => $this->isLive()]);
             $SourceItemPartModel = new SourceItemPartModel();
@@ -43,7 +43,7 @@ class Governmentsource extends BaseController
             $EventModel = new EventModel();
             $query = $EventModel->getByGovernmentSource($id);
             echo view('core/event', ['query' => $query, 'state' => $state, 'title' => 'Event Links']);
-            echo view('footer');
+            echo view('core/footer');
         }
     }
 }

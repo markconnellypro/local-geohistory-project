@@ -26,9 +26,9 @@ class Event extends BaseController
     public function noRecord(string $state): void
     {
         $this->data['state'] = $state;
-        echo view('header', $this->data);
-        echo view('norecord');
-        echo view('footer');
+        echo view('core/header', $this->data);
+        echo view('core/norecord');
+        echo view('core/footer');
     }
 
     public function view(string $state, int|string $id): void
@@ -44,7 +44,7 @@ class Event extends BaseController
             $eventIsMapped = ($query[0]->eventismapped === 't');
             $this->data['pageTitle'] = $query[0]->eventlong;
             $this->data['pageTitleType'] = $query[0]->eventtypeshort;
-            echo view('header', $this->data);
+            echo view('core/header', $this->data);
             echo view('event/detail', ['query' => $query]);
             $AffectedGovernmentGroupModel = new AffectedGovernmentGroupModel();
             $affectedGovernment = $AffectedGovernmentGroupModel->getByEventGovernment($id, $state);
@@ -130,7 +130,7 @@ class Event extends BaseController
                 }
                 echo view('leaflet/end');
             }
-            echo view('footer');
+            echo view('core/footer');
         }
     }
 }

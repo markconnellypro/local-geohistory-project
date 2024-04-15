@@ -18,9 +18,9 @@ class Welcome extends BaseController
     public function index(): void
     {
         $stateArray = $this->getJurisdictions();
-        echo view('header', $this->data);
+        echo view('core/header', $this->data);
         echo view('welcome/detail', ['stateArray' => $stateArray]);
-        echo view('footer');
+        echo view('core/footer');
     }
 
     public function language(): RedirectResponse

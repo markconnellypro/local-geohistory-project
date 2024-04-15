@@ -71,7 +71,7 @@ class Search extends BaseController
     {
         $stateArray = $this->getJurisdictions();
         $this->data['state'] = $state;
-        echo view('header', $this->data);
+        echo view('core/header', $this->data);
         if (!$this->isLive() && !in_array($state, $stateArray)) {
             echo view('search/unavailable');
         } else {
@@ -97,7 +97,7 @@ class Search extends BaseController
                 echo view(ENVIRONMENT . '/government_live', ['id' => $this->data['id'], 'state' => $state, 'isMunicipalityOrLower' => false, 'isCountyOrLower' => false, 'isCountyOrState' => false, 'isState' => true, 'includeGovernment' => true]);
             }
         }
-        echo view('footer');
+        echo view('core/footer');
     }
 
     public function view(string $state, string $category): void
@@ -173,7 +173,7 @@ class Search extends BaseController
         }
 
         if ($fields !== [] && $model !== '') {
-            echo view('header', $this->data);
+            echo view('core/header', $this->data);
             $model = "App\\Models\\" . $model;
             $model = new $model();
             $modelType = 'getSearchBy'. ucwords($type);
@@ -189,7 +189,7 @@ class Search extends BaseController
             }
             echo view('core/parameter', ['searchParameter' => $searchParameter]);
             echo view('core/' . $category, ['query' => $query, 'state' => $state, 'title' => 'Results:', 'type' => $type]);
-            echo view('footer');
+            echo view('core/footer');
         } else {
             $this->response->setHeader('Content-Type', 'application/json');
             echo json_encode($this->request->getPost());

@@ -16,8 +16,8 @@ class Fourofour extends BaseController
     {
         $this->response->setStatusCode(404);
         $this->data['state'] = $state;
-        echo view('header', $this->data);
-        echo view('error');
-        echo view('footer');
+        echo view('core/header', $this->data);
+        echo view('core/error');
+        echo view('core/footer');
     }
 }

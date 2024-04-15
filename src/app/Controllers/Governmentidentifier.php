@@ -18,9 +18,9 @@ class Governmentidentifier extends BaseController
 
     public function noRecord(): void
     {
-        echo view('header', $this->data);
-        echo view('norecord');
-        echo view('footer');
+        echo view('core/header', $this->data);
+        echo view('core/norecord');
+        echo view('core/footer');
     }
 
     public function view(string $type, string $id): null|RedirectResponse
@@ -40,7 +40,7 @@ class Governmentidentifier extends BaseController
         } else {
             $governmentidentifierids = $query[0]->governmentidentifierids;
             $governments = $query[0]->governments;
-            echo view('header', $this->data);
+            echo view('core/header', $this->data);
             echo view('core/governmentidentifier', ['query' => $query, 'title' => 'Detail']);
             $GovernmentModel = new GovernmentModel();
             $query = $GovernmentModel->getByGovernmentIdentifier($governmentidentifierids);
@@ -55,7 +55,7 @@ class Governmentidentifier extends BaseController
                 }
                 echo view('governmentidentifier/census', ['query' => $query, 'type' => $type]);
             }
-            echo view('footer');
+            echo view('core/footer');
         }
         return null;
     }

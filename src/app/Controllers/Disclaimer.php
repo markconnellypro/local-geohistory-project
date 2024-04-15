@@ -15,8 +15,8 @@ class Disclaimer extends BaseController
     public function index(string $state = ''): void
     {
         $this->data['state'] = $state;
-        echo view('header', $this->data);
+        echo view('core/header', $this->data);
         echo view('disclaimer/detail');
-        echo view('footer');
+        echo view('core/footer');
     }
 }

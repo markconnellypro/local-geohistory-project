@@ -18,9 +18,9 @@ class Law extends BaseController
     public function noRecord(string $state): void
     {
         $this->data['state'] = $state;
-        echo view('header', $this->data);
-        echo view('norecord');
-        echo view('footer');
+        echo view('core/header', $this->data);
+        echo view('core/norecord');
+        echo view('core/footer');
     }
 
     public function view(string $state, int|string $id): void
@@ -40,7 +40,7 @@ class Law extends BaseController
         } else {
             $id = $query[0]->lawsectionid;
             $this->data['pageTitle'] = $query[0]->lawsectioncitation;
-            echo view('header', $this->data);
+            echo view('core/header', $this->data);
             echo view('law/detail', ['query' => $query]);
             echo view('core/source', ['query' => $query, 'hasLink' => false]);
             if ($query[0]->url !== '') {
@@ -73,7 +73,7 @@ class Law extends BaseController
             $EventModel = new EventModel();
             $query = $EventModel->$function($id);
             echo view('core/event', ['query' => $query, 'state' => $state, 'title' => 'Event Links', 'eventRelationship' => true, 'includeLawGroup' => true]);
-            echo view('footer');
+            echo view('core/footer');
         }
     }
 }

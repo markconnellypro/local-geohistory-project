@@ -17,7 +17,7 @@ class Key extends BaseController
     public function index(string $state = ''): void
     {
         $this->data['state'] = $state;
-        echo view('header', $this->data);
+        echo view('core/header', $this->data);
 
         $keyQueries = [];
 
@@ -51,6 +51,6 @@ class Key extends BaseController
         foreach ($keys as $k => $v) {
             echo view('core/key', ['query' => $keyQueries[$k], 'type' => strtolower($v), 'title' => $k]);
         }
-        echo view('footer');
+        echo view('core/footer');
     }
 }
