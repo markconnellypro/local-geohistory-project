@@ -19,7 +19,7 @@ class Welcome extends BaseController
     {
         $stateArray = $this->getJurisdictions();
         echo view('header', $this->data);
-        echo view('welcome', ['stateArray' => $stateArray]);
+        echo view('welcome/detail', ['stateArray' => $stateArray]);
         echo view('footer');
     }
 
