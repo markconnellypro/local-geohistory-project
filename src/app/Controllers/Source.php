@@ -44,7 +44,7 @@ class Source extends BaseController
             }
             $SourceCitationNoteModel = new SourceCitationNoteModel();
             $query = $SourceCitationNoteModel->getBySourceCitation($id);
-            echo view('source_note', ['query' => $query, 'state' => $state]);
+            echo view('source/note', ['query' => $query, 'state' => $state]);
             $SourceItemPartModel = new SourceItemPartModel();
             $query = $SourceItemPartModel->getBySourceCitation($id);
             echo view('core/url', ['query' => $query, 'state' => $state, 'title' => 'Calculated URL']);
