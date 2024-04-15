@@ -42,7 +42,7 @@ class Law extends BaseController
             $this->data['pageTitle'] = $query[0]->lawsectioncitation;
             echo view('core/header', $this->data);
             echo view('law/view', ['query' => $query]);
-            echo view('core/source', ['query' => $query, 'hasLink' => false]);
+            echo view('source/table', ['query' => $query, 'hasLink' => false]);
             if ($query[0]->url !== '') {
                 echo view('core/url', ['query' => $query, 'title' => 'Actual URL']);
             }
@@ -66,13 +66,13 @@ class Law extends BaseController
                 echo view(ENVIRONMENT . '/general_lawgroup', ['query' => $query, 'includeForm' => false]);
             }
             $query = $LawSectionModel->getRelated($id);
-            echo view('core/law', ['query' => $query, 'state' => $state, 'title' => 'Related Law', 'type' => 'relationship']);
+            echo view('law/table', ['query' => $query, 'state' => $state, 'title' => 'Related Law', 'type' => 'relationship']);
             $SourceItemPartModel = new SourceItemPartModel();
             $query = $SourceItemPartModel->$function($id);
             echo view('core/url', ['query' => $query, 'state' => $state, 'title' => 'Calculated URL']);
             $EventModel = new EventModel();
             $query = $EventModel->$function($id);
-            echo view('core/event', ['query' => $query, 'state' => $state, 'title' => 'Event Links', 'eventRelationship' => true, 'includeLawGroup' => true]);
+            echo view('event/table', ['query' => $query, 'state' => $state, 'title' => 'Event Links', 'eventRelationship' => true, 'includeLawGroup' => true]);
             echo view('core/footer');
         }
     }

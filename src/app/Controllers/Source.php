@@ -37,8 +37,8 @@ class Source extends BaseController
             $id = $query[0]->sourcecitationid;
             $this->data['pageTitle'] = $query[0]->sourceabbreviation . ($query[0]->sourcecitationpage === '' ? '' : ' ' . $query[0]->sourcecitationpage);
             echo view('core/header', $this->data);
-            echo view('core/sourcecitation', ['query' => $query, 'state' => $state, 'hasColor' => false, 'hasLink' => false, 'title' => 'Detail']);
-            echo view('core/source', ['query' => $query, 'hasLink' => $this->isLive()]);
+            echo view('source/table_citation', ['query' => $query, 'state' => $state, 'hasColor' => false, 'hasLink' => false, 'title' => 'Detail']);
+            echo view('source/table', ['query' => $query, 'hasLink' => $this->isLive()]);
             if ($query[0]->url !== '') {
                 echo view('core/url', ['query' => $query, 'title' => 'Actual URL']);
             }
@@ -50,7 +50,7 @@ class Source extends BaseController
             echo view('core/url', ['query' => $query, 'state' => $state, 'title' => 'Calculated URL']);
             $EventModel = new EventModel();
             $query = $EventModel->getBySourceCitation($id);
-            echo view('core/event', ['query' => $query, 'state' => $state, 'title' => 'Event Links']);
+            echo view('event/table', ['query' => $query, 'state' => $state, 'title' => 'Event Links']);
             echo view('core/footer');
         }
     }

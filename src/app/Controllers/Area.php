@@ -118,12 +118,12 @@ class Area extends BaseController
             if ($searchParameter === []) {
                 echo view('core/parameter', ['searchParameter' => $searchParameter, 'omitColon' => true]);
             }
-            echo view('core/currentgovernment', ['query' => $currentQuery, 'state' => $state]);
+            echo view('event/table_currentgovernment', ['query' => $currentQuery, 'state' => $state]);
             echo view('core/map', ['includeBase' => true]);
             $AffectedGovernmentGroupModel = new AffectedGovernmentGroupModel();
             $query = $AffectedGovernmentGroupModel->getByGovernmentShape($id, $state);
             $events = [];
-            echo view('core/affectedgovernment', ['query' => $query, 'state' => $state, 'includeDate' => true, 'isComplete' => true]);
+            echo view('event/table_affectedgovernment_fixed', ['query' => $query, 'state' => $state, 'includeDate' => true, 'isComplete' => true]);
             foreach ($query as $row) {
                 if (!is_null($row->eventid)) {
                     $events[] = $row->eventid;
@@ -131,11 +131,11 @@ class Area extends BaseController
             }
             $MetesDescriptionModel = new MetesDescriptionModel();
             $query = $MetesDescriptionModel->getByGovernmentShape($id);
-            echo view('core/metes', ['query' => $query, 'hasLink' => true, 'state' => $state, 'title' => 'Metes and Bounds Description']);
+            echo view('metes/table', ['query' => $query, 'hasLink' => true, 'state' => $state, 'title' => 'Metes and Bounds Description']);
             $events = array_unique($events);
             $EventModel = new EventModel();
             $query = $EventModel->getByGovernmentShapeFailure($id, $events);
-            echo view('core/event', ['query' => $query, 'state' => $state, 'title' => 'Other Event Links']);
+            echo view('event/table', ['query' => $query, 'state' => $state, 'title' => 'Other Event Links']);
             echo view('leaflet/start', ['type' => 'area', 'includeBase' => true, 'needRotation' => false]);
             echo view('core/gis', [
                 'query' => $currentQuery,

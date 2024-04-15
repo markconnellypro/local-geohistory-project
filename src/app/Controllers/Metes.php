@@ -34,7 +34,7 @@ class Metes extends BaseController
             $id = $areaQuery[0]->metesdescriptionid;
             $this->data['pageTitle'] = $areaQuery[0]->metesdescriptionlong;
             echo view('core/header', $this->data);
-            echo view('core/metes', ['query' => $areaQuery, 'hasLink' => false, 'title' => 'Detail']);
+            echo view('metes/table', ['query' => $areaQuery, 'hasLink' => false, 'title' => 'Detail']);
             $hasMap = false;
             $hasMetes = false;
             $hasArea = (!is_null($areaQuery[0]->geometry));
@@ -52,7 +52,7 @@ class Metes extends BaseController
             }
             $query = $MetesDescriptionLineModel->getByMetesDescription($id);
             echo view('metes/row', ['query' => $query]);
-            echo view('core/event', ['query' => $areaQuery, 'state' => $state, 'title' => 'Event Links']);
+            echo view('event/table', ['query' => $areaQuery, 'state' => $state, 'title' => 'Event Links']);
             if ($hasMap) {
                 echo view('leaflet/start', ['type' => 'metes', 'includeBase' => $hasBegin, 'needRotation' => false]);
                 if ($hasArea) {
