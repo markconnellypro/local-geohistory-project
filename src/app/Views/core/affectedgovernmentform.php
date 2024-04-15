@@ -18,7 +18,7 @@
                 <?php } ?>
                 <th>Government Form</th>
                 <?php if (!$includeGovernment) { ?>
-                    <th>Date <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#date" aria-label="Date Key"><?= view('general_svg_icon', ['iconLabel' => 'key icon', 'iconName' => 'key', 'iconType' => 'keyicon']); ?></a></th>
+                    <th>Date <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#date" aria-label="Date Key"><?= view('core/svg_icon', ['iconLabel' => 'key icon', 'iconName' => 'key', 'iconType' => 'keyicon']); ?></a></th>
                 <?php } ?>
             </tr>
         </thead>
@@ -27,7 +27,7 @@
     foreach ($query as $row) { ?>
                 <tr>
                     <?php if ($includeGovernment) { ?>
-                        <td><?php echo view('general_link', ['link' => $row->governmentstatelink, 'text' => $row->governmentlong]) ?></td>
+                        <td><?php echo view('core/link', ['link' => $row->governmentstatelink, 'text' => $row->governmentlong]) ?></td>
                     <?php } else { ?>
                         <td data-sort="<?= $row->eventsort ?>"><?= ($isHistory ? $i : '<a href="/' . \Config\Services::request()->getLocale() . '/' . $state . '/event/' . $row->eventslug . '/">View</a>') ?></td>
                     <?php }

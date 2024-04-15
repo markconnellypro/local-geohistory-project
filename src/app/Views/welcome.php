@@ -5,7 +5,7 @@
     <div id="welcomestate" class="welcomecontent">
         <?php foreach ($stateArray as $s) { ?>
             <a href="/<?= \Config\Services::request()->getLocale() ?>/<?= $s ?>/" class="bodyiconcontainer headerimageblock" aria-label="<?= strtoupper($s) ?>">
-                <?= view('general_svg_icon', ['iconLabel' => strtoupper($s) . ' map icon', 'iconName' => $s, 'iconType' => 'bodyicon']); ?>
+                <?= view('core/svg_icon', ['iconLabel' => strtoupper($s) . ' map icon', 'iconName' => $s, 'iconType' => 'bodyicon']); ?>
                 <div style="height: auto;"><?= strtoupper($s) ?></div>
             </a>
         <?php } ?>

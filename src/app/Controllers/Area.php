@@ -116,14 +116,14 @@ class Area extends BaseController
                 $searchParameter['Coordinates'] = $y . ', ' . $x;
             }
             if ($searchParameter === []) {
-                echo view('general_parameter', ['searchParameter' => $searchParameter, 'omitColon' => true]);
+                echo view('core/parameter', ['searchParameter' => $searchParameter, 'omitColon' => true]);
             }
-            echo view('general_currentgovernment', ['query' => $currentQuery, 'state' => $state]);
-            echo view('general_map', ['includeBase' => true]);
+            echo view('core/currentgovernment', ['query' => $currentQuery, 'state' => $state]);
+            echo view('core/map', ['includeBase' => true]);
             $AffectedGovernmentGroupModel = new AffectedGovernmentGroupModel();
             $query = $AffectedGovernmentGroupModel->getByGovernmentShape($id, $state);
             $events = [];
-            echo view('general_affectedgovernment', ['query' => $query, 'state' => $state, 'includeDate' => true, 'isComplete' => true]);
+            echo view('core/affectedgovernment', ['query' => $query, 'state' => $state, 'includeDate' => true, 'isComplete' => true]);
             foreach ($query as $row) {
                 if (!is_null($row->eventid)) {
                     $events[] = $row->eventid;
@@ -131,13 +131,13 @@ class Area extends BaseController
             }
             $MetesDescriptionModel = new MetesDescriptionModel();
             $query = $MetesDescriptionModel->getByGovernmentShape($id);
-            echo view('general_metes', ['query' => $query, 'hasLink' => true, 'state' => $state, 'title' => 'Metes and Bounds Description']);
+            echo view('core/metes', ['query' => $query, 'hasLink' => true, 'state' => $state, 'title' => 'Metes and Bounds Description']);
             $events = array_unique($events);
             $EventModel = new EventModel();
             $query = $EventModel->getByGovernmentShapeFailure($id, $events);
-            echo view('general_event', ['query' => $query, 'state' => $state, 'title' => 'Other Event Links']);
+            echo view('core/event', ['query' => $query, 'state' => $state, 'title' => 'Other Event Links']);
             echo view('leaflet_start', ['type' => 'area', 'includeBase' => true, 'needRotation' => false]);
-            echo view('general_gis', [
+            echo view('core/gis', [
                 'query' => $currentQuery,
                 'element' => 'area',
                 'onEachFeature' => false,
@@ -154,7 +154,7 @@ class Area extends BaseController
                     'pointdescription' => '',
                     'pointgeometry' => '{"type":"Point","coordinates":[' . $x . ',' . $y . ']}',
                 ]];
-                echo view('general_gis', [
+                echo view('core/gis', [
                     'query' => $query,
                     'element' => 'point',
                     'onEachFeature' => false,

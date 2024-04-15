@@ -34,7 +34,7 @@ class Metes extends BaseController
             $id = $areaQuery[0]->metesdescriptionid;
             $this->data['pageTitle'] = $areaQuery[0]->metesdescriptionlong;
             echo view('header', $this->data);
-            echo view('general_metes', ['query' => $areaQuery, 'hasLink' => false, 'title' => 'Detail']);
+            echo view('core/metes', ['query' => $areaQuery, 'hasLink' => false, 'title' => 'Detail']);
             $hasMap = false;
             $hasMetes = false;
             $hasArea = (!is_null($areaQuery[0]->geometry));
@@ -48,15 +48,15 @@ class Metes extends BaseController
             $hasMetes = (count($geometryQuery) > 1);
             if ($hasArea || $hasMetes) {
                 $hasMap = true;
-                echo view('general_map', ['includeBase' => $hasBegin, 'includeDisclaimer' => true]);
+                echo view('core/map', ['includeBase' => $hasBegin, 'includeDisclaimer' => true]);
             }
             $query = $MetesDescriptionLineModel->getByMetesDescription($id);
             echo view('metes_row', ['query' => $query]);
-            echo view('general_event', ['query' => $areaQuery, 'state' => $state, 'title' => 'Event Links']);
+            echo view('core/event', ['query' => $areaQuery, 'state' => $state, 'title' => 'Event Links']);
             if ($hasMap) {
                 echo view('leaflet_start', ['type' => 'metes', 'includeBase' => $hasBegin, 'needRotation' => false]);
                 if ($hasArea) {
-                    echo view('general_gis', [
+                    echo view('core/gis', [
                         'query' => $areaQuery,
                         'element' => 'area',
                         'onEachFeature' => false,
@@ -67,7 +67,7 @@ class Metes extends BaseController
                     ]);
                 }
                 if ($hasMetes) {
-                    echo view('general_gis', [
+                    echo view('core/gis', [
                         'query' => $geometryQuery,
                         'element' => 'line',
                         'onEachFeature' => true,
@@ -76,7 +76,7 @@ class Metes extends BaseController
                         'color' => 'D5103F',
                         'fillOpacity' => 0
                     ]);
-                    echo view('general_gis', [
+                    echo view('core/gis', [
                         'query' => $geometryQuery,
                         'element' => 'point',
                         'onEachFeature' => true,

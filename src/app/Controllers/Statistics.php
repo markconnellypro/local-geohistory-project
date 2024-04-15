@@ -34,7 +34,7 @@ class Statistics extends BaseController
     {
         $this->data['state'] = $state;
         echo view('header', $this->data);
-        echo view('general_ui', $this->data);
+        echo view('core/ui', $this->data);
         $EventTypeModel = new EventTypeModel();
         $this->data['eventTypeQuery'] = $EventTypeModel->getManyByStatistics($state);
         echo view('statistics_index', $this->data);
@@ -157,9 +157,9 @@ class Statistics extends BaseController
 
         $this->data['isContemporaneous'] = ($searchParameter['Grouped By'] === 'Contemporaneous Jurisdictions');
         $this->data['notEvent'] = ($searchParameter['Metric'] === 'Events by Event Type');
-        echo view('general_parameter', ['searchParameter' => $searchParameter]);
+        echo view('core/parameter', ['searchParameter' => $searchParameter]);
         echo view('statistics_view', $this->data);
-        echo view('general_chartjs', ['query' => $this->data['wholeQuery'], 'xLabel' => 'Year', 'yLabel' => ($for === 'createddissolved' ? 'Governments' : 'Events')]);
+        echo view('core/chartjs', ['query' => $this->data['wholeQuery'], 'xLabel' => 'Year', 'yLabel' => ($for === 'createddissolved' ? 'Governments' : 'Events')]);
         echo view('footer');
     }
 }

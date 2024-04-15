@@ -7,7 +7,7 @@
                 <?php if (\App\Controllers\BaseController::isLive()) { ?>
                     <th>ID</th>
                 <?php } ?>
-                <th>Citation <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#law" aria-label="Law Key"><?= view('general_svg_icon', ['iconLabel' => 'key icon', 'iconName' => 'key', 'iconType' => 'keyicon']); ?></a></th>
+                <th>Citation <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#law" aria-label="Law Key"><?= view('core/svg_icon', ['iconLabel' => 'key icon', 'iconName' => 'key', 'iconType' => 'keyicon']); ?></a></th>
                 <th>Title</th>
                 <th>Page Begin</th>
             </tr>

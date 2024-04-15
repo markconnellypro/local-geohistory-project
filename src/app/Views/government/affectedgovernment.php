@@ -14,10 +14,10 @@
                 <?php if ($isMultiple) { ?>
                     <th>Government</th>
                 <?php } ?>
-                <th>How Affected <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#affectedtype" aria-label="Affected Type Key"><?= view('general_svg_icon', ['iconLabel' => 'key icon', 'iconName' => 'key', 'iconType' => 'keyicon']); ?></a></th>
+                <th>How Affected <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#affectedtype" aria-label="Affected Type Key"><?= view('core/svg_icon', ['iconLabel' => 'key icon', 'iconName' => 'key', 'iconType' => 'keyicon']); ?></a></th>
                 <th>Adverse Government</th>
-                <th>How Adverse Affected <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#affectedtype" aria-label="Affected Type Key"><?= view('general_svg_icon', ['iconLabel' => 'key icon', 'iconName' => 'key', 'iconType' => 'keyicon']); ?></a></th>
-                <th>Date <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#date" aria-label="Date Key"><?= view('general_svg_icon', ['iconLabel' => 'key icon', 'iconName' => 'key', 'iconType' => 'keyicon']); ?></a></th>
+                <th>How Adverse Affected <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#affectedtype" aria-label="Affected Type Key"><?= view('core/svg_icon', ['iconLabel' => 'key icon', 'iconName' => 'key', 'iconType' => 'keyicon']); ?></a></th>
+                <th>Date <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#date" aria-label="Date Key"><?= view('core/svg_icon', ['iconLabel' => 'key icon', 'iconName' => 'key', 'iconType' => 'keyicon']); ?></a></th>
             </tr>
         </thead>
         <tbody>
@@ -29,7 +29,7 @@
                         <td><?= $row->governmentaffectedlong ?></td>
                     <?php } ?>
                     <td><?= $row->affectedtypesame . ($row->eventreconstructed === 't' ? '?' : '') ?></td>
-                    <td><?php echo view('general_link', ['link' => $row->governmentstatelink, 'text' => $row->governmentlong]) ?></td>
+                    <td><?php echo view('core/link', ['link' => $row->governmentstatelink, 'text' => $row->governmentlong]) ?></td>
                     <td><?= $row->affectedtypeother . ($row->eventreconstructed === 't' ? '?' : '') ?></td>
                     <td data-sort="<?= $row->eventsort ?>"><?= ($row->eventeffective === '' ? $row->eventyear : $row->eventeffective) ?></td>
                 </tr>

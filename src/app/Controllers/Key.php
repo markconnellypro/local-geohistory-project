@@ -49,7 +49,7 @@ class Key extends BaseController
         ksort($keyQueries);
         echo view('key_start', ['keys' => $keys]);
         foreach ($keys as $k => $v) {
-            echo view('general_key', ['query' => $keyQueries[$k], 'type' => strtolower($v), 'title' => $k]);
+            echo view('core/key', ['query' => $keyQueries[$k], 'type' => strtolower($v), 'title' => $k]);
         }
         echo view('footer');
     }

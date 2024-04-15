@@ -12,7 +12,7 @@
         <tbody>
             <?php foreach ($query as $row) { ?>
                 <tr>
-                    <td class="folder<?= (\App\Controllers\BaseController::isLive() ? $row->governmentcolor : 'none') ?>"><?php echo view('general_link', ['link' => $row->governmentstatelink, 'text' => $row->governmentlong]) ?></td>
+                    <td class="folder<?= (\App\Controllers\BaseController::isLive() ? $row->governmentcolor : 'none') ?>"><?php echo view('core/link', ['link' => $row->governmentstatelink, 'text' => $row->governmentlong]) ?></td>
                     <td class="folder<?= (\App\Controllers\BaseController::isLive() ? $row->governmentcolor : 'none') ?>"><?= $row->governmentrelationship ?></td>
                     <td class="folder<?= (\App\Controllers\BaseController::isLive() ? $row->governmentcolor : 'none') ?>"><?= $row->governmentparentstatus ?></td>
                 </tr>

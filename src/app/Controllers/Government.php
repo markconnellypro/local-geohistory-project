@@ -78,18 +78,18 @@ class Government extends BaseController
                 }
             }
             if ($hasMap) {
-                echo view('general_map', ['includeBase' => true]);
+                echo view('core/map', ['includeBase' => true]);
             }
             if (!$isHistory) {
                 $populationQuery = $GovernmentPopulationModel->getByGovernment($id, $state);
                 if ($populationQuery !== []) {
-                    echo view('general_chart');
+                    echo view('core/chart');
                 }
                 $query = $GovernmentModel->getRelated($id, $state);
                 echo view('government/related', ['query' => $query]);
                 $GovernmentIdentifierModel = new GovernmentIdentifierModel();
                 $query = $GovernmentIdentifierModel->getByGovernment($id, $state);
-                echo view('general_governmentidentifier', ['query' => $query, 'title' => 'Identifier', 'isMultiple' => $this->data['isMultiple']]);
+                echo view('core/governmentidentifier', ['query' => $query, 'title' => 'Identifier', 'isMultiple' => $this->data['isMultiple']]);
             }
             $AffectedGovernmentGroupModel = new AffectedGovernmentGroupModel();
             $query = $AffectedGovernmentGroupModel->getByGovernmentGovernment($id, $state);
@@ -99,7 +99,7 @@ class Government extends BaseController
                 $events[] = $row->event;
             }
             $query = $AffectedGovernmentGroupModel->getByGovernmentForm($id, $state);
-            echo view('general_affectedgovernmentform', ['includeGovernment' => false, 'query' => $query]);
+            echo view('core/affectedgovernmentform', ['includeGovernment' => false, 'query' => $query]);
             foreach ($query as $row) {
                 $events[] = $row->event;
             }
@@ -108,11 +108,11 @@ class Government extends BaseController
             if (!$isHistory) {
                 if ($isCountyOrLower) {
                     $query = $EventModel->getByGovernmentSuccess($id, $events);
-                    echo view('general_event', ['query' => $query, 'state' => $state, 'title' => 'Other Successful Event Links', 'tableId' => 'successfulevent']);
+                    echo view('core/event', ['query' => $query, 'state' => $state, 'title' => 'Other Successful Event Links', 'tableId' => 'successfulevent']);
                 }
                 $GovernmentSourceModel = new GovernmentSourceModel();
                 $query = $GovernmentSourceModel->getByGovernment($id, $state);
-                echo view('general_governmentsource', ['query' => $query, 'state' => $state, 'type' => 'government', 'isMultiple' => $this->data['isMultiple']]);
+                echo view('core/governmentsource', ['query' => $query, 'state' => $state, 'type' => 'government', 'isMultiple' => $this->data['isMultiple']]);
                 $query = $GovernmentModel->getNote($id, $state);
                 if ($query !== []) {
                     echo view(ENVIRONMENT . '/government_note', ['query' => $query, 'isMultiple' => $this->data['isMultiple']]);
@@ -126,7 +126,7 @@ class Government extends BaseController
                     echo view(ENVIRONMENT . '/government_schooldistrict', ['query' => $query, 'isMultiple' => $this->data['isMultiple']]);
                 }
                 $query = $SourceModel->getByGovernment($id);
-                echo view('general_source', ['query' => $query, 'hasLink' => true]);
+                echo view('core/source', ['query' => $query, 'hasLink' => true]);
                 $ResearchLogModel = new ResearchLogModel();
                 $query = $ResearchLogModel->getByGovernment($id, $state);
                 echo view('government/researchlog', ['query' => $query, 'isMultiple' => $this->data['isMultiple']]);
@@ -135,7 +135,7 @@ class Government extends BaseController
                 echo view('government/nationalarchives', ['query' => $query, 'isMultiple' => $this->data['isMultiple']]);
                 if ($isCountyOrLower) {
                     $query = $EventModel->getByGovernmentFailure($id, $events);
-                    echo view('general_event', ['query' => $query, 'state' => $state, 'title' => 'Other Event Links', 'tableId' => 'otherevent']);
+                    echo view('core/event', ['query' => $query, 'state' => $state, 'title' => 'Other Event Links', 'tableId' => 'otherevent']);
                 }
                 $query = $GovernmentModel->getOffice($id, $state);
                 if ($query !== []) {
@@ -144,7 +144,7 @@ class Government extends BaseController
                 if (file_exists(APPPATH . 'Views/' . ENVIRONMENT . '/government_live.php')) {
                     echo view(ENVIRONMENT . '/government_live', ['id' => $id, 'state' => $state, 'isMunicipalityOrLower' => $isMunicipalityOrLower, 'isCountyOrLower' => $isCountyOrLower, 'isCountyOrState' => $isCountyOrState, 'isState' => $isStateOrHigher, 'includeGovernment' => false]);
                 }
-                echo view('general_chartjs', ['query' => $populationQuery, 'xLabel' => 'Year', 'yLabel' => 'Population']);
+                echo view('core/chartjs', ['query' => $populationQuery, 'xLabel' => 'Year', 'yLabel' => 'Population']);
             }
             if ($hasMap) {
                 echo view('leaflet_start', ['type' => 'government', 'includeBase' => true, 'needRotation' => false]);
@@ -152,7 +152,7 @@ class Government extends BaseController
                 $layers = [];
                 $primaryLayer = '';
                 if ($query !== []) {
-                    echo view('general_gis', [
+                    echo view('core/gis', [
                         'query' => $query,
                         'element' => 'metesdescription',
                         'onEachFeature' => true,
@@ -167,7 +167,7 @@ class Government extends BaseController
                 $GovernmentShapeModel = new GovernmentShapeModel();
                 $query = $GovernmentShapeModel->getCurrentByGovernment($id);
                 if ($query !== []) {
-                    echo view('general_gis', [
+                    echo view('core/gis', [
                         'query' => $query,
                         'element' => 'current',
                         'onEachFeature' => false,
@@ -180,7 +180,7 @@ class Government extends BaseController
                 }
                 $query = $GovernmentShapeModel->getPartByGovernment($id, $state);
                 if ($query !== []) {
-                    echo view('general_gis', [
+                    echo view('core/gis', [
                         'query' => $query,
                         'element' => 'shape',
                         'onEachFeature' => false,

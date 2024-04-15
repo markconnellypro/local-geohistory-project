@@ -13,7 +13,7 @@ $state ??= 'usa';
             <tr>
                 <?php if ($includeDate) { ?>
                     <th>Detail</th>
-                    <th>Date <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#date" aria-label="Date Key"><?= view('general_svg_icon', ['iconLabel' => 'key icon', 'iconName' => 'key', 'iconType' => 'keyicon']); ?></a>
+                    <th>Date <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#date" aria-label="Date Key"><?= view('core/svg_icon', ['iconLabel' => 'key icon', 'iconName' => 'key', 'iconType' => 'keyicon']); ?></a>
                     </th>
                 <?php } elseif (\App\Controllers\BaseController::isLive() && $isComplete) { ?>
                     <th>Map<br>Link</th>
@@ -30,7 +30,7 @@ $state ??= 'usa';
                 foreach ($affectedGovernment['rows'] as $id => $row) { ?>
                 <tr>
                     <?php if ($includeDate) { ?>
-                        <td data-sort="<?= $row->eventorder ?>"><?php echo view('general_link', ['link' => ($row->eventslug  === '' ? '' : "/" . \Config\Services::request()->getLocale() . "/" . $state . "/event/" . $row->eventslug . "/"), 'text' => ($row->eventslug  === '' ? 'Missing' : 'View')]) ?></td>
+                        <td data-sort="<?= $row->eventorder ?>"><?php echo view('core/link', ['link' => ($row->eventslug  === '' ? '' : "/" . \Config\Services::request()->getLocale() . "/" . $state . "/event/" . $row->eventslug . "/"), 'text' => ($row->eventslug  === '' ? 'Missing' : 'View')]) ?></td>
                         <td data-sort="<?= $row->eventsort ?>"><?= ($row->eventeffective === '' ? $row->eventyear : $row->eventeffective) ?></td>
                     <?php } elseif (\App\Controllers\BaseController::isLive() && $isComplete) { ?>
                         <td>
@@ -39,7 +39,7 @@ $state ??= 'usa';
                                 foreach ($affectedGovernment['linkTypes'] as $fromTo => $levels) {
                                     foreach ($levels as $level) {
                                         if (isset($row->{ucfirst($fromTo) . ' ' . $level . ' Long'})) { ?>
-                                        <?php echo view('general_link', ['link' => str_replace('government', 'governmentmap', $row->{ucfirst($fromTo) . ' ' . $level . ' Link'}) . $id . "/", 'text' => ucfirst($fromTo)]) ?><br>
+                                        <?php echo view('core/link', ['link' => str_replace('government', 'governmentmap', $row->{ucfirst($fromTo) . ' ' . $level . ' Link'}) . $id . "/", 'text' => ucfirst($fromTo)]) ?><br>
                             <?php
                                         }
                                     }
@@ -52,8 +52,8 @@ $state ??= 'usa';
                             foreach ($levels as $level) { ?>
                             <td>
                                 <?php if (isset($row->{ucfirst($fromTo) . ' ' . $level . ' Long'})) { ?>
-                                    <?php echo view('general_link', ['link' => $row->{ucfirst($fromTo) . ' ' . $level . ' Link'}, 'text' => $row->{ucfirst($fromTo) . ' ' . $level . ' Long'}]) ?>
-                                    <br><span class="i"><?= $row->{ucfirst($fromTo) . ' ' . $level . ' Affected'} ?> <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#affectedtype" aria-label="Affected Type Key"><?= view('general_svg_icon', ['iconLabel' => 'key icon', 'iconName' => 'key', 'iconType' => 'keyicontext']); ?></a></span>
+                                    <?php echo view('core/link', ['link' => $row->{ucfirst($fromTo) . ' ' . $level . ' Link'}, 'text' => $row->{ucfirst($fromTo) . ' ' . $level . ' Long'}]) ?>
+                                    <br><span class="i"><?= $row->{ucfirst($fromTo) . ' ' . $level . ' Affected'} ?> <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#affectedtype" aria-label="Affected Type Key"><?= view('core/svg_icon', ['iconLabel' => 'key icon', 'iconName' => 'key', 'iconType' => 'keyicontext']); ?></a></span>
                                 <?php } ?>
                             </td>
                     <?php }

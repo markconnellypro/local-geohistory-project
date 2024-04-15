@@ -37,7 +37,7 @@ $title ??= '';
                     <div class="headerimageblock">
                         <?php if ($state !== '' && $state !== 'usa') { ?>
                             <a href="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/" aria-label="<?= strtoupper($state) ?>">
-                                <?= view('general_svg_icon', ['iconLabel' => strtoupper($state) . ' map icon', 'iconName' => $state, 'iconType' => 'headericon']); ?>
+                                <?= view('core/svg_icon', ['iconLabel' => strtoupper($state) . ' map icon', 'iconName' => $state, 'iconType' => 'headericon']); ?>
                                 <br><?= strtoupper($state) ?>
                             </a>
                         <?php } ?>
@@ -47,29 +47,29 @@ $title ??= '';
                             <div id="headernavigationpartpart">
                                 <div class="keyiconcontainer">
                                     <a href="/<?= \Config\Services::request()->getLocale() ?>/" aria-label="Return to Home">
-                                        <?= view('general_svg_icon', ['iconLabel' => 'home icon', 'iconName' => 'home', 'iconType' => 'keyiconlarge']); ?>
+                                        <?= view('core/svg_icon', ['iconLabel' => 'home icon', 'iconName' => 'home', 'iconType' => 'keyiconlarge']); ?>
                                     </a>
                                 </div>
                                 <?php if ($state !== '') { ?>
                                     <div class="keyiconcontainer">
                                         <a href="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/" aria-label="Search">
-                                            <?= view('general_svg_icon', ['iconLabel' => 'magnifying glass icon', 'iconName' => 'search', 'iconType' => 'keyiconlarge']); ?>
+                                            <?= view('core/svg_icon', ['iconLabel' => 'magnifying glass icon', 'iconName' => 'search', 'iconType' => 'keyiconlarge']); ?>
                                         </a>
                                     </div>
                                 <?php } ?>
                                 <div class="keyiconcontainer">
                                     <a href="/<?= \Config\Services::request()->getLocale() ?><?= (($state !== '' && $state !== 'usa') ? '/' . $state : '') ?>/about/" aria-label="About">
-                                        <?= view('general_svg_icon', ['iconLabel' => 'about icon', 'iconName' => 'about', 'iconType' => 'keyiconlarge']); ?>
+                                        <?= view('core/svg_icon', ['iconLabel' => 'about icon', 'iconName' => 'about', 'iconType' => 'keyiconlarge']); ?>
                                     </a>
                                 </div>
                                 <div class="keyiconcontainer">
                                     <a href="/<?= \Config\Services::request()->getLocale() ?>/key/" aria-label="Key">
-                                        <?= view('general_svg_icon', ['iconLabel' => 'key icon', 'iconName' => 'key', 'iconType' => 'keyiconlarge']); ?>
+                                        <?= view('core/svg_icon', ['iconLabel' => 'key icon', 'iconName' => 'key', 'iconType' => 'keyiconlarge']); ?>
                                     </a>
                                 </div>
                                 <div class="keyiconcontainer">
                                     <a href="/<?= \Config\Services::request()->getLocale() ?><?= (($state !== '' && $state !== 'usa') ? '/' . $state : '') ?>/statistics/" aria-label="Statistics">
-                                        <?= view('general_svg_icon', ['iconLabel' => 'statistics icon', 'iconName' => 'statistics', 'iconType' => 'keyiconlarge']); ?>
+                                        <?= view('core/svg_icon', ['iconLabel' => 'statistics icon', 'iconName' => 'statistics', 'iconType' => 'keyiconlarge']); ?>
                                     </a>
                                 </div>
                             </div>

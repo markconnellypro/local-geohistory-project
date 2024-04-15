@@ -91,7 +91,7 @@ class Search extends BaseController
             $this->data['governmentIdentifierTypeQuery'] = $GovernmentIdentifierTypeModel->getSearch($state);
             $SourceModel = new SourceModel();
             $this->data['reporterQuery'] = $SourceModel->getSearch($state);
-            echo view('general_ui', $this->data);
+            echo view('core/ui', $this->data);
             echo view('search', $this->data);
             if (file_exists(APPPATH . 'Views/' . ENVIRONMENT . '/government_live.php')) {
                 echo view(ENVIRONMENT . '/government_live', ['id' => $this->data['id'], 'state' => $state, 'isMunicipalityOrLower' => false, 'isCountyOrLower' => false, 'isCountyOrState' => false, 'isState' => true, 'includeGovernment' => true]);
@@ -187,8 +187,8 @@ class Search extends BaseController
                     $searchParameter[$this->parameterType[$key]] = $value;
                 }
             }
-            echo view('general_parameter', ['searchParameter' => $searchParameter]);
-            echo view('general_' . $category, ['query' => $query, 'state' => $state, 'title' => 'Results:', 'type' => $type]);
+            echo view('core/parameter', ['searchParameter' => $searchParameter]);
+            echo view('core/' . $category, ['query' => $query, 'state' => $state, 'title' => 'Results:', 'type' => $type]);
             echo view('footer');
         } else {
             $this->response->setHeader('Content-Type', 'application/json');
