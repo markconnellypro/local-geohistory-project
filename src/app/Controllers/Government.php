@@ -70,7 +70,7 @@ class Government extends BaseController
             $hasMap = ($isCountyOrLower && $query[0]->hasmap === 't');
             $showTimeline = ($query[0]->governmentmapstatustimelapse === 't');
             $statusQuery = $GovernmentMapStatusModel->getDetails();
-            echo view('government/detail', ['query' => $query, 'state' => $state, 'statuses' => $statusQuery]);
+            echo view('government/view', ['query' => $query, 'state' => $state, 'statuses' => $statusQuery]);
             if (!$isHistory) {
                 $query = $SourceCitationModel->getByGovernment($id, $state);
                 if ($query !== []) {

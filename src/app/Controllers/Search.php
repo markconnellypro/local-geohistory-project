@@ -92,7 +92,7 @@ class Search extends BaseController
             $SourceModel = new SourceModel();
             $this->data['reporterQuery'] = $SourceModel->getSearch($state);
             echo view('core/ui', $this->data);
-            echo view('search/detail', $this->data);
+            echo view('search/index', $this->data);
             if (file_exists(APPPATH . 'Views/' . ENVIRONMENT . '/government_live.php')) {
                 echo view(ENVIRONMENT . '/government_live', ['id' => $this->data['id'], 'state' => $state, 'isMunicipalityOrLower' => false, 'isCountyOrLower' => false, 'isCountyOrState' => false, 'isState' => true, 'includeGovernment' => true]);
             }

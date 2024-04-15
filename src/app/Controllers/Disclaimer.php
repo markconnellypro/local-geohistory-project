@@ -16,7 +16,7 @@ class Disclaimer extends BaseController
     {
         $this->data['state'] = $state;
         echo view('core/header', $this->data);
-        echo view('disclaimer/detail');
+        echo view('disclaimer/index');
         echo view('core/footer');
     }
 }

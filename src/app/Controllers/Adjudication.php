@@ -38,7 +38,7 @@ class Adjudication extends BaseController
             $id = $query[0]->adjudicationid;
             $this->data['pageTitle'] = $query[0]->adjudicationtitle;
             echo view('core/header', $this->data);
-            echo view('adjudication/detail', ['query' => $query]);
+            echo view('adjudication/view', ['query' => $query]);
             $AdjudicationLocationModel = new AdjudicationLocationModel();
             $query = $AdjudicationLocationModel->getByAdjudication($id);
             echo view('adjudication/location', ['query' => $query]);
