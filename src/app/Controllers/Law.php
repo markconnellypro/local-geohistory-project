@@ -41,7 +41,7 @@ class Law extends BaseController
             $id = $query[0]->lawsectionid;
             $this->data['pageTitle'] = $query[0]->lawsectioncitation;
             echo view('header', $this->data);
-            echo view('law_detail', ['query' => $query]);
+            echo view('law/detail', ['query' => $query]);
             echo view('core/source', ['query' => $query, 'hasLink' => false]);
             if ($query[0]->url !== '') {
                 echo view('core/url', ['query' => $query, 'title' => 'Actual URL']);
