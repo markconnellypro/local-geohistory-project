@@ -2,7 +2,7 @@
 $needRotation ??= false;
 $state ??= 'usa';
 $type ??= '';
-echo view('leaflet_source');
+echo view('leaflet/source');
 if (file_exists(APPPATH . 'Views/' . ENVIRONMENT . '/leaflet_rotation.php') && $needRotation) {
     echo view(ENVIRONMENT . '/leaflet_rotation');
 } ?>

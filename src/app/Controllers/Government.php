@@ -147,7 +147,7 @@ class Government extends BaseController
                 echo view('core/chartjs', ['query' => $populationQuery, 'xLabel' => 'Year', 'yLabel' => 'Population']);
             }
             if ($hasMap) {
-                echo view('leaflet_start', ['type' => 'government', 'includeBase' => true, 'needRotation' => false]);
+                echo view('leaflet/start', ['type' => 'government', 'includeBase' => true, 'needRotation' => false]);
                 $query = $MetesDescriptionLineModel->getGeometryByGovernment($id);
                 $layers = [];
                 $primaryLayer = '';
@@ -194,7 +194,7 @@ class Government extends BaseController
                 $AppModel = new AppModel();
                 $updatedParts = $AppModel->getLastUpdated()[0];
                 echo view('government/end', ['layers' => $layers, 'primaryLayer' => $primaryLayer, 'state' => $state, 'updatedParts' => $updatedParts, 'showTimeline' => $showTimeline]);
-                echo view('leaflet_end');
+                echo view('leaflet/end');
             }
             echo view('footer');
         }

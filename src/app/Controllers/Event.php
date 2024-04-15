@@ -97,7 +97,7 @@ class Event extends BaseController
             echo view('core/sourcecitation', ['query' => $query, 'state' => $state, 'hasColor' => false, 'hasLink' => true, 'title' => 'Source']);
             if ($hasMap) {
                 $i = 0;
-                echo view('leaflet_start', ['type' => 'event', 'includeBase' => true, 'needRotation' => false]);
+                echo view('leaflet/start', ['type' => 'event', 'includeBase' => true, 'needRotation' => false]);
                 echo view('event/affectedgovernmenttype', ['query' => $affectedGovernment['types']]);
                 if ($hasAffectedGovernmentMap) {
                     echo view('core/gis', [
@@ -128,7 +128,7 @@ class Event extends BaseController
                 } else {
                     echo view('event/end_metesdescription');
                 }
-                echo view('leaflet_end');
+                echo view('leaflet/end');
             }
             echo view('footer');
         }

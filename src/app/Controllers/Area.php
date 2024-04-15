@@ -136,7 +136,7 @@ class Area extends BaseController
             $EventModel = new EventModel();
             $query = $EventModel->getByGovernmentShapeFailure($id, $events);
             echo view('core/event', ['query' => $query, 'state' => $state, 'title' => 'Other Event Links']);
-            echo view('leaflet_start', ['type' => 'area', 'includeBase' => true, 'needRotation' => false]);
+            echo view('leaflet/start', ['type' => 'area', 'includeBase' => true, 'needRotation' => false]);
             echo view('core/gis', [
                 'query' => $currentQuery,
                 'element' => 'area',
@@ -167,7 +167,7 @@ class Area extends BaseController
                 ]);
             }
             echo view('area_end', ['includePoint' => $includePoint]);
-            echo view('leaflet_end');
+            echo view('leaflet/end');
             echo view('footer');
         }
     }

@@ -54,7 +54,7 @@ class Metes extends BaseController
             echo view('metes_row', ['query' => $query]);
             echo view('core/event', ['query' => $areaQuery, 'state' => $state, 'title' => 'Event Links']);
             if ($hasMap) {
-                echo view('leaflet_start', ['type' => 'metes', 'includeBase' => $hasBegin, 'needRotation' => false]);
+                echo view('leaflet/start', ['type' => 'metes', 'includeBase' => $hasBegin, 'needRotation' => false]);
                 if ($hasArea) {
                     echo view('core/gis', [
                         'query' => $areaQuery,
@@ -88,7 +88,7 @@ class Metes extends BaseController
                     ]);
                 }
                 echo view('metes_end', ['includeBase' => $hasBegin, 'includeArea' => $hasArea, 'includeMetes' => $hasMetes]);
-                echo view('leaflet_end', ['includeBase' => $hasBegin]);
+                echo view('leaflet/end', ['includeBase' => $hasBegin]);
             }
             echo view('footer');
         }

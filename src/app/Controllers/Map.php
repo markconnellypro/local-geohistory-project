@@ -69,14 +69,14 @@ class Map extends BaseController
         $this->response->removeHeader('Cache-Control');
         $this->response->setHeader('Cache-Control', 'max-age=86400');
         $this->response->setHeader('Content-Type', 'application/javascript');
-        echo view('leaflet_state_base', $this->data);
+        echo view('leaflet/state_base', $this->data);
         try {
-            echo view('leaflet_state_' . $state, $this->data);
+            echo view('leaflet/state_' . $state, $this->data);
         } catch (\Throwable) {
             try {
                 echo view('development/leaflet_state_' . $state, $this->data);
             } catch (\Throwable) {
-                echo view('leaflet_state', $this->data);
+                echo view('leaflet/state', $this->data);
             }
         }
     }

@@ -36,7 +36,7 @@
         var partData = <?= $query ?>;
         var lastLayer = "";
     </script>
-    <?= view('leaflet_source'); ?>
+    <?= view('leaflet/source'); ?>
     <style>
         .leaflet-container {
             background-color: rgba(255, 0, 0, 0.0);
