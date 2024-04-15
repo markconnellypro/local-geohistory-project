@@ -20,7 +20,7 @@ class About extends BaseController
         echo view('header', $this->data);
         $DocumentationModel = new DocumentationModel();
         $query = $DocumentationModel->getAboutDetail($state);
-        echo view('about', ['query' => $query]);
+        echo view('about/detail', ['query' => $query]);
         echo view('footer');
     }
 }
