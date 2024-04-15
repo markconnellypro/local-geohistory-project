@@ -5,7 +5,7 @@
 <section>
     <h2 id="<?= $type ?>"><?= $title ?></h2>
     <?php if ($type === 'law') {
-        echo view('key_law');
+        echo view('key/law');
     } ?>
     <table class="normal cell-border compact stripe">
         <thead>
