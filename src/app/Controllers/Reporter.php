@@ -38,7 +38,7 @@ class Reporter extends BaseController
             echo view('core/header', $this->data);
             echo view('core/reporter', ['query' => $query, 'state' => $state, 'hasLink' => false, 'title' => 'Detail']);
             echo view('core/source', ['query' => $query, 'hasLink' => false]);
-            echo view('reporter_authorship', ['query' => $query]);
+            echo view('reporter/authorship', ['query' => $query]);
             if ($query[0]->url !== '') {
                 echo view('core/url', ['query' => $query, 'title' => 'Actual URL']);
             }
