@@ -70,7 +70,7 @@ class Government extends BaseController
             $hasMap = ($isCountyOrLower && $query[0]->hasmap === 't');
             $showTimeline = ($query[0]->governmentmapstatustimelapse === 't');
             $statusQuery = $GovernmentMapStatusModel->getDetails();
-            echo view('government_detail', ['query' => $query, 'state' => $state, 'statuses' => $statusQuery]);
+            echo view('government/detail', ['query' => $query, 'state' => $state, 'statuses' => $statusQuery]);
             if (!$isHistory) {
                 $query = $SourceCitationModel->getByGovernment($id, $state);
                 if ($query !== []) {
@@ -86,7 +86,7 @@ class Government extends BaseController
                     echo view('general_chart');
                 }
                 $query = $GovernmentModel->getRelated($id, $state);
-                echo view('government_related', ['query' => $query]);
+                echo view('government/related', ['query' => $query]);
                 $GovernmentIdentifierModel = new GovernmentIdentifierModel();
                 $query = $GovernmentIdentifierModel->getByGovernment($id, $state);
                 echo view('general_governmentidentifier', ['query' => $query, 'title' => 'Identifier', 'isMultiple' => $this->data['isMultiple']]);
@@ -94,7 +94,7 @@ class Government extends BaseController
             $AffectedGovernmentGroupModel = new AffectedGovernmentGroupModel();
             $query = $AffectedGovernmentGroupModel->getByGovernmentGovernment($id, $state);
             $events = [];
-            echo view('government_affectedgovernment', ['query' => $query, 'isMultiple' => $this->data['isMultiple']]);
+            echo view('government/affectedgovernment', ['query' => $query, 'isMultiple' => $this->data['isMultiple']]);
             foreach ($query as $row) {
                 $events[] = $row->event;
             }
@@ -129,10 +129,10 @@ class Government extends BaseController
                 echo view('general_source', ['query' => $query, 'hasLink' => true]);
                 $ResearchLogModel = new ResearchLogModel();
                 $query = $ResearchLogModel->getByGovernment($id, $state);
-                echo view('government_researchlog', ['query' => $query, 'isMultiple' => $this->data['isMultiple']]);
+                echo view('government/researchlog', ['query' => $query, 'isMultiple' => $this->data['isMultiple']]);
                 $NationalArchivesModel = new NationalArchivesModel();
                 $query = $NationalArchivesModel->getByGovernment($id, $state);
-                echo view('government_nationalarchives', ['query' => $query, 'isMultiple' => $this->data['isMultiple']]);
+                echo view('government/nationalarchives', ['query' => $query, 'isMultiple' => $this->data['isMultiple']]);
                 if ($isCountyOrLower) {
                     $query = $EventModel->getByGovernmentFailure($id, $events);
                     echo view('general_event', ['query' => $query, 'state' => $state, 'title' => 'Other Event Links', 'tableId' => 'otherevent']);
@@ -193,7 +193,7 @@ class Government extends BaseController
                 date_default_timezone_set('America/New_York');
                 $AppModel = new AppModel();
                 $updatedParts = $AppModel->getLastUpdated()[0];
-                echo view('government_end', ['layers' => $layers, 'primaryLayer' => $primaryLayer, 'state' => $state, 'updatedParts' => $updatedParts, 'showTimeline' => $showTimeline]);
+                echo view('government/end', ['layers' => $layers, 'primaryLayer' => $primaryLayer, 'state' => $state, 'updatedParts' => $updatedParts, 'showTimeline' => $showTimeline]);
                 echo view('leaflet_end');
             }
             echo view('footer');
