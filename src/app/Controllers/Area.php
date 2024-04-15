@@ -166,7 +166,7 @@ class Area extends BaseController
                     'attribution' => $this->data['extraAttribution']
                 ]);
             }
-            echo view('area_end', ['includePoint' => $includePoint]);
+            echo view('area/end', ['includePoint' => $includePoint]);
             echo view('leaflet/end');
             echo view('footer');
         }
