@@ -74,7 +74,7 @@ class Government extends BaseController
             if (!$isHistory) {
                 $query = $SourceCitationModel->getByGovernment($id, $state);
                 if ($query !== []) {
-                    echo view(ENVIRONMENT . '/government_' . $state, ['query' => $query]);
+                    echo view(ENVIRONMENT . '/government/' . $state, ['query' => $query]);
                 }
             }
             if ($hasMap) {
@@ -115,15 +115,15 @@ class Government extends BaseController
                 echo view('governmentsource/table', ['query' => $query, 'state' => $state, 'type' => 'government', 'isMultiple' => $this->data['isMultiple']]);
                 $query = $GovernmentModel->getNote($id, $state);
                 if ($query !== []) {
-                    echo view(ENVIRONMENT . '/government_note', ['query' => $query, 'isMultiple' => $this->data['isMultiple']]);
+                    echo view(ENVIRONMENT . '/government/note', ['query' => $query, 'isMultiple' => $this->data['isMultiple']]);
                 }
                 $query = $GovernmentFormGovernmentModel->getByGovernment($id, $state);
                 if ($query !== []) {
-                    echo view(ENVIRONMENT . '/government_governmentform', ['query' => $query, 'isMultiple' => $this->data['isMultiple']]);
+                    echo view(ENVIRONMENT . '/government/governmentform', ['query' => $query, 'isMultiple' => $this->data['isMultiple']]);
                 }
                 $query = $GovernmentModel->getSchoolDistrict($id, $state);
                 if ($query !== []) {
-                    echo view(ENVIRONMENT . '/government_schooldistrict', ['query' => $query, 'isMultiple' => $this->data['isMultiple']]);
+                    echo view(ENVIRONMENT . '/government/schooldistrict', ['query' => $query, 'isMultiple' => $this->data['isMultiple']]);
                 }
                 $query = $SourceModel->getByGovernment($id);
                 echo view('source/table', ['query' => $query, 'hasLink' => true]);
@@ -139,10 +139,10 @@ class Government extends BaseController
                 }
                 $query = $GovernmentModel->getOffice($id, $state);
                 if ($query !== []) {
-                    echo view(ENVIRONMENT . '/government_office', ['query' => $query, 'isMultiple' => $this->data['isMultiple']]);
+                    echo view(ENVIRONMENT . '/government/office', ['query' => $query, 'isMultiple' => $this->data['isMultiple']]);
                 }
-                if (file_exists(APPPATH . 'Views/' . ENVIRONMENT . '/government_live.php')) {
-                    echo view(ENVIRONMENT . '/government_live', ['id' => $id, 'state' => $state, 'isMunicipalityOrLower' => $isMunicipalityOrLower, 'isCountyOrLower' => $isCountyOrLower, 'isCountyOrState' => $isCountyOrState, 'isState' => $isStateOrHigher, 'includeGovernment' => false]);
+                if (file_exists(APPPATH . 'Views/' . ENVIRONMENT . '/government/live.php')) {
+                    echo view(ENVIRONMENT . '/government/live', ['id' => $id, 'state' => $state, 'isMunicipalityOrLower' => $isMunicipalityOrLower, 'isCountyOrLower' => $isCountyOrLower, 'isCountyOrState' => $isCountyOrState, 'isState' => $isStateOrHigher, 'includeGovernment' => false]);
                 }
                 echo view('core/chartjs', ['query' => $populationQuery, 'xLabel' => 'Year', 'yLabel' => 'Population']);
             }
