@@ -55,15 +55,15 @@ class Law extends BaseController
             }
             $query = $SourceCitationModel->getByLawNation($id);
             if ($query !== []) {
-                echo view(ENVIRONMENT . '/usa_newberrylaw', ['query' => $query]);
+                echo view(ENVIRONMENT . '/usa/newberrylaw', ['query' => $query]);
             }
             $query = $SourceCitationModel->getByLawState($id, $state);
             if ($query !== []) {
-                echo view(ENVIRONMENT . '/ny_law_detail', ['query' => $query]);
+                echo view(ENVIRONMENT . '/law/ny', ['query' => $query]);
             }
             $query = $LawGroupSectionModel->getByLawSection($id, $state);
             if ($query !== []) {
-                echo view(ENVIRONMENT . '/general_lawgroup', ['query' => $query, 'includeForm' => false]);
+                echo view(ENVIRONMENT . '/lawgroup/table', ['query' => $query, 'includeForm' => false]);
             }
             $query = $LawSectionModel->getRelated($id);
             echo view('law/table', ['query' => $query, 'state' => $state, 'title' => 'Related Law', 'type' => 'relationship']);
