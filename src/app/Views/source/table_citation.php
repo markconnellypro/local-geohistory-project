@@ -8,7 +8,7 @@
     <?php if (!isset($omitTitle)) { ?>
         <h2><?= $title ?></h2>
     <?php } ?>
-    <table class="normal cell-border compact stripe">
+    <table class="normal cell-border compact<?= ($hasColor ? '' : ' stripe') ?>">
         <thead>
             <tr>
                 <?php if ($hasLink) { ?>
