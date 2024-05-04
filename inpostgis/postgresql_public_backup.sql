@@ -2713,6 +2713,13 @@ COMMENT ON COLUMN geohistory.governmentsource.governmentsourceapproved IS 'This 
 
 
 --
+-- Name: COLUMN governmentsource.governmentsourceeffectivenotes; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.governmentsource.governmentsourceeffectivenotes IS 'Values in this field associated with governmentsourcetype Election are used for internal tracking purposes are omitted from open data.';
+
+
+--
 -- Name: governmentsourceevent; Type: TABLE; Schema: geohistory; Owner: postgres
 --
 
