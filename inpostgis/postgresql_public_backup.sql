@@ -5113,6 +5113,7 @@ delete: Should be merged into another feature ID.
 full: Spelling and status match.
 historic-alternate: Historic government with correct spelling shown as USGS alternate.
 historic-county: Temporary historic government created after county division.
+historic-error: Government-identifier link created in error.
 historic-match: Secondary records with spelling match.
 historic-missing: Successor current government does not list as USGS alternate (name change).
 historic-obsolete: Historic government with USGS spelling match.
