@@ -1,5 +1,56 @@
 # Changelog
 
+## [2.0.0] - 2024-05-04
+
+### Added
+
+- Additional database comments.
+- Gd extension to PHP.
+- PHP CS Fixer.
+- PHPStan.
+- Rector.
+- Table geohistory.locale.
+
+### Changed
+
+- CodeIgniter from 4.4.3 to 4.5.1.
+- Database to harmonize foreign key constraint properties.
+- DataTables from 1.13.6 to 2.0.6.
+- Default database character set in ENV.
+- Dependencies to consolidate path references in ENV, save licenses in a centralized location, remove dependency files from repository, but auto-populate most current versions on docker-compose up.
+- Dockerfile to accommodate changes to related private repositories.
+- MapLibre GL JS from 3.3.1 to 4.1.3.
+- Open Data links in ENV to split into 2 fields.
+- PMTiles from 2.11.0 to 3.0.5.
+- PostgreSQL from 16.1 to 16.2.
+- Queries in controllers moved to models, and removed as database functions.
+- Standardize some queries to use standard functions instead of custom functions.
+- Stylistic and minor changes to changelog and README.
+- Tables geohistory.adjudicationevent, geohistory.governmentsourceevent, geohistory.lawgroupsection, geohistory.lawsectionevent, and geohistory.recordingevent, to replace columns adjudicationeventrelationship, governmentsourceeventrelationship, lawsectionrelationship, lawsectioneventrelationship, and recordingeventrelationship, respectively, with eventrelationship column with foreign key reference.
+- Table geohistory.event, to add generated columns and remove additional database functions.
+- Table geohistory.event, to change data type for eventgranted column and replace data with foreign key reference.
+- Table geohistory.governmentidentifiertype, to replace column governmentidentifiertypeprefixlength with governmentidentifiertypeprefixlengthfrom and governmentidentifiertypeprefixlengthto, and to replace column governmentidentifiertypelength with governmentidentifiertypelengthfrom and governmentidentifiertypelengthto.
+- Table geohistory.lawgroup, to remove columns eventtype and lawgroupgovernmenttype and replace with new tables geohistory.lawgroupeventtype and geohistory.lawgroupgovernmenttype.
+- Table geohistory.plss, to change data type for plssfirstdivisionpart column.
+- Table geohistory.sourcecitation, to remove sourcecitationdetail column and replace with new tables geohistory.sourcecitationnote and geohistory.sourcecitationnotetype.
+- Table geohistory.source, to remove sourcegovernment column and replace with new table geohistory.sourcegovernment.
+- Views moved into subfolders.
+
+### Fixed
+
+- Changelog link.
+- DataTables color striping issues.
+- DataTables CORS issues.
+- Linting using PHP CS Fixer.
+- Refactoring using PHPStan and Rector.
+
+### Removed
+
+- Database references in controllers.
+- References to additional database functions.
+- In table geohistory.researchlog, internetarchivehandle column.
+- In table geohistory.sourcecitation, sourcecitationnotes column.
+
 ## [1.2.2] - 2023-11-12
 
 ### Added
@@ -191,6 +242,7 @@
 
 - Public release of the Local Geohistory Project: Application repository.
 
+[2.0.0]: https://github.com/localgeohistoryproject/application/compare/v1.2.2...v2.0.0
 [1.2.2]: https://github.com/localgeohistoryproject/application/compare/v1.2.1...v1.2.2
 [1.2.1]: https://github.com/localgeohistoryproject/application/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/localgeohistoryproject/application/compare/v1.1.2...v1.2.0
