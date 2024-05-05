@@ -4,6 +4,7 @@ set -e
 psql --command="CREATE ROLE readonly NOLOGIN;"
 psql --command="CREATE ROLE $POSTGRES_OTHER_USER LOGIN PASSWORD '$POSTGRES_OTHER_PASSWORD';"
 psql --command="GRANT readonly TO $POSTGRES_OTHER_USER;"
+psql --command="GRANT USAGE ON SCHEMA public TO readonly;" $POSTGRES_DB
 psql --command="ALTER DATABASE $POSTGRES_DB SET timezone TO '$TZ';" $POSTGRES_DB
 psql --command="CREATE EXTENSION postgis;" $POSTGRES_DB
 psql --command="CREATE EXTENSION unaccent;" $POSTGRES_DB
@@ -13,5 +14,6 @@ psql --command="DELETE FROM spatial_ref_sys WHERE srid = 100007;  INSERT INTO sp
 psql --command="CREATE EXTENSION pg_tle;" $POSTGRES_DB
 # Install calendar extension
 psql --command="CREATE SCHEMA calendar;" $POSTGRES_DB
+psql --command="GRANT USAGE ON SCHEMA calendar TO readonly;" $POSTGRES_DB
 psql --file="/inpostgis/postgresql_calendar_extension.sql" $POSTGRES_DB
 psql --command="CREATE EXTENSION calendar;" $POSTGRES_DB
