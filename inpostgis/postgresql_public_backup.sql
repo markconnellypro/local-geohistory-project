@@ -12514,63 +12514,63 @@ GRANT ALL ON FUNCTION geohistory.datetonumeric(date) TO readonly;
 -- Name: FUNCTION government_insertupdate(); Type: ACL; Schema: geohistory; Owner: postgres
 --
 
-GRANT ALL ON FUNCTION geohistory.government_insertupdate() TO readonly;
+REVOKE ALL ON FUNCTION geohistory.government_insertupdate() FROM PUBLIC;
 
 
 --
 -- Name: FUNCTION governmentothercurrentparent_insertupdate(); Type: ACL; Schema: geohistory; Owner: postgres
 --
 
-GRANT ALL ON FUNCTION geohistory.governmentothercurrentparent_insertupdate() TO readonly;
+REVOKE ALL ON FUNCTION geohistory.governmentothercurrentparent_insertupdate() FROM PUBLIC;
 
 
 --
 -- Name: FUNCTION law_insertupdate(); Type: ACL; Schema: geohistory; Owner: postgres
 --
 
-GRANT ALL ON FUNCTION geohistory.law_insertupdate() TO readonly;
+REVOKE ALL ON FUNCTION geohistory.law_insertupdate() FROM PUBLIC;
 
 
 --
 -- Name: FUNCTION lawalternate_update(); Type: ACL; Schema: geohistory; Owner: postgres
 --
 
-GRANT ALL ON FUNCTION geohistory.lawalternate_update() TO readonly;
+REVOKE ALL ON FUNCTION geohistory.lawalternate_update() FROM PUBLIC;
 
 
 --
 -- Name: FUNCTION lawalternatesection_insertupdate(); Type: ACL; Schema: geohistory; Owner: postgres
 --
 
-GRANT ALL ON FUNCTION geohistory.lawalternatesection_insertupdate() TO readonly;
+REVOKE ALL ON FUNCTION geohistory.lawalternatesection_insertupdate() FROM PUBLIC;
 
 
 --
 -- Name: FUNCTION lawgroupsection_deleteupdate(); Type: ACL; Schema: geohistory; Owner: postgres
 --
 
-GRANT ALL ON FUNCTION geohistory.lawgroupsection_deleteupdate() TO readonly;
+REVOKE ALL ON FUNCTION geohistory.lawgroupsection_deleteupdate() FROM PUBLIC;
 
 
 --
 -- Name: FUNCTION lawsection_update(); Type: ACL; Schema: geohistory; Owner: postgres
 --
 
-GRANT ALL ON FUNCTION geohistory.lawsection_update() TO readonly;
+REVOKE ALL ON FUNCTION geohistory.lawsection_update() FROM PUBLIC;
 
 
 --
 -- Name: FUNCTION lawsectionevent_insertupdate(); Type: ACL; Schema: geohistory; Owner: postgres
 --
 
-GRANT ALL ON FUNCTION geohistory.lawsectionevent_insertupdate() TO readonly;
+REVOKE ALL ON FUNCTION geohistory.lawsectionevent_insertupdate() FROM PUBLIC;
 
 
 --
 -- Name: FUNCTION metesdescriptionline_insertupdate(); Type: ACL; Schema: geohistory; Owner: postgres
 --
 
-GRANT ALL ON FUNCTION geohistory.metesdescriptionline_insertupdate() TO readonly;
+REVOKE ALL ON FUNCTION geohistory.metesdescriptionline_insertupdate() FROM PUBLIC;
 
 
 --
@@ -12586,21 +12586,20 @@ GRANT ALL ON FUNCTION geohistory.rangeformat(text, text) TO readonly;
 --
 
 REVOKE ALL ON FUNCTION geohistory.source_insert() FROM PUBLIC;
-GRANT ALL ON FUNCTION geohistory.source_insert() TO readonly;
 
 
 --
 -- Name: FUNCTION source_update(); Type: ACL; Schema: geohistory; Owner: postgres
 --
 
-GRANT ALL ON FUNCTION geohistory.source_update() TO readonly;
+REVOKE ALL ON FUNCTION geohistory.source_update() FROM PUBLIC;
 
 
 --
 -- Name: FUNCTION sourcetype_update(); Type: ACL; Schema: geohistory; Owner: postgres
 --
 
-GRANT ALL ON FUNCTION geohistory.sourcetype_update() TO readonly;
+REVOKE ALL ON FUNCTION geohistory.sourcetype_update() FROM PUBLIC;
 
 
 --
@@ -12608,7 +12607,6 @@ GRANT ALL ON FUNCTION geohistory.sourcetype_update() TO readonly;
 --
 
 REVOKE ALL ON FUNCTION gis.governmentshape_delete() FROM PUBLIC;
-GRANT ALL ON FUNCTION gis.governmentshape_delete() TO readonly;
 
 
 --
@@ -12616,7 +12614,6 @@ GRANT ALL ON FUNCTION gis.governmentshape_delete() TO readonly;
 --
 
 REVOKE ALL ON FUNCTION gis.governmentshape_insert() FROM PUBLIC;
-GRANT ALL ON FUNCTION gis.governmentshape_insert() TO readonly;
 
 
 --
