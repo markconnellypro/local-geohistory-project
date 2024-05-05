@@ -51,8 +51,8 @@ class SourceItemPartModel extends Model
                 WHEN sourceitem.sourceitemurlcomplete THEN ''::text
                 ELSE
                 CASE
-                    WHEN sourcecitationpagefrom ~ '^\d+$' THEN sourceitempart.sourceitempartsequencecharacter::text || (sourceitempart.sourceitempartsequence + sourcecitationpagefrom::integer)
-                    ELSE replace(format('%04s', (sourceitempart.sourceitempartsequence)::text), ' ', '0') || || sourceitempart.sourceitempartsequencecharacter::text
+                    WHEN governmentsource.sourcecitationpagefrom ~ '^\d+$' THEN sourceitempart.sourceitempartsequencecharacter::text || (sourceitempart.sourceitempartsequence + governmentsource.sourcecitationpagefrom::integer)
+                    ELSE replace(format('%04s', (sourceitempart.sourceitempartsequence)::text), ' ', '0') || sourceitempart.sourceitempartsequencecharacter::text
                 END || sourceitempart.sourceitempartsequencecharacterafter::text
             END AS url
             FROM geohistory.governmentsource
