@@ -14,26 +14,27 @@
 ### Changed
 
 - CodeIgniter from 4.4.3 to 4.5.1.
+- Database extract pg_dump and OS versions.
 - Database to harmonize foreign key constraint properties.
 - DataTables from 1.13.6 to 2.0.6.
 - Default database character set in ENV.
-- Dependencies to consolidate path references in ENV, save licenses in a centralized location, remove dependency files from repository, but auto-populate most current versions on docker-compose up.
+- Dependencies to consolidate path references in ENV, remove dependency files except licenses from repository, but auto-populate most current versions on docker-compose up.
 - Dockerfile to accommodate changes to related private repositories.
+- Elevation tiles to be retrieved in development environment when not online.
 - MapLibre GL JS from 3.3.1 to 4.1.3.
 - Open Data links in ENV to split into 2 fields.
 - PMTiles from 2.11.0 to 3.0.5.
-- PostgreSQL from 16.1 to 16.2.
 - Queries in controllers moved to models, and removed as database functions.
 - Standardize some queries to use standard functions instead of custom functions.
 - Stylistic and minor changes to changelog and README.
-- Tables geohistory.adjudicationevent, geohistory.governmentsourceevent, geohistory.lawgroupsection, geohistory.lawsectionevent, and geohistory.recordingevent, to replace columns adjudicationeventrelationship, governmentsourceeventrelationship, lawsectionrelationship, lawsectioneventrelationship, and recordingeventrelationship, respectively, with eventrelationship column with foreign key reference.
-- Table geohistory.event, to add generated columns and remove additional database functions.
+- Table geohistory.event, to add generated columns and remove additional database functions related to the table.
 - Table geohistory.event, to change data type for eventgranted column and replace data with foreign key reference.
 - Table geohistory.governmentidentifiertype, to replace column governmentidentifiertypeprefixlength with governmentidentifiertypeprefixlengthfrom and governmentidentifiertypeprefixlengthto, and to replace column governmentidentifiertypelength with governmentidentifiertypelengthfrom and governmentidentifiertypelengthto.
 - Table geohistory.lawgroup, to remove columns eventtype and lawgroupgovernmenttype and replace with new tables geohistory.lawgroupeventtype and geohistory.lawgroupgovernmenttype.
 - Table geohistory.plss, to change data type for plssfirstdivisionpart column.
-- Table geohistory.sourcecitation, to remove sourcecitationdetail column and replace with new tables geohistory.sourcecitationnote and geohistory.sourcecitationnotetype.
 - Table geohistory.source, to remove sourcegovernment column and replace with new table geohistory.sourcegovernment.
+- Table geohistory.sourcecitation, to remove sourcecitationdetail column and replace with new tables geohistory.sourcecitationnote and geohistory.sourcecitationnotetype.
+- Tables geohistory.adjudicationevent, geohistory.governmentsourceevent, geohistory.lawgroupsection, geohistory.lawsectionevent, and geohistory.recordingevent, to replace columns adjudicationeventrelationship, governmentsourceeventrelationship, lawsectionrelationship, lawsectioneventrelationship, and recordingeventrelationship, respectively, with eventrelationship column with foreign key reference.
 - Views moved into subfolders.
 
 ### Fixed
@@ -47,9 +48,10 @@
 ### Removed
 
 - Database references in controllers.
-- References to additional database functions.
+- References to additional database functions in models.
 - In table geohistory.researchlog, internetarchivehandle column.
 - In table geohistory.sourcecitation, sourcecitationnotes column.
+- Twitterbot from robots.txt whitelist.
 
 ## [1.2.2] - 2023-11-12
 
