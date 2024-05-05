@@ -1,7 +1,7 @@
 SELECT pgtle.install_extension
 (
  'calendar',
- '1.6',
+ '1.7',
  'Support for non-standard calendars.',
 $_pg_tle_$
 
@@ -146,7 +146,7 @@ CREATE TYPE calendar.yearmonthday AS (
 --
 
 CREATE FUNCTION calendar.date(historicdate calendar.historicdate) RETURNS date
-    LANGUAGE plpgsql IMMUTABLE
+    LANGUAGE plpgsql IMMUTABLE SECURITY DEFINER
     AS $$
 
     BEGIN
@@ -158,7 +158,7 @@ CREATE FUNCTION calendar.date(historicdate calendar.historicdate) RETURNS date
 $$;
 
 CREATE FUNCTION calendar.historicdate_difference(historicdate1 calendar.historicdate, historicdate2 calendar.historicdate) RETURNS double precision
-    LANGUAGE sql IMMUTABLE
+    LANGUAGE sql IMMUTABLE SECURITY DEFINER
     AS $$
     SELECT cast(
       CASE
@@ -184,7 +184,7 @@ CREATE TYPE calendar.historicdaterange AS RANGE (
 --
 
 CREATE FUNCTION calendar.hebrewfirst(year integer) RETURNS integer
-    LANGUAGE plpgsql IMMUTABLE
+    LANGUAGE plpgsql IMMUTABLE SECURITY DEFINER
     AS $$
 
     /*
@@ -230,7 +230,7 @@ CREATE FUNCTION calendar.hebrewfirst(year integer) RETURNS integer
 $$;
 
 CREATE FUNCTION calendar.yearmonthday(gregorian date, typeidchar "char") RETURNS calendar.yearmonthday
-    LANGUAGE plpgsql IMMUTABLE
+    LANGUAGE plpgsql IMMUTABLE SECURITY DEFINER
     AS $$
 
     /*
@@ -375,7 +375,7 @@ CREATE FUNCTION calendar.yearmonthday(gregorian date, typeidchar "char") RETURNS
 $$;
 
 CREATE FUNCTION calendar.yearmonthday(historicdate calendar.historicdate) RETURNS calendar.yearmonthday
-    LANGUAGE plpgsql IMMUTABLE
+    LANGUAGE plpgsql IMMUTABLE SECURITY DEFINER
     AS $$
 
     /*
@@ -448,7 +448,7 @@ CREATE FUNCTION calendar.yearmonthday(historicdate calendar.historicdate) RETURN
 $$;
 
 CREATE FUNCTION calendar.date(yearmonthday calendar.yearmonthday, typeidchar "char") RETURNS date
-    LANGUAGE plpgsql IMMUTABLE
+    LANGUAGE plpgsql IMMUTABLE SECURITY DEFINER
     AS $$
 
     /*
@@ -561,7 +561,7 @@ CREATE FUNCTION calendar.date(yearmonthday calendar.yearmonthday, typeidchar "ch
 $$;
 
 CREATE FUNCTION calendar.historicdatetext(historicdate calendar.historicdate) RETURNS text
-    LANGUAGE plpgsql IMMUTABLE
+    LANGUAGE plpgsql IMMUTABLE SECURITY DEFINER
     AS $$
 
     /*
@@ -703,7 +703,7 @@ $$;
 --
 
 CREATE FUNCTION calendar.daterange(historicdaterange calendar.historicdaterange) RETURNS daterange
-    LANGUAGE plpgsql IMMUTABLE
+    LANGUAGE plpgsql IMMUTABLE SECURITY DEFINER
     AS $$
 
     BEGIN
@@ -715,7 +715,7 @@ CREATE FUNCTION calendar.daterange(historicdaterange calendar.historicdaterange)
 $$;
 
 CREATE FUNCTION calendar.historicdate(datetext text) RETURNS calendar.historicdate
-    LANGUAGE plpgsql IMMUTABLE
+    LANGUAGE plpgsql IMMUTABLE SECURITY DEFINER
     AS $$
 
     /*
@@ -982,7 +982,7 @@ CREATE FUNCTION calendar.historicdate(datetext text) RETURNS calendar.historicda
 $$;
 
 CREATE FUNCTION calendar.historicdate(monarchname text, regnalyearnumbervalue integer, month integer, day integer, partidvalue text) RETURNS calendar.historicdate
-    LANGUAGE plpgsql IMMUTABLE
+    LANGUAGE plpgsql IMMUTABLE SECURITY DEFINER
     AS $$
 
     /*
@@ -1063,7 +1063,7 @@ CREATE FUNCTION calendar.historicdate(monarchname text, regnalyearnumbervalue in
 $$;
 
 CREATE FUNCTION calendar.historicdatetextformat(historicdate calendar.historicdate, formattype text, localecode text) RETURNS text
-    LANGUAGE plpgsql IMMUTABLE
+    LANGUAGE plpgsql IMMUTABLE SECURITY DEFINER
     AS $$
 
     /*
@@ -1237,7 +1237,7 @@ CREATE FUNCTION calendar.historicdatetextformat(historicdate calendar.historicda
 $$;
 
 CREATE FUNCTION calendar.historicdaterange(daterangetext text) RETURNS calendar.historicdaterange
-    LANGUAGE plpgsql IMMUTABLE
+    LANGUAGE plpgsql IMMUTABLE SECURITY DEFINER
     AS $$
 
     /*
@@ -1349,7 +1349,7 @@ CREATE FUNCTION calendar.historicdaterange(daterangetext text) RETURNS calendar.
 $$;
 
 CREATE FUNCTION calendar.historicdaterangetext(historicdaterange calendar.historicdaterange) RETURNS text
-    LANGUAGE plpgsql IMMUTABLE
+    LANGUAGE plpgsql IMMUTABLE SECURITY DEFINER
     AS $$
 
     /*
@@ -1406,7 +1406,7 @@ CREATE FUNCTION calendar.historicdaterangetext(historicdaterange calendar.histor
 $$;
 
 CREATE FUNCTION calendar.historicdaterangetextformat(historicdaterange calendar.historicdaterange, formattype text, localecode text) RETURNS text
-    LANGUAGE plpgsql IMMUTABLE
+    LANGUAGE plpgsql IMMUTABLE SECURITY DEFINER
     AS $$
 
     /*
@@ -1464,7 +1464,7 @@ CREATE FUNCTION calendar.historicdaterangetextformat(historicdaterange calendar.
 $$;
 
 CREATE FUNCTION calendar.regnalyeartext(historicdate calendar.historicdate) RETURNS text
-    LANGUAGE plpgsql IMMUTABLE
+    LANGUAGE plpgsql IMMUTABLE SECURITY DEFINER
     AS $$
 
     /*
@@ -3297,7 +3297,7 @@ CREATE CAST (text AS calendar.historicdaterange)
 --
 
 CREATE FUNCTION calendar.is_historicdate(text) RETURNS boolean
-    LANGUAGE plpgsql IMMUTABLE
+    LANGUAGE plpgsql IMMUTABLE SECURITY DEFINER
     AS $$
 
 DECLARE
@@ -3316,7 +3316,7 @@ end;
 $$;
 
 CREATE FUNCTION calendar.is_historicdaterange(text) RETURNS boolean
-    LANGUAGE plpgsql IMMUTABLE
+    LANGUAGE plpgsql IMMUTABLE SECURITY DEFINER
     AS $$
 
 BEGIN
