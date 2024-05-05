@@ -66,7 +66,7 @@ class Event extends BaseController
             if ($hasMap) {
                 echo view('core/map', ['includeBase' => true, 'eventIsMapped' => $eventIsMapped]);
             }
-            if (count($affectedGovernment) > 0) {
+            if (isset($affectedGovernment['rows']) && count($affectedGovernment['rows']) > 0) {
                 echo view('event/table_affectedgovernment', ['affectedGovernment' => $affectedGovernment, 'state' => $state, 'includeDate' => false, 'isComplete' => true]);
             }
             $query = $AffectedGovernmentGroupModel->getByEventForm($id, $state);
