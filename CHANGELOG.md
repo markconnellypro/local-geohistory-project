@@ -1,5 +1,15 @@
 # Changelog
 
+## [2.0.1] - 2024-05-05
+
+### Changed
+
+- MapLibre GL JS from 4.1.3 to 4.2.0.
+
+### Fixed
+
+- Database permissions issues for readonly group, including allowing use of schemas, direct assignment of permissions to functions and tables in some schemas, and adding SECURITY DEFINER to calendar extension (extension version 1.6 -> 1.7).
+
 ## [2.0.0] - 2024-05-04
 
 ### Added
@@ -244,6 +254,7 @@
 
 - Public release of the Local Geohistory Project: Application repository.
 
+[2.0.1]: https://github.com/localgeohistoryproject/application/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/localgeohistoryproject/application/compare/v1.2.2...v2.0.0
 [1.2.2]: https://github.com/localgeohistoryproject/application/compare/v1.2.1...v1.2.2
 [1.2.1]: https://github.com/localgeohistoryproject/application/compare/v1.2.0...v1.2.1
