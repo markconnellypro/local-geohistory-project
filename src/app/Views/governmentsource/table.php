@@ -11,7 +11,7 @@
                 <?php if ($type !== 'source') { ?>
                     <th>Detail</th>
                 <?php }
-                if ($type !== 'government' || !$isMultiple) { ?>
+                if ($type === 'government' && $isMultiple) { ?>
                     <th>Government</th>
                 <?php } ?>
                 <th>Action</th>
@@ -37,7 +37,7 @@
                                 } ?>
                         </td>
                     <?php }
-                    if ($type !== 'government' || !$isMultiple) { ?>
+                    if ($type === 'government' && $isMultiple) { ?>
                         <td><?php echo view('core/link', ['link' => $row->government, 'text' => $row->governmentlong]); ?></td>
                     <?php } ?>
                     <td><span class="b">
