@@ -11996,10 +11996,25 @@ GRANT USAGE ON SCHEMA extra TO readonly;
 
 
 --
+-- Name: SCHEMA geohistory; Type: ACL; Schema: -; Owner: postgres
+--
+
+GRANT USAGE ON SCHEMA geohistory TO readonly;
+
+
+--
+-- Name: SCHEMA gis; Type: ACL; Schema: -; Owner: postgres
+--
+
+GRANT USAGE ON SCHEMA gis TO readonly;
+
+
+--
 -- Name: FUNCTION affectedtypeshort(integer); Type: ACL; Schema: extra; Owner: postgres
 --
 
 REVOKE ALL ON FUNCTION extra.affectedtypeshort(integer) FROM PUBLIC;
+GRANT ALL ON FUNCTION extra.affectedtypeshort(integer) TO readonly;
 
 
 --
@@ -12007,6 +12022,7 @@ REVOKE ALL ON FUNCTION extra.affectedtypeshort(integer) FROM PUBLIC;
 --
 
 REVOKE ALL ON FUNCTION extra.array_combine(integer[]) FROM PUBLIC;
+GRANT ALL ON FUNCTION extra.array_combine(integer[]) TO readonly;
 
 
 --
@@ -12014,6 +12030,7 @@ REVOKE ALL ON FUNCTION extra.array_combine(integer[]) FROM PUBLIC;
 --
 
 REVOKE ALL ON FUNCTION extra.emptytonull(text) FROM PUBLIC;
+GRANT ALL ON FUNCTION extra.emptytonull(text) TO readonly;
 
 
 --
@@ -12021,6 +12038,7 @@ REVOKE ALL ON FUNCTION extra.emptytonull(text) FROM PUBLIC;
 --
 
 REVOKE ALL ON FUNCTION extra.eventeffectivetype(integer) FROM PUBLIC;
+GRANT ALL ON FUNCTION extra.eventeffectivetype(integer) TO readonly;
 
 
 --
@@ -12028,6 +12046,7 @@ REVOKE ALL ON FUNCTION extra.eventeffectivetype(integer) FROM PUBLIC;
 --
 
 REVOKE ALL ON FUNCTION extra.eventeffectivetype(eventeffectivetypegroup character varying, eventeffectivetypequalifier character varying) FROM PUBLIC;
+GRANT ALL ON FUNCTION extra.eventeffectivetype(eventeffectivetypegroup character varying, eventeffectivetypequalifier character varying) TO readonly;
 
 
 --
@@ -12035,6 +12054,7 @@ REVOKE ALL ON FUNCTION extra.eventeffectivetype(eventeffectivetypegroup characte
 --
 
 REVOKE ALL ON FUNCTION extra.fulldate(text) FROM PUBLIC;
+GRANT ALL ON FUNCTION extra.fulldate(text) TO readonly;
 
 
 --
@@ -12042,6 +12062,7 @@ REVOKE ALL ON FUNCTION extra.fulldate(text) FROM PUBLIC;
 --
 
 REVOKE ALL ON FUNCTION extra.governmentabbreviation(integer) FROM PUBLIC;
+GRANT ALL ON FUNCTION extra.governmentabbreviation(integer) TO readonly;
 
 
 --
@@ -12049,6 +12070,7 @@ REVOKE ALL ON FUNCTION extra.governmentabbreviation(integer) FROM PUBLIC;
 --
 
 REVOKE ALL ON FUNCTION extra.governmentabbreviation(integer, character varying) FROM PUBLIC;
+GRANT ALL ON FUNCTION extra.governmentabbreviation(integer, character varying) TO readonly;
 
 
 --
@@ -12056,6 +12078,7 @@ REVOKE ALL ON FUNCTION extra.governmentabbreviation(integer, character varying) 
 --
 
 REVOKE ALL ON FUNCTION extra.governmentabbreviationid(text) FROM PUBLIC;
+GRANT ALL ON FUNCTION extra.governmentabbreviationid(text) TO readonly;
 
 
 --
@@ -12063,6 +12086,7 @@ REVOKE ALL ON FUNCTION extra.governmentabbreviationid(text) FROM PUBLIC;
 --
 
 REVOKE ALL ON FUNCTION extra.governmentcurrentleadparent(integer) FROM PUBLIC;
+GRANT ALL ON FUNCTION extra.governmentcurrentleadparent(integer) TO readonly;
 
 
 --
@@ -12070,6 +12094,7 @@ REVOKE ALL ON FUNCTION extra.governmentcurrentleadparent(integer) FROM PUBLIC;
 --
 
 REVOKE ALL ON FUNCTION extra.governmentcurrentleadstateid(integer) FROM PUBLIC;
+GRANT ALL ON FUNCTION extra.governmentcurrentleadstateid(integer) TO readonly;
 
 
 --
@@ -12077,6 +12102,7 @@ REVOKE ALL ON FUNCTION extra.governmentcurrentleadstateid(integer) FROM PUBLIC;
 --
 
 REVOKE ALL ON FUNCTION extra.governmentformlong(integer) FROM PUBLIC;
+GRANT ALL ON FUNCTION extra.governmentformlong(integer) TO readonly;
 
 
 --
@@ -12084,6 +12110,7 @@ REVOKE ALL ON FUNCTION extra.governmentformlong(integer) FROM PUBLIC;
 --
 
 REVOKE ALL ON FUNCTION extra.governmentformlong(integer, boolean) FROM PUBLIC;
+GRANT ALL ON FUNCTION extra.governmentformlong(integer, boolean) TO readonly;
 
 
 --
@@ -12091,6 +12118,7 @@ REVOKE ALL ON FUNCTION extra.governmentformlong(integer, boolean) FROM PUBLIC;
 --
 
 REVOKE ALL ON FUNCTION extra.governmentformlongreport(integer) FROM PUBLIC;
+GRANT ALL ON FUNCTION extra.governmentformlongreport(integer) TO readonly;
 
 
 --
@@ -12098,6 +12126,7 @@ REVOKE ALL ON FUNCTION extra.governmentformlongreport(integer) FROM PUBLIC;
 --
 
 REVOKE ALL ON FUNCTION extra.governmentindigobook(integer) FROM PUBLIC;
+GRANT ALL ON FUNCTION extra.governmentindigobook(integer) TO readonly;
 
 
 --
@@ -12105,6 +12134,7 @@ REVOKE ALL ON FUNCTION extra.governmentindigobook(integer) FROM PUBLIC;
 --
 
 REVOKE ALL ON FUNCTION extra.governmentindigobook(integer, character varying) FROM PUBLIC;
+GRANT ALL ON FUNCTION extra.governmentindigobook(integer, character varying) TO readonly;
 
 
 --
@@ -12112,6 +12142,7 @@ REVOKE ALL ON FUNCTION extra.governmentindigobook(integer, character varying) FR
 --
 
 REVOKE ALL ON FUNCTION extra.governmentlevel(integer) FROM PUBLIC;
+GRANT ALL ON FUNCTION extra.governmentlevel(integer) TO readonly;
 
 
 --
@@ -12119,6 +12150,7 @@ REVOKE ALL ON FUNCTION extra.governmentlevel(integer) FROM PUBLIC;
 --
 
 REVOKE ALL ON FUNCTION extra.governmentlong(integer) FROM PUBLIC;
+GRANT ALL ON FUNCTION extra.governmentlong(integer) TO readonly;
 
 
 --
@@ -12126,6 +12158,7 @@ REVOKE ALL ON FUNCTION extra.governmentlong(integer) FROM PUBLIC;
 --
 
 REVOKE ALL ON FUNCTION extra.governmentlong(integer, character varying) FROM PUBLIC;
+GRANT ALL ON FUNCTION extra.governmentlong(integer, character varying) TO readonly;
 
 
 --
@@ -12133,6 +12166,7 @@ REVOKE ALL ON FUNCTION extra.governmentlong(integer, character varying) FROM PUB
 --
 
 REVOKE ALL ON FUNCTION extra.governmentname(integer) FROM PUBLIC;
+GRANT ALL ON FUNCTION extra.governmentname(integer) TO readonly;
 
 
 --
@@ -12140,6 +12174,7 @@ REVOKE ALL ON FUNCTION extra.governmentname(integer) FROM PUBLIC;
 --
 
 REVOKE ALL ON FUNCTION extra.governmentshapeslugid(text) FROM PUBLIC;
+GRANT ALL ON FUNCTION extra.governmentshapeslugid(text) TO readonly;
 
 
 --
@@ -12147,6 +12182,7 @@ REVOKE ALL ON FUNCTION extra.governmentshapeslugid(text) FROM PUBLIC;
 --
 
 REVOKE ALL ON FUNCTION extra.governmentshort(integer) FROM PUBLIC;
+GRANT ALL ON FUNCTION extra.governmentshort(integer) TO readonly;
 
 
 --
@@ -12154,6 +12190,7 @@ REVOKE ALL ON FUNCTION extra.governmentshort(integer) FROM PUBLIC;
 --
 
 REVOKE ALL ON FUNCTION extra.governmentshort(integer, character varying) FROM PUBLIC;
+GRANT ALL ON FUNCTION extra.governmentshort(integer, character varying) TO readonly;
 
 
 --
@@ -12161,6 +12198,7 @@ REVOKE ALL ON FUNCTION extra.governmentshort(integer, character varying) FROM PU
 --
 
 REVOKE ALL ON FUNCTION extra.governmentslug(integer) FROM PUBLIC;
+GRANT ALL ON FUNCTION extra.governmentslug(integer) TO readonly;
 
 
 --
@@ -12168,6 +12206,7 @@ REVOKE ALL ON FUNCTION extra.governmentslug(integer) FROM PUBLIC;
 --
 
 REVOKE ALL ON FUNCTION extra.governmentslugalternate(integer) FROM PUBLIC;
+GRANT ALL ON FUNCTION extra.governmentslugalternate(integer) TO readonly;
 
 
 --
@@ -12175,6 +12214,7 @@ REVOKE ALL ON FUNCTION extra.governmentslugalternate(integer) FROM PUBLIC;
 --
 
 REVOKE ALL ON FUNCTION extra.governmentstate(integer) FROM PUBLIC;
+GRANT ALL ON FUNCTION extra.governmentstate(integer) TO readonly;
 
 
 --
@@ -12182,6 +12222,7 @@ REVOKE ALL ON FUNCTION extra.governmentstate(integer) FROM PUBLIC;
 --
 
 REVOKE ALL ON FUNCTION extra.governmentstatelink(integer) FROM PUBLIC;
+GRANT ALL ON FUNCTION extra.governmentstatelink(integer) TO readonly;
 
 
 --
@@ -12189,6 +12230,7 @@ REVOKE ALL ON FUNCTION extra.governmentstatelink(integer) FROM PUBLIC;
 --
 
 REVOKE ALL ON FUNCTION extra.governmentstatelink(v_governmentid integer, v_state character varying, v_locale character varying) FROM PUBLIC;
+GRANT ALL ON FUNCTION extra.governmentstatelink(v_governmentid integer, v_state character varying, v_locale character varying) TO readonly;
 
 
 --
@@ -12196,6 +12238,7 @@ REVOKE ALL ON FUNCTION extra.governmentstatelink(v_governmentid integer, v_state
 --
 
 REVOKE ALL ON FUNCTION extra.governmentstatus(integer) FROM PUBLIC;
+GRANT ALL ON FUNCTION extra.governmentstatus(integer) TO readonly;
 
 
 --
@@ -12203,6 +12246,7 @@ REVOKE ALL ON FUNCTION extra.governmentstatus(integer) FROM PUBLIC;
 --
 
 REVOKE ALL ON FUNCTION extra.governmentsubstitutedcache(integer) FROM PUBLIC;
+GRANT ALL ON FUNCTION extra.governmentsubstitutedcache(integer) TO readonly;
 
 
 --
@@ -12210,6 +12254,7 @@ REVOKE ALL ON FUNCTION extra.governmentsubstitutedcache(integer) FROM PUBLIC;
 --
 
 REVOKE ALL ON FUNCTION extra.governmenttype(integer) FROM PUBLIC;
+GRANT ALL ON FUNCTION extra.governmenttype(integer) TO readonly;
 
 
 --
@@ -12217,6 +12262,7 @@ REVOKE ALL ON FUNCTION extra.governmenttype(integer) FROM PUBLIC;
 --
 
 REVOKE ALL ON FUNCTION extra.lawalternatecitation(integer) FROM PUBLIC;
+GRANT ALL ON FUNCTION extra.lawalternatecitation(integer) TO readonly;
 
 
 --
@@ -12224,6 +12270,7 @@ REVOKE ALL ON FUNCTION extra.lawalternatecitation(integer) FROM PUBLIC;
 --
 
 REVOKE ALL ON FUNCTION extra.lawalternatecitation(integer, boolean) FROM PUBLIC;
+GRANT ALL ON FUNCTION extra.lawalternatecitation(integer, boolean) TO readonly;
 
 
 --
@@ -12231,6 +12278,7 @@ REVOKE ALL ON FUNCTION extra.lawalternatecitation(integer, boolean) FROM PUBLIC;
 --
 
 REVOKE ALL ON FUNCTION extra.lawalternatesectioncitation(integer) FROM PUBLIC;
+GRANT ALL ON FUNCTION extra.lawalternatesectioncitation(integer) TO readonly;
 
 
 --
@@ -12238,6 +12286,7 @@ REVOKE ALL ON FUNCTION extra.lawalternatesectioncitation(integer) FROM PUBLIC;
 --
 
 REVOKE ALL ON FUNCTION extra.lawalternatesectioncitation(integer, boolean) FROM PUBLIC;
+GRANT ALL ON FUNCTION extra.lawalternatesectioncitation(integer, boolean) TO readonly;
 
 
 --
@@ -12245,6 +12294,7 @@ REVOKE ALL ON FUNCTION extra.lawalternatesectioncitation(integer, boolean) FROM 
 --
 
 REVOKE ALL ON FUNCTION extra.lawalternatesectionslug(integer) FROM PUBLIC;
+GRANT ALL ON FUNCTION extra.lawalternatesectionslug(integer) TO readonly;
 
 
 --
@@ -12252,6 +12302,7 @@ REVOKE ALL ON FUNCTION extra.lawalternatesectionslug(integer) FROM PUBLIC;
 --
 
 REVOKE ALL ON FUNCTION extra.lawcitation(integer) FROM PUBLIC;
+GRANT ALL ON FUNCTION extra.lawcitation(integer) TO readonly;
 
 
 --
@@ -12259,6 +12310,7 @@ REVOKE ALL ON FUNCTION extra.lawcitation(integer) FROM PUBLIC;
 --
 
 REVOKE ALL ON FUNCTION extra.lawcitation(integer, boolean) FROM PUBLIC;
+GRANT ALL ON FUNCTION extra.lawcitation(integer, boolean) TO readonly;
 
 
 --
@@ -12266,6 +12318,7 @@ REVOKE ALL ON FUNCTION extra.lawcitation(integer, boolean) FROM PUBLIC;
 --
 
 REVOKE ALL ON FUNCTION extra.lawsectioncitation(integer) FROM PUBLIC;
+GRANT ALL ON FUNCTION extra.lawsectioncitation(integer) TO readonly;
 
 
 --
@@ -12273,6 +12326,7 @@ REVOKE ALL ON FUNCTION extra.lawsectioncitation(integer) FROM PUBLIC;
 --
 
 REVOKE ALL ON FUNCTION extra.lawsectioncitation(integer, boolean) FROM PUBLIC;
+GRANT ALL ON FUNCTION extra.lawsectioncitation(integer, boolean) TO readonly;
 
 
 --
@@ -12280,6 +12334,7 @@ REVOKE ALL ON FUNCTION extra.lawsectioncitation(integer, boolean) FROM PUBLIC;
 --
 
 REVOKE ALL ON FUNCTION extra.lawsectionslug(integer) FROM PUBLIC;
+GRANT ALL ON FUNCTION extra.lawsectionslug(integer) TO readonly;
 
 
 --
@@ -12287,6 +12342,7 @@ REVOKE ALL ON FUNCTION extra.lawsectionslug(integer) FROM PUBLIC;
 --
 
 REVOKE ALL ON FUNCTION extra.metesdescriptionlong(integer) FROM PUBLIC;
+GRANT ALL ON FUNCTION extra.metesdescriptionlong(integer) TO readonly;
 
 
 --
@@ -12294,6 +12350,7 @@ REVOKE ALL ON FUNCTION extra.metesdescriptionlong(integer) FROM PUBLIC;
 --
 
 REVOKE ALL ON FUNCTION extra.metesdescriptionslug(integer) FROM PUBLIC;
+GRANT ALL ON FUNCTION extra.metesdescriptionslug(integer) TO readonly;
 
 
 --
@@ -12301,6 +12358,7 @@ REVOKE ALL ON FUNCTION extra.metesdescriptionslug(integer) FROM PUBLIC;
 --
 
 REVOKE ALL ON FUNCTION extra.plsstownshiplong(integer) FROM PUBLIC;
+GRANT ALL ON FUNCTION extra.plsstownshiplong(integer) TO readonly;
 
 
 --
@@ -12308,6 +12366,7 @@ REVOKE ALL ON FUNCTION extra.plsstownshiplong(integer) FROM PUBLIC;
 --
 
 REVOKE ALL ON FUNCTION extra.plsstownshipshort(integer) FROM PUBLIC;
+GRANT ALL ON FUNCTION extra.plsstownshipshort(integer) TO readonly;
 
 
 --
@@ -12315,6 +12374,7 @@ REVOKE ALL ON FUNCTION extra.plsstownshipshort(integer) FROM PUBLIC;
 --
 
 REVOKE ALL ON FUNCTION extra.punctuationhyphen(text) FROM PUBLIC;
+GRANT ALL ON FUNCTION extra.punctuationhyphen(text) TO readonly;
 
 
 --
@@ -12322,6 +12382,15 @@ REVOKE ALL ON FUNCTION extra.punctuationhyphen(text) FROM PUBLIC;
 --
 
 REVOKE ALL ON FUNCTION extra.punctuationnone(text) FROM PUBLIC;
+GRANT ALL ON FUNCTION extra.punctuationnone(text) TO readonly;
+
+
+--
+-- Name: FUNCTION punctuationnonefuzzy(text); Type: ACL; Schema: extra; Owner: postgres
+--
+
+REVOKE ALL ON FUNCTION extra.punctuationnonefuzzy(text) FROM PUBLIC;
+GRANT ALL ON FUNCTION extra.punctuationnonefuzzy(text) TO readonly;
 
 
 --
@@ -12329,6 +12398,14 @@ REVOKE ALL ON FUNCTION extra.punctuationnone(text) FROM PUBLIC;
 --
 
 REVOKE ALL ON FUNCTION extra.rangefix(text, text) FROM PUBLIC;
+GRANT ALL ON FUNCTION extra.rangefix(text, text) TO readonly;
+
+
+--
+-- Name: FUNCTION refresh_sequence(); Type: ACL; Schema: extra; Owner: postgres
+--
+
+REVOKE ALL ON FUNCTION extra.refresh_sequence() FROM PUBLIC;
 
 
 --
@@ -12350,6 +12427,7 @@ REVOKE ALL ON FUNCTION extra.refresh_view_quick() FROM PUBLIC;
 --
 
 REVOKE ALL ON FUNCTION extra.shortdate(text) FROM PUBLIC;
+GRANT ALL ON FUNCTION extra.shortdate(text) TO readonly;
 
 
 --
@@ -12357,6 +12435,7 @@ REVOKE ALL ON FUNCTION extra.shortdate(text) FROM PUBLIC;
 --
 
 REVOKE ALL ON FUNCTION extra.sourceurlid(integer) FROM PUBLIC;
+GRANT ALL ON FUNCTION extra.sourceurlid(integer) TO readonly;
 
 
 --
@@ -12364,6 +12443,7 @@ REVOKE ALL ON FUNCTION extra.sourceurlid(integer) FROM PUBLIC;
 --
 
 REVOKE ALL ON FUNCTION extra.tribunalfilingoffice(integer) FROM PUBLIC;
+GRANT ALL ON FUNCTION extra.tribunalfilingoffice(integer) TO readonly;
 
 
 --
@@ -12371,6 +12451,7 @@ REVOKE ALL ON FUNCTION extra.tribunalfilingoffice(integer) FROM PUBLIC;
 --
 
 REVOKE ALL ON FUNCTION extra.tribunalgovernmentshort(integer) FROM PUBLIC;
+GRANT ALL ON FUNCTION extra.tribunalgovernmentshort(integer) TO readonly;
 
 
 --
@@ -12378,6 +12459,7 @@ REVOKE ALL ON FUNCTION extra.tribunalgovernmentshort(integer) FROM PUBLIC;
 --
 
 REVOKE ALL ON FUNCTION extra.tribunalgovernmentshort(integer, character varying) FROM PUBLIC;
+GRANT ALL ON FUNCTION extra.tribunalgovernmentshort(integer, character varying) TO readonly;
 
 
 --
@@ -12385,6 +12467,7 @@ REVOKE ALL ON FUNCTION extra.tribunalgovernmentshort(integer, character varying)
 --
 
 REVOKE ALL ON FUNCTION extra.tribunalgovernmentshort(integer, character varying, boolean) FROM PUBLIC;
+GRANT ALL ON FUNCTION extra.tribunalgovernmentshort(integer, character varying, boolean) TO readonly;
 
 
 --
@@ -12392,6 +12475,7 @@ REVOKE ALL ON FUNCTION extra.tribunalgovernmentshort(integer, character varying,
 --
 
 REVOKE ALL ON FUNCTION extra.tribunallong(integer) FROM PUBLIC;
+GRANT ALL ON FUNCTION extra.tribunallong(integer) TO readonly;
 
 
 --
@@ -12399,6 +12483,7 @@ REVOKE ALL ON FUNCTION extra.tribunallong(integer) FROM PUBLIC;
 --
 
 REVOKE ALL ON FUNCTION extra.tribunalshort(integer) FROM PUBLIC;
+GRANT ALL ON FUNCTION extra.tribunalshort(integer) TO readonly;
 
 
 --
@@ -12406,6 +12491,7 @@ REVOKE ALL ON FUNCTION extra.tribunalshort(integer) FROM PUBLIC;
 --
 
 REVOKE ALL ON FUNCTION extra.tribunalshort(integer, character varying) FROM PUBLIC;
+GRANT ALL ON FUNCTION extra.tribunalshort(integer, character varying) TO readonly;
 
 
 --
@@ -12413,6 +12499,7 @@ REVOKE ALL ON FUNCTION extra.tribunalshort(integer, character varying) FROM PUBL
 --
 
 REVOKE ALL ON FUNCTION extra.tribunalshort(integer, integer, character varying) FROM PUBLIC;
+GRANT ALL ON FUNCTION extra.tribunalshort(integer, integer, character varying) TO readonly;
 
 
 --
@@ -12420,6 +12507,70 @@ REVOKE ALL ON FUNCTION extra.tribunalshort(integer, integer, character varying) 
 --
 
 REVOKE ALL ON FUNCTION geohistory.datetonumeric(date) FROM PUBLIC;
+GRANT ALL ON FUNCTION geohistory.datetonumeric(date) TO readonly;
+
+
+--
+-- Name: FUNCTION government_insertupdate(); Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT ALL ON FUNCTION geohistory.government_insertupdate() TO readonly;
+
+
+--
+-- Name: FUNCTION governmentothercurrentparent_insertupdate(); Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT ALL ON FUNCTION geohistory.governmentothercurrentparent_insertupdate() TO readonly;
+
+
+--
+-- Name: FUNCTION law_insertupdate(); Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT ALL ON FUNCTION geohistory.law_insertupdate() TO readonly;
+
+
+--
+-- Name: FUNCTION lawalternate_update(); Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT ALL ON FUNCTION geohistory.lawalternate_update() TO readonly;
+
+
+--
+-- Name: FUNCTION lawalternatesection_insertupdate(); Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT ALL ON FUNCTION geohistory.lawalternatesection_insertupdate() TO readonly;
+
+
+--
+-- Name: FUNCTION lawgroupsection_deleteupdate(); Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT ALL ON FUNCTION geohistory.lawgroupsection_deleteupdate() TO readonly;
+
+
+--
+-- Name: FUNCTION lawsection_update(); Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT ALL ON FUNCTION geohistory.lawsection_update() TO readonly;
+
+
+--
+-- Name: FUNCTION lawsectionevent_insertupdate(); Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT ALL ON FUNCTION geohistory.lawsectionevent_insertupdate() TO readonly;
+
+
+--
+-- Name: FUNCTION metesdescriptionline_insertupdate(); Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT ALL ON FUNCTION geohistory.metesdescriptionline_insertupdate() TO readonly;
 
 
 --
@@ -12427,6 +12578,7 @@ REVOKE ALL ON FUNCTION geohistory.datetonumeric(date) FROM PUBLIC;
 --
 
 REVOKE ALL ON FUNCTION geohistory.rangeformat(text, text) FROM PUBLIC;
+GRANT ALL ON FUNCTION geohistory.rangeformat(text, text) TO readonly;
 
 
 --
@@ -12434,6 +12586,21 @@ REVOKE ALL ON FUNCTION geohistory.rangeformat(text, text) FROM PUBLIC;
 --
 
 REVOKE ALL ON FUNCTION geohistory.source_insert() FROM PUBLIC;
+GRANT ALL ON FUNCTION geohistory.source_insert() TO readonly;
+
+
+--
+-- Name: FUNCTION source_update(); Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT ALL ON FUNCTION geohistory.source_update() TO readonly;
+
+
+--
+-- Name: FUNCTION sourcetype_update(); Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT ALL ON FUNCTION geohistory.sourcetype_update() TO readonly;
 
 
 --
@@ -12441,6 +12608,7 @@ REVOKE ALL ON FUNCTION geohistory.source_insert() FROM PUBLIC;
 --
 
 REVOKE ALL ON FUNCTION gis.governmentshape_delete() FROM PUBLIC;
+GRANT ALL ON FUNCTION gis.governmentshape_delete() TO readonly;
 
 
 --
@@ -12448,6 +12616,1022 @@ REVOKE ALL ON FUNCTION gis.governmentshape_delete() FROM PUBLIC;
 --
 
 REVOKE ALL ON FUNCTION gis.governmentshape_insert() FROM PUBLIC;
+GRANT ALL ON FUNCTION gis.governmentshape_insert() TO readonly;
+
+
+--
+-- Name: TABLE adjudication; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.adjudication TO readonly;
+
+
+--
+-- Name: TABLE adjudicationtype; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.adjudicationtype TO readonly;
+
+
+--
+-- Name: TABLE tribunal; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.tribunal TO readonly;
+
+
+--
+-- Name: TABLE tribunaltype; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.tribunaltype TO readonly;
+
+
+--
+-- Name: TABLE adjudicationextra; Type: ACL; Schema: extra; Owner: postgres
+--
+
+GRANT SELECT ON TABLE extra.adjudicationextra TO readonly;
+
+
+--
+-- Name: TABLE adjudicationextracache; Type: ACL; Schema: extra; Owner: postgres
+--
+
+GRANT SELECT ON TABLE extra.adjudicationextracache TO readonly;
+
+
+--
+-- Name: TABLE government; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.government TO readonly;
+
+
+--
+-- Name: TABLE governmentsubstitute; Type: ACL; Schema: extra; Owner: postgres
+--
+
+GRANT SELECT ON TABLE extra.governmentsubstitute TO readonly;
+
+
+--
+-- Name: TABLE adjudicationevent; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.adjudicationevent TO readonly;
+
+
+--
+-- Name: TABLE adjudicationlocation; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.adjudicationlocation TO readonly;
+
+
+--
+-- Name: TABLE adjudicationlocationtype; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.adjudicationlocationtype TO readonly;
+
+
+--
+-- Name: TABLE affectedgovernmentgroup; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.affectedgovernmentgroup TO readonly;
+
+
+--
+-- Name: TABLE affectedgovernmentgrouppart; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.affectedgovernmentgrouppart TO readonly;
+
+
+--
+-- Name: TABLE affectedgovernmentpart; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.affectedgovernmentpart TO readonly;
+
+
+--
+-- Name: TABLE currentgovernment; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.currentgovernment TO readonly;
+
+
+--
+-- Name: TABLE event; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.event TO readonly;
+
+
+--
+-- Name: TABLE governmentsource; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.governmentsource TO readonly;
+
+
+--
+-- Name: TABLE governmentsourceevent; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.governmentsourceevent TO readonly;
+
+
+--
+-- Name: TABLE law; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.law TO readonly;
+
+
+--
+-- Name: TABLE lawsection; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.lawsection TO readonly;
+
+
+--
+-- Name: TABLE lawsectionevent; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.lawsectionevent TO readonly;
+
+
+--
+-- Name: TABLE metesdescription; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.metesdescription TO readonly;
+
+
+--
+-- Name: TABLE sourcegovernment; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.sourcegovernment TO readonly;
+
+
+--
+-- Name: TABLE affectedgovernmentgis; Type: ACL; Schema: gis; Owner: postgres
+--
+
+GRANT SELECT ON TABLE gis.affectedgovernmentgis TO readonly;
+
+
+--
+-- Name: TABLE governmentshape; Type: ACL; Schema: gis; Owner: postgres
+--
+
+GRANT SELECT ON TABLE gis.governmentshape TO readonly;
+
+
+--
+-- Name: TABLE metesdescriptiongis; Type: ACL; Schema: gis; Owner: postgres
+--
+
+GRANT SELECT ON TABLE gis.metesdescriptiongis TO readonly;
+
+
+--
+-- Name: TABLE eventgovernment; Type: ACL; Schema: extra; Owner: postgres
+--
+
+GRANT SELECT ON TABLE extra.eventgovernment TO readonly;
+
+
+--
+-- Name: TABLE affectedgovernmentlevel; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.affectedgovernmentlevel TO readonly;
+
+
+--
+-- Name: TABLE eventgranted; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.eventgranted TO readonly;
+
+
+--
+-- Name: TABLE governmentothercurrentparent; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.governmentothercurrentparent TO readonly;
+
+
+--
+-- Name: TABLE governmentparent; Type: ACL; Schema: extra; Owner: postgres
+--
+
+GRANT SELECT ON TABLE extra.governmentparent TO readonly;
+
+
+--
+-- Name: TABLE governmentrelation; Type: ACL; Schema: extra; Owner: postgres
+--
+
+GRANT SELECT ON TABLE extra.governmentrelation TO readonly;
+
+
+--
+-- Name: TABLE adjudicationgovernment; Type: ACL; Schema: extra; Owner: postgres
+--
+
+GRANT SELECT ON TABLE extra.adjudicationgovernment TO readonly;
+
+
+--
+-- Name: TABLE adjudicationgovernmentcache; Type: ACL; Schema: extra; Owner: postgres
+--
+
+GRANT SELECT ON TABLE extra.adjudicationgovernmentcache TO readonly;
+
+
+--
+-- Name: TABLE tribunalgovernment; Type: ACL; Schema: extra; Owner: postgres
+--
+
+GRANT SELECT ON TABLE extra.tribunalgovernment TO readonly;
+
+
+--
+-- Name: TABLE tribunalgovernmentcache; Type: ACL; Schema: extra; Owner: postgres
+--
+
+GRANT SELECT ON TABLE extra.tribunalgovernmentcache TO readonly;
+
+
+--
+-- Name: TABLE adjudicationsearch; Type: ACL; Schema: extra; Owner: postgres
+--
+
+GRANT SELECT ON TABLE extra.adjudicationsearch TO readonly;
+
+
+--
+-- Name: TABLE adjudicationsearchcache; Type: ACL; Schema: extra; Owner: postgres
+--
+
+GRANT SELECT ON TABLE extra.adjudicationsearchcache TO readonly;
+
+
+--
+-- Name: TABLE adjudicationsourcecitation; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.adjudicationsourcecitation TO readonly;
+
+
+--
+-- Name: TABLE source; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.source TO readonly;
+
+
+--
+-- Name: TABLE adjudicationsourcecitationextra; Type: ACL; Schema: extra; Owner: postgres
+--
+
+GRANT SELECT ON TABLE extra.adjudicationsourcecitationextra TO readonly;
+
+
+--
+-- Name: TABLE adjudicationsourcecitationextracache; Type: ACL; Schema: extra; Owner: postgres
+--
+
+GRANT SELECT ON TABLE extra.adjudicationsourcecitationextracache TO readonly;
+
+
+--
+-- Name: TABLE adjudicationsourcecitationsourcegovernment; Type: ACL; Schema: extra; Owner: postgres
+--
+
+GRANT SELECT ON TABLE extra.adjudicationsourcecitationsourcegovernment TO readonly;
+
+
+--
+-- Name: TABLE adjudicationsourcecitationsourcegovernmentcache; Type: ACL; Schema: extra; Owner: postgres
+--
+
+GRANT SELECT ON TABLE extra.adjudicationsourcecitationsourcegovernmentcache TO readonly;
+
+
+--
+-- Name: TABLE affectedgovernment_reconstructed; Type: ACL; Schema: extra; Owner: postgres
+--
+
+GRANT SELECT ON TABLE extra.affectedgovernment_reconstructed TO readonly;
+
+
+--
+-- Name: TABLE affectedgovernmentform; Type: ACL; Schema: extra; Owner: postgres
+--
+
+GRANT SELECT ON TABLE extra.affectedgovernmentform TO readonly;
+
+
+--
+-- Name: TABLE affectedgovernmentformcache; Type: ACL; Schema: extra; Owner: postgres
+--
+
+GRANT SELECT ON TABLE extra.affectedgovernmentformcache TO readonly;
+
+
+--
+-- Name: TABLE areagovernment; Type: ACL; Schema: extra; Owner: postgres
+--
+
+GRANT SELECT ON TABLE extra.areagovernment TO readonly;
+
+
+--
+-- Name: TABLE areagovernmentcache; Type: ACL; Schema: extra; Owner: postgres
+--
+
+GRANT SELECT ON TABLE extra.areagovernmentcache TO readonly;
+
+
+--
+-- Name: TABLE eventgovernmentcache; Type: ACL; Schema: extra; Owner: postgres
+--
+
+GRANT SELECT ON TABLE extra.eventgovernmentcache TO readonly;
+
+
+--
+-- Name: TABLE giscache; Type: ACL; Schema: extra; Owner: postgres
+--
+
+GRANT SELECT ON TABLE extra.giscache TO readonly;
+
+
+--
+-- Name: TABLE giscountycache; Type: ACL; Schema: extra; Owner: postgres
+--
+
+GRANT SELECT ON TABLE extra.giscountycache TO readonly;
+
+
+--
+-- Name: TABLE gismunicipalitycache; Type: ACL; Schema: extra; Owner: postgres
+--
+
+GRANT SELECT ON TABLE extra.gismunicipalitycache TO readonly;
+
+
+--
+-- Name: TABLE gisplsstownshipcache; Type: ACL; Schema: extra; Owner: postgres
+--
+
+GRANT SELECT ON TABLE extra.gisplsstownshipcache TO readonly;
+
+
+--
+-- Name: TABLE gisschooldistrictcache; Type: ACL; Schema: extra; Owner: postgres
+--
+
+GRANT SELECT ON TABLE extra.gisschooldistrictcache TO readonly;
+
+
+--
+-- Name: TABLE gissubmunicipalitycache; Type: ACL; Schema: extra; Owner: postgres
+--
+
+GRANT SELECT ON TABLE extra.gissubmunicipalitycache TO readonly;
+
+
+--
+-- Name: TABLE giswardcache; Type: ACL; Schema: extra; Owner: postgres
+--
+
+GRANT SELECT ON TABLE extra.giswardcache TO readonly;
+
+
+--
+-- Name: TABLE affectedtype; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.affectedtype TO readonly;
+
+
+--
+-- Name: TABLE eventeffectivetype; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.eventeffectivetype TO readonly;
+
+
+--
+-- Name: TABLE eventrelationship; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.eventrelationship TO readonly;
+
+
+--
+-- Name: TABLE governmentchangecount; Type: ACL; Schema: extra; Owner: postgres
+--
+
+GRANT SELECT ON TABLE extra.governmentchangecount TO readonly;
+
+
+--
+-- Name: TABLE governmentchangecountcache; Type: ACL; Schema: extra; Owner: postgres
+--
+
+GRANT SELECT ON TABLE extra.governmentchangecountcache TO readonly;
+
+
+--
+-- Name: TABLE governmentchangecountpart; Type: ACL; Schema: extra; Owner: postgres
+--
+
+GRANT SELECT ON TABLE extra.governmentchangecountpart TO readonly;
+
+
+--
+-- Name: TABLE governmentchangecountpartcache; Type: ACL; Schema: extra; Owner: postgres
+--
+
+GRANT SELECT ON TABLE extra.governmentchangecountpartcache TO readonly;
+
+
+--
+-- Name: TABLE governmentextra; Type: ACL; Schema: extra; Owner: postgres
+--
+
+GRANT SELECT ON TABLE extra.governmentextra TO readonly;
+
+
+--
+-- Name: TABLE governmentextracache; Type: ACL; Schema: extra; Owner: postgres
+--
+
+GRANT SELECT ON TABLE extra.governmentextracache TO readonly;
+
+
+--
+-- Name: TABLE governmenthasmappedevent; Type: ACL; Schema: extra; Owner: postgres
+--
+
+GRANT SELECT ON TABLE extra.governmenthasmappedevent TO readonly;
+
+
+--
+-- Name: TABLE governmenthasmappedeventcache; Type: ACL; Schema: extra; Owner: postgres
+--
+
+GRANT SELECT ON TABLE extra.governmenthasmappedeventcache TO readonly;
+
+
+--
+-- Name: TABLE governmentparentcache; Type: ACL; Schema: extra; Owner: postgres
+--
+
+GRANT SELECT ON TABLE extra.governmentparentcache TO readonly;
+
+
+--
+-- Name: TABLE governmentrelationcache; Type: ACL; Schema: extra; Owner: postgres
+--
+
+GRANT SELECT ON TABLE extra.governmentrelationcache TO readonly;
+
+
+--
+-- Name: TABLE governmentshape_history; Type: ACL; Schema: extra; Owner: postgres
+--
+
+GRANT SELECT ON TABLE extra.governmentshape_history TO readonly;
+
+
+--
+-- Name: TABLE governmentshapeextra; Type: ACL; Schema: extra; Owner: postgres
+--
+
+GRANT SELECT ON TABLE extra.governmentshapeextra TO readonly;
+
+
+--
+-- Name: TABLE governmentshapeextracache; Type: ACL; Schema: extra; Owner: postgres
+--
+
+GRANT SELECT ON TABLE extra.governmentshapeextracache TO readonly;
+
+
+--
+-- Name: TABLE governmentsourceextra; Type: ACL; Schema: extra; Owner: postgres
+--
+
+GRANT SELECT ON TABLE extra.governmentsourceextra TO readonly;
+
+
+--
+-- Name: TABLE governmentsourceextracache; Type: ACL; Schema: extra; Owner: postgres
+--
+
+GRANT SELECT ON TABLE extra.governmentsourceextracache TO readonly;
+
+
+--
+-- Name: TABLE governmentsubstitutecache; Type: ACL; Schema: extra; Owner: postgres
+--
+
+GRANT SELECT ON TABLE extra.governmentsubstitutecache TO readonly;
+
+
+--
+-- Name: TABLE lastrefresh; Type: ACL; Schema: extra; Owner: postgres
+--
+
+GRANT SELECT ON TABLE extra.lastrefresh TO readonly;
+
+
+--
+-- Name: TABLE lawalternatesection; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.lawalternatesection TO readonly;
+
+
+--
+-- Name: TABLE lawalternatesectionextra; Type: ACL; Schema: extra; Owner: postgres
+--
+
+GRANT SELECT ON TABLE extra.lawalternatesectionextra TO readonly;
+
+
+--
+-- Name: TABLE lawalternatesectionextracache; Type: ACL; Schema: extra; Owner: postgres
+--
+
+GRANT SELECT ON TABLE extra.lawalternatesectionextracache TO readonly;
+
+
+--
+-- Name: TABLE lawsectionextra; Type: ACL; Schema: extra; Owner: postgres
+--
+
+GRANT SELECT ON TABLE extra.lawsectionextra TO readonly;
+
+
+--
+-- Name: TABLE lawsectionextracache; Type: ACL; Schema: extra; Owner: postgres
+--
+
+GRANT SELECT ON TABLE extra.lawsectionextracache TO readonly;
+
+
+--
+-- Name: TABLE lawsectiongovernment; Type: ACL; Schema: extra; Owner: postgres
+--
+
+GRANT SELECT ON TABLE extra.lawsectiongovernment TO readonly;
+
+
+--
+-- Name: TABLE lawsectiongovernmentcache; Type: ACL; Schema: extra; Owner: postgres
+--
+
+GRANT SELECT ON TABLE extra.lawsectiongovernmentcache TO readonly;
+
+
+--
+-- Name: TABLE metesdescriptionextra; Type: ACL; Schema: extra; Owner: postgres
+--
+
+GRANT SELECT ON TABLE extra.metesdescriptionextra TO readonly;
+
+
+--
+-- Name: TABLE metesdescriptionextracache; Type: ACL; Schema: extra; Owner: postgres
+--
+
+GRANT SELECT ON TABLE extra.metesdescriptionextracache TO readonly;
+
+
+--
+-- Name: TABLE sourcecitation; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.sourcecitation TO readonly;
+
+
+--
+-- Name: TABLE sourcecitationextra; Type: ACL; Schema: extra; Owner: postgres
+--
+
+GRANT SELECT ON TABLE extra.sourcecitationextra TO readonly;
+
+
+--
+-- Name: TABLE sourcecitationextracache; Type: ACL; Schema: extra; Owner: postgres
+--
+
+GRANT SELECT ON TABLE extra.sourcecitationextracache TO readonly;
+
+
+--
+-- Name: TABLE sourcecitationevent; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.sourcecitationevent TO readonly;
+
+
+--
+-- Name: TABLE sourcecitationgovernment; Type: ACL; Schema: extra; Owner: postgres
+--
+
+GRANT SELECT ON TABLE extra.sourcecitationgovernment TO readonly;
+
+
+--
+-- Name: TABLE sourcecitationgovernmentcache; Type: ACL; Schema: extra; Owner: postgres
+--
+
+GRANT SELECT ON TABLE extra.sourcecitationgovernmentcache TO readonly;
+
+
+--
+-- Name: TABLE sourceextra; Type: ACL; Schema: extra; Owner: postgres
+--
+
+GRANT SELECT ON TABLE extra.sourceextra TO readonly;
+
+
+--
+-- Name: TABLE governmentidentifier; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.governmentidentifier TO readonly;
+
+
+--
+-- Name: TABLE statistics_createddissolved; Type: ACL; Schema: extra; Owner: postgres
+--
+
+GRANT SELECT ON TABLE extra.statistics_createddissolved TO readonly;
+
+
+--
+-- Name: TABLE statistics_eventtype; Type: ACL; Schema: extra; Owner: postgres
+--
+
+GRANT SELECT ON TABLE extra.statistics_eventtype TO readonly;
+
+
+--
+-- Name: TABLE governmentmapstatus; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.governmentmapstatus TO readonly;
+
+
+--
+-- Name: TABLE statistics_mapped; Type: ACL; Schema: extra; Owner: postgres
+--
+
+GRANT SELECT ON TABLE extra.statistics_mapped TO readonly;
+
+
+--
+-- Name: TABLE eventtype; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.eventtype TO readonly;
+
+
+--
+-- Name: TABLE governmentform; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.governmentform TO readonly;
+
+
+--
+-- Name: TABLE metesdescriptionline; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.metesdescriptionline TO readonly;
+
+
+--
+-- Name: TABLE researchlog; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.researchlog TO readonly;
+
+
+--
+-- Name: TABLE researchlogtype; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.researchlogtype TO readonly;
+
+
+--
+-- Name: TABLE recording; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.recording TO readonly;
+
+
+--
+-- Name: TABLE recordingevent; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.recordingevent TO readonly;
+
+
+--
+-- Name: TABLE recordingoffice; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.recordingoffice TO readonly;
+
+
+--
+-- Name: TABLE recordingtype; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.recordingtype TO readonly;
+
+
+--
+-- Name: TABLE sourcecitationnote; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.sourcecitationnote TO readonly;
+
+
+--
+-- Name: TABLE sourcecitationnotetype; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.sourcecitationnotetype TO readonly;
+
+
+--
+-- Name: TABLE lawgroup; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.lawgroup TO readonly;
+
+
+--
+-- Name: TABLE lawgroupsection; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.lawgroupsection TO readonly;
+
+
+--
+-- Name: TABLE lawgroupgovernmenttype; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.lawgroupgovernmenttype TO readonly;
+
+
+--
+-- Name: TABLE censusmap; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.censusmap TO readonly;
+
+
+--
+-- Name: TABLE documentation; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.documentation TO readonly;
+
+
+--
+-- Name: TABLE eventmethod; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.eventmethod TO readonly;
+
+
+--
+-- Name: TABLE eventslugretired; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.eventslugretired TO readonly;
+
+
+--
+-- Name: TABLE filing; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.filing TO readonly;
+
+
+--
+-- Name: TABLE filingtype; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.filingtype TO readonly;
+
+
+--
+-- Name: TABLE governmentformgovernment; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.governmentformgovernment TO readonly;
+
+
+--
+-- Name: TABLE governmentidentifiertype; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.governmentidentifiertype TO readonly;
+
+
+--
+-- Name: TABLE lawalternate; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.lawalternate TO readonly;
+
+
+--
+-- Name: TABLE lawgroupeventtype; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.lawgroupeventtype TO readonly;
+
+
+--
+-- Name: TABLE locale; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.locale TO readonly;
+
+
+--
+-- Name: TABLE nationalarchives; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.nationalarchives TO readonly;
+
+
+--
+-- Name: TABLE plss; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.plss TO readonly;
+
+
+--
+-- Name: TABLE plssfirstdivision; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.plssfirstdivision TO readonly;
+
+
+--
+-- Name: TABLE plssfirstdivisionpart; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.plssfirstdivisionpart TO readonly;
+
+
+--
+-- Name: TABLE plssmeridian; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.plssmeridian TO readonly;
+
+
+--
+-- Name: TABLE plssseconddivision; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.plssseconddivision TO readonly;
+
+
+--
+-- Name: TABLE plssspecialsurvey; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.plssspecialsurvey TO readonly;
+
+
+--
+-- Name: TABLE plsstownship; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.plsstownship TO readonly;
+
+
+--
+-- Name: TABLE recordingofficetype; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.recordingofficetype TO readonly;
+
+
+--
+-- Name: TABLE shorttype; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.shorttype TO readonly;
+
+
+--
+-- Name: TABLE sourceitem; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.sourceitem TO readonly;
+
+
+--
+-- Name: TABLE sourceitemcategory; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.sourceitemcategory TO readonly;
+
+
+--
+-- Name: TABLE sourceitempart; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.sourceitempart TO readonly;
+
+
+--
+-- Name: TABLE sourcetype; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.sourcetype TO readonly;
+
+
+--
+-- Name: TABLE deleted_affectedgovernmentgis; Type: ACL; Schema: gis; Owner: postgres
+--
+
+GRANT SELECT ON TABLE gis.deleted_affectedgovernmentgis TO readonly;
+
+
+--
+-- Name: TABLE deleted_metesdescriptiongis; Type: ACL; Schema: gis; Owner: postgres
+--
+
+GRANT SELECT ON TABLE gis.deleted_metesdescriptiongis TO readonly;
+
+
+--
+-- Name: DEFAULT PRIVILEGES FOR FUNCTIONS; Type: DEFAULT ACL; Schema: extra; Owner: postgres
+--
+
+ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA extra GRANT ALL ON FUNCTIONS TO readonly;
+
+
+--
+-- Name: DEFAULT PRIVILEGES FOR TABLES; Type: DEFAULT ACL; Schema: extra; Owner: postgres
+--
+
+ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA extra GRANT SELECT ON TABLES TO readonly;
+
+
+--
+-- Name: DEFAULT PRIVILEGES FOR FUNCTIONS; Type: DEFAULT ACL; Schema: geohistory; Owner: postgres
+--
+
+ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA geohistory GRANT ALL ON FUNCTIONS TO readonly;
+
+
+--
+-- Name: DEFAULT PRIVILEGES FOR TABLES; Type: DEFAULT ACL; Schema: geohistory; Owner: postgres
+--
+
+ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA geohistory GRANT SELECT ON TABLES TO readonly;
+
+
+--
+-- Name: DEFAULT PRIVILEGES FOR FUNCTIONS; Type: DEFAULT ACL; Schema: gis; Owner: postgres
+--
+
+ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA gis GRANT ALL ON FUNCTIONS TO readonly;
+
+
+--
+-- Name: DEFAULT PRIVILEGES FOR TABLES; Type: DEFAULT ACL; Schema: gis; Owner: postgres
+--
+
+ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA gis GRANT SELECT ON TABLES TO readonly;
 
 
 --
