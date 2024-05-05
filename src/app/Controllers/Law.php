@@ -2,83 +2,78 @@
 
 namespace App\Controllers;
 
+use App\Models\EventModel;
+use App\Models\SourceItemPartModel;
+
 class Law extends BaseController
 {
-
-    private $data;
+    private array $data = [
+        'title' => 'Law Detail',
+    ];
 
     public function __construct()
     {
-        $this->data = [
-            'title' => 'Law Detail',
-            'isInternetExplorer' => $this->isInternetExplorer(),
-            'live' => $this->isLive(),
-            'online' => $this->isOnline(),
-            'updated' => $this->lastUpdated()->fulldate,
-        ];
     }
 
-    public function noRecord($state)
+    public function noRecord(string $state): void
     {
         $this->data['state'] = $state;
-        echo view('header', $this->data);
-        echo view('norecord');
-        echo view('footer');
+        echo view('core/header', $this->data);
+        echo view('core/norecord');
+        echo view('core/footer');
     }
 
-    public function view($state, $id)
+    public function view(string $state, int|string $id): void
     {
         $this->data['state'] = $state;
-        $queryType = '';
-        if ($this->data['live'] and preg_match('/^\d{1,9}$/', $id)) {
-            $id = intval($id);
-        } elseif (substr($id, -10) == '-alternate') {
-            $queryType = 'alternate';
+        if (str_ends_with($id, '-alternate')) {
+            $function = 'getByLawAlternateSection';
+            $LawSectionModel = new \App\Models\LawAlternateSectionModel();
+        } else {
+            $function = 'getByLawSection';
+            $LawSectionModel = new \App\Models\LawSectionModel();
         }
-        $query = $this->db->query('SELECT * FROM extra.ci_model_law' . $queryType . '_detail(?, ?, ?)', [$id, $state, $this->data['live']])->getResult();
-
-        if (count($query) != 1) {
+        $id = $this->getIdInt($id);
+        $query = $LawSectionModel->getDetail($id, $state);
+        if (count($query) !== 1) {
             $this->noRecord($state);
         } else {
             $id = $query[0]->lawsectionid;
             $this->data['pageTitle'] = $query[0]->lawsectioncitation;
-            echo view('header', $this->data);
-            echo view('law_detail', ['query' => $query]);
-            echo view('general_source', ['query' => $query, 'hasLink' => false]);
-            if ($query[0]->url != '') {
-                echo view('general_url', ['query' => $query, 'title' => 'Actual URL']);
+            echo view('core/header', $this->data);
+            echo view('law/view', ['query' => $query]);
+            echo view('source/table', ['query' => $query, 'hasLink' => false]);
+            if ($query[0]->url !== '') {
+                echo view('core/url', ['query' => $query, 'title' => 'Actual URL']);
             }
-            if (file_exists(APPPATH . 'Views/' . ENVIRONMENT . '/usa_newberrylaw.php')) {
-                $query = $this->db->query('SELECT * FROM reference_usa.ci_model_law_newberry(?)', [$id])->getResult();
-                if (!empty($query)) {
-                    echo view(ENVIRONMENT . '/usa_newberrylaw', ['query' => $query]);
-                }
+            if ($this->isLive()) {
+                $LawGroupSectionModel = new \App\Models\Development\LawGroupSectionModel();
+                $SourceCitationModel = new \App\Models\Development\SourceCitationModel();
+            } else {
+                $LawGroupSectionModel = new \App\Models\LawGroupSectionModel();
+                $SourceCitationModel = new \App\Models\SourceCitationModel();
             }
-            if (file_exists(APPPATH . 'Views/' . ENVIRONMENT . '/ny_law_detail.php')) {
-                $query = $this->db->query('SELECT * FROM reference_usa_state.ci_model_ny_law(?)', [$id])->getResult();
-                if (!empty($query)) {
-                    echo view(ENVIRONMENT . '/ny_law_detail', ['query' => $query]);
-                }
+            $query = $SourceCitationModel->getByLawNation($id);
+            if ($query !== []) {
+                echo view(ENVIRONMENT . '/usa/newberrylaw', ['query' => $query]);
             }
-            if (file_exists(APPPATH . 'Views/' . ENVIRONMENT . '/general_lawgroup.php')) {
-                $query = $this->db->query('SELECT * FROM extra_development.ci_model_law_lawgroup(?, ?)', [$id, $state])->getResult();
-                if (!empty($query)) {
-                    echo view(ENVIRONMENT . '/general_lawgroup', ['query' => $query, 'includeForm' => false]);
-                }
+            $query = $SourceCitationModel->getByLawState($id, $state);
+            if ($query !== []) {
+                echo view(ENVIRONMENT . '/law/ny', ['query' => $query]);
             }
-            $query = $this->db->query('SELECT * FROM extra.ci_model_law' . $queryType . '_related(?)', [$id])->getResult();
-            if (count($query) > 0) {
-                echo view('general_law', ['query' => $query, 'state' => $state, 'title' => 'Related Law', 'type' => 'relationship']);
+            $query = $LawGroupSectionModel->getByLawSection($id, $state);
+            if ($query !== []) {
+                echo view(ENVIRONMENT . '/lawgroup/table', ['query' => $query, 'includeForm' => false]);
             }
-            $query = $this->db->query('SELECT * FROM extra.ci_model_law' . $queryType . '_url(?, ?)', [$id, $this->data['live']])->getResult();
-            if (count($query) > 0) {
-                echo view('general_url', ['query' => $query, 'state' => $state, 'title' => 'Calculated URL']);
-            }
-            $query = $this->db->query('SELECT * FROM extra.ci_model_law' . $queryType . '_event(?)', [$id])->getResult();
-            if (count($query) > 0) {
-                echo view('general_event', ['query' => $query, 'state' => $state, 'title' => 'Event Links', 'eventRelationship' => true, 'includeLawGroup' => true]);
-            }
-            echo view('footer');
+            $query = $LawSectionModel->getRelated($id);
+            echo view('law/table', ['query' => $query, 'state' => $state, 'title' => 'Related Law', 'type' => 'relationship']);
+            $SourceItemPartModel = new SourceItemPartModel();
+            $query = $SourceItemPartModel->$function($id);
+            echo view('core/url', ['query' => $query, 'state' => $state, 'title' => 'Calculated URL']);
+            $EventModel = new EventModel();
+            $query = $EventModel->$function($id);
+            echo view('event/table', ['query' => $query, 'state' => $state, 'title' => 'Event Links', 'eventRelationship' => true, 'includeLawGroup' => true]);
+            echo view('core/footer');
         }
     }
 }

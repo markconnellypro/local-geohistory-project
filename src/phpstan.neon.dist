@@ -1,0 +1,49 @@
+parameters:
+	tmpDir: build/phpstan
+	level: 6
+	paths:
+		- app/Config
+		- app/Controllers
+		- app/Libraries
+		- app/Models
+		- app/Views
+	bootstrapFiles:
+		- vendor/codeigniter4/framework/system/Test/bootstrap.php
+	excludePaths:
+		- app/Config/development
+		- app/Config/production
+		- app/Config/ContentSecurityPolicy.php
+		- app/Config/Exceptions.php
+		- app/Config/Kint.php
+		- app/Config/Logger.php
+		- app/Config/Mimes.php
+		- app/Config/Modules.php
+		- app/Config/Routes.php
+		- app/Config/Routing.php
+		- app/Config/Toolbar.php
+		- app/Config/View.php
+		- app/Controllers/Development
+		- app/Models/Development
+		- app/Views/development
+		- app/Views/errors
+	checkMissingIterableValueType: false
+	checkGenericClassInNonGenericObjectType: false
+	checkMissingCallableSignature: true
+	reportMaybesInPropertyPhpDocTypes: false
+	treatPhpDocTypesAsCertain: false
+	strictRules:
+		allRules: false
+		disallowedLooseComparison: true
+		booleansInConditions: true
+		disallowedConstructs: true
+		matchingInheritedMethodNames: true
+	universalObjectCratesClasses:
+		- CodeIgniter\Entity
+		- CodeIgniter\Entity\Entity
+		- Faker\Generator
+	scanDirectories:
+		- vendor/codeigniter4/framework/system/Helpers
+	dynamicConstantNames:
+		- APP_NAMESPACE
+		- CI_DEBUG
+		- ENVIRONMENT

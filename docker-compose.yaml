@@ -20,6 +20,7 @@ services:
             - ${INPHP_P}:/inphp/p:ro
             - ${INPHP_PROJECT}:/inphp/project:ro
             - ${INPHP_S}:/inphp/s:ro
+            - ./license:/license
             - ./src:/var/www
         depends_on:
             - postgis

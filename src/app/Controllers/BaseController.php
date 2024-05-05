@@ -8,6 +8,7 @@ use App\Libraries\IncomingRequest;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 use Psr\Log\LoggerInterface;
+use App\Models\AppModel;
 
 /**
  * Class BaseController
@@ -33,21 +34,12 @@ abstract class BaseController extends Controller
      * class instantiation. These helpers will be available
      * to all other controllers that extend BaseController.
      *
-     * @var array
+     * @var list<string>
      */
     protected $helpers = [];
 
-    /**
-     * Be sure to declare properties for any property fetch you initialized.
-     * The creation of dynamic property is deprecated in PHP 8.2.
-     */
     // protected $session;
-    protected $db;
-
-    /**
-     * Constructor.
-     */
-    public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
+    public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger): void
     {
         // Do Not Edit This Line
         parent::initController($request, $response, $logger);
@@ -55,78 +47,15 @@ abstract class BaseController extends Controller
         // Preload any models, libraries, etc, here.
 
         // E.g.: $this->session = \Config\Services::session();
-        $this->db = db_connect();
     }
 
-    protected function affectedGovernmentProcess($partQuery = [], $wholeQuery = [])
+    public static function isInternetExplorer(): bool
     {
-        $affectedGovernment = [
-            'linkTypes' => [],
-            'rows' => [],
-            'types' => [],
-        ];
-        if (isset($partQuery)) {
-            foreach ($partQuery as $row) {
-                if (!empty($row->governmentfromlong)) {
-                    $affectedGovernment['types']['from'][$row->affectedgovernmentleveldisplayorder] = $row->affectedgovernmentlevellong;
-                    if (!empty($row->includelink) and $row->includelink == 't') {
-                        $affectedGovernment['linkTypes']['from'][$row->affectedgovernmentleveldisplayorder] = $row->affectedgovernmentlevellong;
-                    }
-                    $affectedGovernment['rows'][$row->id]['From ' . $row->affectedgovernmentlevellong . ' Link'] = $row->governmentfrom;
-                    $affectedGovernment['rows'][$row->id]['From ' . $row->affectedgovernmentlevellong . ' Long'] = $row->governmentfromlong;
-                    $affectedGovernment['rows'][$row->id]['From ' . $row->affectedgovernmentlevellong . ' Affected'] = $row->affectedtypefrom;
-                }
-                if (!empty($row->governmenttolong)) {
-                    $affectedGovernment['types']['to'][$row->affectedgovernmentleveldisplayorder] = $row->affectedgovernmentlevellong;
-                    if (!empty($row->includelink) and $row->includelink == 't') {
-                        $affectedGovernment['linkTypes']['to'][$row->affectedgovernmentleveldisplayorder] = $row->affectedgovernmentlevellong;
-                    }
-                    $affectedGovernment['rows'][$row->id]['To ' . $row->affectedgovernmentlevellong . ' Link'] = $row->governmentto;
-                    $affectedGovernment['rows'][$row->id]['To ' . $row->affectedgovernmentlevellong . ' Long'] = $row->governmenttolong;
-                    $affectedGovernment['rows'][$row->id]['To ' . $row->affectedgovernmentlevellong . ' Affected'] = $row->affectedtypeto;
-                }
-            }
-            foreach ($affectedGovernment['types'] as $fromTo => $levels) {
-                ksort($levels);
-                $affectedGovernment['types'][$fromTo] = $levels;
-            }
-            $kSort = $affectedGovernment['types'];
-            ksort($kSort);
-            $affectedGovernment['types'] = $kSort;
-            foreach ($affectedGovernment['linkTypes'] as $fromTo => $levels) {
-                ksort($levels);
-                $affectedGovernment['linkTypes'][$fromTo] = $levels;
-            }
-            $kSort = $affectedGovernment['linkTypes'];
-            ksort($kSort);
-            $affectedGovernment['linkTypes'] = $kSort;
-        }
-        if (isset($wholeQuery)) {
-            foreach ($wholeQuery as $row) {
-                foreach ($row as $key => $value) {
-                    $affectedGovernment['rows'][$row['id']][$key] = $value;
-                }
-            }
-        }
-        foreach ($affectedGovernment['rows'] as $key => $value) {
-            $affectedGovernment['rows'][$key] = (object) $value;
-        }
-        return $affectedGovernment;
+        $agent = \Config\Services::request()->getUserAgent();
+        return $agent->getBrowser() === 'Internet Explorer';
     }
 
-    protected function isInternetExplorer(): bool
-    {
-        if (isset($_SERVER['HTTP_USER_AGENT'])) {
-            $browser = strtolower($_SERVER['HTTP_USER_AGENT']);
-            return strpos($browser, 'msie') !== false
-                or strpos($browser, 'internet explorer') !== false
-                or strpos($browser, 'trident') !== false;
-        } else {
-            return false;
-        }
-    }
-
-    protected function getJurisdictions()
+    public static function getJurisdictions(): array
     {
         $jurisdictions = trim(($_ENV['app_jurisdiction'] ?? '') . '|' . ($_ENV['app_jurisdiction_development'] ?? ''), '|');
         $jurisdictions = explode('|', $jurisdictions);
@@ -134,7 +63,7 @@ abstract class BaseController extends Controller
         return $jurisdictions;
     }
 
-    public static function getProductionJurisdictions()
+    public static function getProductionJurisdictions(): array
     {
         $jurisdictions = trim(($_ENV['app_jurisdiction'] ?? ''), '|');
         $jurisdictions = explode('|', $jurisdictions);
@@ -142,24 +71,32 @@ abstract class BaseController extends Controller
         return $jurisdictions;
     }
 
-    protected function isLive(): bool
+    public static function isLive(): bool
     {
-        return (ENVIRONMENT == 'development');
+        return (ENVIRONMENT === 'development');
     }
 
-    protected function isOnline(): bool
+    public static function isOnline(): bool
     {
-        if ($this->isLive() and gethostbyname('unpkg.com') == 'unpkg.com') {
+        if (static::isLive() && gethostbyname('unpkg.com') === 'unpkg.com') {
             return false;
         } else {
             return true;
         }
     }
 
-    protected function lastUpdated()
+    public static function lastUpdated(): string
     {
         date_default_timezone_set('America/New_York');
-        $this->db = db_connect();
-        return $this->db->query('SELECT * FROM extra.ci_model_lastrefresh()')->getResult()[0];
+        $AppModel = new AppModel();
+        return $AppModel->getLastUpdated()[0]->fulldate ?? '';
+    }
+
+    protected function getIdInt(int|string $id): int|string
+    {
+        if (static::isLive() && preg_match('/^\d{1,9}$/', $id)) {
+            $id = (int) $id;
+        }
+        return $id;
     }
 }

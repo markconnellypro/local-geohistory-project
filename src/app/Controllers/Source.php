@@ -2,61 +2,56 @@
 
 namespace App\Controllers;
 
+use App\Models\EventModel;
+use App\Models\SourceCitationModel;
+use App\Models\SourceCitationNoteModel;
+use App\Models\SourceItemPartModel;
+
 class Source extends BaseController
 {
-
-    private $data;
+    private array $data = [
+        'title' => 'Source Detail',
+    ];
 
     public function __construct()
     {
-        $this->data = [
-            'title' => 'Source Detail',
-            'isInternetExplorer' => $this->isInternetExplorer(),
-            'live' => $this->isLive(),
-            'online' => $this->isOnline(),
-            'updated' => $this->lastUpdated()->fulldate,
-        ];
     }
 
-    public function noRecord($state)
+    public function noRecord(string $state): void
     {
         $this->data['state'] = $state;
-        echo view('header', $this->data);
-        echo view('norecord');
-        echo view('footer');
+        echo view('core/header', $this->data);
+        echo view('core/norecord');
+        echo view('core/footer');
     }
 
-    public function view($state, $id)
+    public function view(string $state, int|string $id): void
     {
         $this->data['state'] = $state;
-        if ($this->data['live'] and preg_match('/^\d{1,9}$/', $id)) {
-            $id = intval($id);
-        }
-        $query = $this->db->query('SELECT * FROM extra.ci_model_source_detail(?, ?)', [$id, $state])->getResult();
-        if (count($query) != 1) {
+        $id = $this->getIdInt($id);
+        $SourceCitationModel = new SourceCitationModel();
+        $query = $SourceCitationModel->getDetail($id, $state);
+        if (count($query) !== 1) {
             $this->noRecord($state);
         } else {
             $id = $query[0]->sourcecitationid;
-            $this->data['pageTitle'] = $query[0]->sourceabbreviation . (empty($query[0]->sourcecitationpage) ? '' : ' ' . $query[0]->sourcecitationpage);
-            echo view('header', $this->data);
-            echo view('general_sourcecitation', ['query' => $query, 'state' => $state, 'hasColor' => false, 'hasLink' => false, 'title' => 'Detail']);
-            echo view('general_source', ['query' => $query, 'hasLink' => $this->data['live']]);
-            if ($query[0]->url != '') {
-                echo view('general_url', ['query' => $query, 'title' => 'Actual URL']);
+            $this->data['pageTitle'] = $query[0]->sourceabbreviation . ($query[0]->sourcecitationpage === '' ? '' : ' ' . $query[0]->sourcecitationpage);
+            echo view('core/header', $this->data);
+            echo view('source/table_citation', ['query' => $query, 'state' => $state, 'hasColor' => false, 'hasLink' => false, 'title' => 'Detail']);
+            echo view('source/table', ['query' => $query, 'hasLink' => $this->isLive()]);
+            if ($query[0]->url !== '') {
+                echo view('core/url', ['query' => $query, 'title' => 'Actual URL']);
             }
-            $query = $this->db->query('SELECT * FROM extra.ci_model_source_note(?)', [$id])->getResult();
-            if (count($query) > 0) {
-                echo view('source_note', ['query' => $query, 'state' => $state]);
-            }
-            $query = $this->db->query('SELECT * FROM extra.ci_model_source_url(?)', [$id])->getResult();
-            if (count($query) > 0) {
-                echo view('general_url', ['query' => $query, 'state' => $state, 'title' => 'Calculated URL']);
-            }
-            $query = $this->db->query('SELECT * FROM extra.ci_model_source_event(?)', [$id])->getResult();
-            if (count($query) > 0) {
-                echo view('general_event', ['query' => $query, 'state' => $state, 'title' => 'Event Links']);
-            }
-            echo view('footer');
+            $SourceCitationNoteModel = new SourceCitationNoteModel();
+            $query = $SourceCitationNoteModel->getBySourceCitation($id);
+            echo view('source/note', ['query' => $query, 'state' => $state]);
+            $SourceItemPartModel = new SourceItemPartModel();
+            $query = $SourceItemPartModel->getBySourceCitation($id);
+            echo view('core/url', ['query' => $query, 'state' => $state, 'title' => 'Calculated URL']);
+            $EventModel = new EventModel();
+            $query = $EventModel->getBySourceCitation($id);
+            echo view('event/table', ['query' => $query, 'state' => $state, 'title' => 'Event Links']);
+            echo view('core/footer');
         }
     }
 }

@@ -2,19 +2,22 @@
 
 namespace App\Controllers;
 
+use App\Models\EventTypeModel;
+
 class Statistics extends BaseController
 {
+    private array $data = [
+        'title' => 'Statistics',
+    ];
 
-    private $data;
-
-    private $byType = [
+    private array $byType = [
         'current' => 'Modern-Day Jurisdictions',
         'historic' => 'Contemporaneous Jurisdictions',
         'incorporated' => 'Incorporated Municipalities',
         'total' => 'Total Municipalities',
     ];
 
-    private $forType = [
+    private array $forType = [
         'eventtype' => 'Events by Event Type',
         'created' => 'Created Municipalities',
         'dissolved' => 'Dissolved Municipalities',
@@ -25,37 +28,31 @@ class Statistics extends BaseController
 
     public function __construct()
     {
-        $this->data = [
-            'title' => 'Statistics',
-            'isInternetExplorer' => $this->isInternetExplorer(),
-            'live' => $this->isLive(),
-            'online' => $this->isOnline(),
-            'updated' => $this->lastUpdated()->fulldate,
-        ];
     }
 
-    public function index($state = '')
+    public function index(string $state = ''): void
     {
         $this->data['state'] = $state;
-        echo view('header', $this->data);
-        echo view('general_ui', $this->data);
-        $this->data['eventTypeQuery'] = $this->db->query('SELECT * FROM extra.ci_model_statistics_eventtype_list(?)', [(empty($state) ? $this->data['live'] : $state)])->getResultArray();
-        echo view('statistics_index', $this->data);
-        echo view('footer');
+        echo view('core/header', $this->data);
+        echo view('core/ui', $this->data);
+        $EventTypeModel = new EventTypeModel();
+        $this->data['eventTypeQuery'] = $EventTypeModel->getManyByStatistics($state);
+        echo view('statistics/index', $this->data);
+        echo view('core/footer');
     }
 
-    public function noRecord($state = '')
+    public function noRecord(string $state = ''): void
     {
         $this->data['state'] = $state;
-        echo view('header', $this->data);
-        echo view('norecord');
-        echo view('footer');
+        echo view('core/header', $this->data);
+        echo view('core/norecord');
+        echo view('core/footer');
     }
 
-    public function view($state = '')
+    public function view(string $state = ''): void
     {
         $this->data['state'] = $state;
-        echo view('header', $this->data);
+        echo view('core/header', $this->data);
 
         $by = $this->request->getPost('by');
         $for = $this->request->getPost('for');
@@ -69,31 +66,31 @@ class Statistics extends BaseController
         }
         $for = $for[0];
 
+        $searchParameter = [];
         if (!isset($this->byType[$by])) {
-            echo view('error');
-            echo view('footer');
+            echo view('core/error');
+            echo view('core/footer');
             die();
         } else {
             $searchParameter['byType'] = $this->byType[$by];
             $by .= $byExtra;
         }
 
-        $from = $this->request->getPost('from', FILTER_SANITIZE_NUMBER_INT);
-        $to = $this->request->getPost('to', FILTER_SANITIZE_NUMBER_INT);
-        if (empty($from) and empty($to)) {
-            $from = 0;
-            $to = intval(date('Y'));
-        } elseif (empty($from)) {
+        $from = (int) $this->request->getPost('from', FILTER_SANITIZE_NUMBER_INT);
+        $to = (int) $this->request->getPost('to', FILTER_SANITIZE_NUMBER_INT);
+        if ($from === 0 && $to === 0) {
+            $to = (int) date('Y');
+        } elseif ($from === 0) {
             $from = $to;
-        } elseif (empty($to)) {
+        } elseif ($to === 0) {
             $to = $from;
         } elseif ($from > $to) {
             $temporary = $to;
             $to = $from;
             $from = $temporary;
         }
-        if ($from == $to or $from == 0) {
-            $dateRange = $from;
+        if ($from === 0 || $from === $to) {
+            $dateRange = $from === 0 ? '' : (string) $from;
             $dateRangePlural = '';
         } else {
             $dateRange = $from . '&ndash;' . $to;
@@ -101,8 +98,8 @@ class Statistics extends BaseController
         }
 
         if (!isset($this->forType[$for])) {
-            echo view('error');
-            echo view('footer');
+            echo view('core/error');
+            echo view('core/footer');
             die();
         } else {
             $searchParameter = [
@@ -112,15 +109,13 @@ class Statistics extends BaseController
         }
 
         $fields = [$from, $to, $by];
-        if ($for == 'eventtype') {
-            $eventType = $this->request->getPost('eventtype');
-            if (empty($eventType)) {
-                $eventType = '';
-            }
-            $query = $this->db->query('SELECT * FROM extra.ci_model_statistics_eventtype(?)', [$eventType])->getResult();
+        if ($for === 'eventtype') {
+            $eventType = (string) $this->request->getPost('eventtype');
+            $EventTypeModel = new EventTypeModel();
+            $query = $EventTypeModel->getOneByStatistics($eventType);
             if (count($query) !== 1) {
-                echo view('error');
-                echo view('footer');
+                echo view('core/error');
+                echo view('core/footer');
                 die();
             }
             array_unshift($fields, $eventType);
@@ -128,39 +123,43 @@ class Statistics extends BaseController
         } else {
             $eventType = '';
             array_unshift($fields, $for);
-            if ($for != 'mapped') {
+            if ($for !== 'mapped') {
                 $for = 'createddissolved';
             }
         }
 
-        if (!empty($dateRange)) {
+        if ($dateRange !== '') {
             $searchParameter['Year' . $dateRangePlural] = $dateRange;
         }
 
-        if (empty($state)) {
-            $fields[] = $this->data['live'];
-        } else {
-            $fields[] = $state;
-        }
+        $fields[] = $state;
 
-        $this->data['wholeQuery'] = $this->db->query('SELECT * FROM extra.ci_model_statistics_' . $for . '_' . (empty($state) ? 'nation' : 'state') . '_whole(?, ?, ?, ?, ?)', $fields)->getResult();
-        if ($this->data['wholeQuery'][0]->datarow == '["x"]') {
+        $types = [
+            'createddissolved' => 'Government',
+            'eventtype' => 'Event',
+            'mapped' => 'GovernmentShape',
+        ];
+        $model = "App\\Models\\" . $types[$for] . 'Model';
+        $model = new $model();
+        $type = 'getByStatistics' . ($state === '' ? 'Nation' : 'State') . 'Whole';
+
+        $this->data['wholeQuery'] = $model->$type($fields);
+        if ($this->data['wholeQuery'][0]->datarow === '["x"]') {
             $this->data['wholeQuery'] = [];
         } else {
-            $this->data['query'] = $this->db->query('SELECT * FROM extra.ci_model_statistics_' . $for . '_' . (empty($state) ? 'nation' : 'state') . '_part(?, ?, ?, ?, ?)', $fields)->getResult();
+            $type = str_replace('Whole', 'Part', $type);
+            $this->data['query'] = $model->$type($fields);
             foreach ($this->data['query'] as $key => $row) {
                 $this->data['query'][$key] = '"' . $row->series . '":{"xrow":' . $row->xrow . ',"yrow":' . $row->yrow . ',"ysum":' . $row->ysum . '}';
             }
-            $this->data['query'] = '{' . implode(',',  $this->data['query']) . '}';
+            $this->data['query'] = '{' . implode(',', $this->data['query']) . '}';
         }
 
-        $this->data['isContemporaneous'] = ($searchParameter['Grouped By'] == 'Contemporaneous Jurisdictions');
-        $this->data['notEvent'] = ($searchParameter['Metric'] == 'Events by Event Type');
-        echo view('general_parameter', ['searchParameter' => $searchParameter]);
-        echo view('statistics_view', $this->data);
-        if (count($this->data['wholeQuery']) > 0) {
-            echo view('general_chartjs', ['query' => $this->data['wholeQuery'], 'online' => $this->data['online'], 'xLabel' => 'Year', 'yLabel' => ($for == 'createddissolved' ? 'Governments' : 'Events')]);
-        }
-        echo view('footer');
+        $this->data['isContemporaneous'] = ($searchParameter['Grouped By'] === 'Contemporaneous Jurisdictions');
+        $this->data['notEvent'] = ($searchParameter['Metric'] === 'Events by Event Type');
+        echo view('core/parameter', ['searchParameter' => $searchParameter]);
+        echo view('statistics/view', $this->data);
+        echo view('core/chartjs', ['query' => $this->data['wholeQuery'], 'xLabel' => 'Year', 'yLabel' => ($for === 'createddissolved' ? 'Governments' : 'Events')]);
+        echo view('core/footer');
     }
 }

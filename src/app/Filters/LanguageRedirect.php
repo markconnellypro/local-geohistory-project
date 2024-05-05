@@ -8,18 +8,19 @@ use CodeIgniter\Filters\FilterInterface;
 
 class LanguageRedirect implements FilterInterface
 {
-    public function before(RequestInterface $request, $arguments = null)
+    public function before(RequestInterface $request, $arguments = null): void
     {
-        $segments = $request->uri->getSegments();
+        $segments = $request->getUri()->getSegments();
         $locale = $request->getLocale();
-        if (isset($segments[0]) and $segments[0] !== $locale and $segments !== ['robots.txt']) {
+        if (isset($segments[0]) && $segments[0] !== $locale && $segments !== ['robots.txt']) {
             $segments[0] = $locale;
             $segments = '/' . implode('/', $segments) . '/';
-            return redirect()->to($segments);
+            header('Location: ' . $segments);
+            die();
         }
     }
 
-    public function after(RequestInterface $request, ResponseInterface $response, $arguments = null)
+    public function after(RequestInterface $request, ResponseInterface $response, $arguments = null): void
     {
     }
 }

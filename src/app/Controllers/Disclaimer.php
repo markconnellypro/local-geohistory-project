@@ -4,25 +4,19 @@ namespace App\Controllers;
 
 class Disclaimer extends BaseController
 {
-
-    private $data;
+    private array $data = [
+        'title' => 'Disclaimers',
+    ];
 
     public function __construct()
     {
-        $this->data = [
-            'title' => 'Disclaimers',
-            'isInternetExplorer' => $this->isInternetExplorer(),
-            'live' => $this->isLive(),
-            'online' => $this->isOnline(),
-            'updated' => $this->lastUpdated()->fulldate,
-        ];
     }
 
-    public function index($state = '')
+    public function index(string $state = ''): void
     {
         $this->data['state'] = $state;
-        echo view('header', $this->data);
-        echo view('disclaimer');
-        echo view('footer');
+        echo view('core/header', $this->data);
+        echo view('disclaimer/index');
+        echo view('core/footer');
     }
 }

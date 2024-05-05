@@ -12,7 +12,7 @@ This repository does not contain the data, which can be found in the [Open Data 
 
 These instructions were created using Ubuntu; however, URLs to software instructions are provided to facilitate installations on other operating systems.
 
-### Install Git, Docker, and Docker Compose
+### Prerequisites
 
 Several components must be installed to build the application. On Ubuntu, run the following code via Terminal:
 
@@ -28,9 +28,9 @@ More detailed installation instructions for Git are available at:
 
 <https://git-scm.com/downloads>
 
-### Clone main repository into new Code folder
+### Clone repository
 
-Navigate to the folder where the application code will be downloaded, then run the following command using a program such as Command Prompt (Windows), Git BASH, or Terminal, and run the following code:
+Navigate to the folder where the application code will be downloaded, then run the following command using a program such as Command Prompt (Windows), Git BASH, or Terminal:
 
 ```bash
 git clone https://github.com/localgeohistoryproject/application.git PHP

@@ -2,96 +2,97 @@
 
 namespace App\Controllers;
 
+use App\Models\AffectedGovernmentGroupModel;
+use App\Models\EventModel;
+use App\Models\GovernmentShapeModel;
+use App\Models\MetesDescriptionModel;
+
 class Area extends BaseController
 {
-
-    private $data;
+    private array $data = [
+        'title' => 'Area Detail',
+        'extraAttribution' => '',
+    ];
 
     public function __construct()
     {
-        $this->data = [
-            'title' => 'Area Detail',
-            'isInternetExplorer' => $this->isInternetExplorer(),
-            'live' => $this->isLive(),
-            'online' => $this->isOnline(),
-            'updated' => $this->lastUpdated()->fulldate,
-            'extraAttribution' => '',
-        ];
     }
 
-    public function address($state)
+    public function address(string $state): void
     {
+        $addressText = $this->request->getPost('address', FILTER_SANITIZE_STRING);
         try {
-            $addressText = $this->request->getPost('address', FILTER_SANITIZE_STRING);
             $data = file_get_contents('https://us1.locationiq.com/v1/search.php?key=' . getenv('locationiq_key') . '&format=json&countrycodes=us&dedupe=1&q=' . urlencode($addressText));
-            if (($data = json_decode($data, TRUE)) !== FALSE) {
-                if (count($data) == 1) {
+            if (($data = json_decode($data, true)) !== false) {
+                if (count($data) === 1) {
                     $this->data['extraAttribution'] = 'Address searching courtesy of <a href="https://locationiq.com/attribution/">LocationIQ</a>.';
                     $this->point($state, $data[0]['lat'], $data[0]['lon'], $addressText);
                 } else {
                     $this->addressCensusBureau($state, $addressText);
                 }
             }
-        } catch (\Throwable $t) {
+        } catch (\Throwable) {
             $this->addressCensusBureau($state, $addressText);
         }
     }
 
-    public function addressCensusBureau($state, $addressText)
+    public function addressCensusBureau(string $state, string $addressText): void
     {
         try {
             $data = file_get_contents('https://geocoding.geo.census.gov/geocoder/locations/onelineaddress?benchmark=9&format=json&address=' . $addressText);
-            if (($data = json_decode($data, TRUE)) !== FALSE) {
-                if (count($data['result']['addressMatches']) == 1 and strtolower($data['result']['addressMatches'][0]['addressComponents']['state']) == $state) {
+            if (($data = json_decode($data, true)) !== false) {
+                if (count($data['result']['addressMatches']) === 1 && strtolower($data['result']['addressMatches'][0]['addressComponents']['state']) === $state) {
                     $this->data['extraAttribution'] = 'Address searching courtesy of the <a href="https://geocoding.geo.census.gov/geocoder/">U.S. Census Bureau</a>.';
                     $this->point($state, $data['result']['addressMatches'][0]['coordinates']['y'], $data['result']['addressMatches'][0]['coordinates']['x'], $addressText);
                 } else {
                     $this->noRecord($state);
                 }
             }
-        } catch (\Throwable $t) {
+        } catch (\Throwable) {
             $this->noRecord($state);
         }
     }
 
-    public function noRecord($state)
+    public function noRecord(string $state): void
     {
         $this->data['state'] = $state;
-        echo view('header', $this->data);
-        echo view('norecord');
-        echo view('footer');
+        echo view('core/header', $this->data);
+        echo view('core/norecord');
+        echo view('core/footer');
     }
 
-    public function point($state, $y = 0, $x = 0, $addressText = '')
+    public function point(string $state, float $y = 0, float $x = 0, string $addressText = ''): void
     {
-        if (empty($y) and !empty($this->request->getPost('y', FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION))) {
-            $y = $this->request->getPost('y', FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
+        if ($y === 0.0 && $this->request->getPost('y', FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION) !== '') {
+            $y = (float) $this->request->getPost('y', FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
         }
-        if (empty($x) and !empty($this->request->getPost('x', FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION))) {
-            $x = $this->request->getPost('x', FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
+        if ($x === 0.0 && $this->request->getPost('x', FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION) !== '') {
+            $x = (float) $this->request->getPost('x', FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
         }
         // Only applies in US
-        if ($y < 0 or $x > 0) {
+        if ($y < 0 || $x > 0) {
             $newX = $y;
             $y = $x;
             $x = $newX;
         }
-        $query = $this->db->query('SELECT * FROM extra.ci_model_area_point(?, ?)', [$y, $x])->getResult();
-        if (count($query) != 1) {
+        $GovernmentShapeModel = new GovernmentShapeModel();
+        $query = $GovernmentShapeModel->getPointId($y, $x);
+        if (count($query) !== 1) {
             $this->noRecord($state);
         } else {
             $this->view($state, $query[0]->governmentshapeid, $y, $x, $addressText);
         }
     }
 
-    public function view($state, $id, $y = 0, $x = 0, $addressText = '')
+    public function view(string $state, int|string $id, float $y = 0, float $x = 0, string $addressText = ''): void
     {
         $this->data['state'] = $state;
-        if (($this->data['live'] or !empty($y) or !empty($x)) and preg_match('/^\d{1,9}$/', $id)) {
-            $id = intval($id);
+        if (($this->isLive() || $y !== 0.0 || $x !== 0.0) && preg_match('/^\d{1,9}$/', $id)) {
+            $id = (int) $id;
         }
-        $currentQuery = $this->db->query('SELECT * FROM extra.ci_model_area_currentgovernment(?, ?, ?)', [$id, $state, $this->request->getLocale()])->getResult();
-        if (count($currentQuery) != 1) {
+        $GovernmentShapeModel = new GovernmentShapeModel();
+        $currentQuery = $GovernmentShapeModel->getDetail($id, $state);
+        if (count($currentQuery) !== 1) {
             $this->noRecord($state);
         } else {
             $id = $currentQuery[0]->governmentshapeid;
@@ -102,44 +103,41 @@ class Area extends BaseController
                 $currentQuery[0]->governmentstateabbreviation
             ];
             foreach ($governmentArray as $g) {
-                if (!empty($g) and substr($g, 0, 14) !== 'Unincorporated' and substr($g, 0, 11) !== 'Unorganized' and substr($g, 0, 7) !== 'Unknown') {
+                if ($g !== '' && !str_starts_with($g, 'Unincorporated') && !str_starts_with($g, 'Unorganized') && !str_starts_with($g, 'Unknown')) {
                     $this->data['pageTitle'] = $g;
                     break;
                 }
             }
-            echo view('header', $this->data);
-            if (!empty($addressText)) {
+            echo view('core/header', $this->data);
+            $searchParameter = [];
+            if ($addressText !== '') {
                 $searchParameter['Address'] = $addressText;
-            } elseif (!empty($x) or !empty($y)) {
+            } elseif ($x !== 0.0 || $y !== 0.0) {
                 $searchParameter['Coordinates'] = $y . ', ' . $x;
             }
-            if (isset($searchParameter)) {
-                echo view('general_parameter', ['searchParameter' => $searchParameter, 'omitColon' => true]);
+            if ($searchParameter === []) {
+                echo view('core/parameter', ['searchParameter' => $searchParameter, 'omitColon' => true]);
             }
-            echo view('general_currentgovernment', ['query' => $currentQuery, 'state' => $state]);
-            echo view('general_map', ['live' => $this->data['live'], 'includeBase' => true]);
-            $query = $this->db->query('SELECT * FROM extra.ci_model_area_affectedgovernment(?, ?, ?)', [$id, $state, $this->request->getLocale()])->getResult();
+            echo view('event/table_currentgovernment', ['query' => $currentQuery, 'state' => $state]);
+            echo view('core/map', ['includeBase' => true]);
+            $AffectedGovernmentGroupModel = new AffectedGovernmentGroupModel();
+            $query = $AffectedGovernmentGroupModel->getByGovernmentShape($id, $state);
             $events = [];
-            if (count($query) > 0) {
-                echo view('general_affectedgovernment', ['query' => $query, 'state' => $state, 'includeDate' => true, 'isComplete' => true]);
-                foreach ($query as $row) {
-                    if (!empty($row->eventid)) {
-                        $events[] = $row->eventid;
-                    }
+            echo view('event/table_affectedgovernment_fixed', ['query' => $query, 'state' => $state, 'includeDate' => true, 'isComplete' => true]);
+            foreach ($query as $row) {
+                if (!is_null($row->eventid)) {
+                    $events[] = $row->eventid;
                 }
             }
-            $query = $this->db->query('SELECT * FROM extra.ci_model_area_metesdescription(?)', [$id])->getResult();
-            if (count($query) > 0) {
-                echo view('general_metes', ['query' => $query, 'hasLink' => true, 'state' => $state, 'title' => 'Metes and Bounds Description']);
-            }
+            $MetesDescriptionModel = new MetesDescriptionModel();
+            $query = $MetesDescriptionModel->getByGovernmentShape($id);
+            echo view('metes/table', ['query' => $query, 'hasLink' => true, 'state' => $state, 'title' => 'Metes and Bounds Description']);
             $events = array_unique($events);
-            $events = '{' . implode(',', $events) . '}';
-            $query = $this->db->query('SELECT * FROM extra.ci_model_area_event_failure(?, ?)', [$id, $events])->getResult();
-            if (count($query) > 0) {
-                echo view('general_event', ['query' => $query, 'state' => $state, 'title' => 'Other Event Links']);
-            }
-            echo view('leaflet_start', ['type' => 'area', 'includeBase' => true, 'needRotation' => false, 'online' => $this->data['online']]);
-            echo view('general_gis', [
+            $EventModel = new EventModel();
+            $query = $EventModel->getByGovernmentShapeFailure($id, $events);
+            echo view('event/table', ['query' => $query, 'state' => $state, 'title' => 'Other Event Links']);
+            echo view('leaflet/start', ['type' => 'area', 'includeBase' => true, 'needRotation' => false]);
+            echo view('core/gis', [
                 'query' => $currentQuery,
                 'element' => 'area',
                 'onEachFeature' => false,
@@ -149,14 +147,14 @@ class Area extends BaseController
                 'fillOpacity' => 0.5
             ]);
             $includePoint = false;
-            if (!empty($x) and !empty($y)) {
+            if ($x !== 0.0 && $y !== 0.0) {
                 $includePoint = true;
                 $query = [(object)[
                     'line' => '',
                     'pointdescription' => '',
                     'pointgeometry' => '{"type":"Point","coordinates":[' . $x . ',' . $y . ']}',
                 ]];
-                echo view('general_gis', [
+                echo view('core/gis', [
                     'query' => $query,
                     'element' => 'point',
                     'onEachFeature' => false,
@@ -168,9 +166,9 @@ class Area extends BaseController
                     'attribution' => $this->data['extraAttribution']
                 ]);
             }
-            echo view('area_end', ['includePoint' => $includePoint]);
-            echo view('leaflet_end', ['live' => $this->data['live']]);
-            echo view('footer');
+            echo view('area/end', ['includePoint' => $includePoint]);
+            echo view('leaflet/end');
+            echo view('core/footer');
         }
     }
 }

@@ -2,28 +2,25 @@
 
 namespace App\Controllers;
 
+use App\Models\DocumentationModel;
+
 class About extends BaseController
 {
-
-    private $data;
+    private array $data = [
+        'title' => 'About',
+    ];
 
     public function __construct()
     {
-        $this->data = [
-            'title' => 'About',
-            'isInternetExplorer' => $this->isInternetExplorer(),
-            'live' => $this->isLive(),
-            'online' => $this->isOnline(),
-            'updated' => $this->lastUpdated()->fulldate,
-        ];
     }
 
-    public function index($state = '')
+    public function index(string $state = ''): void
     {
         $this->data['state'] = $state;
-        echo view('header', $this->data);
-        $query = $this->db->query('SELECT * FROM extra.ci_model_about(?)', [$state])->getResult();
-        echo view('about', ['query' => $query]);
-        echo view('footer');
+        echo view('core/header', $this->data);
+        $DocumentationModel = new DocumentationModel();
+        $query = $DocumentationModel->getAboutDetail($state);
+        echo view('about/index', ['query' => $query]);
+        echo view('core/footer');
     }
 }

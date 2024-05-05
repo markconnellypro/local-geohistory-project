@@ -4,26 +4,20 @@ namespace App\Controllers;
 
 class Fourofour extends BaseController
 {
-
-    private $data;
+    private array $data = [
+        'title' => '404',
+    ];
 
     public function __construct()
     {
-        $this->data = [
-            'title' => '404',
-            'isInternetExplorer' => $this->isInternetExplorer(),
-            'live' => $this->isLive(),
-            'online' => $this->isOnline(),
-            'updated' => $this->lastUpdated()->fulldate,
-        ];
     }
 
-    public function index($state = '')
+    public function index(string $state = ''): void
     {
         $this->response->setStatusCode(404);
         $this->data['state'] = $state;
-        echo view('header', $this->data);
-        echo view('error');
-        echo view('footer');
+        echo view('core/header', $this->data);
+        echo view('core/error');
+        echo view('core/footer');
     }
 }

@@ -2,65 +2,61 @@
 
 namespace App\Controllers;
 
+use App\Models\MetesDescriptionModel;
+
 class Metes extends BaseController
 {
-
-    private $data;
+    private array $data = [
+        'title' => 'Metes and Bounds Description Detail',
+    ];
 
     public function __construct()
     {
-        $this->data = [
-            'title' => 'Metes and Bounds Description Detail',
-            'isInternetExplorer' => $this->isInternetExplorer(),
-            'live' => $this->isLive(),
-            'online' => $this->isOnline(),
-            'updated' => $this->lastUpdated()->fulldate,
-        ];
     }
 
-    public function noRecord($state)
+    public function noRecord(string $state): void
     {
         $this->data['state'] = $state;
-        echo view('header', $this->data);
-        echo view('norecord');
-        echo view('footer');
+        echo view('core/header', $this->data);
+        echo view('core/norecord');
+        echo view('core/footer');
     }
 
-    public function view($state, $id)
+    public function view(string $state, int|string $id): void
     {
         $this->data['state'] = $state;
-        if ($this->data['live'] and preg_match('/^\d{1,9}$/', $id)) {
-            $id = intval($id);
-        }
-        $areaQuery = $this->db->query('SELECT * FROM extra.ci_model_metes_detail(?, ?)', [$id, $state])->getResult();
-        if (count($areaQuery) != 1) {
+        $id = $this->getIdInt($id);
+        $MetesDescriptionModel = new MetesDescriptionModel();
+        $areaQuery = $MetesDescriptionModel->getDetail($id, $state);
+        if (count($areaQuery) !== 1) {
             $this->noRecord($state);
         } else {
             $id = $areaQuery[0]->metesdescriptionid;
             $this->data['pageTitle'] = $areaQuery[0]->metesdescriptionlong;
-            echo view('header', $this->data);
-            echo view('general_metes', ['query' => $areaQuery, 'hasLink' => false, 'title' => 'Detail']);
+            echo view('core/header', $this->data);
+            echo view('metes/table', ['query' => $areaQuery, 'hasLink' => false, 'title' => 'Detail']);
             $hasMap = false;
             $hasMetes = false;
             $hasArea = (!is_null($areaQuery[0]->geometry));
-            $hasBegin = ($areaQuery[0]->hasbeginpoint == 't' or $hasArea);
-            if ($this->data['live']) {
-                $geometryQuery = $this->db->query('SELECT * FROM extra_development.ci_model_metes_line(?)', [$id])->getResult();
-                $hasMetes = (count($geometryQuery) > 1);
+            $hasBegin = ($areaQuery[0]->hasbeginpoint === 't' || $hasArea);
+            if ($this->isLive()) {
+                $MetesDescriptionLineModel = new \App\Models\Development\MetesDescriptionLineModel();
+            } else {
+                $MetesDescriptionLineModel = new \App\Models\MetesDescriptionLineModel();
             }
-            if ($hasArea or $hasMetes) {
+            $geometryQuery = $MetesDescriptionLineModel->getGeometryByMetesDescription($id);
+            $hasMetes = (count($geometryQuery) > 1);
+            if ($hasArea || $hasMetes) {
                 $hasMap = true;
-                echo view('general_map', ['live' => $this->data['live'], 'includeBase' => $hasBegin, 'includeDisclaimer' => true]);
+                echo view('core/map', ['includeBase' => $hasBegin, 'includeDisclaimer' => true]);
             }
-            $query = $this->db->query('SELECT * FROM extra.ci_model_metes_row(?)', [$id])->getResult();
-            if (count($query) > 0) {
-                echo view('metes_row', ['query' => $query]);
-            }
-            echo view('general_event', ['query' => $areaQuery, 'state' => $state, 'title' => 'Event Links']);
+            $query = $MetesDescriptionLineModel->getByMetesDescription($id);
+            echo view('metes/row', ['query' => $query]);
+            echo view('event/table', ['query' => $areaQuery, 'state' => $state, 'title' => 'Event Links']);
             if ($hasMap) {
-                echo view('leaflet_start', ['type' => 'metes', 'includeBase' => $hasBegin, 'needRotation' => false, 'online' => $this->data['online']]);
+                echo view('leaflet/start', ['type' => 'metes', 'includeBase' => $hasBegin, 'needRotation' => false]);
                 if ($hasArea) {
-                    echo view('general_gis', [
+                    echo view('core/gis', [
                         'query' => $areaQuery,
                         'element' => 'area',
                         'onEachFeature' => false,
@@ -71,7 +67,7 @@ class Metes extends BaseController
                     ]);
                 }
                 if ($hasMetes) {
-                    echo view('general_gis', [
+                    echo view('core/gis', [
                         'query' => $geometryQuery,
                         'element' => 'line',
                         'onEachFeature' => true,
@@ -80,7 +76,7 @@ class Metes extends BaseController
                         'color' => 'D5103F',
                         'fillOpacity' => 0
                     ]);
-                    echo view('general_gis', [
+                    echo view('core/gis', [
                         'query' => $geometryQuery,
                         'element' => 'point',
                         'onEachFeature' => true,
@@ -91,10 +87,10 @@ class Metes extends BaseController
                         'radius' => 6
                     ]);
                 }
-                echo view('metes_end', ['includeBase' => $hasBegin, 'includeArea' => $hasArea, 'includeMetes' => $hasMetes]);
-                echo view('leaflet_end', ['includeBase' => $hasBegin, 'live' => $this->data['live']]);
+                echo view('metes/end', ['includeBase' => $hasBegin, 'includeArea' => $hasArea, 'includeMetes' => $hasMetes]);
+                echo view('leaflet/end', ['includeBase' => $hasBegin]);
             }
-            echo view('footer');
+            echo view('core/footer');
         }
     }
 }

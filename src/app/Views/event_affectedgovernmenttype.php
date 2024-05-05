@@ -1,1 +1,0 @@
-    var affectedgovernmenttype = <?= json_encode($query); ?>;

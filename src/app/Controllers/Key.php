@@ -2,41 +2,55 @@
 
 namespace App\Controllers;
 
+use App\Models\DocumentationModel;
+
 class Key extends BaseController
 {
-
-    private $data;
+    private array $data = [
+        'title' => 'Key',
+    ];
 
     public function __construct()
     {
-        $this->data = [
-            'title' => 'Key',
-            'isInternetExplorer' => $this->isInternetExplorer(),
-            'live' => $this->isLive(),
-            'online' => $this->isOnline(),
-            'updated' => $this->lastUpdated()->fulldate,
-        ];
     }
 
-    public function index($state = '')
+    public function index(string $state = ''): void
     {
         $this->data['state'] = $state;
-        echo view('header', $this->data);
+        echo view('core/header', $this->data);
+
+        $keyQueries = [];
+
         $keys = [
-            'eventtype' => 'Event Type',
-            'governmentlevel' => 'Government Level',
-            'governmentmapstatus' => 'Government Map Status',
-            'governmenttimelapsemapcolor' => 'Government Timelapse Map Color',
-            'affectedtype' => 'How Affected',
-            'law' => 'Law',
-            'eventrelationship' => 'Relationship',
-            'eventgranted' => 'Successful?',
+            'Government Level' => 'governmentlevel',
+            'Government Map Status' => 'governmentmapstatus',
+            'Government Timelapse Map Color' => 'governmenttimelapsemapcolor',
+            'Law' => 'law',
         ];
-        echo view('key_start', ['keys' => $keys]);
+        $DocumentationModel = new DocumentationModel();
         foreach ($keys as $k => $v) {
-            $query = $this->db->query('SELECT * FROM extra.ci_model_key_' . $k . '()', [])->getResult();
-            echo view('general_key', ['query' => $query, 'type' => $k, 'title' => $v]);
+            $keyQueries[$k] = $DocumentationModel->getKey($v);
         }
-        echo view('footer');
+
+        $modelKeys = [
+            'Event Type' => 'EventType',
+            'How Affected' => 'AffectedType',
+            'Relationship' => 'EventRelationship',
+            'Successful?' => 'EventGranted'
+        ];
+        $keys = array_merge($keys, $modelKeys);
+        foreach ($modelKeys as $k => $v) {
+            $model = "App\\Models\\" . $v . 'Model';
+            $model = new $model();
+            $keyQueries[$k] = $model->getKey();
+        }
+
+        ksort($keys);
+        ksort($keyQueries);
+        echo view('key/start', ['keys' => $keys]);
+        foreach ($keys as $k => $v) {
+            echo view('key/table', ['query' => $keyQueries[$k], 'type' => strtolower($v), 'title' => $k]);
+        }
+        echo view('core/footer');
     }
 }
