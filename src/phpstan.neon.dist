@@ -26,11 +26,11 @@ parameters:
 		- app/Models/Development
 		- app/Views/development
 		- app/Views/errors
-	checkMissingIterableValueType: false
-	checkGenericClassInNonGenericObjectType: false
 	checkMissingCallableSignature: true
 	reportMaybesInPropertyPhpDocTypes: false
 	treatPhpDocTypesAsCertain: false
+	ignoreErrors:
+		- identifier: missingType.iterableValue
 	strictRules:
 		allRules: false
 		disallowedLooseComparison: true
