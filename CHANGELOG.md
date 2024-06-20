@@ -1,5 +1,24 @@
 # Changelog
 
+## [2.0.2] - 2024-06-20
+
+### Changed
+
+- CodeIgniter from 4.5.1 to 4.5.2.
+- DataTables from 2.0.6 to 2.0.8.
+- MapLibre GL JS from 4.2.0 to 4.4.1.
+- MapLibre GL Leaflet from 0.0.20 to 0.0.21.
+- PHP CS Fixer from 3.54.0 to 3.59.3.
+- PHPStan from 1.10.67 to 1.11.5.
+- PHPStan Extension Installer from 1.3.1 to 1.4.1.
+- PHPStan Strict Rules from 1.5.5 to 1.6.0.
+- Rector from 1.0.4 to 1.1.0.
+- PMTiles from 3.0.5 to 3.0.6.
+
+### Fixed
+
+- View for Government Action table to re-add Government column in some scenarios.
+
 ## [2.0.1] - 2024-05-05
 
 ### Changed
@@ -254,6 +273,7 @@
 
 - Public release of the Local Geohistory Project: Application repository.
 
+[2.0.2]: https://github.com/localgeohistoryproject/application/compare/v2.0.1...v2.0.2
 [2.0.1]: https://github.com/localgeohistoryproject/application/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/localgeohistoryproject/application/compare/v1.2.2...v2.0.0
 [1.2.2]: https://github.com/localgeohistoryproject/application/compare/v1.2.1...v1.2.2
