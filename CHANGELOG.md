@@ -12,8 +12,8 @@
 - PHPStan from 1.10.67 to 1.11.5.
 - PHPStan Extension Installer from 1.3.1 to 1.4.1.
 - PHPStan Strict Rules from 1.5.5 to 1.6.0.
-- Rector from 1.0.4 to 1.1.0.
 - PMTiles from 3.0.5 to 3.0.6.
+- Rector from 1.0.4 to 1.1.0.
 
 ### Fixed
 
