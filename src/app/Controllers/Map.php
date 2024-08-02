@@ -74,7 +74,7 @@ class Map extends BaseController
             echo view('leaflet/state_' . $state, $this->data);
         } catch (\Throwable) {
             try {
-                echo view('development/leaflet_state_' . $state, $this->data);
+                echo view('development/leaflet/state_' . $state, $this->data);
             } catch (\Throwable) {
                 echo view('leaflet/state', $this->data);
             }
