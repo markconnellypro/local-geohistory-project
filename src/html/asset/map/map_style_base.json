@@ -1016,9 +1016,30 @@
             "source": "street-tile",
             "source-layer": "segment",
             "filter": [
-                "==",
-                "$type",
-                "LineString"
+                "all",
+                [
+                    "==",
+                    "$type",
+                    "LineString"
+                ],
+                [
+                    "any",
+                    [
+                        "!in",
+                        "class",
+                        "bridleway",
+                        "cycleway",
+                        "footway",
+                        "pedestrian",
+                        "service",
+                        "steps"
+                    ],
+                    [
+                        "in",
+                        "subclass",
+                        "alley"
+                    ]
+                ]
             ],
             "layout": {
                 "symbol-placement": "line",
@@ -1051,7 +1072,7 @@
             }
         },
         {
-            "id": "transportation-segment-motorway",
+            "id": "transportation-segment-road-1",
             "type": "line",
             "source": "street-tile",
             "source-layer": "segment",
@@ -1088,83 +1109,7 @@
             }
         },
         {
-            "id": "transportation-segment-other",
-            "type": "line",
-            "source": "street-tile",
-            "source-layer": "segment",
-            "filter": [
-                "in",
-                "class",
-                "secondary",
-                "tertiary",
-                "residential",
-                "alley"
-            ],
-            "layout": {
-                "line-cap": "round",
-                "line-join": "round",
-                "visibility": "visible"
-            },
-            "paint": {
-                "line-color": "rgba(128, 126, 126, 0.7)",
-                "line-width": {
-                    "base": 1.4,
-                    "stops": [
-                        [
-                            5,
-                            0
-                        ],
-                        [
-                            6,
-                            0.5
-                        ],
-                        [
-                            20,
-                            20
-                        ]
-                    ]
-                }
-            }
-        },
-        {
-            "id": "transportation-segment-path-track",
-            "type": "line",
-            "source": "street-tile",
-            "source-layer": "segment",
-            "filter": [
-                "in",
-                "class",
-                "path",
-                "track"
-            ],
-            "layout": {
-                "line-cap": "square",
-                "line-join": "bevel",
-                "visibility": "visible"
-            },
-            "paint": {
-                "line-color": "hsl(0, 0%, 97%)",
-                "line-dasharray": [
-                    1,
-                    1
-                ],
-                "line-width": {
-                    "base": 1.55,
-                    "stops": [
-                        [
-                            4,
-                            0.25
-                        ],
-                        [
-                            20,
-                            10
-                        ]
-                    ]
-                }
-            }
-        },
-        {
-            "id": "transportation-segment-primary-trunk",
+            "id": "transportation-segment-road-2",
             "type": "line",
             "source": "street-tile",
             "source-layer": "segment",
@@ -1195,6 +1140,90 @@
                         [
                             20,
                             30
+                        ]
+                    ]
+                }
+            }
+        },
+        {
+            "id": "transportation-segment-road-3",
+            "type": "line",
+            "source": "street-tile",
+            "source-layer": "segment",
+            "filter": [
+                "in",
+                "class",
+                "secondary",
+                "tertiary"
+            ],
+            "layout": {
+                "line-cap": "round",
+                "line-join": "round",
+                "visibility": "visible"
+            },
+            "paint": {
+                "line-color": "rgba(128, 126, 126, 0.7)",
+                "line-width": {
+                    "base": 1.4,
+                    "stops": [
+                        [
+                            5,
+                            0
+                        ],
+                        [
+                            6,
+                            0.5
+                        ],
+                        [
+                            20,
+                            20
+                        ]
+                    ]
+                }
+            }
+        },
+        {
+            "id": "transportation-segment-road-4",
+            "type": "line",
+            "source": "street-tile",
+            "source-layer": "segment",
+            "filter": [
+                "any",
+                [
+                    "in",
+                    "class",
+                    "living_street",
+                    "residential",
+                    "unclassified",
+                    "unknown"
+                ],
+                [
+                    "in",
+                    "subclass",
+                    "alley"
+                ]
+            ],
+            "layout": {
+                "line-cap": "round",
+                "line-join": "round",
+                "visibility": "visible"
+            },
+            "paint": {
+                "line-color": "rgba(128, 126, 126, 0.7)",
+                "line-width": {
+                    "base": 1.4,
+                    "stops": [
+                        [
+                            5,
+                            0
+                        ],
+                        [
+                            6,
+                            0.5
+                        ],
+                        [
+                            20,
+                            20
                         ]
                     ]
                 }
