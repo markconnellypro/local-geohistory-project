@@ -1023,22 +1023,13 @@
                     "LineString"
                 ],
                 [
-                    "any",
-                    [
-                        "!in",
-                        "class",
-                        "bridleway",
-                        "cycleway",
-                        "footway",
-                        "pedestrian",
-                        "service",
-                        "steps"
-                    ],
-                    [
-                        "in",
-                        "subclass",
-                        "alley"
-                    ]
+                    "!in",
+                    "class",
+                    "bridleway",
+                    "cycleway",
+                    "footway",
+                    "pedestrian",
+                    "steps"
                 ]
             ],
             "layout": {
@@ -1188,20 +1179,13 @@
             "source": "street-tile",
             "source-layer": "segment",
             "filter": [
-                "any",
-                [
-                    "in",
-                    "class",
-                    "living_street",
-                    "residential",
-                    "unclassified",
-                    "unknown"
-                ],
-                [
-                    "in",
-                    "subclass",
-                    "alley"
-                ]
+                "in",
+                "class",
+                "living_street",
+                "residential",
+                "service",
+                "unclassified",
+                "unknown"
             ],
             "layout": {
                 "line-cap": "round",
@@ -1211,19 +1195,15 @@
             "paint": {
                 "line-color": "rgba(128, 126, 126, 0.7)",
                 "line-width": {
-                    "base": 1.4,
+                    "base": 1.55,
                     "stops": [
                         [
-                            5,
-                            0
-                        ],
-                        [
-                            6,
-                            0.5
+                            4,
+                            0.25
                         ],
                         [
                             20,
-                            20
+                            30
                         ]
                     ]
                 }
