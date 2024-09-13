@@ -25,10 +25,10 @@ RUN mkdir /usr/src/docker
 COPY ./docker/php/import_common_php.sh ./docker/php/import_dependency.sh ./src/private/development/docker/import_developmen[t]_php.sh ./src/private/production/docke[r]/* ./src/private/personal-production/personal-docke[r]/* /usr/src/docker/
 RUN chmod -R 764 /usr/src/docker/*
 ARG CI_ENVIRONMENT
+RUN apt-get update
+RUN apt-get install -y unzip zip
 RUN /usr/src/docker/import_common_php.sh
 # Restart Apache
 RUN service apache2 restart
 # Install Composer and prerequisites
-RUN apt-get update
-RUN apt-get install -y unzip zip
 COPY --from=composer:2.6.5 /usr/bin/composer /usr/bin/composer
