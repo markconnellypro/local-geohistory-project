@@ -95,6 +95,11 @@ class Event extends BaseController
             $SourceCitationModel = new SourceCitationModel();
             $query = $SourceCitationModel->getByEvent($id);
             echo view('source/table_citation', ['query' => $query, 'state' => $state, 'hasColor' => false, 'hasLink' => true, 'title' => 'Source']);
+            if ($this->isLive()) {
+                $FileSourceModel = new \App\Models\Development\FileSourceModel();
+                $query = $FileSourceModel->getByEvent($id);
+                echo view(ENVIRONMENT . '/filesource/table', ['query' => $query, 'state' => $state]);
+            }
             if ($hasMap) {
                 $i = 0;
                 echo view('leaflet/start', ['type' => 'event', 'includeBase' => true, 'needRotation' => false]);
