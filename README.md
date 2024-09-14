@@ -17,7 +17,7 @@ These instructions were created using Ubuntu; however, URLs to software instruct
 Several components must be installed to build the application. On Ubuntu, run the following code via Terminal:
 
 ```bash
-sudo apt-get install git docker docker-compose
+sudo apt-get install git docker.io docker-compose-v2
 ```
 
 More detailed installation instructions for Docker and Docker Compose are available at:
@@ -64,7 +64,7 @@ The **inpostgis** folder contains 2 SQL files containing the structural elements
 The final step to deploying the application is to build it using Docker Compose. Run the following command using a program such as Command Prompt (Windows), Git BASH, or Terminal:
 
 ```bash
-sudo docker-compose up --detach
+sudo docker compose up --detach
 ```
 
 ### Check installation
