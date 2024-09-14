@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 16.2 (Debian 16.2-1.pgdg110+2)
--- Dumped by pg_dump version 16.2 (Ubuntu 16.2-1.pgdg22.04+1)
+-- Dumped from database version 16.4 (Debian 16.4-1.pgdg110+1)
+-- Dumped by pg_dump version 16.4 (Ubuntu 16.4-1.pgdg22.04+1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -7842,6 +7842,7 @@ CREATE TABLE geohistory.plsstownship (
     plssrangefraction character varying(10) DEFAULT '0'::character varying NOT NULL,
     plssrangedirection character varying(1) DEFAULT '0'::character varying NOT NULL,
     plsstownshipduplicate character varying(1) DEFAULT '0'::character varying NOT NULL,
+    plsstownshipname text DEFAULT ''::text NOT NULL,
     plsstownshipfull text GENERATED ALWAYS AS (((((
 CASE
     WHEN (plsstownshipnumber = 0) THEN ''::text
