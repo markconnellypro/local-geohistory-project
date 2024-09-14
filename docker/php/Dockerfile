@@ -20,9 +20,9 @@ RUN install-php-extensions gd intl pgsql xsl zip
 # Adjust configuration files
 COPY /docker/php/mods-enabled/headers.conf /etc/apache2/mods-enabled/
 RUN mkdir /usr/src/docker
-# OTHER OPERATING SYSTEMS: May need to use the commented version below instead of the uncommented version 2 lines down
-# COPY ./docker/php/import_common_php.sh ./docker/php/import_dependency.sh /usr/src/docker/
-COPY ./docker/php/import_common_php.sh ./docker/php/import_dependency.sh ./src/private/development/docker/import_developmen[t]_php.sh ./src/private/production/docke[r]/* ./src/private/personal-production/personal-docke[r]/* /usr/src/docker/
+ARG DOCKER_PHP_SH
+ARG DOCKER_PHP_SH_SECONDARY
+COPY /docker/php/import_common_php.sh /docker/php/import_dependency.sh ${DOCKER_PHP_SH} ${DOCKER_PHP_SH_SECONDARY} /usr/src/docker/
 RUN chmod -R 764 /usr/src/docker/*
 ARG CI_ENVIRONMENT
 RUN apt-get update
