@@ -1,4 +1,4 @@
-FROM php:8.2.11-apache
+FROM php:8.3.11-apache
 # Create writable dictory for CodeIgniter
 RUN mkdir /writable
 RUN mkdir /writable/cache
