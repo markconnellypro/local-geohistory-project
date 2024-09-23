@@ -22,7 +22,7 @@ COPY /docker/php/mods-enabled/headers.conf /etc/apache2/mods-enabled/
 RUN mkdir /usr/src/docker
 ARG DOCKER_PHP
 ARG DOCKER_PHP_PERSONAL
-COPY /docker/php/import_common_php.sh /src/private/${DOCKER_PHP}/docker/* /src/private/${DOCKER_PHP_PERSONAL}/docker/* /usr/src/docker/
+COPY /docker/php/import_common_php.sh /docker/php/import_dependency.sh /src/private/${DOCKER_PHP}/docker/* /src/private/${DOCKER_PHP_PERSONAL}/docker/* /usr/src/docker/
 RUN chmod -R 764 /usr/src/docker/*
 ARG CI_ENVIRONMENT
 RUN apt-get update
