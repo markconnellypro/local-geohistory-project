@@ -7,8 +7,8 @@ RUN git clone -b v1.1.1 https://github.com/aws/pg_tle.git /tmp/pg_tle/
 RUN make -C /tmp/pg_tle/
 RUN make -C /tmp/pg_tle/ install
 # Copy scripts and imports to launch database
-ARG DOCKER_POSTGIS_SH
-COPY /docker/postgis/import_common_postgis.sh ${DOCKER_POSTGIS_SH} /docker-entrypoint-initdb.d/
+ARG DOCKER_POSTGIS
+COPY /docker/postgis/import_common_postgis.sh /src/private/${DOCKER_POSTGIS}/docker/import_env_postgis.sh /docker-entrypoint-initdb.d/
 RUN mkdir /tmp/inpostgis/
 RUN chmod -R 777 /tmp/inpostgis/
 RUN rm -rf /docker-entrypoint-initdb.d/10_postgis.sh

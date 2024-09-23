@@ -6,8 +6,8 @@ services:
             dockerfile: ./docker/php/Dockerfile
             args:
                 CI_ENVIRONMENT: ${CI_ENVIRONMENT}
-                DOCKER_PHP_SH: ${DOCKER_PHP_SH}
-                DOCKER_PHP_SH_SECONDARY: ${DOCKER_PHP_SH_SECONDARY}
+                DOCKER_PHP: ${DOCKER_PHP}
+                DOCKER_PHP_PERSONAL: ${DOCKER_PHP_PERSONAL}
         restart: always
         environment:
             TZ: ${TZ}
@@ -31,7 +31,7 @@ services:
             context: ./
             dockerfile: ./docker/postgis/Dockerfile
             args:
-                DOCKER_POSTGIS_SH: ${DOCKER_POSTGIS_SH}
+                DOCKER_POSTGIS: ${DOCKER_POSTGIS}
         restart: always
         command:
           - "postgres"
