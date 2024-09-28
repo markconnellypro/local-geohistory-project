@@ -15,8 +15,7 @@ curl -s -S -o "${license_folder}/D3.txt" "https:/${dependency_d3}/../LICENSE"
 
 curl -s -S -o ${asset_folder}/css/dataTables.dataTables.min.css "https:/${dependency_datatables}/css/dataTables.dataTables.min.css"
 curl -s -S -o ${asset_folder}/js/dataTables.min.js "https:/${dependency_datatables}/js/dataTables.min.js"
-curl -s -S -o "${license_folder}/DataTables.html" "https://datatables.net/license/"
-curl -s -S -o "${license_folder}/DataTables-MIT.html" "https://datatables.net/license/mit"
+curl -s -S -o "${license_folder}/DataTables.txt" "https:/${dependency_datatables_license}"
 
 curl -s -S --output-dir ${asset_folder} -O "https:/${dependency_html_to_image}/html-to-image.js"
 curl -s -S -o "${license_folder}/Html to Image.txt" "https:/${dependency_html_to_image}/../LICENSE"
