@@ -57,6 +57,7 @@ class Map extends BaseController
     public function leaflet(string $state = ''): void
     {
         $zoom = ($state === 'zoom');
+        $state = ($state === 'zoom' ? '' : $state);
         $this->response->removeHeader('Cache-Control');
         $this->response->setHeader('Cache-Control', 'max-age=86400');
         $this->response->setHeader('Content-Type', 'application/javascript');
