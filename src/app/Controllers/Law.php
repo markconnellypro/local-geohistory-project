@@ -7,25 +7,17 @@ use App\Models\SourceItemPartModel;
 
 class Law extends BaseController
 {
-    private array $data = [
-        'title' => 'Law Detail',
-    ];
-
-    public function __construct()
-    {
-    }
+    private string $title = 'Law Detail';
 
     public function noRecord(string $state): void
     {
-        $this->data['state'] = $state;
-        echo view('core/header', $this->data);
+        echo view('core/header', ['state' => $state, 'title' => $this->title]);
         echo view('core/norecord');
         echo view('core/footer');
     }
 
     public function view(string $state, int|string $id): void
     {
-        $this->data['state'] = $state;
         if (str_ends_with($id, '-alternate')) {
             $function = 'getByLawAlternateSection';
             $LawSectionModel = new \App\Models\LawAlternateSectionModel();
@@ -39,8 +31,7 @@ class Law extends BaseController
             $this->noRecord($state);
         } else {
             $id = $query[0]->lawsectionid;
-            $this->data['pageTitle'] = $query[0]->lawsectioncitation;
-            echo view('core/header', $this->data);
+            echo view('core/header', ['state' => $state, 'title' => $this->title, 'pageTitle' => $query[0]->lawsectioncitation]);
             echo view('law/view', ['query' => $query]);
             echo view('source/table', ['query' => $query, 'hasLink' => false]);
             if ($query[0]->url !== '') {
@@ -65,14 +56,11 @@ class Law extends BaseController
             if ($query !== []) {
                 echo view(ENVIRONMENT . '/lawgroup/table', ['query' => $query, 'includeForm' => false]);
             }
-            $query = $LawSectionModel->getRelated($id);
-            echo view('law/table', ['query' => $query, 'state' => $state, 'title' => 'Related Law', 'type' => 'relationship']);
+            echo view('law/table', ['query' => $LawSectionModel->getRelated($id), 'state' => $state, 'title' => 'Related Law', 'type' => 'relationship']);
             $SourceItemPartModel = new SourceItemPartModel();
-            $query = $SourceItemPartModel->$function($id);
-            echo view('core/url', ['query' => $query, 'state' => $state, 'title' => 'Calculated URL']);
+            echo view('core/url', ['query' => $SourceItemPartModel->$function($id), 'state' => $state, 'title' => 'Calculated URL']);
             $EventModel = new EventModel();
-            $query = $EventModel->$function($id);
-            echo view('event/table', ['query' => $query, 'state' => $state, 'title' => 'Event Links', 'eventRelationship' => true, 'includeLawGroup' => true]);
+            echo view('event/table', ['query' => $EventModel->$function($id), 'state' => $state, 'title' => 'Event Links', 'eventRelationship' => true, 'includeLawGroup' => true]);
             echo view('core/footer');
         }
     }

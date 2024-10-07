@@ -4,18 +4,11 @@ namespace App\Controllers;
 
 class Bot extends BaseController
 {
-    private array $data = [
-        'title' => 'Bot',
-    ];
-
-    public function __construct()
-    {
-    }
+    private string $title = 'Bot';
 
     public function index(string $state = ''): void
     {
-        $this->data['state'] = $state;
-        echo view('core/header', $this->data);
+        echo view('core/header', ['state' => $state, 'title' => $this->title]);
         echo view('bot/index');
         echo view('core/footer');
     }

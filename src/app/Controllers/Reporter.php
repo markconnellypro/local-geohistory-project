@@ -9,25 +9,17 @@ use App\Models\SourceItemPartModel;
 
 class Reporter extends BaseController
 {
-    private array $data = [
-        'title' => 'Reporter Details',
-    ];
-
-    public function __construct()
-    {
-    }
+    private string $title = 'Reporter Details';
 
     public function noRecord(string $state): void
     {
-        $this->data['state'] = $state;
-        echo view('core/header', $this->data);
+        echo view('core/header', ['state' => $state, 'title' => $this->title]);
         echo view('core/norecord');
         echo view('core/footer');
     }
 
     public function view(string $state, int|string $id): void
     {
-        $this->data['state'] = $state;
         $id = $this->getIdInt($id);
         $AdjudicationSourceCitationModel = new AdjudicationSourceCitationModel();
         $query = $AdjudicationSourceCitationModel->getDetail($id, $state);
@@ -35,7 +27,7 @@ class Reporter extends BaseController
             $this->noRecord($state);
         } else {
             $id = $query[0]->adjudicationsourcecitationid;
-            echo view('core/header', $this->data);
+            echo view('core/header', ['state' => $state, 'title' => $this->title]);
             echo view('reporter/table', ['query' => $query, 'state' => $state, 'hasLink' => false, 'title' => 'Detail']);
             echo view('source/table', ['query' => $query, 'hasLink' => false]);
             echo view('reporter/authorship', ['query' => $query]);
@@ -43,14 +35,11 @@ class Reporter extends BaseController
                 echo view('core/url', ['query' => $query, 'title' => 'Actual URL']);
             }
             $SourceItemPartModel = new SourceItemPartModel();
-            $query = $SourceItemPartModel->getByAdjudicationSourceCitation($id);
-            echo view('core/url', ['query' => $query, 'state' => $state, 'title' => 'Calculated URL']);
+            echo view('core/url', ['query' => $SourceItemPartModel->getByAdjudicationSourceCitation($id), 'state' => $state, 'title' => 'Calculated URL']);
             $AdjudicationModel = new AdjudicationModel();
-            $query = $AdjudicationModel->getByAdjudicationSourceCitation($id);
-            echo view('adjudication/table', ['query' => $query, 'state' => $state]);
+            echo view('adjudication/table', ['query' => $AdjudicationModel->getByAdjudicationSourceCitation($id), 'state' => $state]);
             $EventModel = new EventModel();
-            $query = $EventModel->getByAdjudicationSourceCitation($id);
-            echo view('event/table', ['query' => $query, 'state' => $state, 'title' => 'Event Links']);
+            echo view('event/table', ['query' => $EventModel->getByAdjudicationSourceCitation($id), 'state' => $state, 'title' => 'Event Links']);
             echo view('core/footer');
         }
     }

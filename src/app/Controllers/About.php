@@ -6,21 +6,13 @@ use App\Models\DocumentationModel;
 
 class About extends BaseController
 {
-    private array $data = [
-        'title' => 'About',
-    ];
-
-    public function __construct()
-    {
-    }
+    private string $title = 'About';
 
     public function index(string $state = ''): void
     {
-        $this->data['state'] = $state;
-        echo view('core/header', $this->data);
+        echo view('core/header', ['state' => $state, 'title' => $this->title]);
         $DocumentationModel = new DocumentationModel();
-        $query = $DocumentationModel->getAboutDetail($state);
-        echo view('about/index', ['query' => $query]);
+        echo view('about/index', ['query' => $DocumentationModel->getAboutDetail($state)]);
         echo view('core/footer');
     }
 }

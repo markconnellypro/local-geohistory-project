@@ -6,9 +6,7 @@ use App\Models\EventTypeModel;
 
 class Statistics extends BaseController
 {
-    private array $data = [
-        'title' => 'Statistics',
-    ];
+    private string $title = 'Statistics';
 
     private array $byType = [
         'current' => 'Modern-Day Jurisdictions',
@@ -26,33 +24,28 @@ class Statistics extends BaseController
         'mapped_review' => 'Reviewed Municipalities',
     ];
 
-    public function __construct()
-    {
-    }
-
     public function index(string $state = ''): void
     {
-        $this->data['state'] = $state;
-        echo view('core/header', $this->data);
-        echo view('core/ui', $this->data);
+        echo view('core/header', ['state' => $state, 'title' => $this->title]);
+        echo view('core/ui');
         $EventTypeModel = new EventTypeModel();
-        $this->data['eventTypeQuery'] = $EventTypeModel->getManyByStatistics($state);
-        echo view('statistics/index', $this->data);
+        echo view('statistics/index', [
+            'state' => $state,
+            'eventTypeQuery' => $EventTypeModel->getManyByStatistics($state)
+        ]);
         echo view('core/footer');
     }
 
     public function noRecord(string $state = ''): void
     {
-        $this->data['state'] = $state;
-        echo view('core/header', $this->data);
+        echo view('core/header', ['state' => $state, 'title' => $this->title]);
         echo view('core/norecord');
         echo view('core/footer');
     }
 
     public function view(string $state = ''): void
     {
-        $this->data['state'] = $state;
-        echo view('core/header', $this->data);
+        echo view('core/header', ['state' => $state, 'title' => $this->title]);
 
         $by = $this->request->getPost('by');
         $for = $this->request->getPost('for');
@@ -143,23 +136,27 @@ class Statistics extends BaseController
         $model = new $model();
         $type = 'getByStatistics' . ($state === '' ? 'Nation' : 'State') . 'Whole';
 
-        $this->data['wholeQuery'] = $model->$type($fields);
-        if ($this->data['wholeQuery'][0]->datarow === '["x"]') {
-            $this->data['wholeQuery'] = [];
+        $wholeQuery = $model->$type($fields);
+        if ($wholeQuery[0]->datarow === '["x"]') {
+            $wholeQuery = [];
+            $query = [];
         } else {
             $type = str_replace('Whole', 'Part', $type);
-            $this->data['query'] = $model->$type($fields);
-            foreach ($this->data['query'] as $key => $row) {
-                $this->data['query'][$key] = '"' . $row->series . '":{"xrow":' . $row->xrow . ',"yrow":' . $row->yrow . ',"ysum":' . $row->ysum . '}';
+            $query = $model->$type($fields);
+            foreach ($query as $key => $row) {
+                $query[$key] = '"' . $row->series . '":{"xrow":' . $row->xrow . ',"yrow":' . $row->yrow . ',"ysum":' . $row->ysum . '}';
             }
-            $this->data['query'] = '{' . implode(',', $this->data['query']) . '}';
+            $query = '{' . implode(',', $query) . '}';
         }
-
-        $this->data['isContemporaneous'] = ($searchParameter['Grouped By'] === 'Contemporaneous Jurisdictions');
-        $this->data['notEvent'] = ($searchParameter['Metric'] === 'Events by Event Type');
         echo view('core/parameter', ['searchParameter' => $searchParameter]);
-        echo view('statistics/view', $this->data);
-        echo view('core/chartjs', ['query' => $this->data['wholeQuery'], 'xLabel' => 'Year', 'yLabel' => ($for === 'createddissolved' ? 'Governments' : 'Events')]);
+        echo view('statistics/view', [
+            'wholeQuery' => $wholeQuery,
+            'isContemporaneous' => ($searchParameter['Grouped By'] === 'Contemporaneous Jurisdictions'),
+            'notEvent' => ($searchParameter['Metric'] === 'Events by Event Type'),
+            'query' => $query,
+            'state' => $state,
+        ]);
+        echo view('core/chartjs', ['query' => $wholeQuery, 'xLabel' => 'Year', 'yLabel' => ($for === 'createddissolved' ? 'Governments' : 'Events')]);
         echo view('core/footer');
     }
 }

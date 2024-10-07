@@ -7,14 +7,6 @@ use CodeIgniter\HTTP\ResponseInterface;
 
 class Map extends BaseController
 {
-    private array $data = [
-        'title' => 'Map',
-    ];
-
-    public function __construct()
-    {
-    }
-
     public function baseStyle(int $maxZoom = 14, ResponseInterface $response = null): void
     {
         if (!$response instanceof \CodeIgniter\HTTP\ResponseInterface) {
@@ -64,19 +56,18 @@ class Map extends BaseController
 
     public function leaflet(string $state = ''): void
     {
-        $this->data['state'] = ($state === 'zoom' ? '' : $state);
-        $this->data['zoom'] = ($state === 'zoom');
+        $zoom = ($state === 'zoom');
         $this->response->removeHeader('Cache-Control');
         $this->response->setHeader('Cache-Control', 'max-age=86400');
         $this->response->setHeader('Content-Type', 'application/javascript');
-        echo view('leaflet/state_base', $this->data);
+        echo view('leaflet/state_base', ['state' => $state, 'zoom' => $zoom]);
         try {
-            echo view('leaflet/state_' . $state, $this->data);
+            echo view('leaflet/state_' . $state);
         } catch (\Throwable) {
             try {
-                echo view('development/leaflet/state_' . $state, $this->data);
+                echo view('development/leaflet/state_' . $state);
             } catch (\Throwable) {
-                echo view('leaflet/state', $this->data);
+                echo view('leaflet/state');
             }
         }
     }

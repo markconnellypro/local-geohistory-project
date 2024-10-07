@@ -7,18 +7,11 @@ use CodeIgniter\HTTP\RedirectResponse;
 
 class Governmentidentifier extends BaseController
 {
-    private readonly array $data;
-
-    public function __construct()
-    {
-        $this->data = [
-            'title' => 'Government Identifier Detail',
-        ];
-    }
+    private string $title = 'Government Identifier Detail';
 
     public function noRecord(): void
     {
-        echo view('core/header', $this->data);
+        echo view('core/header', ['state' => '', 'title' => $this->title]);
         echo view('core/norecord');
         echo view('core/footer');
     }
@@ -40,13 +33,11 @@ class Governmentidentifier extends BaseController
         } else {
             $governmentidentifierids = $query[0]->governmentidentifierids;
             $governments = $query[0]->governments;
-            echo view('core/header', $this->data);
+            echo view('core/header', ['state' => '', 'title' => $this->title]);
             echo view('governmentidentifier/table', ['query' => $query, 'title' => 'Detail']);
             $GovernmentModel = new GovernmentModel();
-            $query = $GovernmentModel->getByGovernmentIdentifier($governmentidentifierids);
-            echo view('government/table', ['query' => $query, 'title' => 'Government', 'type' => 'identifier']);
-            $query = $GovernmentIdentifierModel->getRelated($governments, $governmentidentifierids);
-            echo view('governmentidentifier/table', ['query' => $query, 'title' => 'Related']);
+            echo view('government/table', ['query' => $GovernmentModel->getByGovernmentIdentifier($governmentidentifierids), 'title' => 'Government', 'type' => 'identifier']);
+            echo view('governmentidentifier/table', ['query' => $GovernmentIdentifierModel->getRelated($governments, $governmentidentifierids), 'title' => 'Related']);
             if ($type === 'us-census' || $type === 'usgs') {
                 if ($type === 'us-census') {
                     $query = $GovernmentIdentifierModel->getCensus($governmentidentifierids);
