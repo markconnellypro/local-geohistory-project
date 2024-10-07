@@ -2,6 +2,8 @@
 
 namespace App\Controllers;
 
+use App\Models\DocumentationModel;
+
 class Disclaimer extends BaseController
 {
     private string $title = 'Disclaimers';
@@ -9,7 +11,8 @@ class Disclaimer extends BaseController
     public function index(string $state = ''): void
     {
         echo view('core/header', ['state' => $state, 'title' => $this->title]);
-        echo view('disclaimer/index');
+        $DocumentationModel = new DocumentationModel();
+        echo view('disclaimer/index', ['query' => $DocumentationModel->getDisclaimer()]);
         echo view('core/footer');
     }
 }

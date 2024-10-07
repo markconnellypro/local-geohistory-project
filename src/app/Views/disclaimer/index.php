@@ -1,11 +1,16 @@
-		<p><span class="b">Scope and Purpose of Project:</span> This project aims to educate users and disseminate information concerning the geographic history and structure of political subdivisions and local government.</p>
-		<p><span class="b">Quality and Completeness:</span> The data included in this resource is incomplete. Records from previous centuries do not contain as much information as desired. Certain primary records are inaccessible or no longer existent. Depending on the era, local government boundaries were able to be altered by municipal, county, state, provincial, federal, or royal officials, each maintaining their own sets of records, which may or may not have survived the test of time. Land surveys conducted prior to the invention of modern surveying equipment were often inaccurate, and may not align properly with other surveys of the same boundary. While every effort has been made to include data of high quality within this project, certain data may be inaccurate or of low quality due to data entry errors or inaccuracies in source documents.</p>
-		<p><span class="b">Not a Government Document:</span> While much of the data on this resource is derived from official government records, this resource is not affiliated with or endorsed by any government agency at any level.</p>
-		<p><span class="b">Not Legal Advice:</span> The information in this project was not compiled or reviewed by an attorney, and does not constitute either legal advice or the opinion of an attorney. If you have questions of law concerning the data in this project, or concerning a local boundary line, you are encouraged to contact an attorney licensed in the appropriate jurisdiction.</p>
-		<p><span class="b">Not the Product of a Surveyor:</span> The information in this project was not compiled or reviewed by a land surveyor. Any mapping or other data on this resource only shows approximate boundaries, and is not of surveying or engineering quality. If you have questions about the exact location of a boundary, or need to ascertain a boundary, you are encouraged to contact a land surveyor licensed in the appropriate jurisdiction.</p>
-		<p><span class="b">Copyright and Intellectual Property:</span> The compiler only holds copyright for the format in which the data for this project is presented, and for any original information presented. Certain mapping data is copyrighted by the original data creator, and is used on this site pursuant to licensing agreements. If you believe any portion of this resource violates any copyright or trademark you hold, please contact the compiler immediately. Every effort will be made to evaluate a claim within five (5) business days of receipt.</p>
-		<p><span class="b">Bandwidth and Data Extraction:</span> Manual and automated extraction of a substantial portion of the content of this site, unless allowed by the robots.txt file, is prohibited. Users who have substantial data needs must use the <a href="<?= getenv('app_compiler_opendataurl') ?>"><?= lang('Template.opendata') ?></a> repositories instead. Users may not use project API keys to remote services, such as base layer mapping, for purposes other than viewing content as presented on this site. In order to keep this information available for free online to the widest possible audience, the compiler reserves the right to restrict access by high-volume users to this site.</p>
-		<p><span class="b">Governing Law:</span> This resource is governed by the laws of the <?= getenv('app_venue_state') ?> and the <?= getenv('app_venue_country') ?>. By using this resource, you agree that the venue of any disputes arising herefrom is <?= getenv('app_venue_county') ?>.</p>
-		<p><span class="b">Language:</span> If there are any discrepancies between different languages' versions of these disclaimers, the English-language version shall prevail.</p>
-		<p><span class="b">Compiler Contact Information:</span><br><?= getenv('app_compiler_name') ?><br>Email: <a href="mailto:<?= getenv('app_compiler_email') ?>"><?= getenv('app_compiler_email') ?></a><br>Fax: <?= getenv('app_compiler_fax') ?></p>
-		<p><span class="b">These disclaimers were last updated April 10, 2023.</span></p>
+<?php foreach ($query as $row) { ?>
+	<section id="<?= $row->documentationsort ?>">
+    	<h2><?= $row->documentationshort ?></h2>
+		<p>
+			<?= $row->documentationlong ?>
+		</p>
+	</section>
+<?php } ?>
+	<section id="compiler">
+		<h2>Compiler Contact Information</h2>
+		<p>
+			<?= getenv('app_compiler_name') ?><br>
+			Email: <a href="mailto:<?= getenv('app_compiler_email') ?>"><?= getenv('app_compiler_email') ?></a><br>
+			Fax: <?= getenv('app_compiler_fax') ?>
+		</p>
+	</section>
