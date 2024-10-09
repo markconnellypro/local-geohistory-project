@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 16.2 (Debian 16.2-1.pgdg110+2)
--- Dumped by pg_dump version 16.2 (Ubuntu 16.2-1.pgdg22.04+1)
+-- Dumped from database version 16.4 (Debian 16.4-1.pgdg110+2)
+-- Dumped by pg_dump version 16.4 (Ubuntu 16.4-0ubuntu0.24.04.2)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -311,12 +311,13 @@ CREATE FUNCTION extra.governmentindigobook(integer) RETURNS text
     LANGUAGE sql STABLE
     AS $_$
         SELECT CASE
-            WHEN governmentindigobook = '' THEN governmentabbreviation || '.'
-            ELSE 
-        governmentindigobook END AS governmentindigobook
+            WHEN governmentindigobook = '' AND governmentabbreviation <> '' THEN governmentabbreviation || '.'
+            WHEN governmentindigobook = '' THEN governmentname || '.'
+            ELSE governmentindigobook
+        END AS governmentindigobook
         FROM geohistory.government
         WHERE governmentid = $1;
-    $_$;
+$_$;
 
 
 ALTER FUNCTION extra.governmentindigobook(integer) OWNER TO postgres;
@@ -1353,6 +1354,8 @@ RAISE INFO '%', clock_timestamp();
     REFRESH MATERIALIZED VIEW extra.lawsectionextracache;
 RAISE INFO '%', clock_timestamp();
     REFRESH MATERIALIZED VIEW extra.metesdescriptionextracache;
+RAISE INFO '%', clock_timestamp();
+    REFRESH MATERIALIZED VIEW extra.recordingextracache;
 RAISE INFO '%', clock_timestamp();
     REFRESH MATERIALIZED VIEW extra.sourcecitationextracache;
 RAISE INFO '%', clock_timestamp();
@@ -4666,10 +4669,10 @@ CREATE VIEW extra.governmentsourceextra AS
                 CASE
                     WHEN ((governmentsource.governmentsourcevolume)::text <> ''::text) THEN ('-v'::text || (governmentsource.governmentsourcevolume)::text)
                     ELSE ''::text
-                END) || '-'::text) || extra.rangefix((governmentsource.governmentsourcepagefrom)::text, (governmentsource.governmentsourcepageto)::text)), '[\s\-\.\/''\(\);:,&"#§\?\[\]]+'::text, '-'::text, 'g'::text)), '-'::text) AS governmentsourcepartslug
+                END) || '-'::text) || extra.rangefix((governmentsource.governmentsourcepagefrom)::text, (governmentsource.governmentsourcepageto)::text)), '[\s\-\.\/''\(\);:,&"#§\?\[\]]+'::text, '-'::text, 'g'::text)), '-'::text) AS governmentsourcepartslug,
+            (governmentsource.source IS NOT NULL) AS hassource
            FROM (geohistory.governmentsource
              JOIN extra.governmentextra ON ((governmentsource.government = governmentextra.governmentid)))
-          WHERE (governmentsource.source IS NOT NULL)
         ), governmentsourceslugcounts AS (
          SELECT count(*) AS rowct,
             governmentsourceslugs_1.governmentsourcepartslug
@@ -4681,7 +4684,8 @@ CREATE VIEW extra.governmentsourceextra AS
         CASE
             WHEN (governmentsourceslugcounts.rowct > 1) THEN ('-'::text || rank() OVER (PARTITION BY governmentsourceslugcounts.governmentsourcepartslug ORDER BY governmentsourceslugs.governmentsourceid))
             ELSE ''::text
-        END) AS governmentsourceslug
+        END) AS governmentsourceslug,
+    governmentsourceslugs.hassource
    FROM (governmentsourceslugs
      JOIN governmentsourceslugcounts ON ((governmentsourceslugs.governmentsourcepartslug = governmentsourceslugcounts.governmentsourcepartslug)))
   ORDER BY governmentsourceslugs.governmentsourceid;
@@ -4695,7 +4699,8 @@ ALTER VIEW extra.governmentsourceextra OWNER TO postgres;
 
 CREATE MATERIALIZED VIEW extra.governmentsourceextracache AS
  SELECT governmentsourceid,
-    governmentsourceslug
+    governmentsourceslug,
+    hassource
    FROM extra.governmentsourceextra
   WITH NO DATA;
 
@@ -4881,6 +4886,155 @@ CREATE MATERIALIZED VIEW extra.metesdescriptionextracache AS
 
 
 ALTER MATERIALIZED VIEW extra.metesdescriptionextracache OWNER TO postgres;
+
+--
+-- Name: recording; Type: TABLE; Schema: geohistory; Owner: postgres
+--
+
+CREATE TABLE geohistory.recording (
+    recordingid integer NOT NULL,
+    recordingoffice integer NOT NULL,
+    recordingvolume character varying(50) DEFAULT ''::character varying NOT NULL,
+    recordingpage bigint,
+    recordingpagetext character varying(25) DEFAULT ''::character varying NOT NULL,
+    recordingdescription text DEFAULT ''::character varying NOT NULL,
+    recordingdate calendar.historicdatetext DEFAULT (''::text)::calendar.historicdatetext NOT NULL,
+    recordingrepositorylevel integer,
+    recordingrepositoryshort character varying(30) DEFAULT ''::text NOT NULL,
+    recordingrepositoryitemnumber character varying(10) DEFAULT ''::text NOT NULL,
+    recordingrepositoryitemfrom integer,
+    recordingrepositoryitemto integer,
+    recordingrepositoryitemlocation character varying(25) DEFAULT ''::character varying NOT NULL,
+    recordingrepositoryextractdate calendar.historicdatetext DEFAULT (''::text)::calendar.historicdatetext NOT NULL,
+    recordingrepositoryorder smallint,
+    recordingrepositoryentry character varying(75) DEFAULT ''::text NOT NULL,
+    recordingisrelevant character varying(1) DEFAULT ''::character varying NOT NULL,
+    recordingobtainedcopy character varying(1) DEFAULT ''::character varying NOT NULL,
+    recordingtype integer,
+    recordingnumbertype integer,
+    recordingnumber bigint,
+    recordingnumbertext character varying(25) DEFAULT ''::character varying NOT NULL,
+    recordingvolumeofficerinitials character varying(10) DEFAULT ''::character varying NOT NULL,
+    recordingrepositoryseries character varying(50) DEFAULT ''::character varying NOT NULL,
+    recordingrepositorycontainer character varying(50) DEFAULT ''::character varying NOT NULL
+);
+
+
+ALTER TABLE geohistory.recording OWNER TO postgres;
+
+--
+-- Name: COLUMN recording.recordingdescription; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.recording.recordingdescription IS 'This field is used for internal tracking purposes, and is not included in open data.';
+
+
+--
+-- Name: COLUMN recording.recordingrepositoryshort; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.recording.recordingrepositoryshort IS 'Conform with new abbreviations as of 2018-01-31';
+
+
+--
+-- Name: COLUMN recording.recordingisrelevant; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.recording.recordingisrelevant IS 'This field is used for internal tracking purposes, and is not included in open data.';
+
+
+--
+-- Name: COLUMN recording.recordingobtainedcopy; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.recording.recordingobtainedcopy IS 'This field is used for internal tracking purposes, and is not included in open data.';
+
+
+--
+-- Name: recordingoffice; Type: TABLE; Schema: geohistory; Owner: postgres
+--
+
+CREATE TABLE geohistory.recordingoffice (
+    recordingofficeid integer NOT NULL,
+    government integer NOT NULL,
+    recordingofficetype integer NOT NULL,
+    recordingofficedistrictcircuit character varying(2) DEFAULT ''::character varying NOT NULL
+);
+
+
+ALTER TABLE geohistory.recordingoffice OWNER TO postgres;
+
+--
+-- Name: recordingofficetype; Type: TABLE; Schema: geohistory; Owner: postgres
+--
+
+CREATE TABLE geohistory.recordingofficetype (
+    recordingofficetypeid integer NOT NULL,
+    recordingofficetypelevel integer NOT NULL,
+    recordingofficetypeshort character varying(25) DEFAULT ''::character varying NOT NULL,
+    recordingofficetypelong text NOT NULL,
+    recordingofficetypedivision character varying(50) DEFAULT ''::character varying NOT NULL,
+    recordingofficetypeisaftergovernment boolean DEFAULT false NOT NULL,
+    abbreviationverified boolean DEFAULT false NOT NULL,
+    CONSTRAINT recordingofficetype_check CHECK ((recordingofficetypelong <> ''::text))
+);
+
+
+ALTER TABLE geohistory.recordingofficetype OWNER TO postgres;
+
+--
+-- Name: recordingtype; Type: TABLE; Schema: geohistory; Owner: postgres
+--
+
+CREATE TABLE geohistory.recordingtype (
+    recordingtypeid integer NOT NULL,
+    recordingtypetype character varying(20) DEFAULT 'Book'::text NOT NULL,
+    recordingtypeabbreviation character varying(45) NOT NULL,
+    recordingtypelong character varying(45) NOT NULL,
+    recordingtypeshort character varying(25) NOT NULL,
+    recordingtypevolumetype character varying(15) DEFAULT 'Volume'::text NOT NULL,
+    recordingtypepagetype character varying(10) DEFAULT 'Page'::text NOT NULL,
+    recordingisnumber boolean DEFAULT false NOT NULL,
+    CONSTRAINT recordingtype_check CHECK ((((recordingtypeabbreviation)::text <> ''::text) AND ((recordingtypelong)::text <> ''::text) AND ((recordingtypeshort)::text <> ''::text)))
+);
+
+
+ALTER TABLE geohistory.recordingtype OWNER TO postgres;
+
+--
+-- Name: recordingextra; Type: VIEW; Schema: extra; Owner: postgres
+--
+
+CREATE VIEW extra.recordingextra AS
+ SELECT recording.recordingid,
+    lower(regexp_replace(regexp_replace(regexp_replace(replace(((((
+        CASE
+            WHEN (recording.recordingtype IS NOT NULL) THEN ((((((((((recordingtype.recordingtypelong)::text || '-'::text) || (recordingtype.recordingtypetype)::text) || '-'::text) || (recording.recordingvolume)::text) || '-'::text) || (recording.recordingvolumeofficerinitials)::text) || '-'::text) || COALESCE((recording.recordingpage)::text, ''::text)) || (recording.recordingpagetext)::text)
+            WHEN (recording.recordingnumbertype IS NOT NULL) THEN ((((((recordingnumbertype.recordingtypelong)::text || '-'::text) || (recordingnumbertype.recordingtypetype)::text) || '-'::text) || COALESCE((recording.recordingnumber)::text, ''::text)) || (recording.recordingnumbertext)::text)
+            ELSE ''::text
+        END || '-of-'::text) || "left"((recording.recordingdate)::text, 4)) || '-'::text) || recording.recordingid), ', '::text, ' '::text), '[ \/'',"]'::text, '-'::text, 'g'::text), '[\-]+'::text, '-'::text, 'g'::text), '[\(\)\?\.\[\]]'::text, ''::text, 'g'::text)) AS recordingslug
+   FROM ((((geohistory.recording
+     LEFT JOIN geohistory.recordingoffice ON ((recording.recordingoffice = recordingoffice.recordingofficeid)))
+     LEFT JOIN geohistory.recordingofficetype ON ((recordingoffice.recordingofficetype = recordingofficetype.recordingofficetypeid)))
+     LEFT JOIN geohistory.recordingtype ON ((recording.recordingtype = recordingtype.recordingtypeid)))
+     LEFT JOIN geohistory.recordingtype recordingnumbertype ON ((recording.recordingnumbertype = recordingnumbertype.recordingtypeid)))
+  ORDER BY recording.recordingid;
+
+
+ALTER VIEW extra.recordingextra OWNER TO postgres;
+
+--
+-- Name: recordingextracache; Type: MATERIALIZED VIEW; Schema: extra; Owner: postgres
+--
+
+CREATE MATERIALIZED VIEW extra.recordingextracache AS
+ SELECT recordingid,
+    recordingslug
+   FROM extra.recordingextra
+  WITH NO DATA;
+
+
+ALTER MATERIALIZED VIEW extra.recordingextracache OWNER TO postgres;
 
 --
 -- Name: sourcecitation; Type: TABLE; Schema: geohistory; Owner: postgres
@@ -6092,83 +6246,6 @@ COMMENT ON COLUMN geohistory.researchlogtype.researchlogtypeisrecord IS 'Rows wi
 
 
 --
--- Name: recording; Type: TABLE; Schema: geohistory; Owner: postgres
---
-
-CREATE TABLE geohistory.recording (
-    recordingid integer NOT NULL,
-    recordingoffice integer NOT NULL,
-    recordingvolume character varying(50) DEFAULT ''::character varying NOT NULL,
-    recordingpage bigint,
-    recordingpagetext character varying(25) DEFAULT ''::character varying NOT NULL,
-    recordingdescription text DEFAULT ''::character varying NOT NULL,
-    recordingdate calendar.historicdatetext DEFAULT (''::text)::calendar.historicdatetext NOT NULL,
-    recordingrepositorylevel integer,
-    recordingrepositoryshort character varying(30) DEFAULT ''::text NOT NULL,
-    recordingrepositoryitemnumber character varying(10) DEFAULT ''::text NOT NULL,
-    recordingrepositoryitemfrom integer,
-    recordingrepositoryitemto integer,
-    recordingrepositoryitemlocation character varying(25) DEFAULT ''::character varying NOT NULL,
-    recordingrepositoryextractdate calendar.historicdatetext DEFAULT (''::text)::calendar.historicdatetext NOT NULL,
-    recordingrepositoryorder smallint,
-    recordingrepositoryentry character varying(75) DEFAULT ''::text NOT NULL,
-    recordingisrelevant character varying(1) DEFAULT ''::character varying NOT NULL,
-    recordingobtainedcopy character varying(1) DEFAULT ''::character varying NOT NULL,
-    recordingtype integer,
-    recordingnumbertype integer,
-    recordingnumber bigint,
-    recordingnumbertext character varying(25) DEFAULT ''::character varying NOT NULL,
-    recordingvolumeofficerinitials character varying(10) DEFAULT ''::character varying NOT NULL,
-    recordingrepositoryseries character varying(50) DEFAULT ''::character varying NOT NULL,
-    recordingrepositorycontainer character varying(50) DEFAULT ''::character varying NOT NULL
-);
-
-
-ALTER TABLE geohistory.recording OWNER TO postgres;
-
---
--- Name: COLUMN recording.recordingdescription; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.recording.recordingdescription IS 'This field is used for internal tracking purposes, and is not included in open data.';
-
-
---
--- Name: COLUMN recording.recordingrepositoryshort; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.recording.recordingrepositoryshort IS 'Conform with new abbreviations as of 2018-01-31';
-
-
---
--- Name: COLUMN recording.recordingrepositoryitemfrom; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.recording.recordingrepositoryitemfrom IS 'For instances where this field is used for internal tracking purposes, particular values may be omitted in open data.';
-
-
---
--- Name: COLUMN recording.recordingrepositoryitemto; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.recording.recordingrepositoryitemto IS 'For instances where this field is used for internal tracking purposes, particular values may be omitted in open data.';
-
-
---
--- Name: COLUMN recording.recordingisrelevant; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.recording.recordingisrelevant IS 'This field is used for internal tracking purposes, and is not included in open data.';
-
-
---
--- Name: COLUMN recording.recordingobtainedcopy; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.recording.recordingobtainedcopy IS 'This field is used for internal tracking purposes, and is not included in open data.';
-
-
---
 -- Name: recordingevent; Type: TABLE; Schema: geohistory; Owner: postgres
 --
 
@@ -6183,39 +6260,6 @@ CREATE TABLE geohistory.recordingevent (
 
 
 ALTER TABLE geohistory.recordingevent OWNER TO postgres;
-
---
--- Name: recordingoffice; Type: TABLE; Schema: geohistory; Owner: postgres
---
-
-CREATE TABLE geohistory.recordingoffice (
-    recordingofficeid integer NOT NULL,
-    government integer NOT NULL,
-    recordingofficetype integer NOT NULL,
-    recordingofficedistrictcircuit character varying(2) DEFAULT ''::character varying NOT NULL
-);
-
-
-ALTER TABLE geohistory.recordingoffice OWNER TO postgres;
-
---
--- Name: recordingtype; Type: TABLE; Schema: geohistory; Owner: postgres
---
-
-CREATE TABLE geohistory.recordingtype (
-    recordingtypeid integer NOT NULL,
-    recordingtypetype character varying(20) DEFAULT 'Book'::text NOT NULL,
-    recordingtypeabbreviation character varying(45) NOT NULL,
-    recordingtypelong character varying(45) NOT NULL,
-    recordingtypeshort character varying(25) NOT NULL,
-    recordingtypevolumetype character varying(15) DEFAULT 'Volume'::text NOT NULL,
-    recordingtypepagetype character varying(10) DEFAULT 'Page'::text NOT NULL,
-    recordingisnumber boolean DEFAULT false NOT NULL,
-    CONSTRAINT recordingtype_check CHECK ((((recordingtypeabbreviation)::text <> ''::text) AND ((recordingtypelong)::text <> ''::text) AND ((recordingtypeshort)::text <> ''::text)))
-);
-
-
-ALTER TABLE geohistory.recordingtype OWNER TO postgres;
 
 --
 -- Name: sourcecitationnote; Type: TABLE; Schema: geohistory; Owner: postgres
@@ -6694,7 +6738,7 @@ ALTER SEQUENCE geohistory.currentgovernment_currentgovernmentid_seq OWNED BY geo
 CREATE TABLE geohistory.documentation (
     documentationid integer NOT NULL,
     documentationtype character varying(30) NOT NULL,
-    documentationshort character varying(15) NOT NULL,
+    documentationshort character varying(50) NOT NULL,
     documentationlong text NOT NULL,
     documentationcolor character varying(40) DEFAULT ''::character varying NOT NULL,
     documentationlocale character varying(2) DEFAULT 'en'::character varying NOT NULL,
@@ -7842,6 +7886,7 @@ CREATE TABLE geohistory.plsstownship (
     plssrangefraction character varying(10) DEFAULT '0'::character varying NOT NULL,
     plssrangedirection character varying(1) DEFAULT '0'::character varying NOT NULL,
     plsstownshipduplicate character varying(1) DEFAULT '0'::character varying NOT NULL,
+    plsstownshipname text DEFAULT ''::text NOT NULL,
     plsstownshipfull text GENERATED ALWAYS AS (((((
 CASE
     WHEN (plsstownshipnumber = 0) THEN ''::text
@@ -8026,24 +8071,6 @@ ALTER SEQUENCE geohistory.recordingoffice_recordingofficeid_seq OWNER TO postgre
 
 ALTER SEQUENCE geohistory.recordingoffice_recordingofficeid_seq OWNED BY geohistory.recordingoffice.recordingofficeid;
 
-
---
--- Name: recordingofficetype; Type: TABLE; Schema: geohistory; Owner: postgres
---
-
-CREATE TABLE geohistory.recordingofficetype (
-    recordingofficetypeid integer NOT NULL,
-    recordingofficetypelevel integer NOT NULL,
-    recordingofficetypeshort character varying(25) DEFAULT ''::character varying NOT NULL,
-    recordingofficetypelong text NOT NULL,
-    recordingofficetypedivision character varying(50) DEFAULT ''::character varying NOT NULL,
-    recordingofficetypeisaftergovernment boolean DEFAULT false NOT NULL,
-    abbreviationverified boolean DEFAULT false NOT NULL,
-    CONSTRAINT recordingofficetype_check CHECK ((recordingofficetypelong <> ''::text))
-);
-
-
-ALTER TABLE geohistory.recordingofficetype OWNER TO postgres;
 
 --
 -- Name: recordingofficetype_recordingofficetypeid_seq; Type: SEQUENCE; Schema: geohistory; Owner: postgres
@@ -13219,6 +13246,48 @@ GRANT SELECT ON TABLE extra.metesdescriptionextracache TO readonly;
 
 
 --
+-- Name: TABLE recording; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.recording TO readonly;
+
+
+--
+-- Name: TABLE recordingoffice; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.recordingoffice TO readonly;
+
+
+--
+-- Name: TABLE recordingofficetype; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.recordingofficetype TO readonly;
+
+
+--
+-- Name: TABLE recordingtype; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.recordingtype TO readonly;
+
+
+--
+-- Name: TABLE recordingextra; Type: ACL; Schema: extra; Owner: postgres
+--
+
+GRANT SELECT ON TABLE extra.recordingextra TO readonly;
+
+
+--
+-- Name: TABLE recordingextracache; Type: ACL; Schema: extra; Owner: postgres
+--
+
+GRANT SELECT ON TABLE extra.recordingextracache TO readonly;
+
+
+--
 -- Name: TABLE sourcecitation; Type: ACL; Schema: geohistory; Owner: postgres
 --
 
@@ -13338,31 +13407,10 @@ GRANT SELECT ON TABLE geohistory.researchlogtype TO readonly;
 
 
 --
--- Name: TABLE recording; Type: ACL; Schema: geohistory; Owner: postgres
---
-
-GRANT SELECT ON TABLE geohistory.recording TO readonly;
-
-
---
 -- Name: TABLE recordingevent; Type: ACL; Schema: geohistory; Owner: postgres
 --
 
 GRANT SELECT ON TABLE geohistory.recordingevent TO readonly;
-
-
---
--- Name: TABLE recordingoffice; Type: ACL; Schema: geohistory; Owner: postgres
---
-
-GRANT SELECT ON TABLE geohistory.recordingoffice TO readonly;
-
-
---
--- Name: TABLE recordingtype; Type: ACL; Schema: geohistory; Owner: postgres
---
-
-GRANT SELECT ON TABLE geohistory.recordingtype TO readonly;
 
 
 --
@@ -13531,13 +13579,6 @@ GRANT SELECT ON TABLE geohistory.plssspecialsurvey TO readonly;
 --
 
 GRANT SELECT ON TABLE geohistory.plsstownship TO readonly;
-
-
---
--- Name: TABLE recordingofficetype; Type: ACL; Schema: geohistory; Owner: postgres
---
-
-GRANT SELECT ON TABLE geohistory.recordingofficetype TO readonly;
 
 
 --

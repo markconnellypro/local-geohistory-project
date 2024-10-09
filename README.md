@@ -17,7 +17,7 @@ These instructions were created using Ubuntu; however, URLs to software instruct
 Several components must be installed to build the application. On Ubuntu, run the following code via Terminal:
 
 ```bash
-sudo apt-get install git docker docker-compose
+sudo apt-get install git docker.io docker-compose-v2
 ```
 
 More detailed installation instructions for Docker and Docker Compose are available at:
@@ -53,7 +53,7 @@ The application uses symbolic links to propagate the .env file to 2 other locati
 src/.env
 ```
 
-The application also contains 2 Dockerfiles, one in **docker/php** and one in **docker/postgis**, which may need to be modified in other operating systems where COPY statements will fail if the file does not exist. In these situations, uncomment the line starting with **COPY** that is immediately below the line starting with **# OTHER OPERATING SYSTEMS** by removing **#** from the beginning of the line, and then go to the following **COPY** line and add **#** to the beginning of the line to comment it out.
+The application also contains 2 Dockerfiles, one in **docker/php** and one in **docker/postgis**.
 
 ### Copy data files into the inpostgis folder
 
@@ -64,7 +64,7 @@ The **inpostgis** folder contains 2 SQL files containing the structural elements
 The final step to deploying the application is to build it using Docker Compose. Run the following command using a program such as Command Prompt (Windows), Git BASH, or Terminal:
 
 ```bash
-sudo docker-compose up --detach
+sudo docker compose up --detach
 ```
 
 ### Check installation

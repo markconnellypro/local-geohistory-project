@@ -6,25 +6,17 @@ use App\Models\MetesDescriptionModel;
 
 class Metes extends BaseController
 {
-    private array $data = [
-        'title' => 'Metes and Bounds Description Detail',
-    ];
-
-    public function __construct()
-    {
-    }
+    private string $title = 'Metes and Bounds Description Detail';
 
     public function noRecord(string $state): void
     {
-        $this->data['state'] = $state;
-        echo view('core/header', $this->data);
+        echo view('core/header', ['state' => $state, 'title' => $this->title]);
         echo view('core/norecord');
         echo view('core/footer');
     }
 
     public function view(string $state, int|string $id): void
     {
-        $this->data['state'] = $state;
         $id = $this->getIdInt($id);
         $MetesDescriptionModel = new MetesDescriptionModel();
         $areaQuery = $MetesDescriptionModel->getDetail($id, $state);
@@ -32,8 +24,7 @@ class Metes extends BaseController
             $this->noRecord($state);
         } else {
             $id = $areaQuery[0]->metesdescriptionid;
-            $this->data['pageTitle'] = $areaQuery[0]->metesdescriptionlong;
-            echo view('core/header', $this->data);
+            echo view('core/header', ['state' => $state, 'title' => $this->title, 'pageTitle' => $areaQuery[0]->metesdescriptionlong]);
             echo view('metes/table', ['query' => $areaQuery, 'hasLink' => false, 'title' => 'Detail']);
             $hasMap = false;
             $hasMetes = false;
@@ -50,8 +41,7 @@ class Metes extends BaseController
                 $hasMap = true;
                 echo view('core/map', ['includeBase' => $hasBegin, 'includeDisclaimer' => true]);
             }
-            $query = $MetesDescriptionLineModel->getByMetesDescription($id);
-            echo view('metes/row', ['query' => $query]);
+            echo view('metes/row', ['query' => $MetesDescriptionLineModel->getByMetesDescription($id)]);
             echo view('event/table', ['query' => $areaQuery, 'state' => $state, 'title' => 'Event Links']);
             if ($hasMap) {
                 echo view('leaflet/start', ['type' => 'metes', 'includeBase' => $hasBegin, 'needRotation' => false]);

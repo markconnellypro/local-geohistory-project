@@ -1,5 +1,49 @@
 # Changelog
 
+## [2.1.0] - 2024-10-09
+
+### Added
+
+- Database column hassource to views extra.governmentsourceextra and extra.governmentsourceextracache.
+- Database column plsstownshipname to geohistory.plsstownship.
+- Database views extra.recordingextra and extra.recordingextracache.
+- Functionality to accommodate changes to related private repositories.
+- Google Analytics support.
+
+### Changed
+
+- CodeIgniter from 4.5.2 to 4.5.5.
+- Controller properties and view calls to remove $this->data array; pass model results directly in more situations.
+- CSS and HTML tag id references.
+- Database column documentationshort in geohistory.documentation to lengthen field.
+- Database extract pg_dump and OS versions.
+- Database function extra.governmentindigobook(integer) to cover additional scenarios.
+- DataTables from 2.0.8 to 2.1.8.
+- Dockerfile to accommodate changes to related private repositories.
+- Dockerfiles to remove globs and reconfigure folder structure for environment-specific files.
+- MapLibre GL JS from 4.4.1 to 4.7.1.
+- MapLibre GL Leaflet from 0.0.21 to 0.0.22.
+- PHP CS Fixer from 3.59.3 to 3.64.0.
+- PHP docker image from 8.2.11-apache to php:8.3.11-apache.
+- PHPStan Extension Installer from 1.4.1 to 1.4.3.
+- PHPStan from 1.11.5 to 1.12.6.
+- PHPStan Strict Rules from 1.6.0 to 1.6.1.
+- PMTiles from 3.0.6 to 3.2.0.
+- README to update installation instructions to accommodate Ubuntu 24.04 LTS, and remove other OS warning.
+- Rector from 1.1.0 to 1.2.6.
+
+### Fixed
+
+- App\Filters\LanguageRedirect to accommodate classes without a getLocale method.
+- Functionality to accommodate changes to related private repositories.
+- GovernmentModel->getAbbreviationid(string) to force uppercase comparison and output proper response column.
+
+### Removed
+
+- Database extract exclusion warnings from comments for columns recordingrepositoryitemfrom and recordingrepositoryitemto in geohistory.recording.
+- Disclaimer text and venue environmental variables from repository (to be stored in Open Data repository).
+- PHPStan review of certain development directories.
+
 ## [2.0.2] - 2024-06-20
 
 ### Changed
@@ -273,6 +317,7 @@
 
 - Public release of the Local Geohistory Project: Application repository.
 
+[2.1.0]: https://github.com/localgeohistoryproject/application/compare/v2.0.2...v2.1.0
 [2.0.2]: https://github.com/localgeohistoryproject/application/compare/v2.0.1...v2.0.2
 [2.0.1]: https://github.com/localgeohistoryproject/application/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/localgeohistoryproject/application/compare/v1.2.2...v2.0.0

@@ -9,9 +9,7 @@ use App\Models\SourceModel;
 
 class Search extends BaseController
 {
-    private array $data = [
-        'title' => 'Search',
-    ];
+    private string $title = 'Search';
 
     private array $categoryType = [
         'event' => 'Event',
@@ -43,10 +41,6 @@ class Search extends BaseController
         'statewide' => 'Statewide',
     ];
 
-    public function __construct()
-    {
-    }
-
     private function governmentLevel(string $a): int
     {
         return match ($a) {
@@ -59,42 +53,42 @@ class Search extends BaseController
 
     public function governmentlookup(string $state, string $government = '', string $type = ''): void
     {
-        $this->data['state'] = $state;
         $GovernmentModel = new GovernmentModel();
         $type = 'getLookupBy' . ucwords(str_replace('parent', 'Parent', $type));
-        $this->data['query'] = $GovernmentModel->$type($state, $government);
         $this->response->setHeader('Content-Type', 'application/json');
-        echo json_encode($this->data['query']);
+        echo json_encode($GovernmentModel->$type($state, $government));
     }
 
     public function index(string $state = ''): void
     {
         $stateArray = $this->getJurisdictions();
-        $this->data['state'] = $state;
-        echo view('core/header', $this->data);
+        echo view('core/header', ['state' => $state, 'title' => $this->title]);
         if (!$this->isLive() && !in_array($state, $stateArray)) {
             echo view('search/unavailable');
         } else {
             $GovernmentModel = new GovernmentModel();
-            $this->data['id'] = $GovernmentModel->getSlug($GovernmentModel->getAbbreviationId($state));
+            $id = $GovernmentModel->getSlug($GovernmentModel->getAbbreviationId($state));
+            echo view('core/ui');
             $EventTypeModel = new EventTypeModel();
-            $this->data['eventTypeQuery'] = $EventTypeModel->getSearch($state);
-            $this->data['months'] = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-            foreach ($this->data['months'] as $k => $m) {
-                $this->data['months'][$k] = [
+            $GovernmentIdentifierTypeModel = new GovernmentIdentifierTypeModel();
+            $SourceModel = new SourceModel();
+            $months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            foreach ($months as $k => $m) {
+                $months[$k] = [
                     'monthNumber' => $k + 1,
                     'monthName' => $m
                 ];
             }
-            $this->data['tribunalgovernmentshortQuery'] = $GovernmentModel->getSearch($state);
-            $GovernmentIdentifierTypeModel = new GovernmentIdentifierTypeModel();
-            $this->data['governmentIdentifierTypeQuery'] = $GovernmentIdentifierTypeModel->getSearch($state);
-            $SourceModel = new SourceModel();
-            $this->data['reporterQuery'] = $SourceModel->getSearch($state);
-            echo view('core/ui', $this->data);
-            echo view('search/index', $this->data);
+            echo view('search/index', [
+                'eventTypeQuery' => $EventTypeModel->getSearch($state),
+                'governmentIdentifierTypeQuery' => $GovernmentIdentifierTypeModel->getSearch($state),
+                'months' => $months,
+                'reporterQuery' => $SourceModel->getSearch($state),
+                'state' => $state,
+                'tribunalgovernmentshortQuery' => $GovernmentModel->getSearch($state),
+            ]);
             if (file_exists(APPPATH . 'Views/' . ENVIRONMENT . '/government/live.php')) {
-                echo view(ENVIRONMENT . '/government/live', ['id' => $this->data['id'], 'state' => $state, 'isMunicipalityOrLower' => false, 'isCountyOrLower' => false, 'isCountyOrState' => false, 'isState' => true, 'includeGovernment' => true]);
+                echo view(ENVIRONMENT . '/government/live', ['id' => $id, 'state' => $state, 'isMunicipalityOrLower' => false, 'isCountyOrLower' => false, 'isCountyOrState' => false, 'isState' => true, 'includeGovernment' => true]);
             }
         }
         echo view('core/footer');
@@ -102,7 +96,6 @@ class Search extends BaseController
 
     public function view(string $state, string $category): void
     {
-        $this->data['state'] = $state;
         $type = $this->request->getPost('type');
         $fields = [];
         $model = '';
@@ -173,11 +166,10 @@ class Search extends BaseController
         }
 
         if ($fields !== [] && $model !== '') {
-            echo view('core/header', $this->data);
+            echo view('core/header', ['state' => $state, 'title' => $this->title]);
             $model = "App\\Models\\" . $model;
             $model = new $model();
             $modelType = 'getSearchBy'. ucwords($type);
-            $query = $model->$modelType($fields);
             $searchParameter = [
                 'Search For' => $this->categoryType[$category],
                 'Search By' => $this->typeType[$this->request->getPost('type')],
@@ -188,7 +180,7 @@ class Search extends BaseController
                 }
             }
             echo view('core/parameter', ['searchParameter' => $searchParameter]);
-            echo view($category . '/table', ['query' => $query, 'state' => $state, 'title' => 'Results:', 'type' => $type]);
+            echo view($category . '/table', ['query' => $model->$modelType($fields), 'state' => $state, 'title' => 'Results:', 'type' => $type]);
             echo view('core/footer');
         } else {
             $this->response->setHeader('Content-Type', 'application/json');

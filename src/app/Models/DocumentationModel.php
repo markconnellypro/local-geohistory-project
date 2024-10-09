@@ -24,6 +24,21 @@ class DocumentationModel extends Model
         ])->getResult();
     }
 
+    public function getDisclaimer(): array
+    {
+        $query = <<<QUERY
+            SELECT documentation.documentationid,
+                lower(replace(documentation.documentationshort, ' ', '')) AS documentationsort,
+                documentation.documentationshort,
+                documentation.documentationlong
+            FROM geohistory.documentation
+            WHERE documentation.documentationtype = 'disclaimer'
+            ORDER BY 1
+        QUERY;
+
+        return $this->db->query($query)->getResult();
+    }
+
     public function getKey(string $type): array
     {
         $query = <<<QUERY

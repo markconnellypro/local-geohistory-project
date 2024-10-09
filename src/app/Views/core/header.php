@@ -94,5 +94,5 @@ $title ??= '';
         </header>
         <main class="bodytext" <?= (isset($widthOverride) ? ' style="width: ' . $widthOverride . 'px; max-width: ' . $widthOverride . 'px;"' : '') ?>>
             <?php if ($title !== 'Welcome') { ?>
-                <h1 id="topheader"><?= $title ?></h1>
+                <h1><?= $title ?></h1>
             <?php } ?>

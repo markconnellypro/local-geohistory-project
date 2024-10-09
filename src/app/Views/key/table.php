@@ -2,8 +2,8 @@
     $title ??= '';
     $type ??= '';
     ?>
-<section>
-    <h2 id="<?= $type ?>"><?= $title ?></h2>
+<section id="<?= $type ?>">
+    <h2><?= $title ?></h2>
     <?php if ($type === 'law') {
         echo view('key/law');
     } ?>

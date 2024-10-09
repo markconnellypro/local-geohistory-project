@@ -1,4 +1,4 @@
-FROM php:8.2.11-apache
+FROM php:8.3.11-apache
 # Create writable dictory for CodeIgniter
 RUN mkdir /writable
 RUN mkdir /writable/cache
@@ -20,15 +20,15 @@ RUN install-php-extensions gd intl pgsql xsl zip
 # Adjust configuration files
 COPY /docker/php/mods-enabled/headers.conf /etc/apache2/mods-enabled/
 RUN mkdir /usr/src/docker
-# OTHER OPERATING SYSTEMS: May need to use the commented version below instead of the uncommented version 2 lines down
-# COPY ./docker/php/import_common_php.sh ./docker/php/import_dependency.sh /usr/src/docker/
-COPY ./docker/php/import_common_php.sh ./docker/php/import_dependency.sh ./src/private/development/docker/import_developmen[t]_php.sh ./src/private/production/docke[r]/* ./src/private/personal-production/personal-docke[r]/* /usr/src/docker/
+ARG DOCKER_PHP
+ARG DOCKER_PHP_PERSONAL
+COPY /docker/php/import_common_php.sh /docker/php/import_dependency.sh /src/private/${DOCKER_PHP}/docker/* /src/private/${DOCKER_PHP_PERSONAL}/docker/* /usr/src/docker/
 RUN chmod -R 764 /usr/src/docker/*
 ARG CI_ENVIRONMENT
+RUN apt-get update
+RUN apt-get install -y unzip zip
 RUN /usr/src/docker/import_common_php.sh
 # Restart Apache
 RUN service apache2 restart
 # Install Composer and prerequisites
-RUN apt-get update
-RUN apt-get install -y unzip zip
 COPY --from=composer:2.6.5 /usr/bin/composer /usr/bin/composer

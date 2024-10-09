@@ -174,6 +174,7 @@ class GovernmentSourceModel extends Model
                 AND governmentsourceevent.event = ?
             LEFT JOIN extra.governmentsourceextracache
                 ON governmentsource.governmentsourceid = governmentsourceextracache.governmentsourceid
+                AND governmentsourceextracache.hassource
             ORDER BY 12
         QUERY;
 
@@ -281,6 +282,7 @@ class GovernmentSourceModel extends Model
             SELECT governmentsourceextracache.governmentsourceid AS id
                 FROM extra.governmentsourceextracache
             WHERE governmentsourceextracache.governmentsourceslug = ?
+                AND governmentsourceextracache.hassource
         QUERY;
 
         $query = $this->db->query($query, [

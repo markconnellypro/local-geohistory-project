@@ -15,25 +15,17 @@ use App\Models\SourceCitationModel;
 
 class Event extends BaseController
 {
-    private array $data = [
-        'title' => 'Event Detail',
-    ];
-
-    public function __construct()
-    {
-    }
+    private string $title = 'Event Detail';
 
     public function noRecord(string $state): void
     {
-        $this->data['state'] = $state;
-        echo view('core/header', $this->data);
+        echo view('core/header', ['state' => $state, 'title' => $this->title]);
         echo view('core/norecord');
         echo view('core/footer');
     }
 
     public function view(string $state, int|string $id): void
     {
-        $this->data['state'] = $state;
         $id = $this->getIdInt($id);
         $EventModel = new EventModel();
         $query = $EventModel->getDetail($id, $state);
@@ -42,9 +34,7 @@ class Event extends BaseController
         } else {
             $id = $query[0]->eventid;
             $eventIsMapped = ($query[0]->eventismapped === 't');
-            $this->data['pageTitle'] = $query[0]->eventlong;
-            $this->data['pageTitleType'] = $query[0]->eventtypeshort;
-            echo view('core/header', $this->data);
+            echo view('core/header', ['state' => $state, 'title' => $this->title, 'pageTitle' => $query[0]->eventlong, 'pageTitleType' => $query[0]->eventtypeshort]);
             echo view('event/view', ['query' => $query]);
             $AffectedGovernmentGroupModel = new AffectedGovernmentGroupModel();
             $affectedGovernment = $AffectedGovernmentGroupModel->getByEventGovernment($id, $state);
@@ -56,8 +46,8 @@ class Event extends BaseController
             } else {
                 $MetesDescriptionLineModel = new \App\Models\MetesDescriptionLineModel();
             }
-            $metesdescriptiongisquery = $MetesDescriptionLineModel->getGeometryByEvent($id, $state);
-            if ($metesdescriptiongisquery !== []) {
+            $metesDescriptionGisQuery = $MetesDescriptionLineModel->getGeometryByEvent($id, $state);
+            if ($metesDescriptionGisQuery !== []) {
                 $hasMap = true;
             }
             if (!$this->isLive() && !$eventIsMapped) {
@@ -69,32 +59,27 @@ class Event extends BaseController
             if (isset($affectedGovernment['rows']) && count($affectedGovernment['rows']) > 0) {
                 echo view('event/table_affectedgovernment', ['affectedGovernment' => $affectedGovernment, 'state' => $state, 'includeDate' => false, 'isComplete' => true]);
             }
-            $query = $AffectedGovernmentGroupModel->getByEventForm($id, $state);
-            echo view('event/table_affectedgovernmentform', ['includeGovernment' => true, 'query' => $query]);
+            echo view('event/table_affectedgovernmentform', ['includeGovernment' => true, 'query' => $AffectedGovernmentGroupModel->getByEventForm($id, $state)]);
             $CurrentGovernmentModel = new CurrentGovernmentModel();
-            $query = $CurrentGovernmentModel->getByEvent($id, $state);
-            echo view('event/table_currentgovernment', ['query' => $query, 'state' => $state]);
+            echo view('event/table_currentgovernment', ['query' => $CurrentGovernmentModel->getByEvent($id, $state), 'state' => $state]);
             $MetesDescriptionModel = new MetesDescriptionModel();
-            $query = $MetesDescriptionModel->getByEvent($id);
-            echo view('metes/table', ['query' => $query, 'hasLink' => true, 'state' => $state, 'title' => 'Metes and Bounds Description']);
+            echo view('metes/table', ['query' => $MetesDescriptionModel->getByEvent($id), 'hasLink' => true, 'state' => $state, 'title' => 'Metes and Bounds Description']);
             $PlssModel = new PlssModel();
-            $query = $PlssModel->getByEvent($id);
-            echo view('event/plss', ['query' => $query]);
+            echo view('event/plss', ['query' => $PlssModel->getByEvent($id)]);
             $AdjudicationModel = new AdjudicationModel();
-            $query = $AdjudicationModel->getByEvent($id);
-            echo view('adjudication/table', ['query' => $query, 'state' => $state, 'eventRelationship' => true]);
+            echo view('adjudication/table', ['query' => $AdjudicationModel->getByEvent($id), 'state' => $state, 'eventRelationship' => true]);
             $LawSectionModel = new LawSectionModel();
-            $query = $LawSectionModel->getByEvent($id);
-            echo view('law/table', ['query' => $query, 'state' => $state, 'title' => 'Law', 'type' => 'relationship', 'includeLawGroup' => true]);
+            echo view('law/table', ['query' => $LawSectionModel->getByEvent($id), 'state' => $state, 'title' => 'Law', 'type' => 'relationship', 'includeLawGroup' => true]);
             $RecordingModel = new RecordingModel();
-            $query = $RecordingModel->getByEvent($id, $state);
-            echo view('event/recording', ['query' => $query]);
+            echo view('event/recording', ['query' => $RecordingModel->getByEvent($id, $state)]);
             $GovernmentSourceModel = new GovernmentSourceModel();
-            $query = $GovernmentSourceModel->getByEvent($id, $state);
-            echo view('governmentsource/table', ['query' => $query, 'state' => $state, 'type' => 'event']);
+            echo view('governmentsource/table', ['query' => $GovernmentSourceModel->getByEvent($id, $state), 'state' => $state, 'type' => 'event']);
             $SourceCitationModel = new SourceCitationModel();
-            $query = $SourceCitationModel->getByEvent($id);
-            echo view('source/table_citation', ['query' => $query, 'state' => $state, 'hasColor' => false, 'hasLink' => true, 'title' => 'Source']);
+            echo view('source/table_citation', ['query' => $SourceCitationModel->getByEvent($id), 'state' => $state, 'hasColor' => false, 'hasLink' => true, 'title' => 'Source']);
+            if ($this->isLive()) {
+                $FileSourceModel = new \App\Models\Development\FileSourceModel();
+                echo view(ENVIRONMENT . '/filesource/table', ['query' => $FileSourceModel->getByEvent($id), 'state' => $state]);
+            }
             if ($hasMap) {
                 $i = 0;
                 echo view('leaflet/start', ['type' => 'event', 'includeBase' => true, 'needRotation' => false]);
@@ -111,9 +96,9 @@ class Event extends BaseController
                     ]);
                 }
                 $layers = [];
-                if ($this->isLive() && $metesdescriptiongisquery !== []) {
+                if ($this->isLive() && $metesDescriptionGisQuery !== []) {
                     echo view('core/gis', [
-                        'query' => $metesdescriptiongisquery,
+                        'query' => $metesDescriptionGisQuery,
                         'element' => 'metesdescription',
                         'onEachFeature' => false,
                         'onEachFeature2' => false,

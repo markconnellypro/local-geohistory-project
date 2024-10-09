@@ -6,19 +6,12 @@ use CodeIgniter\HTTP\RedirectResponse;
 
 class Welcome extends BaseController
 {
-    private readonly array $data;
-
-    public function __construct()
-    {
-        $this->data = [
-            'title' => 'Welcome',
-        ];
-    }
+    private string $title = 'Welcome';
 
     public function index(): void
     {
         $stateArray = $this->getJurisdictions();
-        echo view('core/header', $this->data);
+        echo view('core/header', ['state' => '', 'title' => $this->title]);
         echo view('welcome/index', ['stateArray' => $stateArray]);
         echo view('core/footer');
     }

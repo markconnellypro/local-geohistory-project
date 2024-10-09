@@ -24,6 +24,7 @@ parameters:
 		- app/Config/View.php
 		- app/Controllers/Development
 		- app/Models/Development
+		- app/ThirdParty/development
 		- app/Views/development
 		- app/Views/errors
 	checkMissingCallableSignature: true

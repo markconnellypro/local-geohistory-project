@@ -116,13 +116,13 @@ class GovernmentModel extends Model
     public function getAbbreviationId(string $id): int
     {
         $query = <<<QUERY
-            SELECT governmentid
+            SELECT governmentid AS id
             FROM geohistory.government
-            WHERE governmentabbreviation = ?
+            WHERE upper(governmentabbreviation) = ?
         QUERY;
 
         $query = $this->db->query($query, [
-            $id,
+            strtoupper($id),
         ])->getResult();
 
         $id = -1;
