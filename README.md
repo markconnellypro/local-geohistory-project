@@ -53,7 +53,7 @@ The application uses symbolic links to propagate the .env file to 2 other locati
 src/.env
 ```
 
-The application also contains 2 Dockerfiles, one in **docker/php** and one in **docker/postgis**, which may need to be modified in other operating systems where COPY statements will fail if the file does not exist. In these situations, uncomment the line starting with **COPY** that is immediately below the line starting with **# OTHER OPERATING SYSTEMS** by removing **#** from the beginning of the line, and then go to the following **COPY** line and add **#** to the beginning of the line to comment it out.
+The application also contains 2 Dockerfiles, one in **docker/php** and one in **docker/postgis**.
 
 ### Copy data files into the inpostgis folder
 

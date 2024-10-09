@@ -29,7 +29,7 @@
 - PHPStan from 1.11.5 to 1.12.6.
 - PHPStan Strict Rules from 1.6.0 to 1.6.1.
 - PMTiles from 3.0.6 to 3.2.0.
-- README to update installation instructions to accommodate Ubuntu 24.04 LTS.
+- README to update installation instructions to accommodate Ubuntu 24.04 LTS, and remove other OS warning.
 - Rector from 1.1.0 to 1.2.6.
 
 ### Fixed
