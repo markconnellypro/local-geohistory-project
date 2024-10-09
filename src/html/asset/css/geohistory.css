@@ -181,6 +181,10 @@ header A:hover {
     display: inline-block;
 }
 
+div.dt-container div.dt-layout-row {
+    margin: 0.35em 0 !important;
+}
+
 @media screen {
     .headerfooter {
         background-color: #003A70;
@@ -214,11 +218,13 @@ header A:hover {
         color: white;
     }
 
-    table.dataTable.stripe > tbody > tr:nth-child(2n+1) > *, table.dataTable.display > tbody > tr:nth-child(2n+1) > * {
+    table.dataTable.stripe>tbody>tr:nth-child(2n+1)>*,
+    table.dataTable.display>tbody>tr:nth-child(2n+1)>* {
         background-color: #EFEFEE !important;
     }
 
-    table.dataTable.stripe > tbody > tr:nth-child(2n) > *, table.dataTable.display > tbody > tr:nth-child(2n) > * {
+    table.dataTable.stripe>tbody>tr:nth-child(2n)>*,
+    table.dataTable.display>tbody>tr:nth-child(2n)>* {
         background-color: #E0DFDD !important;
     }
 
