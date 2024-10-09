@@ -1,3 +1,4 @@
+<?php $query ??= []; ?>
 <?php foreach ($query as $row) { ?>
 	<section id="<?= $row->documentationsort ?>">
     	<h2><?= $row->documentationshort ?></h2>
