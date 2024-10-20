@@ -40,15 +40,15 @@ class Area extends BaseController
                     $this->extraAttribution = 'Address searching courtesy of the <a href="https://geocoding.geo.census.gov/geocoder/">U.S. Census Bureau</a>.';
                     $this->point($state, $data['result']['addressMatches'][0]['coordinates']['y'], $data['result']['addressMatches'][0]['coordinates']['x'], $addressText);
                 } else {
-                    $this->noRecord($state);
+                    $this->noRecord();
                 }
             }
         } catch (\Throwable) {
-            $this->noRecord($state);
+            $this->noRecord();
         }
     }
 
-    public function noRecord(string $state): void
+    public function noRecord(): void
     {
         echo view('core/header', ['title' => $this->title]);
         echo view('core/norecord');
@@ -72,7 +72,7 @@ class Area extends BaseController
         $GovernmentShapeModel = new GovernmentShapeModel();
         $query = $GovernmentShapeModel->getPointId($y, $x);
         if (count($query) !== 1) {
-            $this->noRecord($state);
+            $this->noRecord();
         } else {
             $this->view($state, $query[0]->governmentshapeid, $y, $x, $addressText);
         }
@@ -86,7 +86,7 @@ class Area extends BaseController
         $GovernmentShapeModel = new GovernmentShapeModel();
         $currentQuery = $GovernmentShapeModel->getDetail($id, $state);
         if (count($currentQuery) !== 1) {
-            $this->noRecord($state);
+            $this->noRecord();
         } else {
             $id = $currentQuery[0]->governmentshapeid;
             $governmentArray = [

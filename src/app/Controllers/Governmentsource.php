@@ -10,7 +10,7 @@ class Governmentsource extends BaseController
 {
     private string $title = 'Government Source Detail';
 
-    public function noRecord(string $state): void
+    public function noRecord(): void
     {
         echo view('core/header', ['title' => $this->title]);
         echo view('core/norecord');
@@ -23,7 +23,7 @@ class Governmentsource extends BaseController
         $GovernmentSourceModel = new GovernmentSourceModel();
         $query = $GovernmentSourceModel->getDetail($id, $state);
         if (count($query) !== 1) {
-            $this->noRecord($state);
+            $this->noRecord();
         } else {
             $id = $query[0]->governmentsourceid;
             echo view('core/header', ['title' => $this->title]);

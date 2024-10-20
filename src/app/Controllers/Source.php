@@ -11,7 +11,7 @@ class Source extends BaseController
 {
     private string $title = 'Source Detail';
 
-    public function noRecord(string $state): void
+    public function noRecord(): void
     {
         echo view('core/header', ['title' => $this->title]);
         echo view('core/norecord');
@@ -24,7 +24,7 @@ class Source extends BaseController
         $SourceCitationModel = new SourceCitationModel();
         $query = $SourceCitationModel->getDetail($id, $state);
         if (count($query) !== 1) {
-            $this->noRecord($state);
+            $this->noRecord();
         } else {
             $id = $query[0]->sourcecitationid;
             $pageTitle = $query[0]->sourceabbreviation . ($query[0]->sourcecitationpage === '' ? '' : ' ' . $query[0]->sourcecitationpage);

@@ -12,7 +12,7 @@ class Adjudication extends BaseController
 {
     private string $title = 'Adjudication Detail';
 
-    public function noRecord(string $state): void
+    public function noRecord(): void
     {
         echo view('core/header', ['title' => $this->title]);
         echo view('core/norecord');
@@ -25,7 +25,7 @@ class Adjudication extends BaseController
         $AdjudicationModel = new AdjudicationModel();
         $query = $AdjudicationModel->getDetail($id, $state);
         if (count($query) !== 1) {
-            $this->noRecord($state);
+            $this->noRecord();
         } else {
             $id = $query[0]->adjudicationid;
             echo view('core/header', ['title' => $this->title, 'pageTitle' => $query[0]->adjudicationtitle]);

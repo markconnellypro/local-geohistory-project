@@ -15,7 +15,7 @@ class Government extends BaseController
 {
     private string $title = 'Government Detail';
 
-    public function noRecord(string $state): void
+    public function noRecord(): void
     {
         echo view('core/header', ['title' => $this->title]);
         echo view('core/norecord');
@@ -44,7 +44,7 @@ class Government extends BaseController
         }
         $query = $GovernmentModel->getDetail($id, $state);
         if (count($query) !== 1 || $query[0]->governmentlevel === 'placeholder') {
-            $this->noRecord($state);
+            $this->noRecord();
         } elseif (!is_null($query[0]->governmentsubstituteslug)) {
             header("HTTP/1.1 301 Moved Permanently");
             header("Location: /" . $this->request->getLocale() . "/" . $state . "/government/" . $query[0]->governmentsubstituteslug . "/");

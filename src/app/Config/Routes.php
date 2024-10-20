@@ -20,12 +20,12 @@ if (mb_strpos(base_url(), $_ENV['app_baseLocalGeohistoryProjectUrl']) !== false)
 
     foreach ($controllerRegex as $c) {
         $routes->add('{locale}/' . $stateProvinceRegex . '/' . $c . '/(:segment)', ucwords($c) . '::view/$1/$2');
-        $routes->add('{locale}/' . $stateProvinceRegex . '/' . $c, ucwords($c) . '::noRecord/$1');
+        $routes->add('{locale}/' . $c, ucwords($c) . '::noRecord');
     }
 
     $routes->add('{locale}/search', 'Search::index/');
     $routes->add('{locale}/' . $stateProvinceRegex . '/search/' . $mainSearchRegex, 'Search::view/$1/$2');
-    $routes->add('{locale}/' . $stateProvinceRegex . '/search/(:segment)', 'Search::noRecord/$1');
+    $routes->add('{locale}/search/(:segment)', 'Search::noRecord');
 
     $routes->add('{locale}/' . $stateProvinceRegex . '/address', 'Area::address/$1');
     $routes->add('{locale}/' . $stateProvinceRegex . '/point/(:segment)/(:segment)', 'Area::point/$1/$2/$3');

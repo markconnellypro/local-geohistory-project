@@ -11,7 +11,7 @@ class Reporter extends BaseController
 {
     private string $title = 'Reporter Details';
 
-    public function noRecord(string $state): void
+    public function noRecord(): void
     {
         echo view('core/header', ['title' => $this->title]);
         echo view('core/norecord');
@@ -24,7 +24,7 @@ class Reporter extends BaseController
         $AdjudicationSourceCitationModel = new AdjudicationSourceCitationModel();
         $query = $AdjudicationSourceCitationModel->getDetail($id, $state);
         if (count($query) !== 1) {
-            $this->noRecord($state);
+            $this->noRecord();
         } else {
             $id = $query[0]->adjudicationsourcecitationid;
             echo view('core/header', ['title' => $this->title]);

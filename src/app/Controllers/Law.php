@@ -9,7 +9,7 @@ class Law extends BaseController
 {
     private string $title = 'Law Detail';
 
-    public function noRecord(string $state): void
+    public function noRecord(): void
     {
         echo view('core/header', ['title' => $this->title]);
         echo view('core/norecord');
@@ -28,7 +28,7 @@ class Law extends BaseController
         $id = $this->getIdInt($id);
         $query = $LawSectionModel->getDetail($id, $state);
         if (count($query) !== 1) {
-            $this->noRecord($state);
+            $this->noRecord();
         } else {
             $id = $query[0]->lawsectionid;
             echo view('core/header', ['title' => $this->title, 'pageTitle' => $query[0]->lawsectioncitation]);

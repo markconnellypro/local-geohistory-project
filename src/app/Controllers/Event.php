@@ -17,7 +17,7 @@ class Event extends BaseController
 {
     private string $title = 'Event Detail';
 
-    public function noRecord(string $state): void
+    public function noRecord(): void
     {
         echo view('core/header', ['title' => $this->title]);
         echo view('core/norecord');
@@ -30,7 +30,7 @@ class Event extends BaseController
         $EventModel = new EventModel();
         $query = $EventModel->getDetail($id, $state);
         if (count($query) !== 1 || $query[0]->eventgranted === 'placeholder' && !$this->isLive()) {
-            $this->noRecord($state);
+            $this->noRecord();
         } else {
             $id = $query[0]->eventid;
             $eventIsMapped = ($query[0]->eventismapped === 't');

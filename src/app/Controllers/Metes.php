@@ -8,7 +8,7 @@ class Metes extends BaseController
 {
     private string $title = 'Metes and Bounds Description Detail';
 
-    public function noRecord(string $state): void
+    public function noRecord(): void
     {
         echo view('core/header', ['title' => $this->title]);
         echo view('core/norecord');
@@ -21,7 +21,7 @@ class Metes extends BaseController
         $MetesDescriptionModel = new MetesDescriptionModel();
         $areaQuery = $MetesDescriptionModel->getDetail($id, $state);
         if (count($areaQuery) !== 1) {
-            $this->noRecord($state);
+            $this->noRecord();
         } else {
             $id = $areaQuery[0]->metesdescriptionid;
             echo view('core/header', ['title' => $this->title, 'pageTitle' => $areaQuery[0]->metesdescriptionlong]);
