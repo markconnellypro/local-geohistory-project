@@ -9,13 +9,11 @@ class GovernmentSourceModel extends Model
     // extra.ci_model_governmentsource_detail(integer, character varying, boolean, character varying)
     // extra.ci_model_governmentsource_detail(text, character varying, boolean, character varying)
 
-    // FUNCTION: extra.governmentlong
-    // FUNCTION: extra.governmentstatelink
     // FUNCTION: extra.rangefix
     // FUNCTION: extra.shortdate
     // VIEW: extra.sourceextra
 
-    public function getDetail(int|string $id, string $state): array
+    public function getDetail(int|string $id): array
     {
         if (!is_int($id)) {
             $id = $this->getSlugId($id);
@@ -23,8 +21,8 @@ class GovernmentSourceModel extends Model
 
         $query = <<<QUERY
             SELECT DISTINCT governmentsource.governmentsourceid,
-                extra.governmentstatelink(governmentsource.government, ?, ?) AS government,
-                extra.governmentlong(governmentsource.government, ?) AS governmentlong,
+                government.governmentslug,
+                government.governmentlong,
                 governmentsource.governmentsourcetype,
                 governmentsource.governmentsourcenumber,
                     CASE
@@ -84,18 +82,16 @@ class GovernmentSourceModel extends Model
                 source.sourceid,
                 'sourceitem' AS linktype
             FROM geohistory.governmentsource
+            JOIN geohistory.government
+                ON governmentsource.government = government.governmentid
             JOIN geohistory.source
                 ON governmentsource.source = source.sourceid
             JOIN extra.sourceextra
                 ON source.sourceid = sourceextra.sourceid
             WHERE governmentsource.governmentsourceid = ?
-            -- Add state filter
         QUERY;
 
         return $this->db->query($query, [
-            $state,
-            \Config\Services::request()->getLocale(),
-            strtoupper($state),
             \App\Controllers\BaseController::isLive(),
             $id
         ])->getResult();
@@ -103,17 +99,15 @@ class GovernmentSourceModel extends Model
 
     // extra.ci_model_event_governmentsource(integer, character varying, boolean, character varying)
 
-    // FUNCTION: extra.governmentlong
-    // FUNCTION: extra.governmentstatelink
     // FUNCTION: extra.rangefix
     // FUNCTION: extra.shortdate
     // VIEW: extra.governmentsourceextracache
 
-    public function getByEvent(int $id, string $state): array
+    public function getByEvent(int $id): array
     {
         $query = <<<QUERY
-            SELECT DISTINCT extra.governmentstatelink(governmentsource.government, ?, ?) AS government,
-                extra.governmentlong(governmentsource.government, ?) AS governmentlong,
+            SELECT DISTINCT government.governmentslug,
+                government.governmentlong,
                 governmentsource.governmentsourcetype,
                 governmentsource.governmentsourcenumber,
                     CASE
@@ -169,6 +163,8 @@ class GovernmentSourceModel extends Model
                     ELSE ' p. ' || extra.rangefix(governmentsource.sourcecitationpagefrom, governmentsource.sourcecitationpageto)
                 END) AS sourcecitationlocation
             FROM geohistory.governmentsource
+            JOIN geohistory.government
+                ON governmentsource.government = government.governmentid
             JOIN geohistory.governmentsourceevent
                 ON governmentsource.governmentsourceid = governmentsourceevent.governmentsource
                 AND governmentsourceevent.event = ?
@@ -179,9 +175,6 @@ class GovernmentSourceModel extends Model
         QUERY;
 
         return $this->db->query($query, [
-            $state,
-            \Config\Services::request()->getLocale(),
-            strtoupper($state),
             \App\Controllers\BaseController::isLive(),
             $id,
         ])->getResult();
@@ -189,12 +182,11 @@ class GovernmentSourceModel extends Model
 
     // extra.ci_model_government_governmentsource(integer, character varying, boolean)
 
-    // FUNCTION: extra.governmentlong
     // FUNCTION: extra.rangefix
     // FUNCTION: extra.shortdate
     // VIEW: extra.governmentsubstitutecache
 
-    public function getByGovernment(int $id, string $state): array
+    public function getByGovernment(int $id): array
     {
         $query = <<<QUERY
             SELECT DISTINCT array_agg(event.eventslug) AS eventslug,
@@ -251,9 +243,11 @@ class GovernmentSourceModel extends Model
                     WHEN governmentsource.sourcecitationpagefrom = '' OR governmentsource.sourcecitationpagefrom = '0' THEN ''
                     ELSE ' p. ' || extra.rangefix(governmentsource.sourcecitationpagefrom, governmentsource.sourcecitationpageto)
                 END) AS sourcecitationlocation,
-                extra.governmentlong(governmentsource.government, ?) AS governmentlong,
-                '' AS government
+                government.governmentlong,
+                '' AS governmentslug
             FROM geohistory.governmentsource
+            JOIN geohistory.government
+                ON governmentsource.government = government.governmentid
             JOIN extra.governmentsubstitutecache
                 ON governmentsource.government = governmentsubstitutecache.governmentid
                 AND governmentsubstitutecache.governmentsubstitute = ?
@@ -267,7 +261,6 @@ class GovernmentSourceModel extends Model
 
         return $this->db->query($query, [
             \App\Controllers\BaseController::isLive(),
-            strtoupper($state),
             $id,
         ])->getResult();
     }

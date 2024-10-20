@@ -37,7 +37,7 @@
                         </td>
                     <?php }
                     if ($type !== 'government' || $isMultiple) { ?>
-                        <td><?php echo view('core/link', ['link' => $row->government, 'text' => $row->governmentlong]); ?></td>
+                        <td><?php echo view('core/link', ['link' => '/' . \Config\Services::request()->getLocale() . '/government/' . $row->governmentslug . '/', 'text' => $row->governmentlong]); ?></td>
                     <?php } ?>
                     <td><span class="b">
                             <?= ($row->governmentsourcebody === '' ? '' : $row->governmentsourcebody . ' ') . $row->governmentsourcetype .
