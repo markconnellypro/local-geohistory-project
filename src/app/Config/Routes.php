@@ -24,6 +24,9 @@ if (mb_strpos(base_url(), $_ENV['app_baseLocalGeohistoryProjectUrl']) !== false)
         $routes->add('{locale}/' . $c, ucwords($c) . '::noRecord');
     }
 
+    if ($_ENV['app_jurisdiction'] !== '') {
+        $routes->add('{locale}/' . $stateProvinceRegex, 'Search::redirect');
+    }
     $routes->add('{locale}/search', 'Search::index/');
     $routes->add('{locale}/' . $stateProvinceRegex . '/search/' . $mainSearchRegex, 'Search::view/$1/$2');
     $routes->add('{locale}/search/(:segment)', 'Search::noRecord');
@@ -53,8 +56,6 @@ if (mb_strpos(base_url(), $_ENV['app_baseLocalGeohistoryProjectUrl']) !== false)
     $routes->add('{locale}/' . $stateProvinceRegex . '/lookup/government/(:segment)', 'Search::governmentlookup/$1/$2/government');
     $routes->add('{locale}/' . $stateProvinceRegex . '/lookup/governmentparent/(:segment)', 'Search::governmentlookup/$1/$2/governmentparent');
     $routes->add('{locale}/' . $stateProvinceRegex . '/lookup/tribunal/(:num)', 'Search::tribunallookup/$1');
-
-    $routes->add('{locale}/' . $stateProvinceRegex, 'Search::index/$1');
 }
 
 /*

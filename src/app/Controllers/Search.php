@@ -6,6 +6,7 @@ use App\Models\EventTypeModel;
 use App\Models\GovernmentIdentifierTypeModel;
 use App\Models\GovernmentModel;
 use App\Models\SourceModel;
+use CodeIgniter\HTTP\RedirectResponse;
 
 class Search extends BaseController
 {
@@ -99,6 +100,11 @@ class Search extends BaseController
         echo view('core/header', ['title' => $this->title]);
         echo view('core/norecord');
         echo view('core/footer');
+    }
+
+    public function redirect(int|string $id): RedirectResponse
+    {
+        return redirect()->to('/search/', 301);
     }
 
     public function view(string $state, string $category): void
