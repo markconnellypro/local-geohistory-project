@@ -8,7 +8,7 @@ class Key extends BaseController
 {
     private string $title = 'Key';
 
-    public function index(string $state = ''): void
+    public function index(): void
     {
         echo view('core/header', ['title' => $this->title]);
 

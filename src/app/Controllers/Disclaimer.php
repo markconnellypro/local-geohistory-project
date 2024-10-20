@@ -8,7 +8,7 @@ class Disclaimer extends BaseController
 {
     private string $title = 'Disclaimers';
 
-    public function index(string $state = ''): void
+    public function index(): void
     {
         echo view('core/header', ['title' => $this->title]);
         $DocumentationModel = new DocumentationModel();
