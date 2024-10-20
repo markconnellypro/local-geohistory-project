@@ -26,7 +26,7 @@ class Statistics extends BaseController
 
     public function index(string $state = ''): void
     {
-        echo view('core/header', ['state' => $state, 'title' => $this->title]);
+        echo view('core/header', ['title' => $this->title]);
         echo view('core/ui');
         $EventTypeModel = new EventTypeModel();
         echo view('statistics/index', [
@@ -38,14 +38,14 @@ class Statistics extends BaseController
 
     public function noRecord(string $state = ''): void
     {
-        echo view('core/header', ['state' => $state, 'title' => $this->title]);
+        echo view('core/header', ['title' => $this->title]);
         echo view('core/norecord');
         echo view('core/footer');
     }
 
     public function view(string $state = ''): void
     {
-        echo view('core/header', ['state' => $state, 'title' => $this->title]);
+        echo view('core/header', ['title' => $this->title]);
 
         $by = $this->request->getPost('by');
         $for = $this->request->getPost('for');

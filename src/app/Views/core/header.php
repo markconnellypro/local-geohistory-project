@@ -1,5 +1,4 @@
 <?php
-$state ??= 'usa';
 $title ??= '';
 ?>
 <!DOCTYPE html>
@@ -22,7 +21,7 @@ $title ??= '';
     <?php } ?>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta charset="UTF-8">
-    <title><?= (isset($pageTitle) ? $pageTitle . ' | ' : '') . (isset($pageTitleType) ? $pageTitleType . ' | ' : '') . $title ?><?= lang('Template.projectName') ?></title>
+    <title><?= (isset($pageTitle) ? $pageTitle . ' | ' : '') . (isset($pageTitleType) ? $pageTitleType . ' | ' : '') . $title ?> | <?= lang('Template.projectName') ?></title>
     <link rel="preload" href="/asset/font/lora-regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
     <link rel="preload" href="/asset/font/lora-semibold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
     <link rel="preload" href="/asset/font/lora-italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
@@ -58,15 +57,13 @@ $title ??= '';
                                         <?= view('core/svg_icon', ['iconLabel' => 'home icon', 'iconName' => 'home', 'iconType' => 'keyiconlarge']); ?>
                                     </a>
                                 </div>
-                                <?php if ($state !== '' && $state !== 'usa') { ?>
-                                    <div class="keyiconcontainer">
-                                        <a href="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/" aria-label="Search">
-                                            <?= view('core/svg_icon', ['iconLabel' => 'magnifying glass icon', 'iconName' => 'search', 'iconType' => 'keyiconlarge']); ?>
-                                        </a>
-                                    </div>
-                                <?php } ?>
                                 <div class="keyiconcontainer">
-                                    <a href="/<?= \Config\Services::request()->getLocale() ?><?= (($state !== '' && $state !== 'usa') ? '/' . $state : '') ?>/about/" aria-label="About">
+                                    <a href="/<?= \Config\Services::request()->getLocale() ?>/search/" aria-label="Search">
+                                        <?= view('core/svg_icon', ['iconLabel' => 'magnifying glass icon', 'iconName' => 'search', 'iconType' => 'keyiconlarge']); ?>
+                                    </a>
+                                </div>
+                                <div class="keyiconcontainer">
+                                    <a href="/<?= \Config\Services::request()->getLocale() ?>/about/" aria-label="About">
                                         <?= view('core/svg_icon', ['iconLabel' => 'about icon', 'iconName' => 'about', 'iconType' => 'keyiconlarge']); ?>
                                     </a>
                                 </div>
@@ -76,7 +73,7 @@ $title ??= '';
                                     </a>
                                 </div>
                                 <div class="keyiconcontainer">
-                                    <a href="/<?= \Config\Services::request()->getLocale() ?><?= (($state !== '' && $state !== 'usa') ? '/' . $state : '') ?>/statistics/" aria-label="Statistics">
+                                    <a href="/<?= \Config\Services::request()->getLocale() ?>/statistics/" aria-label="Statistics">
                                         <?= view('core/svg_icon', ['iconLabel' => 'statistics icon', 'iconName' => 'statistics', 'iconType' => 'keyiconlarge']); ?>
                                     </a>
                                 </div>

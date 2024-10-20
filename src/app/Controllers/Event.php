@@ -19,7 +19,7 @@ class Event extends BaseController
 
     public function noRecord(string $state): void
     {
-        echo view('core/header', ['state' => $state, 'title' => $this->title]);
+        echo view('core/header', ['title' => $this->title]);
         echo view('core/norecord');
         echo view('core/footer');
     }
@@ -34,7 +34,7 @@ class Event extends BaseController
         } else {
             $id = $query[0]->eventid;
             $eventIsMapped = ($query[0]->eventismapped === 't');
-            echo view('core/header', ['state' => $state, 'title' => $this->title, 'pageTitle' => $query[0]->eventlong, 'pageTitleType' => $query[0]->eventtypeshort]);
+            echo view('core/header', ['title' => $this->title, 'pageTitle' => $query[0]->eventlong, 'pageTitleType' => $query[0]->eventtypeshort]);
             echo view('event/view', ['query' => $query]);
             $AffectedGovernmentGroupModel = new AffectedGovernmentGroupModel();
             $affectedGovernment = $AffectedGovernmentGroupModel->getByEventGovernment($id, $state);

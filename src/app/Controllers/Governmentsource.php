@@ -12,7 +12,7 @@ class Governmentsource extends BaseController
 
     public function noRecord(string $state): void
     {
-        echo view('core/header', ['state' => $state, 'title' => $this->title]);
+        echo view('core/header', ['title' => $this->title]);
         echo view('core/norecord');
         echo view('core/footer');
     }
@@ -26,7 +26,7 @@ class Governmentsource extends BaseController
             $this->noRecord($state);
         } else {
             $id = $query[0]->governmentsourceid;
-            echo view('core/header', ['state' => $state, 'title' => $this->title]);
+            echo view('core/header', ['title' => $this->title]);
             echo view('governmentsource/table', ['query' => $query, 'state' => $state, 'type' => 'source']);
             echo view('source/table', ['query' => $query, 'hasLink' => $this->isLive()]);
             $SourceItemPartModel = new SourceItemPartModel();

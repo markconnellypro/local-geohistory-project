@@ -11,7 +11,7 @@ class Law extends BaseController
 
     public function noRecord(string $state): void
     {
-        echo view('core/header', ['state' => $state, 'title' => $this->title]);
+        echo view('core/header', ['title' => $this->title]);
         echo view('core/norecord');
         echo view('core/footer');
     }
@@ -31,7 +31,7 @@ class Law extends BaseController
             $this->noRecord($state);
         } else {
             $id = $query[0]->lawsectionid;
-            echo view('core/header', ['state' => $state, 'title' => $this->title, 'pageTitle' => $query[0]->lawsectioncitation]);
+            echo view('core/header', ['title' => $this->title, 'pageTitle' => $query[0]->lawsectioncitation]);
             echo view('law/view', ['query' => $query]);
             echo view('source/table', ['query' => $query, 'hasLink' => false]);
             if ($query[0]->url !== '') {

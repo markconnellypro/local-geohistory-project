@@ -23,6 +23,7 @@ if (mb_strpos(base_url(), $_ENV['app_baseLocalGeohistoryProjectUrl']) !== false)
         $routes->add('{locale}/' . $stateProvinceRegex . '/' . $c, ucwords($c) . '::noRecord/$1');
     }
 
+    $routes->add('{locale}/search', 'Search::index/');
     $routes->add('{locale}/' . $stateProvinceRegex . '/search/' . $mainSearchRegex, 'Search::view/$1/$2');
     $routes->add('{locale}/' . $stateProvinceRegex . '/search/(:segment)', 'Search::noRecord/$1');
 

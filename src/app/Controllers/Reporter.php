@@ -13,7 +13,7 @@ class Reporter extends BaseController
 
     public function noRecord(string $state): void
     {
-        echo view('core/header', ['state' => $state, 'title' => $this->title]);
+        echo view('core/header', ['title' => $this->title]);
         echo view('core/norecord');
         echo view('core/footer');
     }
@@ -27,7 +27,7 @@ class Reporter extends BaseController
             $this->noRecord($state);
         } else {
             $id = $query[0]->adjudicationsourcecitationid;
-            echo view('core/header', ['state' => $state, 'title' => $this->title]);
+            echo view('core/header', ['title' => $this->title]);
             echo view('reporter/table', ['query' => $query, 'state' => $state, 'hasLink' => false, 'title' => 'Detail']);
             echo view('source/table', ['query' => $query, 'hasLink' => false]);
             echo view('reporter/authorship', ['query' => $query]);

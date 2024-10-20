@@ -13,7 +13,7 @@ class Source extends BaseController
 
     public function noRecord(string $state): void
     {
-        echo view('core/header', ['state' => $state, 'title' => $this->title]);
+        echo view('core/header', ['title' => $this->title]);
         echo view('core/norecord');
         echo view('core/footer');
     }
@@ -28,7 +28,7 @@ class Source extends BaseController
         } else {
             $id = $query[0]->sourcecitationid;
             $pageTitle = $query[0]->sourceabbreviation . ($query[0]->sourcecitationpage === '' ? '' : ' ' . $query[0]->sourcecitationpage);
-            echo view('core/header', ['state' => $state, 'title' => $this->title, 'pageTitle' => $pageTitle]);
+            echo view('core/header', ['title' => $this->title, 'pageTitle' => $pageTitle]);
             echo view('source/table_citation', ['query' => $query, 'state' => $state, 'hasColor' => false, 'hasLink' => false, 'title' => 'Detail']);
             echo view('source/table', ['query' => $query, 'hasLink' => $this->isLive()]);
             if ($query[0]->url !== '') {

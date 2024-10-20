@@ -50,7 +50,7 @@ class Area extends BaseController
 
     public function noRecord(string $state): void
     {
-        echo view('core/header', ['state' => $state, 'title' => $this->title]);
+        echo view('core/header', ['title' => $this->title]);
         echo view('core/norecord');
         echo view('core/footer');
     }
@@ -102,7 +102,7 @@ class Area extends BaseController
                     break;
                 }
             }
-            echo view('core/header', ['state' => $state, 'title' => $this->title, 'pageTitle' => $pageTitle]);
+            echo view('core/header', ['title' => $this->title, 'pageTitle' => $pageTitle]);
             $searchParameter = [];
             if ($addressText !== '') {
                 $searchParameter['Address'] = $addressText;

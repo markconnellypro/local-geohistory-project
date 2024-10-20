@@ -10,7 +10,7 @@ class Metes extends BaseController
 
     public function noRecord(string $state): void
     {
-        echo view('core/header', ['state' => $state, 'title' => $this->title]);
+        echo view('core/header', ['title' => $this->title]);
         echo view('core/norecord');
         echo view('core/footer');
     }
@@ -24,7 +24,7 @@ class Metes extends BaseController
             $this->noRecord($state);
         } else {
             $id = $areaQuery[0]->metesdescriptionid;
-            echo view('core/header', ['state' => $state, 'title' => $this->title, 'pageTitle' => $areaQuery[0]->metesdescriptionlong]);
+            echo view('core/header', ['title' => $this->title, 'pageTitle' => $areaQuery[0]->metesdescriptionlong]);
             echo view('metes/table', ['query' => $areaQuery, 'hasLink' => false, 'title' => 'Detail']);
             $hasMap = false;
             $hasMetes = false;

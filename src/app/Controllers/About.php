@@ -10,7 +10,7 @@ class About extends BaseController
 
     public function index(string $state = ''): void
     {
-        echo view('core/header', ['state' => $state, 'title' => $this->title]);
+        echo view('core/header', ['title' => $this->title]);
         $DocumentationModel = new DocumentationModel();
         echo view('about/index', ['query' => $DocumentationModel->getAboutDetail($state)]);
         echo view('core/footer');

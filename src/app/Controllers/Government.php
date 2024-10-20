@@ -17,7 +17,7 @@ class Government extends BaseController
 
     public function noRecord(string $state): void
     {
-        echo view('core/header', ['state' => $state, 'title' => $this->title]);
+        echo view('core/header', ['title' => $this->title]);
         echo view('core/norecord');
         echo view('core/footer');
     }
@@ -52,7 +52,7 @@ class Government extends BaseController
         } else {
             $id = $query[0]->governmentid;
             $isMultiple = ($query[0]->governmentsubstitutemultiple === 't');
-            echo view('core/header', ['state' => $state, 'title' => $this->title, 'pageTitle' => $query[0]->governmentlong]);
+            echo view('core/header', ['title' => $this->title, 'pageTitle' => $query[0]->governmentlong]);
             $isMunicipalityOrLower = ($query[0]->governmentlevel === 'municipality or lower');
             $isCountyOrLower = ($query[0]->governmentlevel === 'municipality or lower' || $query[0]->governmentlevel === 'county');
             $isCountyOrState = ($query[0]->governmentlevel === 'state' || $query[0]->governmentlevel === 'county');

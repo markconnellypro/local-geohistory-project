@@ -62,7 +62,7 @@ class Search extends BaseController
     public function index(string $state = ''): void
     {
         $stateArray = $this->getJurisdictions();
-        echo view('core/header', ['state' => $state, 'title' => $this->title]);
+        echo view('core/header', ['title' => $this->title]);
         if (!$this->isLive() && !in_array($state, $stateArray)) {
             echo view('search/unavailable');
         } else {
@@ -166,7 +166,7 @@ class Search extends BaseController
         }
 
         if ($fields !== [] && $model !== '') {
-            echo view('core/header', ['state' => $state, 'title' => $this->title]);
+            echo view('core/header', ['title' => $this->title]);
             $model = "App\\Models\\" . $model;
             $model = new $model();
             $modelType = 'getSearchBy'. ucwords($type);
