@@ -12,9 +12,8 @@ class AdjudicationSourceCitationModel extends Model
     // FUNCTION: extra.rangefix
     // FUNCTION: extra.shortdate
     // VIEW: extra.sourceextra
-    // VIEW: extra.adjudicationgovernmentcache
 
-    public function getDetail(int|string $id, string $state): array
+    public function getDetail(int|string $id): array
     {
         if (!is_int($id)) {
             $id = $this->getSlugId($id);
@@ -42,15 +41,10 @@ class AdjudicationSourceCitationModel extends Model
             JOIN geohistory.adjudicationsourcecitation
                 ON source.sourceid = adjudicationsourcecitation.source
                 AND adjudicationsourcecitation.adjudicationsourcecitationid = ?
-            LEFT JOIN extra.adjudicationgovernmentcache
-                ON adjudicationsourcecitation.adjudication = adjudicationgovernmentcache.adjudicationid
-            WHERE governmentrelationstate = ?
-                OR governmentrelationstate IS NULL
         QUERY;
 
         return $this->db->query($query, [
             $id,
-            strtoupper($state),
         ])->getResult();
     }
 

@@ -24,11 +24,11 @@ class Reporter extends BaseController
         return redirect()->to('/' . $this->request->getLocale() . '/reporter/' . $id . '/', 301);
     }
 
-    public function view(string $state, int|string $id): void
+    public function view(int|string $id): void
     {
         $id = $this->getIdInt($id);
         $AdjudicationSourceCitationModel = new AdjudicationSourceCitationModel();
-        $query = $AdjudicationSourceCitationModel->getDetail($id, $state);
+        $query = $AdjudicationSourceCitationModel->getDetail($id);
         if (count($query) !== 1) {
             $this->noRecord();
         } else {
@@ -41,7 +41,7 @@ class Reporter extends BaseController
                 echo view('core/url', ['query' => $query, 'title' => 'Actual URL']);
             }
             $SourceItemPartModel = new SourceItemPartModel();
-            echo view('core/url', ['query' => $SourceItemPartModel->getByAdjudicationSourceCitation($id), 'state' => $state, 'title' => 'Calculated URL']);
+            echo view('core/url', ['query' => $SourceItemPartModel->getByAdjudicationSourceCitation($id), 'title' => 'Calculated URL']);
             $AdjudicationModel = new AdjudicationModel();
             echo view('adjudication/table', ['query' => $AdjudicationModel->getByAdjudicationSourceCitation($id)]);
             $EventModel = new EventModel();
