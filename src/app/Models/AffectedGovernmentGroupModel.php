@@ -315,47 +315,47 @@ class AffectedGovernmentGroupModel extends Model
     // FUNCTION: extra.governmentabbreviation
     // FUNCTION: extra.governmentlong
     // FUNCTION: extra.governmentshort
-    // FUNCTION: extra.governmentstatelink
+    // FUNCTION: extra.governmentslug
 
-    public function getByGovernmentShape(int $id, string $state): array
+    public function getByGovernmentShape(int $id): array
     {
         $query = <<<QUERY
             WITH foundaffectedgovernment AS (
                 SELECT event.eventid,
                 event.eventslug,
-                extra.governmentstatelink(affectedgovernment_reconstructed.municipalityfrom, ?, ?) AS municipalityfrom,
-                extra.governmentlong(affectedgovernment_reconstructed.municipalityfrom, ?) AS municipalityfromlong,
+                extra.governmentslug(affectedgovernment_reconstructed.municipalityfrom) AS municipalityfrom,
+                extra.governmentlong(affectedgovernment_reconstructed.municipalityfrom, '') AS municipalityfromlong,
                 extra.affectedtypeshort(affectedgovernment_reconstructed.affectedtypemunicipalityfrom) AS affectedtypemunicipalityfrom,
-                extra.governmentstatelink(affectedgovernment_reconstructed.countyfrom, ?, ?) AS countyfrom,
-                extra.governmentshort(affectedgovernment_reconstructed.countyfrom, ?) AS countyfromshort,
+                extra.governmentslug(affectedgovernment_reconstructed.countyfrom) AS countyfrom,
+                extra.governmentshort(affectedgovernment_reconstructed.countyfrom, '') AS countyfromshort,
                 extra.affectedtypeshort(affectedgovernment_reconstructed.affectedtypecountyfrom) AS affectedtypecountyfrom,
-                extra.governmentstatelink(affectedgovernment_reconstructed.statefrom, ?, ?) AS statefrom,
+                extra.governmentslug(affectedgovernment_reconstructed.statefrom) AS statefrom,
                 extra.governmentabbreviation(affectedgovernment_reconstructed.statefrom) AS statefromabbreviation,
                 extra.affectedtypeshort(affectedgovernment_reconstructed.affectedtypestatefrom) AS affectedtypestatefrom,
-                extra.governmentstatelink(affectedgovernment_reconstructed.municipalityto, ?, ?) AS municipalityto,
-                extra.governmentlong(affectedgovernment_reconstructed.municipalityto, ?) AS municipalitytolong,
+                extra.governmentslug(affectedgovernment_reconstructed.municipalityto) AS municipalityto,
+                extra.governmentlong(affectedgovernment_reconstructed.municipalityto, '') AS municipalitytolong,
                 extra.affectedtypeshort(affectedgovernment_reconstructed.affectedtypemunicipalityto) AS affectedtypemunicipalityto,
-                extra.governmentstatelink(affectedgovernment_reconstructed.countyto, ?, ?) AS countyto,
-                extra.governmentshort(affectedgovernment_reconstructed.countyto, ?) AS countytoshort,
+                extra.governmentslug(affectedgovernment_reconstructed.countyto) AS countyto,
+                extra.governmentshort(affectedgovernment_reconstructed.countyto, '') AS countytoshort,
                 extra.affectedtypeshort(affectedgovernment_reconstructed.affectedtypecountyto) AS affectedtypecountyto,
-                extra.governmentstatelink(affectedgovernment_reconstructed.stateto, ?, ?) AS stateto,
+                extra.governmentslug(affectedgovernment_reconstructed.stateto) AS stateto,
                 extra.governmentabbreviation(affectedgovernment_reconstructed.stateto) AS statetoabbreviation,
                 extra.affectedtypeshort(affectedgovernment_reconstructed.affectedtypestateto) AS affectedtypestateto,
                 CASE WHEN affectedgovernment_reconstructed.submunicipalityfrom IS NOT NULL 
                     OR affectedgovernment_reconstructed.submunicipalityto IS NOT NULL
                     OR affectedgovernment_reconstructed.subcountyfrom IS NOT NULL
                     OR affectedgovernment_reconstructed.subcountyto IS NOT NULL THEN TRUE ELSE FALSE END AS textflag,
-                COALESCE(extra.governmentstatelink(affectedgovernment_reconstructed.submunicipalityfrom, ?, ?), '') AS submunicipalityfrom,
-                COALESCE(extra.governmentlong(affectedgovernment_reconstructed.submunicipalityfrom, ?), '') AS submunicipalityfromlong,
+                COALESCE(extra.governmentslug(affectedgovernment_reconstructed.submunicipalityfrom), '') AS submunicipalityfrom,
+                COALESCE(extra.governmentlong(affectedgovernment_reconstructed.submunicipalityfrom, ''), '') AS submunicipalityfromlong,
                 COALESCE(extra.affectedtypeshort(affectedgovernment_reconstructed.affectedtypesubmunicipalityfrom), '') AS affectedtypesubmunicipalityfrom,
-                COALESCE(extra.governmentstatelink(affectedgovernment_reconstructed.submunicipalityto, ?, ?), '') AS submunicipalityto,
-                COALESCE(extra.governmentlong(affectedgovernment_reconstructed.submunicipalityto, ?), '') AS submunicipalitytolong,
+                COALESCE(extra.governmentslug(affectedgovernment_reconstructed.submunicipalityto), '') AS submunicipalityto,
+                COALESCE(extra.governmentlong(affectedgovernment_reconstructed.submunicipalityto, ''), '') AS submunicipalitytolong,
                 COALESCE(extra.affectedtypeshort(affectedgovernment_reconstructed.affectedtypesubmunicipalityto), '') AS affectedtypesubmunicipalityto,
-                COALESCE(extra.governmentstatelink(affectedgovernment_reconstructed.subcountyfrom, ?, ?), '') AS subcountyfrom,
-                COALESCE(extra.governmentshort(affectedgovernment_reconstructed.subcountyfrom, ?), '') AS subcountyfromshort,
+                COALESCE(extra.governmentslug(affectedgovernment_reconstructed.subcountyfrom), '') AS subcountyfrom,
+                COALESCE(extra.governmentshort(affectedgovernment_reconstructed.subcountyfrom, ''), '') AS subcountyfromshort,
                 COALESCE(extra.affectedtypeshort(affectedgovernment_reconstructed.affectedtypesubcountyfrom), '') AS affectedtypesubcountyfrom,
-                COALESCE(extra.governmentstatelink(affectedgovernment_reconstructed.subcountyto, ?, ?), '') AS subcountyto,
-                COALESCE(extra.governmentshort(affectedgovernment_reconstructed.subcountyto, ?), '') AS subcountytoshort,
+                COALESCE(extra.governmentslug(affectedgovernment_reconstructed.subcountyto), '') AS subcountyto,
+                COALESCE(extra.governmentshort(affectedgovernment_reconstructed.subcountyto, ''), '') AS subcountytoshort,
                 COALESCE(extra.affectedtypeshort(affectedgovernment_reconstructed.affectedtypesubcountyto), '') AS affectedtypesubcountyto,
                 event.eventyear,
                 event.eventeffectivetext AS eventeffective,
@@ -375,21 +375,18 @@ class AffectedGovernmentGroupModel extends Model
             ), currentgovernment AS (
                 -- Taken from GovernmentShapeModel->getDetail
                 SELECT DISTINCT governmentshape.governmentshapeid,
-                    COALESCE(extra.governmentstatelink(governmentshape.governmentsubmunicipality, ?, ?), '') AS governmentsubmunicipality,
-                    COALESCE(extra.governmentlong(governmentshape.governmentsubmunicipality, ?), '') AS governmentsubmunicipalitylong,
-                    extra.governmentstatelink(governmentshape.governmentmunicipality, ?, ?) AS governmentmunicipality,
-                    extra.governmentlong(governmentshape.governmentmunicipality, ?) AS governmentmunicipalitylong,
-                    extra.governmentstatelink(governmentshape.governmentcounty, ?, ?) AS governmentcounty,
-                    extra.governmentshort(governmentshape.governmentcounty, ?) AS governmentcountyshort,
-                    extra.governmentstatelink(governmentshape.governmentstate, ?, ?) AS governmentstate,
+                    COALESCE(extra.governmentslug(governmentshape.governmentsubmunicipality), '') AS governmentsubmunicipality,
+                    COALESCE(extra.governmentlong(governmentshape.governmentsubmunicipality, ''), '') AS governmentsubmunicipalitylong,
+                    extra.governmentslug(governmentshape.governmentmunicipality) AS governmentmunicipality,
+                    extra.governmentlong(governmentshape.governmentmunicipality, '') AS governmentmunicipalitylong,
+                    extra.governmentslug(governmentshape.governmentcounty) AS governmentcounty,
+                    extra.governmentshort(governmentshape.governmentcounty, '') AS governmentcountyshort,
+                    extra.governmentslug(governmentshape.governmentstate) AS governmentstate,
                     extra.governmentabbreviation(governmentshape.governmentstate) AS governmentstateabbreviation,
                     governmentshape.governmentshapeid AS id,
                     public.st_asgeojson(governmentshape.governmentshapegeometry) AS geometry
                 FROM gis.governmentshape
-                LEFT JOIN extra.areagovernmentcache
-                ON governmentshape.governmentshapeid = areagovernmentcache.governmentshapeid
                 WHERE governmentshape.governmentshapeid = ?
-                AND (governmentrelationstate = ? OR governmentrelationstate IS NULL)
             )
             SELECT eventid, eventslug, municipalityfrom, municipalityfromlong, affectedtypemunicipalityfrom, countyfrom, countyfromshort, affectedtypecountyfrom, statefrom, statefromabbreviation, affectedtypestatefrom, municipalityto, municipalitytolong, affectedtypemunicipalityto, countyto, countytoshort, affectedtypecountyto, stateto, statetoabbreviation, affectedtypestateto, textflag, submunicipalityfrom, submunicipalityfromlong, affectedtypesubmunicipalityfrom, submunicipalityto, submunicipalitytolong, affectedtypesubmunicipalityto, subcountyfrom, subcountyfromshort, affectedtypesubcountyfrom, subcountyto, subcountytoshort, affectedtypesubcountyto, eventyear, eventeffective, eventsort, 
                (eventorder * 2 - 1) AS eventorder
@@ -493,48 +490,8 @@ class AffectedGovernmentGroupModel extends Model
         QUERY;
 
         return $this->db->query($query, [
-            $state,
-            \Config\Services::request()->getLocale(),
-            strtoupper($state),
-            $state,
-            \Config\Services::request()->getLocale(),
-            strtoupper($state),
-            $state,
-            \Config\Services::request()->getLocale(),
-            $state,
-            \Config\Services::request()->getLocale(),
-            strtoupper($state),
-            $state,
-            \Config\Services::request()->getLocale(),
-            strtoupper($state),
-            $state,
-            \Config\Services::request()->getLocale(),
-            $state,
-            \Config\Services::request()->getLocale(),
-            strtoupper($state),
-            $state,
-            \Config\Services::request()->getLocale(),
-            strtoupper($state),
-            $state,
-            \Config\Services::request()->getLocale(),
-            strtoupper($state),
-            $state,
-            \Config\Services::request()->getLocale(),
-            strtoupper($state),
             $id,
-            $state,
-            \Config\Services::request()->getLocale(),
-            strtoupper($state),
-            $state,
-            \Config\Services::request()->getLocale(),
-            strtoupper($state),
-            $state,
-            \Config\Services::request()->getLocale(),
-            strtoupper($state),
-            $state,
-            \Config\Services::request()->getLocale(),
             $id,
-            strtoupper($state),
         ])->getResult();
     }
 

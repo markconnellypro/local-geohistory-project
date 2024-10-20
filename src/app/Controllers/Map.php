@@ -54,40 +54,48 @@ class Map extends BaseController
         echo json_encode($json);
     }
 
-    public function leaflet(string $state = ''): void
+    public function leaflet(string $zoom = ''): void
     {
-        $zoom = ($state === 'zoom');
-        $state = ($state === 'zoom' ? '' : $state);
+        $jurisdictions = strtolower($this->request->getGet('jurisdictions') ?? '');
+        $jurisdictions = explode(',', $jurisdictions);
+        $jurisdictions = array_unique($jurisdictions);
+        foreach ($jurisdictions as $key => $jurisdiction) {
+            if (!(preg_match('/^[a-z\-]{2,}$/', $jurisdiction) === 1)) {
+                unset($jurisdictions[$key]);
+            }
+        }
+        sort($jurisdictions);
         $this->response->removeHeader('Cache-Control');
         $this->response->setHeader('Cache-Control', 'max-age=86400');
         $this->response->setHeader('Content-Type', 'application/javascript');
-        echo view('leaflet/state_base', ['state' => $state, 'zoom' => $zoom]);
-        try {
-            echo view('leaflet/state_' . $state);
-        } catch (\Throwable) {
+        echo view('leaflet/jurisdiction', ['jurisdictions' => $jurisdictions !== [], 'zoom' => $zoom === 'zoom']);
+        foreach ($jurisdictions as $jurisdiction) {
             try {
-                echo view('development/leaflet/state_' . $state);
+                echo view('leaflet/jurisdiction_' . $jurisdiction);
             } catch (\Throwable) {
-                echo view('leaflet/state');
+                try {
+                    echo view('development/leaflet/jurisdiction_' . $jurisdiction);
+                } catch (\Throwable) {
+                }
             }
         }
     }
 
-    public function overlayStyle(string $state = ''): void
+    public function overlayStyle(): void
     {
         $this->response->removeHeader('Cache-Control');
         $this->response->setHeader('Cache-Control', 'max-age=86400');
         $this->response->setHeader('Content-Type', 'application/json');
         $json = json_decode(file_get_contents(__DIR__ . '/../../html/asset/map/map_style_overlay.json'), true);
-        $json['sources']['localgeohistoryproject']['tiles'][0] = getenv('app_baseLocalGeohistoryProjectUrl') . '/' . \Config\Services::request()->getLocale() . '/' . $state . $json['sources']['localgeohistoryproject']['tiles'][0];
+        $json['sources']['localgeohistoryproject']['tiles'][0] = getenv('app_baseLocalGeohistoryProjectUrl') . '/' . \Config\Services::request()->getLocale() . $json['sources']['localgeohistoryproject']['tiles'][0];
         echo json_encode($json);
     }
 
-    public function tile(float $z, float $x, float $y, string $state = ''): void
+    public function tile(float $z, float $x, float $y): void
     {
         $this->response->setHeader('Content-Type', 'application/x-protobuf');
         $GovernmentShapeModel = new GovernmentShapeModel();
-        $query = $GovernmentShapeModel->getTile($state, $z, $x, $y);
+        $query = $GovernmentShapeModel->getTile($z, $x, $y);
         foreach ($query as $row) {
             echo pg_unescape_bytea($row->mvt);
         }

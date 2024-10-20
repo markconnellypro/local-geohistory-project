@@ -14,7 +14,7 @@ class Area extends BaseController
 
     private string $title = 'Area Detail';
 
-    public function address(string $state): void
+    public function address(): void
     {
         $addressText = $this->request->getPost('address', FILTER_SANITIZE_STRING);
         try {
@@ -22,24 +22,24 @@ class Area extends BaseController
             if (($data = json_decode($data, true)) !== false) {
                 if (count($data) === 1) {
                     $this->extraAttribution = 'Address searching courtesy of <a href="https://locationiq.com/attribution/">LocationIQ</a>.';
-                    $this->point($state, $data[0]['lat'], $data[0]['lon'], $addressText);
+                    $this->point($data[0]['lat'], $data[0]['lon'], $addressText);
                 } else {
-                    $this->addressCensusBureau($state, $addressText);
+                    $this->addressCensusBureau($addressText);
                 }
             }
         } catch (\Throwable) {
-            $this->addressCensusBureau($state, $addressText);
+            $this->addressCensusBureau($addressText);
         }
     }
 
-    public function addressCensusBureau(string $state, string $addressText): void
+    public function addressCensusBureau(string $addressText): void
     {
         try {
             $data = file_get_contents('https://geocoding.geo.census.gov/geocoder/locations/onelineaddress?benchmark=9&format=json&address=' . $addressText);
             if (($data = json_decode($data, true)) !== false) {
-                if (count($data['result']['addressMatches']) === 1 && strtolower($data['result']['addressMatches'][0]['addressComponents']['state']) === $state) {
+                if (count($data['result']['addressMatches']) === 1) {
                     $this->extraAttribution = 'Address searching courtesy of the <a href="https://geocoding.geo.census.gov/geocoder/">U.S. Census Bureau</a>.';
-                    $this->point($state, $data['result']['addressMatches'][0]['coordinates']['y'], $data['result']['addressMatches'][0]['coordinates']['x'], $addressText);
+                    $this->point($data['result']['addressMatches'][0]['coordinates']['y'], $data['result']['addressMatches'][0]['coordinates']['x'], $addressText);
                 } else {
                     $this->noRecord();
                 }
@@ -56,7 +56,7 @@ class Area extends BaseController
         echo view('core/footer');
     }
 
-    public function point(string $state, float $y = 0, float $x = 0, string $addressText = ''): void
+    public function point(float $y = 0, float $x = 0, string $addressText = ''): void
     {
         if ($y === 0.0 && $this->request->getPost('y', FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION) !== '') {
             $y = (float) $this->request->getPost('y', FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
@@ -75,7 +75,7 @@ class Area extends BaseController
         if (count($query) !== 1) {
             $this->noRecord();
         } else {
-            $this->view($state, $query[0]->governmentshapeid, $y, $x, $addressText);
+            $this->view($query[0]->governmentshapeid, $y, $x, $addressText);
         }
     }
 
@@ -84,13 +84,13 @@ class Area extends BaseController
         return redirect()->to('/' . $this->request->getLocale() . '/area/' . $id . '/', 301);
     }
 
-    public function view(string $state, int|string $id, float $y = 0, float $x = 0, string $addressText = ''): void
+    public function view(int|string $id, float $y = 0, float $x = 0, string $addressText = ''): void
     {
         if (($this->isLive() || $y !== 0.0 || $x !== 0.0) && preg_match('/^\d{1,9}$/', $id)) {
             $id = (int) $id;
         }
         $GovernmentShapeModel = new GovernmentShapeModel();
-        $currentQuery = $GovernmentShapeModel->getDetail($id, $state);
+        $currentQuery = $GovernmentShapeModel->getDetail($id);
         if (count($currentQuery) !== 1) {
             $this->noRecord();
         } else {
@@ -100,6 +100,9 @@ class Area extends BaseController
                 $currentQuery[0]->governmentmunicipalitylong,
                 $currentQuery[0]->governmentcountyshort,
                 $currentQuery[0]->governmentstateabbreviation
+            ];
+            $jurisdictions = [
+                strtolower($currentQuery[0]->governmentstateabbreviation),
             ];
             $pageTitle = '';
             foreach ($governmentArray as $g) {
@@ -118,10 +121,10 @@ class Area extends BaseController
             if ($searchParameter === []) {
                 echo view('core/parameter', ['searchParameter' => $searchParameter, 'omitColon' => true]);
             }
-            echo view('event/table_currentgovernment', ['query' => $currentQuery, 'state' => $state]);
+            echo view('event/table_currentgovernment', ['query' => $currentQuery]);
             echo view('core/map', ['includeBase' => true]);
             $AffectedGovernmentGroupModel = new AffectedGovernmentGroupModel();
-            $query = $AffectedGovernmentGroupModel->getByGovernmentShape($id, $state);
+            $query = $AffectedGovernmentGroupModel->getByGovernmentShape($id);
             $events = [];
             echo view('event/table_affectedgovernment_fixed', ['query' => $query, 'includeDate' => true, 'isComplete' => true]);
             foreach ($query as $row) {
@@ -134,7 +137,7 @@ class Area extends BaseController
             $events = array_unique($events);
             $EventModel = new EventModel();
             echo view('event/table', ['query' => $EventModel->getByGovernmentShapeFailure($id, $events), 'title' => 'Other Event Links']);
-            echo view('leaflet/start', ['type' => 'area', 'includeBase' => true, 'needRotation' => false]);
+            echo view('leaflet/start', ['type' => 'area', 'jurisdictions' => $jurisdictions, 'includeBase' => true, 'needRotation' => false]);
             echo view('core/gis', [
                 'query' => $currentQuery,
                 'element' => 'area',

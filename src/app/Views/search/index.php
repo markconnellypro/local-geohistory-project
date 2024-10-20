@@ -76,7 +76,7 @@ echo view('search/submit', ['type' => 'identifier']);
         </form>
     </div>
     <div id="forms_location" class="option_select option_indent">
-        <form method="post" action="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/address/" class="form_select" id="form_location_address">
+        <form method="post" action="/<?= \Config\Services::request()->getLocale() ?>/address/" class="form_select" id="form_location_address">
             <label for="form_location_address_address" class="forselectize">Address</label><br>
             <input id="form_location_address_address" class="selectize-input forselectize stringcheck required" name="address" type="text" style="width: 300px;" required="required"><br>
             <br>
@@ -84,7 +84,7 @@ echo view('search/submit', ['type' => 'identifier']);
 echo view('search/submit', ['type' => 'address']);
 ?>
         </form>
-        <form method="post" action="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/point/" class="form_select" id="form_location_point">
+        <form method="post" action="/<?= \Config\Services::request()->getLocale() ?>/point/" class="form_select" id="form_location_point">
             <label for="form_location_point_y" class="forselectize">Latitude</label><br>
             <input id="form_location_point_y" class="selectize-input forselectize stringcheck required" name="y" type="number" min="-180" max="180" step="any" style="width: 150px;" required="required"><br>
             <label for="form_location_point_x" class="forselectize">Longitude</label><br>

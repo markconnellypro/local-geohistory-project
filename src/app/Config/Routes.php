@@ -31,18 +31,18 @@ if (mb_strpos(base_url(), $_ENV['app_baseLocalGeohistoryProjectUrl']) !== false)
     $routes->add('{locale}/' . $stateProvinceRegex . '/search/' . $mainSearchRegex, 'Search::view/$1/$2');
     $routes->add('{locale}/search/(:segment)', 'Search::noRecord');
 
-    $routes->add('{locale}/' . $stateProvinceRegex . '/address', 'Area::address/$1');
-    $routes->add('{locale}/' . $stateProvinceRegex . '/point/(:segment)/(:segment)', 'Area::point/$1/$2/$3');
-    $routes->add('{locale}/' . $stateProvinceRegex . '/point', 'Area::point/$1');
+    $routes->add('{locale}/address', 'Area::address');
+    $routes->add('{locale}/point/(:segment)/(:segment)', 'Area::point/$1/$2');
+    $routes->add('{locale}/point', 'Area::point');
 
     $routes->add('{locale}/governmentidentifier/(:segment)/(:segment)', 'Governmentidentifier::view/$1/$2');
 
-    $routes->add('{locale}/' . $stateProvinceRegex . '/leaflet', 'Map::leaflet/$1');
+    $routes->add('{locale}/leaflet', 'Map::leaflet');
 
     $routes->add('{locale}/' . $stateProvinceRegex . '/about', 'About::index/$1');
-    $routes->add('{locale}/' . $stateProvinceRegex . '/map-base', 'Map::baseStyle');
-    $routes->add('{locale}/' . $stateProvinceRegex . '/map-overlay', 'Map::overlayStyle/$1');
-    $routes->add('{locale}/' . $stateProvinceRegex . '/map-tile/(:num)/(:num)/(:num)', 'Map::tile/$2/$3/$4/$1');
+    $routes->add('{locale}/map-base', 'Map::baseStyle');
+    $routes->add('{locale}/map-overlay', 'Map::overlayStyle');
+    $routes->add('{locale}/map-tile/(:num)/(:num)/(:num)', 'Map::tile/$1/$2/$3');
     $routes->add('{locale}/about', 'About::index');
     $routes->add('{locale}/bot', 'Bot::index');
     $routes->add('{locale}/disclaimer', 'Disclaimer');

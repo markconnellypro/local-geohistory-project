@@ -12,10 +12,10 @@ class GovernmentShapeModel extends Model
     // FUNCTION: extra.governmentabbreviation
     // FUNCTION: extra.governmentlong
     // FUNCTION: extra.governmentshort
-    // FUNCTION: extra.governmentstatelink
+    // FUNCTION: extra.governmentslug
     // VIEW: extra.areagovernmentcache
 
-    public function getDetail(int|string $id, string $state): array
+    public function getDetail(int|string $id): array
     {
         if (!is_int($id)) {
             $id = $this->getSlugId($id);
@@ -23,38 +23,23 @@ class GovernmentShapeModel extends Model
 
         $query = <<<QUERY
             SELECT DISTINCT governmentshape.governmentshapeid,
-                COALESCE(extra.governmentstatelink(governmentshape.governmentsubmunicipality, ?, ?), '') AS governmentsubmunicipality,
-                COALESCE(extra.governmentlong(governmentshape.governmentsubmunicipality, ?), '') AS governmentsubmunicipalitylong,
-                extra.governmentstatelink(governmentshape.governmentmunicipality, ?, ?) AS governmentmunicipality,
-                extra.governmentlong(governmentshape.governmentmunicipality, ?) AS governmentmunicipalitylong,
-                extra.governmentstatelink(governmentshape.governmentcounty, ?, ?) AS governmentcounty,
-                extra.governmentshort(governmentshape.governmentcounty, ?) AS governmentcountyshort,
-                extra.governmentstatelink(governmentshape.governmentstate, ?, ?) AS governmentstate,
+                COALESCE(extra.governmentslug(governmentshape.governmentsubmunicipality), '') AS governmentsubmunicipality,
+                COALESCE(extra.governmentlong(governmentshape.governmentsubmunicipality, ''), '') AS governmentsubmunicipalitylong,
+                extra.governmentslug(governmentshape.governmentmunicipality) AS governmentmunicipality,
+                extra.governmentlong(governmentshape.governmentmunicipality, '') AS governmentmunicipalitylong,
+                extra.governmentslug(governmentshape.governmentcounty) AS governmentcounty,
+                extra.governmentshort(governmentshape.governmentcounty, '') AS governmentcountyshort,
+                extra.governmentslug(governmentshape.governmentstate) AS governmentstate,
                 extra.governmentabbreviation(governmentshape.governmentstate) AS governmentstateabbreviation,
                 governmentshape.governmentshapeid AS id,
                 public.st_asgeojson(governmentshape.governmentshapegeometry) AS geometry
             FROM gis.governmentshape
-            LEFT JOIN extra.areagovernmentcache
-            ON governmentshape.governmentshapeid = areagovernmentcache.governmentshapeid
             WHERE governmentshape.governmentshapeid = ?
-            AND (governmentrelationstate = ? OR governmentrelationstate IS NULL)
             ORDER BY 8, 6, 4, 2
         QUERY;
 
         return $this->db->query($query, [
-            $state,
-            \Config\Services::request()->getLocale(),
-            strtoupper($state),
-            $state,
-            \Config\Services::request()->getLocale(),
-            strtoupper($state),
-            $state,
-            \Config\Services::request()->getLocale(),
-            strtoupper($state),
-            $state,
-            \Config\Services::request()->getLocale(),
             $id,
-            strtoupper($state),
         ])->getResult();
     }
 
@@ -490,14 +475,12 @@ class GovernmentShapeModel extends Model
 
     // extra.ci_model_map_tile(v_state character varying, v_z integer, v_x integer, v_y integer)
 
-    // FUNCTION: extra.governmentabbreviation
-    // FUNCTION: extra.governmentcurrentleadstateid
-    // FUNCTION: extra.governmentshort
+// FUNCTION: extra.governmentshort
     // VIEW: extra.giscountycache
     // VIEW: extra.gismunicipalitycache
     // VIEW: extra.gissubmunicipalitycache
 
-    public function getTile(string $state, float $z, float $x, float $y): array
+    public function getTile(float $z, float $x, float $y): array
     {
         $query = <<<QUERY
             WITH mvtgeometrycounty AS (
@@ -506,7 +489,6 @@ class GovernmentShapeModel extends Model
                 extra.governmentshort(giscountycache.government) AS description
                 FROM extra.giscountycache
                 WHERE giscountycache.geometry && ST_Transform(ST_TileEnvelope(?, ?, ?, margin => (64.0 / 4096)), 4326)
-                AND extra.governmentabbreviation(extra.governmentcurrentleadstateid(giscountycache.government)) = ?
             ),
             mvtgeometrymunicipality AS (
                 SELECT ST_AsMVTGeom(ST_Transform(gismunicipalitycache.geometry, 3857), ST_TileEnvelope(?, ?, ?), extent => 4096, buffer => 64) AS geometry,
@@ -515,7 +497,6 @@ class GovernmentShapeModel extends Model
                 FROM extra.gismunicipalitycache
                 WHERE ? >= 6 
                 AND gismunicipalitycache.geometry && ST_Transform(ST_TileEnvelope(?, ?, ?, margin => (64.0 / 4096)), 4326)
-                AND extra.governmentabbreviation(extra.governmentcurrentleadstateid(gismunicipalitycache.government)) = ?
             ),
             mvtgeometrysubmunicipality AS (
                 SELECT ST_AsMVTGeom(ST_Transform(gissubmunicipalitycache.geometry, 3857), ST_TileEnvelope(?, ?, ?), extent => 4096, buffer => 64) AS geometry,
@@ -524,7 +505,6 @@ class GovernmentShapeModel extends Model
                 FROM extra.gissubmunicipalitycache
                 WHERE ? >= 6 
                 AND gissubmunicipalitycache.geometry && ST_Transform(ST_TileEnvelope(?, ?, ?, margin => (64.0 / 4096)), 4326)
-                AND extra.governmentabbreviation(extra.governmentcurrentleadstateid(gissubmunicipalitycache.government)) = ?
             )
             SELECT ST_AsMVT(mvtgeometrycounty.*, 'county') AS mvt
             FROM mvtgeometrycounty
@@ -543,7 +523,6 @@ class GovernmentShapeModel extends Model
             $z,
             $x,
             $y,
-            strtoupper($state),
             $z,
             $x,
             $y,
@@ -551,7 +530,6 @@ class GovernmentShapeModel extends Model
             $z,
             $x,
             $y,
-            strtoupper($state),
             $z,
             $x,
             $y,
@@ -559,7 +537,6 @@ class GovernmentShapeModel extends Model
             $z,
             $x,
             $y,
-            strtoupper($state),
         ])->getResult();
     }
 }

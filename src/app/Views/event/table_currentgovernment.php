@@ -21,17 +21,29 @@
                     <?php } ?>
                     <td>
                         <?php if ($row->governmentsubmunicipality !== '') {
-                            echo view('core/link', ['link' => $row->governmentsubmunicipality, 'text' => $row->governmentsubmunicipalitylong]);
+                            echo view('core/link', [
+                                'link' => '/' . \Config\Services::request()->getLocale() . '/government/' . $row->governmentsubmunicipality . '/',
+                                'text' => $row->governmentsubmunicipalitylong
+                            ]);
                         } ?>
                     </td>
                     <td>
-                        <?php echo view('core/link', ['link' => $row->governmentmunicipality, 'text' => $row->governmentmunicipalitylong]) ?>
+                        <?php echo view('core/link', [
+                            'link' => '/' . \Config\Services::request()->getLocale() . '/government/' . $row->governmentmunicipality . '/',
+                            'text' => $row->governmentmunicipalitylong
+                        ]); ?>
                     </td>
                     <td>
-                        <?php echo view('core/link', ['link' => $row->governmentcounty, 'text' => $row->governmentcountyshort]) ?>
+                        <?php echo view('core/link', [
+                            'link' => '/' . \Config\Services::request()->getLocale() . '/government/' . $row->governmentcounty . '/',
+                            'text' => $row->governmentcountyshort
+                        ]); ?>
                     </td>
                     <td>
-                        <?php echo view('core/link', ['link' => $row->governmentstate, 'text' => $row->governmentstateabbreviation]) ?>
+                        <?php echo view('core/link', [
+                            'link' => '/' . \Config\Services::request()->getLocale() . '/government/' . $row->governmentstate . '/',
+                            'text' => $row->governmentstateabbreviation
+                        ]); ?>
                     </td>
                 </tr>
             <?php } ?>
