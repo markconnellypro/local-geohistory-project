@@ -11,7 +11,7 @@ class CurrentGovernmentModel extends Model
     // FUNCTION: extra.governmentabbreviation
     // FUNCTION: extra.governmentlong
     // FUNCTION: extra.governmentshort
-    // FUNCTION: extra.governmentstatelink
+    // FUNCTION: extra.governmentslug
 
     public function getByEvent(int $id): array
     {

@@ -29,7 +29,11 @@ $isComplete ??= true;
                 foreach ($affectedGovernment['rows'] as $id => $row) { ?>
                 <tr>
                     <?php if ($includeDate) { ?>
-                        <td data-sort="<?= $row->eventorder ?>"><?php echo view('core/link', ['link' => ($row->eventslug  === '' ? '' : "/" . \Config\Services::request()->getLocale() . "/event/" . $row->eventslug . "/"), 'text' => ($row->eventslug  === '' ? 'Missing' : 'View')]) ?></td>
+                        <td data-sort="<?= $row->eventorder ?>"><?php echo view('core/link', [
+                            'type' => 'event',
+                            'link' => $row->eventslug,
+                            'text' => ($row->eventslug  === '' ? 'Missing' : 'View')
+                        ]) ?></td>
                         <td data-sort="<?= $row->eventsort ?>"><?= ($row->eventeffective === '' ? $row->eventyear : $row->eventeffective) ?></td>
                     <?php } elseif (\App\Controllers\BaseController::isLive() && $isComplete) { ?>
                         <td>
@@ -39,7 +43,8 @@ $isComplete ??= true;
                                     foreach ($levels as $level) {
                                         if (isset($row->{ucfirst($fromTo) . ' ' . $level . ' Long'})) { ?>
                                         <?php echo view('core/link', [
-                                            'link' => '/' . \Config\Services::request()->getLocale() . '/governmentmap/' . $row->{ucfirst($fromTo) . ' ' . $level . ' Link'} . '/' . $id . "/",
+                                            'type' => 'governmentmap',
+                                            'link' => $row->{ucfirst($fromTo) . ' ' . $level . ' Link'} . '/' . $id,
                                             'text' => ucfirst($fromTo)
                                         ]) ?><br>
                             <?php
@@ -55,7 +60,8 @@ $isComplete ??= true;
                             <td>
                                 <?php if (isset($row->{ucfirst($fromTo) . ' ' . $level . ' Long'})) { ?>
                                     <?php echo view('core/link', [
-                                        'link' => '/' . \Config\Services::request()->getLocale() . '/government/' . $row->{ucfirst($fromTo) . ' ' . $level . ' Link'} . '/',
+                                        'type' => 'government',
+                                        'link' => $row->{ucfirst($fromTo) . ' ' . $level . ' Link'},
                                         'text' => $row->{ucfirst($fromTo) . ' ' . $level . ' Long'}
                                     ]) ?>
                                     <br><span class="i"><?= $row->{ucfirst($fromTo) . ' ' . $level . ' Affected'} ?> <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#affectedtype" aria-label="Affected Type Key"><?= view('core/svg_icon', ['iconLabel' => 'key icon', 'iconName' => 'key', 'iconType' => 'keyicontext']); ?></a></span>

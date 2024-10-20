@@ -28,7 +28,11 @@
                         <td><?= $row->governmentaffectedlong ?></td>
                     <?php } ?>
                     <td><?= $row->affectedtypesame . ($row->eventreconstructed === 't' ? '?' : '') ?></td>
-                    <td><?php echo view('core/link', ['link' => $row->governmentstatelink, 'text' => $row->governmentlong]) ?></td>
+                    <td><?php echo view('core/link', [
+                        'type' => 'government',
+                        'link' => $row->governmentslug,
+                        'text' => $row->governmentlong,
+                    ]) ?></td>
                     <td><?= $row->affectedtypeother . ($row->eventreconstructed === 't' ? '?' : '') ?></td>
                     <td data-sort="<?= $row->eventsort ?>"><?= ($row->eventeffective === '' ? $row->eventyear : $row->eventeffective) ?></td>
                 </tr>

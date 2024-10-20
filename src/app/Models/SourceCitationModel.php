@@ -94,7 +94,7 @@ class SourceCitationModel extends Model
         ])->getResult();
     }
 
-    public function getByGovernment(int $id, string $state): array
+    public function getByGovernment(int $id, array $jurisdictions): array
     {
         return [];
     }

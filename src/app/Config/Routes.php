@@ -19,7 +19,7 @@ if (mb_strpos(base_url(), $_ENV['app_baseLocalGeohistoryProjectUrl']) !== false)
     $mainSearchRegex = '(event|government|adjudication|law)';
 
     foreach ($controllerRegex as $c) {
-        $routes->add('{locale}/' . $c . '/(:segment)', ucwords($c) . '::view//$1');
+        $routes->add('{locale}/' . $c . '/(:segment)', ucwords($c) . '::view/$1');
         $routes->add('{locale}/' . $stateProvinceRegex . '/' . $c . '/(:segment)', ucwords($c) . '::redirect/$2');
         $routes->add('{locale}/' . $c, ucwords($c) . '::noRecord');
     }

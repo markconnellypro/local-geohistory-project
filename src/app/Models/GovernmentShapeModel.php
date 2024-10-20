@@ -266,12 +266,12 @@ class GovernmentShapeModel extends Model
     // FUNCTION: extra.emptytonull
     // FUNCTION: extra.governmentshort
     // FUNCTION: extra.governmentlong
-    // FUNCTION: extra.governmentstatelink
+    // FUNCTION: extra.governmentslug
     // FUNCTION: extra.plsstownshipshort
     // VIEW: extra.governmentshapeextracache
     // VIEW: extra.governmentsubstitutecache
 
-    public function getPartByGovernment(int $id, string $state): array
+    public function getPartByGovernment(int $id): array
     {
         $query = <<<QUERY
             WITH affectedgovernmentsummary AS (
@@ -367,7 +367,7 @@ class GovernmentShapeModel extends Model
                         'eventdatetext', governmentshapeeventparts.eventdatetext,
                         'eventtextsortdate', governmentshapeeventparts.eventtextsortdate,
                         'eventgovernmentlong', CASE
-                            WHEN governmentshapeeventearliest.mineventsort = governmentshapeeventparts.eventsort OR governmentshapeeventparts.eventstatus = 'name' THEN extra.governmentlong(governmentshapeeventparts.governmentto, ?)
+                            WHEN governmentshapeeventearliest.mineventsort = governmentshapeeventparts.eventsort OR governmentshapeeventparts.eventstatus = 'name' THEN extra.governmentlong(governmentshapeeventparts.governmentto, '')
                             ELSE NULL
                         END)) AS eventjson
                     FROM governmentshapeeventparts,
@@ -388,12 +388,12 @@ class GovernmentShapeModel extends Model
             END AS governmentshapeslug,
             '' AS plsstownship,
             COALESCE(extra.plsstownshipshort(governmentshape.governmentshapeplsstownship), '') AS plsstownshipshort,
-            COALESCE(extra.governmentstatelink(governmentshape.governmentsubmunicipality, ?, ?), '') AS submunicipality,
-            COALESCE(extra.governmentlong(governmentshape.governmentsubmunicipality, ?), '') AS submunicipalitylong,
-            extra.governmentstatelink(governmentshape.governmentmunicipality, ?, ?) AS municipality,
-            extra.governmentlong(governmentshape.governmentmunicipality, ?) AS municipalitylong,
-            extra.governmentstatelink(governmentshape.governmentcounty, ?, ?) AS county,
-            extra.governmentshort(governmentshape.governmentcounty, ?) AS countyshort,
+            COALESCE(extra.governmentslug(governmentshape.governmentsubmunicipality), '') AS submunicipality,
+            COALESCE(extra.governmentlong(governmentshape.governmentsubmunicipality, ''), '') AS submunicipalitylong,
+            extra.governmentslug(governmentshape.governmentmunicipality) AS municipality,
+            extra.governmentlong(governmentshape.governmentmunicipality, '') AS municipalitylong,
+            extra.governmentslug(governmentshape.governmentcounty) AS county,
+            extra.governmentshort(governmentshape.governmentcounty, '') AS countyshort,
             st_asgeojson(governmentshape.governmentshapegeometry) AS geometry,
             CASE
                 WHEN NOT (ARRAY[governmentshape.governmentcounty, governmentshape.governmentmunicipality, governmentshape.governmentshapeplsstownship, governmentshape.governmentschooldistrict, governmentshape.governmentsubmunicipality, governmentshape.governmentward] && ARRAY[?::integer]) AND governmentshapeevent.governmentshapeid IS NOT NULL AND governmentshapeevent.eventstatus = 'proposed' THEN 1
@@ -426,16 +426,6 @@ class GovernmentShapeModel extends Model
         return $this->db->query($query, [
             $id,
             $id,
-            strtoupper($state),
-            $state,
-            \Config\Services::request()->getLocale(),
-            strtoupper($state),
-            $state,
-            \Config\Services::request()->getLocale(),
-            strtoupper($state),
-            $state,
-            \Config\Services::request()->getLocale(),
-            strtoupper($state),
             $id,
             $id,
             $id,

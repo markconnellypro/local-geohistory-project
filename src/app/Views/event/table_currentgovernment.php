@@ -22,26 +22,30 @@
                     <td>
                         <?php if ($row->governmentsubmunicipality !== '') {
                             echo view('core/link', [
-                                'link' => '/' . \Config\Services::request()->getLocale() . '/government/' . $row->governmentsubmunicipality . '/',
+                                'type' => 'government',
+                                'link' => $row->governmentsubmunicipality,
                                 'text' => $row->governmentsubmunicipalitylong
                             ]);
                         } ?>
                     </td>
                     <td>
                         <?php echo view('core/link', [
-                            'link' => '/' . \Config\Services::request()->getLocale() . '/government/' . $row->governmentmunicipality . '/',
+                            'type' => 'government',
+                            'link' => $row->governmentmunicipality,
                             'text' => $row->governmentmunicipalitylong
                         ]); ?>
                     </td>
                     <td>
                         <?php echo view('core/link', [
-                            'link' => '/' . \Config\Services::request()->getLocale() . '/government/' . $row->governmentcounty . '/',
+                            'type' => 'government',
+                            'link' => $row->governmentcounty,
                             'text' => $row->governmentcountyshort
                         ]); ?>
                     </td>
                     <td>
                         <?php echo view('core/link', [
-                            'link' => '/' . \Config\Services::request()->getLocale() . '/government/' . $row->governmentstate . '/',
+                            'type' => 'government',
+                            'link' => $row->governmentstate,
                             'text' => $row->governmentstateabbreviation
                         ]); ?>
                     </td>

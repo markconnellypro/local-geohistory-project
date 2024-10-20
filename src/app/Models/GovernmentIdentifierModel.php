@@ -37,7 +37,7 @@ class GovernmentIdentifierModel extends Model
     // FUNCTION: extra.governmentlong
     // VIEW: extra.governmentsubstitutecache
 
-    public function getByGovernment(int $id, string $state): array
+    public function getByGovernment(int $id): array
     {
         $query = <<<QUERY
             SELECT DISTINCT governmentidentifiertype.governmentidentifiertypetype,
@@ -46,7 +46,7 @@ class GovernmentIdentifierModel extends Model
                 governmentidentifier.governmentidentifierprefix || governmentidentifiertype.governmentidentifiertypeprefixdelimiter || governmentidentifier.governmentidentifier AS governmentidentifier,
                 governmentidentifier.governmentidentifierstatus,
                 replace(replace(governmentidentifiertype.governmentidentifiertypeurl, '<Identifier>', governmentidentifier.governmentidentifierprefix || governmentidentifiertype.governmentidentifiertypeprefixdelimiter || governmentidentifier.governmentidentifier), '<Language>', ?) AS governmentidentifiertypeurl,
-                extra.governmentlong(governmentidentifier.government, ?) AS governmentlong
+                extra.governmentlong(governmentidentifier.government, '') AS governmentlong
             FROM geohistory.governmentidentifier
                 JOIN geohistory.governmentidentifiertype
                 ON governmentidentifier.governmentidentifiertype = governmentidentifiertype.governmentidentifiertypeid
@@ -57,7 +57,6 @@ class GovernmentIdentifierModel extends Model
 
         return $this->db->query($query, [
             \Config\Services::request()->getLocale(),
-            strtoupper($state),
             $id,
         ])->getResult();
     }

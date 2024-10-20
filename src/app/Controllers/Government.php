@@ -28,7 +28,7 @@ class Government extends BaseController
         return redirect()->to('/' . $this->request->getLocale() . '/government/' . $id . '/', 301);
     }
 
-    public function view(string $state, int|string $id, bool $isHistory = false): void
+    public function view(int|string $id, bool $isHistory = false): void
     {
         $id = $this->getIdInt($id);
         if ($this->isLive()) {
@@ -48,12 +48,12 @@ class Government extends BaseController
             $SourceModel = new \App\Models\SourceModel();
             $SourceCitationModel = new \App\Models\SourceCitationModel();
         }
-        $query = $GovernmentModel->getDetail($id, $state);
+        $query = $GovernmentModel->getDetail($id);
         if (count($query) !== 1 || $query[0]->governmentlevel === 'placeholder') {
             $this->noRecord();
         } elseif (!is_null($query[0]->governmentsubstituteslug)) {
             header("HTTP/1.1 301 Moved Permanently");
-            header("Location: /" . $this->request->getLocale() . "/" . $state . "/government/" . $query[0]->governmentsubstituteslug . "/");
+            header("Location: /" . $this->request->getLocale() . "/government/" . $query[0]->governmentsubstituteslug . "/");
             exit();
         } else {
             $id = $query[0]->governmentid;
@@ -64,35 +64,38 @@ class Government extends BaseController
             $isCountyOrState = ($query[0]->governmentlevel === 'state' || $query[0]->governmentlevel === 'county');
             $isStateOrHigher = (($query[0]->governmentlevel === 'state' || $query[0]->governmentlevel === 'country'));
             $hasMap = ($isCountyOrLower && $query[0]->hasmap === 't');
+            $jurisdictions = [
+                strtolower($query[0]->governmentcurrentleadstate),
+            ];
             $showTimeline = ($query[0]->governmentmapstatustimelapse === 't');
             $statusQuery = $GovernmentMapStatusModel->getDetails();
             echo view('government/view', ['query' => $query, 'statuses' => $statusQuery]);
             if (!$isHistory) {
-                $query = $SourceCitationModel->getByGovernment($id, $state);
-                if ($query !== []) {
-                    echo view(ENVIRONMENT . '/government/' . $state, ['query' => $query]);
+                $query = $SourceCitationModel->getByGovernment($id, $jurisdictions);
+                if ($query !== [] && $query['data'] !== []) {
+                    echo view(ENVIRONMENT . '/government/' . $query['jurisdiction'], ['query' => $query['data']]);
                 }
             }
             if ($hasMap) {
                 echo view('core/map', ['includeBase' => true]);
             }
             if (!$isHistory) {
-                $populationQuery = $GovernmentPopulationModel->getByGovernment($id, $state);
+                $populationQuery = $GovernmentPopulationModel->getByGovernment($id);
                 if ($populationQuery !== []) {
                     echo view('core/chart');
                 }
-                echo view('government/related', ['query' => $GovernmentModel->getRelated($id, $state)]);
+                echo view('government/related', ['query' => $GovernmentModel->getRelated($id)]);
                 $GovernmentIdentifierModel = new GovernmentIdentifierModel();
-                echo view('governmentidentifier/table', ['query' => $GovernmentIdentifierModel->getByGovernment($id, $state), 'title' => 'Identifier', 'isMultiple' => $isMultiple]);
+                echo view('governmentidentifier/table', ['query' => $GovernmentIdentifierModel->getByGovernment($id), 'title' => 'Identifier', 'isMultiple' => $isMultiple]);
             }
             $AffectedGovernmentGroupModel = new AffectedGovernmentGroupModel();
-            $query = $AffectedGovernmentGroupModel->getByGovernmentGovernment($id, $state);
+            $query = $AffectedGovernmentGroupModel->getByGovernmentGovernment($id);
             $events = [];
             echo view('government/affectedgovernment', ['query' => $query, 'isMultiple' => $isMultiple]);
             foreach ($query as $row) {
                 $events[] = $row->event;
             }
-            $query = $AffectedGovernmentGroupModel->getByGovernmentForm($id, $state);
+            $query = $AffectedGovernmentGroupModel->getByGovernmentForm($id);
             echo view('event/table_affectedgovernmentform', ['includeGovernment' => false, 'query' => $query]);
             foreach ($query as $row) {
                 $events[] = $row->event;
@@ -104,38 +107,38 @@ class Government extends BaseController
                     echo view('event/table', ['query' => $EventModel->getByGovernmentSuccess($id, $events), 'title' => 'Other Successful Event Links', 'tableId' => 'successfulevent']);
                 }
                 $GovernmentSourceModel = new GovernmentSourceModel();
-                echo view('governmentsource/table', ['query' => $GovernmentSourceModel->getByGovernment($id, $state), 'type' => 'government', 'isMultiple' => $isMultiple]);
-                $query = $GovernmentModel->getNote($id, $state);
+                echo view('governmentsource/table', ['query' => $GovernmentSourceModel->getByGovernment($id), 'type' => 'government', 'isMultiple' => $isMultiple]);
+                $query = $GovernmentModel->getNote($id);
                 if ($query !== []) {
                     echo view(ENVIRONMENT . '/government/note', ['query' => $query, 'isMultiple' => $isMultiple]);
                 }
-                $query = $GovernmentFormGovernmentModel->getByGovernment($id, $state);
+                $query = $GovernmentFormGovernmentModel->getByGovernment($id);
                 if ($query !== []) {
                     echo view(ENVIRONMENT . '/government/governmentform', ['query' => $query, 'isMultiple' => $isMultiple]);
                 }
-                $query = $GovernmentModel->getSchoolDistrict($id, $state);
+                $query = $GovernmentModel->getSchoolDistrict($id);
                 if ($query !== []) {
                     echo view(ENVIRONMENT . '/government/schooldistrict', ['query' => $query, 'isMultiple' => $isMultiple]);
                 }
                 echo view('source/table', ['query' => $SourceModel->getByGovernment($id), 'hasLink' => true]);
                 $ResearchLogModel = new ResearchLogModel();
-                echo view('government/researchlog', ['query' => $ResearchLogModel->getByGovernment($id, $state), 'isMultiple' => $isMultiple]);
+                echo view('government/researchlog', ['query' => $ResearchLogModel->getByGovernment($id), 'isMultiple' => $isMultiple]);
                 $NationalArchivesModel = new NationalArchivesModel();
-                echo view('government/nationalarchives', ['query' => $NationalArchivesModel->getByGovernment($id, $state), 'isMultiple' => $isMultiple]);
+                echo view('government/nationalarchives', ['query' => $NationalArchivesModel->getByGovernment($id), 'isMultiple' => $isMultiple]);
                 if ($isCountyOrLower) {
                     echo view('event/table', ['query' => $EventModel->getByGovernmentFailure($id, $events), 'title' => 'Other Event Links', 'tableId' => 'otherevent']);
                 }
-                $query = $GovernmentModel->getOffice($id, $state);
+                $query = $GovernmentModel->getOffice($id);
                 if ($query !== []) {
                     echo view(ENVIRONMENT . '/government/office', ['query' => $query, 'isMultiple' => $isMultiple]);
                 }
                 if (file_exists(APPPATH . 'Views/' . ENVIRONMENT . '/government/live.php')) {
-                    echo view(ENVIRONMENT . '/government/live', ['id' => $id, 'state' => $state, 'isMunicipalityOrLower' => $isMunicipalityOrLower, 'isCountyOrLower' => $isCountyOrLower, 'isCountyOrState' => $isCountyOrState, 'isState' => $isStateOrHigher, 'includeGovernment' => false]);
+                    echo view(ENVIRONMENT . '/government/live', ['id' => $id, 'isMunicipalityOrLower' => $isMunicipalityOrLower, 'isCountyOrLower' => $isCountyOrLower, 'isCountyOrState' => $isCountyOrState, 'isState' => $isStateOrHigher, 'includeGovernment' => false]);
                 }
                 echo view('core/chartjs', ['query' => $populationQuery, 'xLabel' => 'Year', 'yLabel' => 'Population']);
             }
             if ($hasMap) {
-                echo view('leaflet/start', ['type' => 'government', 'includeBase' => true, 'needRotation' => false]);
+                echo view('leaflet/start', ['type' => 'government', 'jurisdictions' => $jurisdictions, 'includeBase' => true, 'needRotation' => false]);
                 $query = $MetesDescriptionLineModel->getGeometryByGovernment($id);
                 $layers = [];
                 $primaryLayer = '';
@@ -166,7 +169,7 @@ class Government extends BaseController
                     ]);
                     $layers['current'] = 'Approximate Current Boundary';
                 }
-                $query = $GovernmentShapeModel->getPartByGovernment($id, $state);
+                $query = $GovernmentShapeModel->getPartByGovernment($id);
                 if ($query !== []) {
                     echo view('core/gis', [
                         'query' => $query,

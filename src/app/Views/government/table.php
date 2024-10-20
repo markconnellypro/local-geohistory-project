@@ -16,7 +16,11 @@
         <tbody>
             <?php foreach ($query as $row) { ?>
                 <tr>
-                    <td><?php echo view('core/link', ['link' => $row->governmentstatelink, 'text' => $row->governmentlong]) ?></td>
+                    <td><?php echo view('core/link', [
+                        'type' => 'government',
+                        'link' => $row->governmentslug,
+                        'text' => $row->governmentlong
+                    ]) ?></td>
                     <?php if ($type !== 'government') { ?>
                         <td><?= $row->governmentparentstatus ?></td>
                     <?php } ?>

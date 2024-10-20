@@ -16,10 +16,9 @@ class GovernmentModel extends Model
     // VIEW: extra.governmentchangecountcache
     // VIEW: extra.governmentextracache
     // VIEW: extra.governmenthasmappedeventcache
-    // VIEW: extra.governmentrelationcache
     // VIEW: extra.governmentsubstitutecache
 
-    public function getDetail(int|string $id, string $state): array
+    public function getDetail(int|string $id): array
     {
         if (!is_int($id)) {
             $id = $this->getSlugId($id);
@@ -27,7 +26,7 @@ class GovernmentModel extends Model
 
         $query = <<<QUERY
             SELECT government.governmentid,
-                extra.governmentlong(government.governmentid, ?) AS governmentlong,
+                extra.governmentlong(government.governmentid, '') AS governmentlong,
                     CASE
                         WHEN government.governmentcurrentform IS NULL THEN government.governmenttype
                         ELSE governmentform.governmentformlongextended
@@ -49,7 +48,7 @@ class GovernmentModel extends Model
                         WHEN governmentchangecountcache.creation = 1
                             AND array_length(governmentchangecountcache.creationas, 1) = 1
                             AND government.governmentid <> governmentchangecountcache.creationas[1]
-                            THEN extra.governmentlong(governmentchangecountcache.creationas[1], ?)
+                            THEN extra.governmentlong(governmentchangecountcache.creationas[1], '')
                         ELSE ''
                     END AS governmentcreationlong,
                 governmentchangecountcache.altertotal AS governmentaltercount,
@@ -62,7 +61,8 @@ class GovernmentModel extends Model
                 government.governmentmapstatus,
                 governmentmapstatus.governmentmapstatustimelapse,
                 governmentsubstitutecache.governmentsubstitutemultiple,
-                governmentextracache.governmentsubstituteslug
+                governmentextracache.governmentsubstituteslug,
+                government.governmentcurrentleadstate
             FROM geohistory.government
             JOIN extra.governmentextracache
                 ON government.governmentid = governmentextracache.governmentid
@@ -80,10 +80,6 @@ class GovernmentModel extends Model
             LEFT JOIN geohistory.event dissolutionevent
                 ON governmentchangecountcache.dissolutionevent IS NOT NULL
                 AND governmentchangecountcache.dissolutionevent[1] = dissolutionevent.eventid
-            JOIN extra.governmentrelationcache
-                ON government.governmentid = governmentrelationcache.governmentid
-                AND (governmentrelationcache.governmentrelationstate = ?
-                OR (governmentrelationcache.governmentlevel = 1 AND governmentrelationcache.governmentrelationstate = '' AND governmentrelationcache.governmentid = ?))
             LEFT OUTER JOIN
                 (
                 SELECT DISTINCT true AS hasmap
@@ -100,9 +96,6 @@ class GovernmentModel extends Model
         QUERY;
 
         return $this->db->query($query, [
-            strtoupper($state),
-            strtoupper($state),
-            strtoupper($state),
             $id,
             $id,
             $id,
@@ -137,12 +130,12 @@ class GovernmentModel extends Model
     // extra.ci_model_governmentidentifier_government(integer[], character varying)
 
     // FUNCTION: extra.governmentlong
-    // FUNCTION: extra.governmentstatelink
+    // FUNCTION: extra.governmentslug
 
     public function getByGovernmentIdentifier(string $ids): array
     {
         $query = <<<QUERY
-            SELECT extra.governmentstatelink(governmentidentifier.government, '--', ?) governmentstatelink,
+            SELECT extra.governmentslug(governmentidentifier.government) governmentslug,
                 extra.governmentlong(governmentidentifier.government, '--') AS governmentlong,
                 governmentidentifier.governmentidentifierstatus AS governmentparentstatus
             FROM geohistory.governmentidentifier
@@ -150,7 +143,6 @@ class GovernmentModel extends Model
         QUERY;
 
         return $this->db->query($query, [
-            \Config\Services::request()->getLocale(),
             $ids
         ])->getResult();
     }
@@ -491,12 +483,12 @@ class GovernmentModel extends Model
         ])->getResultArray();
     }
 
-    public function getNote(int $id, string $state): array
+    public function getNote(int $id): array
     {
         return [];
     }
 
-    public function getOffice(int $id, string $state): array
+    public function getOffice(int $id): array
     {
         return [];
     }
@@ -504,20 +496,21 @@ class GovernmentModel extends Model
     // extra.ci_model_government_related(integer, character varying, character varying)
 
     // FUNCTION: extra.governmentlong
-    // FUNCTION: extra.governmentstatelink
+    // FUNCTION: extra.governmentslug
     // VIEW: extra.governmentparentcache
     // VIEW: extra.governmentsubstitutecache
 
-    public function getRelated(int $id, string $state): array
+    public function getRelated(int $id): array
     {
         $query = <<<QUERY
             WITH relationpart AS (
-                SELECT DISTINCT extra.governmentstatelink(
+                SELECT DISTINCT extra.governmentslug(
                     CASE
                         WHEN government.governmentstatus = ANY (ARRAY['alternate', 'language']) THEN government.governmentsubstitute
                         ELSE government.governmentid
-                    END, ?, ?) AS governmentstatelink,
-                extra.governmentlong(governmentparentcache.governmentparent, ?) AS governmentlong,
+                    END) AS governmentslug,
+                'government' AS governmentslugtype,
+                extra.governmentlong(governmentparentcache.governmentparent, '') AS governmentlong,
                 'Parent' AS governmentrelationship,
                     CASE
                         WHEN government.governmentstatus = ANY (ARRAY['alternate', 'language']) THEN 'variant'
@@ -540,12 +533,13 @@ class GovernmentModel extends Model
                     LEFT JOIN geohistory.governmentmapstatus ON government.governmentmapstatus = governmentmapstatus.governmentmapstatusid AND governmentmapstatus.governmentmapstatusreviewed AND (government.governmentstatus <> ALL (ARRAY['proposed', 'unincorporated']))
                 WHERE governmentparentcache.governmentparentstatus <> 'placeholder' AND governmentparentcache.governmentparent IS NOT NULL
                 UNION
-                SELECT DISTINCT extra.governmentstatelink(
+                SELECT DISTINCT extra.governmentslug(
                     CASE
                         WHEN government.governmentstatus = ANY (ARRAY['alternate', 'language']) THEN government.governmentsubstitute
                         ELSE government.governmentid
-                    END, ?, ?) AS governmentstatelink,
-                extra.governmentlong(governmentparentcache.governmentid, ?) AS governmentlong,
+                    END) AS governmentslug,
+                'government' AS governmentslugtype,
+                extra.governmentlong(governmentparentcache.governmentid, '') AS governmentlong,
                 'Child' AS governmentrelationship,
                     CASE
                         WHEN government.governmentstatus = ANY (ARRAY['alternate', 'language']) THEN 'variant'
@@ -574,8 +568,9 @@ class GovernmentModel extends Model
                     AND (government.governmentstatus <> ALL (ARRAY['proposed', 'unincorporated']))
                 WHERE governmentparentcache.governmentparentstatus <> 'placeholder'
                 UNION
-                SELECT DISTINCT '/en/' || ? || '/event/' || event.eventslug || '/' AS governmentstatelink,
-                extra.governmentlong(government.governmentid, ?) AS governmentlong,
+                SELECT DISTINCT event.eventslug AS governmentslug,
+                'event' AS governmentslugtype,
+                extra.governmentlong(government.governmentid, '') AS governmentlong,
                     CASE
                         WHEN government.governmentstatus = ANY (ARRAY['alternate', 'language']) THEN 'Variant'
                         ELSE 'Historic'
@@ -594,12 +589,13 @@ class GovernmentModel extends Model
                     LEFT JOIN geohistory.event
                     ON government.governmentid = event.government
                 ), relationrank AS (
-                    SELECT relationpart.governmentstatelink,
+                    SELECT relationpart.governmentslug,
+                    relationpart.governmentslugtype,
                     relationpart.governmentlong,
                     relationpart.governmentrelationship,
                     relationpart.governmentparentstatus,
                     relationpart.governmentcolor,
-                    row_number() OVER (PARTITION BY relationpart.governmentstatelink, relationpart.governmentlong, relationpart.governmentrelationship ORDER BY relationpart.isgovernmentsubstitute DESC, (
+                    row_number() OVER (PARTITION BY relationpart.governmentslug, relationpart.governmentlong, relationpart.governmentrelationship ORDER BY relationpart.isgovernmentsubstitute DESC, (
                         CASE
                             WHEN relationpart.governmentparentstatus = 'current' THEN 1
                             WHEN relationpart.governmentparentstatus = 'most recent' THEN 2
@@ -609,7 +605,8 @@ class GovernmentModel extends Model
                         END)) AS roworder
                     FROM relationpart
                 )
-            SELECT relationrank.governmentstatelink,
+            SELECT relationrank.governmentslug,
+            relationrank.governmentslugtype,
             relationrank.governmentlong,
             relationrank.governmentrelationship,
             relationrank.governmentparentstatus,
@@ -620,20 +617,12 @@ class GovernmentModel extends Model
         QUERY;
 
         return $this->db->query($query, [
-            $state,
-            \Config\Services::request()->getLocale(),
-            strtoupper($state),
             $id,
             $id,
             $id,
-            $state,
-            \Config\Services::request()->getLocale(),
-            strtoupper($state),
             $id,
             $id,
             $id,
-            strtolower($state),
-            strtoupper($state),
             $id,
             $id,
         ])->getResult();
@@ -672,7 +661,7 @@ class GovernmentModel extends Model
     // extra.ci_model_search_government_government(text, text, text, integer, text, character varying)
 
     // FUNCTION: extra.governmentlong
-    // FUNCTION: extra.governmentstatelink
+    // FUNCTION: extra.governmentslug
     // VIEW: extra.governmentextracache
     // VIEW: extra.governmentrelationcache
 
@@ -702,11 +691,11 @@ class GovernmentModel extends Model
                     OR (? = 'statewide' AND governmentrelationcache.governmentlevel = 2)
                 )
             )
-            SELECT DISTINCT extra.governmentstatelink(CASE
+            SELECT DISTINCT extra.governmentslug(CASE
                     WHEN government.governmentstatus IN ('alternate', 'language') THEN government.governmentsubstitute
                     ELSE government.governmentid
-                END, ?, ?) AS governmentstatelink,
-                extra.governmentlong(government.governmentid, ?) AS governmentlong
+                END) AS governmentslug,
+                extra.governmentlong(government.governmentid, '') AS governmentlong
                 FROM selectedgovernment
                 JOIN extra.governmentrelationcache
                 ON selectedgovernment.governmentid = governmentrelationcache.governmentid 
@@ -715,11 +704,11 @@ class GovernmentModel extends Model
                 JOIN geohistory.government
                 ON governmentrelationcache.governmentrelation = government.governmentid
             UNION DISTINCT
-            SELECT DISTINCT extra.governmentstatelink(CASE
+            SELECT DISTINCT extra.governmentslug(CASE
                     WHEN government.governmentstatus IN ('alternate', 'language') THEN government.governmentsubstitute
                     ELSE government.governmentid
-                END, ?, ?) AS governmentstatelink,
-                extra.governmentlong(government.governmentid, ?) AS governmentlong
+                END) AS governmentslug,
+                extra.governmentlong(government.governmentid, '') AS governmentlong
                 FROM selectedgovernment
                 JOIN extra.governmentrelationcache
                 ON selectedgovernment.governmentid = governmentrelationcache.governmentrelation
@@ -736,20 +725,14 @@ class GovernmentModel extends Model
             strtoupper($state),
             $government,
             $type,
-            $state,
-            \Config\Services::request()->getLocale(),
-            strtoupper($state),
             $level,
             $type,
-            $state,
-            \Config\Services::request()->getLocale(),
-            strtoupper($state),
             $level,
             $type
         ])->getResult();
     }
 
-    public function getSchoolDistrict(int $id, string $state): array
+    public function getSchoolDistrict(int $id): array
     {
         return [];
     }

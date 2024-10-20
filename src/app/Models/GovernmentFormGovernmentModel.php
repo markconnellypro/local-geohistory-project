@@ -6,7 +6,7 @@ use CodeIgniter\Model;
 
 class GovernmentFormGovernmentModel extends Model
 {
-    public function getByGovernment(int $id, string $state): array
+    public function getByGovernment(int $id): array
     {
         return [];
     }

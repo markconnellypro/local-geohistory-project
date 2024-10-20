@@ -33,7 +33,11 @@
                 <?php if ($row->eventgranted !== 'government') { ?>
                     <td><?= $row->eventgranted ?></td>
                 <?php } else { ?>
-                    <td><?php echo view('core/link', ['link' => $row->government, 'text' => 'View']) ?></td>
+                    <td><?php echo view('core/link', [
+                        'type' => 'government',
+                        'link' => $row->government,
+                        'text' => 'View'
+                    ]) ?></td>
                 <?php } ?>
             </tr>
         </tbody>

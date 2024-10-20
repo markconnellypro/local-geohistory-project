@@ -12,7 +12,7 @@ class NationalArchivesModel extends Model
     // VIEW: extra.governmentsubstitutecache
     // VIEW: extra.sourceextra
 
-    public function getByGovernment(int $id, string $state): array
+    public function getByGovernment(int $id): array
     {
         $query = <<<QUERY
             SELECT DISTINCT sourceextra.sourceabbreviation,
@@ -23,7 +23,7 @@ class NationalArchivesModel extends Model
                 nationalarchives.nationalarchivesunitto,
                 'https://catalog.archives.gov/id/' || nationalarchives.nationalarchivesunit || '?objectPage=' || nationalarchives.nationalarchivesunitfrom AS url,
                 nationalarchives.nationalarchivesexamined,
-                extra.governmentlong(nationalarchives.government, ?) AS governmentlong
+                extra.governmentlong(nationalarchives.government, '') AS governmentlong
             FROM geohistory.nationalarchives
             JOIN geohistory.source
                 ON nationalarchives.source = source.sourceid
@@ -41,7 +41,7 @@ class NationalArchivesModel extends Model
                 NULL::integer AS nationalarchivesunitto,
                 '' AS url,
                 censusmap.censusmapexamined AS nationalarchivesexamined,
-                extra.governmentlong(censusmap.government, ?) AS governmentlong
+                extra.governmentlong(censusmap.government, '') AS governmentlong
             FROM geohistory.censusmap
             JOIN geohistory.source
                 ON source.sourceshort = 'Cns.Mp.'
@@ -59,9 +59,7 @@ class NationalArchivesModel extends Model
         QUERY;
 
         return $this->db->query($query, [
-            strtoupper($state),
             $id,
-            strtoupper($state),
             $id,
         ])->getResult();
     }

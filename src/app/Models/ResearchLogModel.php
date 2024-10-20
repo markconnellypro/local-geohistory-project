@@ -13,7 +13,7 @@ class ResearchLogModel extends Model
     // FUNCTION: extra.shortdate
     // VIEW: extra.governmentsubstitutecache
 
-    public function getByGovernment(int $id, string $state): array
+    public function getByGovernment(int $id): array
     {
         $query = <<<QUERY
             SELECT researchlog.researchlogid,
@@ -33,7 +33,7 @@ class ResearchLogModel extends Model
                     WHEN ? THEN researchlog.researchlognotes
                     ELSE ''
                 END AS researchlognotes,
-                extra.governmentlong(researchlog.government, ?) AS governmentlong
+                extra.governmentlong(researchlog.government, '') AS governmentlong
             FROM geohistory.researchlog
             JOIN geohistory.researchlogtype
                 ON researchlog.researchlogtype = researchlogtype.researchlogtypeid
@@ -51,7 +51,6 @@ class ResearchLogModel extends Model
             \App\Controllers\BaseController::isLive(),
             \App\Controllers\BaseController::isLive(),
             \App\Controllers\BaseController::isLive(),
-            strtoupper($state),
             $id,
             \App\Controllers\BaseController::isLive(),
         ])->getResult();

@@ -104,7 +104,7 @@ class AffectedGovernmentGroupModel extends Model
     // FUNCTION: extra.governmentlong
     // VIEW: extra.governmentsubstitute
 
-    public function getByGovernmentForm(int $id, string $state): array
+    public function getByGovernmentForm(int $id): array
     {
         $query = <<<QUERY
             SELECT DISTINCT event.eventsort,
@@ -115,7 +115,7 @@ class AffectedGovernmentGroupModel extends Model
                 event.eventeffectivetext AS eventeffective,
                 event.eventeffective AS eventeffectivesort,
                 NOT eventgranted.eventgrantedcertainty AS eventreconstructed,
-                extra.governmentlong(affectedgovernmentpart.governmentto, ?) AS governmentaffectedlong
+                extra.governmentlong(affectedgovernmentpart.governmentto, '') AS governmentaffectedlong
             FROM geohistory.event
             JOIN geohistory.eventgranted
                 ON event.eventgranted = eventgranted.eventgrantedid
@@ -135,7 +135,6 @@ class AffectedGovernmentGroupModel extends Model
 
         return $this->db->query($query, [
             \App\Controllers\BaseController::isLive(),
-            strtoupper($state),
             $id,
         ])->getResult();
     }
@@ -144,11 +143,11 @@ class AffectedGovernmentGroupModel extends Model
     // NOT REMOVED
 
     // FUNCTION: extra.governmentlong
-    // FUNCTION: extra.governmentstatelink
+    // FUNCTION: extra.governmentslug
     // FUNCTION: extra.governmentsubstitutedcache
     // VIEW: extra.governmentsubstitutecache
 
-    public function getByGovernmentGovernment(int $id, string $state): array
+    public function getByGovernmentGovernment(int $id): array
     {
         $query = <<<QUERY
             SELECT DISTINCT event.eventsort,
@@ -158,11 +157,11 @@ class AffectedGovernmentGroupModel extends Model
                     WHEN affectedgovernment.affectedtypesamewithin THEN ' (Within)'
                     ELSE ''
                 END AS affectedtypesame,
-                extra.governmentlong(affectedgovernment.government, ?) AS governmentlong,
+                extra.governmentlong(affectedgovernment.government, '') AS governmentlong,
                 CASE
                     WHEN affectedgovernment.government = ANY (extra.governmentsubstitutedcache(?)) THEN ''
-                    ELSE extra.governmentstatelink(affectedgovernment.government, ?, ?)
-                END AS governmentstatelink,
+                    ELSE extra.governmentslug(affectedgovernment.government)
+                END AS governmentslug,
                 affectedtypeother.affectedtypeshort || CASE
                     WHEN affectedgovernment.affectedtypeotherwithin THEN ' (Within)'
                     ELSE ''
@@ -171,7 +170,7 @@ class AffectedGovernmentGroupModel extends Model
                 event.eventeffectivetext AS eventeffective,
                 event.eventeffective AS eventeffectivesort,
                 NOT eventgranted.eventgrantedcertainty AS eventreconstructed,
-                extra.governmentlong(affectedgovernment.governmentaffected, ?) AS governmentaffectedlong
+                extra.governmentlong(affectedgovernment.governmentaffected, '') AS governmentaffectedlong
             FROM (
                 -- To-From
                     SELECT DISTINCT affectedgovernmentgroup.event,
@@ -291,11 +290,7 @@ class AffectedGovernmentGroupModel extends Model
         QUERY;
 
         return $this->db->query($query, [
-            strtoupper($state),
             $id,
-            $state,
-            \Config\Services::request()->getLocale(),
-            strtoupper($state),
             $id,
             $id,
             $id,

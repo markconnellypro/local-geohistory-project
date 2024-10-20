@@ -27,7 +27,8 @@
                 <tr>
                     <?php if ($includeGovernment) { ?>
                         <td><?php echo view('core/link', [
-                            'link' => '/' . \Config\Services::request()->getLocale() . '/government/' . $row->governmentslug . '/',
+                            'type' => 'government',
+                            'link' => $row->governmentslug,
                             'text' => $row->governmentlong
                         ]) ?></td>
                     <?php } else { ?>

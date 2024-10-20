@@ -50,17 +50,18 @@ info.onAdd = function(map) {
 	return this._div;
 };
 
+
 infoRegularUpdate = function(props) {
   if(props) {
     t = (props.plsstownshipshort !== '' ? '<div class="mapwidth2">Survey Township: </div>'
       + (props.plsstownship !== '' ? '<a href="' + props.plsstownship + '">' : '')
       + props.plsstownshipshort + (props.plsstownship !== '' ? '</a>' : '') + '<br>' : '')
-      + (props.submunicipalitylong !== '' ? '<div class="mapwidth2">Sub-Municipality: </div><a href="' + props.submunicipality + '">'
+      + (props.submunicipalitylong !== '' ? '<div class="mapwidth2">Sub-Municipality: </div><a href="/<?= \Config\Services::request()->getLocale() ?>/government/' + props.submunicipality + '/">'
       + props.submunicipalitylong + '</a><br>' : '') + '<div class="mapwidth2">Municipality: </div>'
-      + (props.municipality !== '' ? '<a href="' + props.municipality + '">' : '')
+      + (props.municipality !== '' ? '<a href="/<?= \Config\Services::request()->getLocale() ?>/government/' + props.municipality + '/">' : '')
       + props.municipalitylong + (props.municipality !== '' ? '</a>' : '') + '<br>'
       + '<div class="mapwidth2">County: </div>'
-      + (props.county !== '' ? '<a href="' + props.county + '">' : '')
+      + (props.county !== '' ? '<a href="/<?= \Config\Services::request()->getLocale() ?>/government/' + props.county + '/">' : '')
       + props.countyshort + (props.county !== '' ? '</a>' : '')
       + '<br><div class="mapwidth2">Status: </div><a href="/<?= \Config\Services::request()->getLocale() ?>/key/#governmentmapstatus">'
       + dispositionColorName(props.disposition) + '</a><br>';
