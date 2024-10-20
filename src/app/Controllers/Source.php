@@ -24,11 +24,11 @@ class Source extends BaseController
         return redirect()->to('/' . $this->request->getLocale() . '/source/' . $id . '/', 301);
     }
 
-    public function view(string $state, int|string $id): void
+    public function view(int|string $id): void
     {
         $id = $this->getIdInt($id);
         $SourceCitationModel = new SourceCitationModel();
-        $query = $SourceCitationModel->getDetail($id, $state);
+        $query = $SourceCitationModel->getDetail($id);
         if (count($query) !== 1) {
             $this->noRecord();
         } else {
@@ -41,9 +41,9 @@ class Source extends BaseController
                 echo view('core/url', ['query' => $query, 'title' => 'Actual URL']);
             }
             $SourceCitationNoteModel = new SourceCitationNoteModel();
-            echo view('source/note', ['query' => $SourceCitationNoteModel->getBySourceCitation($id), 'state' => $state]);
+            echo view('source/note', ['query' => $SourceCitationNoteModel->getBySourceCitation($id)]);
             $SourceItemPartModel = new SourceItemPartModel();
-            echo view('core/url', ['query' => $SourceItemPartModel->getBySourceCitation($id), 'state' => $state, 'title' => 'Calculated URL']);
+            echo view('core/url', ['query' => $SourceItemPartModel->getBySourceCitation($id), 'title' => 'Calculated URL']);
             $EventModel = new EventModel();
             echo view('event/table', ['query' => $EventModel->getBySourceCitation($id), 'title' => 'Event Links']);
             echo view('core/footer');

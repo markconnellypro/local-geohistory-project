@@ -11,10 +11,9 @@ class SourceCitationModel extends Model
 
     // FUNCTION: extra.rangefix
     // FUNCTION: extra.shortdate
-    // VIEW: extra.sourcecitationgovernmentcache
     // VIEW: extra.sourceextra
 
-    public function getDetail(int|string $id, string $state): array
+    public function getDetail(int|string $id): array
     {
         if (!is_int($id)) {
             $id = $this->getSlugId($id);
@@ -46,15 +45,10 @@ class SourceCitationModel extends Model
             JOIN geohistory.sourcecitation
                 ON source.sourceid = sourcecitation.source
                 AND sourcecitation.sourcecitationid = ?
-            LEFT JOIN extra.sourcecitationgovernmentcache
-                ON sourcecitation.sourcecitationid = sourcecitationgovernmentcache.sourcecitationid
-            WHERE governmentrelationstate = ?
-                OR governmentrelationstate IS NULL
         QUERY;
 
         return $this->db->query($query, [
             $id,
-            strtoupper($state),
         ])->getResult();
     }
 
