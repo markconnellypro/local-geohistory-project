@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Models\AffectedGovernmentGroupModel;
 use App\Models\MetesDescriptionModel;
 use CodeIgniter\HTTP\RedirectResponse;
 
@@ -21,15 +22,21 @@ class Metes extends BaseController
         return redirect()->to('/' . $this->request->getLocale() . '/metes/' . $id . '/', 301);
     }
 
-    public function view(string $state, int|string $id): void
+    public function view(int|string $id): void
     {
         $id = $this->getIdInt($id);
         $MetesDescriptionModel = new MetesDescriptionModel();
-        $areaQuery = $MetesDescriptionModel->getDetail($id, $state);
+        $areaQuery = $MetesDescriptionModel->getDetail($id);
         if (count($areaQuery) !== 1) {
             $this->noRecord();
         } else {
             $id = $areaQuery[0]->metesdescriptionid;
+            $jurisdictions = explode(',', $areaQuery[0]->jurisdictions);
+            if ($jurisdictions === [] || $jurisdictions === ['']) {
+                $AffectedGovernmentGroupModel = new AffectedGovernmentGroupModel();
+                $jurisdictions = $AffectedGovernmentGroupModel->getByEventGovernment($areaQuery[0]->eventid);
+                $jurisdictions = $jurisdictions['jurisdictions'];
+            }
             echo view('core/header', ['title' => $this->title, 'pageTitle' => $areaQuery[0]->metesdescriptionlong]);
             echo view('metes/table', ['query' => $areaQuery, 'hasLink' => false, 'title' => 'Detail']);
             $hasMap = false;
@@ -50,7 +57,7 @@ class Metes extends BaseController
             echo view('metes/row', ['query' => $MetesDescriptionLineModel->getByMetesDescription($id)]);
             echo view('event/table', ['query' => $areaQuery, 'title' => 'Event Links']);
             if ($hasMap) {
-                echo view('leaflet/start', ['type' => 'metes', 'includeBase' => $hasBegin, 'needRotation' => false]);
+                echo view('leaflet/start', ['type' => 'metes', 'jurisdictions' => $jurisdictions, 'includeBase' => $hasBegin, 'needRotation' => false]);
                 if ($hasArea) {
                     echo view('core/gis', [
                         'query' => $areaQuery,

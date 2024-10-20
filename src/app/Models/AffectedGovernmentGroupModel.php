@@ -550,10 +550,6 @@ class AffectedGovernmentGroupModel extends Model
             }
         }
 
-        foreach ($rows as $key => $value) {
-            $rows[$key] = (object) $value;
-        }
-
         if ($jurisdictions === []) {
             foreach ($rows as $row) {
                 $jurisdiction = explode('-', $row['From County Link']);
@@ -569,6 +565,10 @@ class AffectedGovernmentGroupModel extends Model
 
         $jurisdictions = array_keys($jurisdictions);
         sort($jurisdictions);
+
+        foreach ($rows as $key => $value) {
+            $rows[$key] = (object) $value;
+        }
 
         return [
             'affectedGovernment' => [
