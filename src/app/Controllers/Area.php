@@ -123,17 +123,17 @@ class Area extends BaseController
             $AffectedGovernmentGroupModel = new AffectedGovernmentGroupModel();
             $query = $AffectedGovernmentGroupModel->getByGovernmentShape($id, $state);
             $events = [];
-            echo view('event/table_affectedgovernment_fixed', ['query' => $query, 'state' => $state, 'includeDate' => true, 'isComplete' => true]);
+            echo view('event/table_affectedgovernment_fixed', ['query' => $query, 'includeDate' => true, 'isComplete' => true]);
             foreach ($query as $row) {
                 if (!is_null($row->eventid)) {
                     $events[] = $row->eventid;
                 }
             }
             $MetesDescriptionModel = new MetesDescriptionModel();
-            echo view('metes/table', ['query' => $MetesDescriptionModel->getByGovernmentShape($id), 'hasLink' => true, 'state' => $state, 'title' => 'Metes and Bounds Description']);
+            echo view('metes/table', ['query' => $MetesDescriptionModel->getByGovernmentShape($id), 'hasLink' => true, 'title' => 'Metes and Bounds Description']);
             $events = array_unique($events);
             $EventModel = new EventModel();
-            echo view('event/table', ['query' => $EventModel->getByGovernmentShapeFailure($id, $events), 'state' => $state, 'title' => 'Other Event Links']);
+            echo view('event/table', ['query' => $EventModel->getByGovernmentShapeFailure($id, $events), 'title' => 'Other Event Links']);
             echo view('leaflet/start', ['type' => 'area', 'includeBase' => true, 'needRotation' => false]);
             echo view('core/gis', [
                 'query' => $currentQuery,

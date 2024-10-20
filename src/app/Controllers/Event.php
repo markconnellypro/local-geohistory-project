@@ -63,25 +63,25 @@ class Event extends BaseController
                 echo view('core/map', ['includeBase' => true, 'eventIsMapped' => $eventIsMapped]);
             }
             if (isset($affectedGovernment['rows']) && count($affectedGovernment['rows']) > 0) {
-                echo view('event/table_affectedgovernment', ['affectedGovernment' => $affectedGovernment, 'state' => $state, 'includeDate' => false, 'isComplete' => true]);
+                echo view('event/table_affectedgovernment', ['affectedGovernment' => $affectedGovernment, 'includeDate' => false, 'isComplete' => true]);
             }
             echo view('event/table_affectedgovernmentform', ['includeGovernment' => true, 'query' => $AffectedGovernmentGroupModel->getByEventForm($id, $state)]);
             $CurrentGovernmentModel = new CurrentGovernmentModel();
             echo view('event/table_currentgovernment', ['query' => $CurrentGovernmentModel->getByEvent($id, $state), 'state' => $state]);
             $MetesDescriptionModel = new MetesDescriptionModel();
-            echo view('metes/table', ['query' => $MetesDescriptionModel->getByEvent($id), 'hasLink' => true, 'state' => $state, 'title' => 'Metes and Bounds Description']);
+            echo view('metes/table', ['query' => $MetesDescriptionModel->getByEvent($id), 'hasLink' => true, 'title' => 'Metes and Bounds Description']);
             $PlssModel = new PlssModel();
             echo view('event/plss', ['query' => $PlssModel->getByEvent($id)]);
             $AdjudicationModel = new AdjudicationModel();
-            echo view('adjudication/table', ['query' => $AdjudicationModel->getByEvent($id), 'state' => $state, 'eventRelationship' => true]);
+            echo view('adjudication/table', ['query' => $AdjudicationModel->getByEvent($id), 'eventRelationship' => true]);
             $LawSectionModel = new LawSectionModel();
-            echo view('law/table', ['query' => $LawSectionModel->getByEvent($id), 'state' => $state, 'title' => 'Law', 'type' => 'relationship', 'includeLawGroup' => true]);
+            echo view('law/table', ['query' => $LawSectionModel->getByEvent($id), 'title' => 'Law', 'type' => 'relationship', 'includeLawGroup' => true]);
             $RecordingModel = new RecordingModel();
             echo view('event/recording', ['query' => $RecordingModel->getByEvent($id, $state)]);
             $GovernmentSourceModel = new GovernmentSourceModel();
-            echo view('governmentsource/table', ['query' => $GovernmentSourceModel->getByEvent($id, $state), 'state' => $state, 'type' => 'event']);
+            echo view('governmentsource/table', ['query' => $GovernmentSourceModel->getByEvent($id, $state), 'type' => 'event']);
             $SourceCitationModel = new SourceCitationModel();
-            echo view('source/table_citation', ['query' => $SourceCitationModel->getByEvent($id), 'state' => $state, 'hasColor' => false, 'hasLink' => true, 'title' => 'Source']);
+            echo view('source/table_citation', ['query' => $SourceCitationModel->getByEvent($id), 'hasColor' => false, 'hasLink' => true, 'title' => 'Source']);
             if ($this->isLive()) {
                 $FileSourceModel = new \App\Models\Development\FileSourceModel();
                 echo view(ENVIRONMENT . '/filesource/table', ['query' => $FileSourceModel->getByEvent($id), 'state' => $state]);

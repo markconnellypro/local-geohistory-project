@@ -34,7 +34,7 @@ class Reporter extends BaseController
         } else {
             $id = $query[0]->adjudicationsourcecitationid;
             echo view('core/header', ['title' => $this->title]);
-            echo view('reporter/table', ['query' => $query, 'state' => $state, 'hasLink' => false, 'title' => 'Detail']);
+            echo view('reporter/table', ['query' => $query, 'hasLink' => false, 'title' => 'Detail']);
             echo view('source/table', ['query' => $query, 'hasLink' => false]);
             echo view('reporter/authorship', ['query' => $query]);
             if ($query[0]->url !== '') {
@@ -43,9 +43,9 @@ class Reporter extends BaseController
             $SourceItemPartModel = new SourceItemPartModel();
             echo view('core/url', ['query' => $SourceItemPartModel->getByAdjudicationSourceCitation($id), 'state' => $state, 'title' => 'Calculated URL']);
             $AdjudicationModel = new AdjudicationModel();
-            echo view('adjudication/table', ['query' => $AdjudicationModel->getByAdjudicationSourceCitation($id), 'state' => $state]);
+            echo view('adjudication/table', ['query' => $AdjudicationModel->getByAdjudicationSourceCitation($id)]);
             $EventModel = new EventModel();
-            echo view('event/table', ['query' => $EventModel->getByAdjudicationSourceCitation($id), 'state' => $state, 'title' => 'Event Links']);
+            echo view('event/table', ['query' => $EventModel->getByAdjudicationSourceCitation($id), 'title' => 'Event Links']);
             echo view('core/footer');
         }
     }

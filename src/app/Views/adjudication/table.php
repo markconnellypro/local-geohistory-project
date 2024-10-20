@@ -1,6 +1,4 @@
-<?php if (is_array($query ?? '') && $query !== []) {
-    $state ??= 'usa';
-    ?>
+<?php if (is_array($query ?? '') && $query !== []) { ?>
 <section>
     <h2>Adjudication</h2>
     <table class="normal cell-border compact stripe">
@@ -19,7 +17,7 @@
         <tbody>
             <?php foreach ($query as $row) { ?>
                 <tr>
-                    <td><a href="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/adjudication/<?= $row->adjudicationslug ?>/">View</a></td>
+                    <td><a href="/<?= \Config\Services::request()->getLocale() ?>/adjudication/<?= $row->adjudicationslug ?>/">View</a></td>
                     <td><?= $row->tribunallong ?></td>
                     <td><?= $row->adjudicationtypelong ?></td>
                     <td><?= $row->adjudicationnumber ?></td>

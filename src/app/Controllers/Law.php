@@ -62,11 +62,11 @@ class Law extends BaseController
             if ($query !== []) {
                 echo view(ENVIRONMENT . '/lawgroup/table', ['query' => $query, 'includeForm' => false]);
             }
-            echo view('law/table', ['query' => $LawSectionModel->getRelated($id), 'state' => $state, 'title' => 'Related Law', 'type' => 'relationship']);
+            echo view('law/table', ['query' => $LawSectionModel->getRelated($id), 'title' => 'Related Law', 'type' => 'relationship']);
             $SourceItemPartModel = new SourceItemPartModel();
             echo view('core/url', ['query' => $SourceItemPartModel->$function($id), 'state' => $state, 'title' => 'Calculated URL']);
             $EventModel = new EventModel();
-            echo view('event/table', ['query' => $EventModel->$function($id), 'state' => $state, 'title' => 'Event Links', 'eventRelationship' => true, 'includeLawGroup' => true]);
+            echo view('event/table', ['query' => $EventModel->$function($id), 'title' => 'Event Links', 'eventRelationship' => true, 'includeLawGroup' => true]);
             echo view('core/footer');
         }
     }

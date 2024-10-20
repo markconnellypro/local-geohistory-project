@@ -1,7 +1,6 @@
 <?php if (is_array($query ?? '') && $query !== []) {
     $isHistory ??= false;
     $isMultiple ??= false;
-    $state ??= 'usa';
     ?>
 <section>
     <?php if (!$isHistory) { ?>
@@ -24,7 +23,7 @@
             <?php $i = 1;
     foreach ($query as $row) { ?>
                 <tr>
-                    <td data-sort="<?= $row->eventsort ?>"><?= ($isHistory ? $i : '<a href="/' . \Config\Services::request()->getLocale() . '/' . $state . '/event/' . $row->eventslug . '/">View</a>') ?></td>
+                    <td data-sort="<?= $row->eventsort ?>"><?= ($isHistory ? $i : '<a href="/' . \Config\Services::request()->getLocale() . '/event/' . $row->eventslug . '/">View</a>') ?></td>
                     <?php if ($isMultiple) { ?>
                         <td><?= $row->governmentaffectedlong ?></td>
                     <?php } ?>

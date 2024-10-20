@@ -2,7 +2,6 @@
 $layers ??= ['default' => 'default'];
 $primaryLayer ??= '';
 $showTimeline ??= false;
-$state ??= 'usa';
 $updatedParts ??= (object)[
     'sortdate' => '',
     'sortdatetext' => ''
@@ -71,10 +70,10 @@ infoRegularUpdate = function(props) {
       } else {
         t += '<div class="mapwidth2"></div>';
       }
-      t += '<a href="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/event/' + props.event[i].eventslug + '/">'
+      t += '<a href="/<?= \Config\Services::request()->getLocale() ?>/event/' + props.event[i].eventslug + '/">'
         + props.event[i].eventdatetext + '</a><br>';
     }
-    t += '<div class="mapwidth2">Area: </div><a href="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/area/' + props.governmentshapeslug + '/">View</a>';
+    t += '<div class="mapwidth2">Area: </div><a href="/<?= \Config\Services::request()->getLocale() ?>/area/' + props.governmentshapeslug + '/">View</a>';
   } else {
     t = '<div class="b">Click on any shaded<br>area for more info.</span>';
   }
@@ -96,7 +95,7 @@ info2.onAdd = function(map) {
 };
 
 info2RegularUpdate = function(props) {
-	this._div.innerHTML = (props ? '<div class="mapwidth">Event: </div><a href="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/event/' + props.event + '/">'
+	this._div.innerHTML = (props ? '<div class="mapwidth">Event: </div><a href="/<?= \Config\Services::request()->getLocale() ?>/event/' + props.event + '/">'
     + props.metesdescriptionlong + '</a> <br>' : '<div class="b">Click on any description for more info.</span>');
 };
 

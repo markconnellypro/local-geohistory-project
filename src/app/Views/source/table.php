@@ -1,6 +1,5 @@
 <?php if (is_array($query ?? '') && $query !== []) {
-    $hasLink ??= false;
-    $state ??= 'usa';?>
+    $hasLink ??= false; ?>
 <section>
     <h2>Source</h2>
     <table class="normal cell-border compact stripe">
@@ -18,7 +17,7 @@
             <?php foreach ($query as $row) { ?>
                 <tr>
                     <?php if ($hasLink) { ?>
-                        <td><a href="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/<?= $row->linktype ?>/<?= $row->sourceid ?>/">View</a></td>
+                        <td><a href="/<?= \Config\Services::request()->getLocale() ?>/<?= $row->linktype ?>/<?= $row->sourceid ?>/">View</a></td>
                     <?php } ?>
                     <td><?= $row->sourceabbreviation ?></td>
                     <td><?= $row->sourcetype ?></td>

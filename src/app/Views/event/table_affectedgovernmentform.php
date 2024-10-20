@@ -1,7 +1,6 @@
 <?php if (is_array($query ?? '') && $query !== []) {
     $includeGovernment ??= false;
     $isHistory ??= false;
-    $state ??= 'usa';
     ?>
 <section>
     <h2>Affected Government Form</h2>
@@ -29,7 +28,7 @@
                     <?php if ($includeGovernment) { ?>
                         <td><?php echo view('core/link', ['link' => $row->governmentstatelink, 'text' => $row->governmentlong]) ?></td>
                     <?php } else { ?>
-                        <td data-sort="<?= $row->eventsort ?>"><?= ($isHistory ? $i : '<a href="/' . \Config\Services::request()->getLocale() . '/' . $state . '/event/' . $row->eventslug . '/">View</a>') ?></td>
+                        <td data-sort="<?= $row->eventsort ?>"><?= ($isHistory ? $i : '<a href="/' . \Config\Services::request()->getLocale() . '/event/' . $row->eventslug . '/">View</a>') ?></td>
                     <?php }
                     if (isset($isMultiple) && !$isMultiple) { ?>
                         <td><?= $row->governmentaffectedlong ?></td>

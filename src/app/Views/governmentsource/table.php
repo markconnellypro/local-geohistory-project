@@ -1,6 +1,5 @@
 <?php if (is_array($query ?? '') && $query !== []) {
     $isMultiple ??= false;
-    $state ??= 'usa';
     $type ??= '';
     ?>
 <section>
@@ -27,11 +26,11 @@
                     <?php if ($type !== 'source') { ?>
                         <td data-sort="<?= $row->governmentsourcesort ?>">
                             <?php if (isset($row->governmentsourceslug) && $row->governmentsourceslug !== '') { ?>
-                                <a href="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/governmentsource/<?= $row->governmentsourceslug ?>/">View</a>
+                                <a href="/<?= \Config\Services::request()->getLocale() ?>/governmentsource/<?= $row->governmentsourceslug ?>/">View</a>
                                 <?php } elseif (isset($row->eventslug)) {
                                     $i = 0;
                                     foreach (explode(',', str_replace(['{', '}'], '', $row->eventslug)) as $event) { ?>
-                                    <?= ($i > 0 ? '<br>' : '') ?><a href="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/event/<?= $event ?>/">View</a>
+                                    <?= ($i > 0 ? '<br>' : '') ?><a href="/<?= \Config\Services::request()->getLocale() ?>/event/<?= $event ?>/">View</a>
                             <?php $i++;
                                     }
                                 } ?>

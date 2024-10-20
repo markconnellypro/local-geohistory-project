@@ -33,12 +33,12 @@ class Governmentsource extends BaseController
         } else {
             $id = $query[0]->governmentsourceid;
             echo view('core/header', ['title' => $this->title]);
-            echo view('governmentsource/table', ['query' => $query, 'state' => $state, 'type' => 'source']);
+            echo view('governmentsource/table', ['query' => $query, 'type' => 'source']);
             echo view('source/table', ['query' => $query, 'hasLink' => $this->isLive()]);
             $SourceItemPartModel = new SourceItemPartModel();
             echo view('core/url', ['query' => $SourceItemPartModel->getByGovernmentSource($id), 'state' => $state, 'title' => 'Calculated URL']);
             $EventModel = new EventModel();
-            echo view('event/table', ['query' => $EventModel->getByGovernmentSource($id), 'state' => $state, 'title' => 'Event Links']);
+            echo view('event/table', ['query' => $EventModel->getByGovernmentSource($id), 'title' => 'Event Links']);
             echo view('core/footer');
         }
     }

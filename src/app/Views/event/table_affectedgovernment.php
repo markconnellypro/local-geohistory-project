@@ -2,7 +2,6 @@
 $affectedGovernment ??= ['linkTypes' => [], 'rows' => [], 'types' => []];
 $includeDate ??= false;
 $isComplete ??= true;
-$state ??= 'usa';
 ?>
 <section>
     <?php if ($isComplete) { ?>
@@ -30,7 +29,7 @@ $state ??= 'usa';
                 foreach ($affectedGovernment['rows'] as $id => $row) { ?>
                 <tr>
                     <?php if ($includeDate) { ?>
-                        <td data-sort="<?= $row->eventorder ?>"><?php echo view('core/link', ['link' => ($row->eventslug  === '' ? '' : "/" . \Config\Services::request()->getLocale() . "/" . $state . "/event/" . $row->eventslug . "/"), 'text' => ($row->eventslug  === '' ? 'Missing' : 'View')]) ?></td>
+                        <td data-sort="<?= $row->eventorder ?>"><?php echo view('core/link', ['link' => ($row->eventslug  === '' ? '' : "/" . \Config\Services::request()->getLocale() . "/event/" . $row->eventslug . "/"), 'text' => ($row->eventslug  === '' ? 'Missing' : 'View')]) ?></td>
                         <td data-sort="<?= $row->eventsort ?>"><?= ($row->eventeffective === '' ? $row->eventyear : $row->eventeffective) ?></td>
                     <?php } elseif (\App\Controllers\BaseController::isLive() && $isComplete) { ?>
                         <td>

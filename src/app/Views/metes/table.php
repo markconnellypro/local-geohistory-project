@@ -1,6 +1,5 @@
 <?php if (is_array($query ?? '') && $query !== []) {
     $hasLink ??= false;
-    $state ??= 'usa';
     $title ??= '';
     ?>
 <section>
@@ -24,7 +23,7 @@
             <?php foreach ($query as $row) { ?>
                 <tr>
                     <?php if ($hasLink) { ?>
-                        <td><a href="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/metes/<?= $row->metesdescriptionslug ?>/">View</a></td>
+                        <td><a href="/<?= \Config\Services::request()->getLocale() ?>/metes/<?= $row->metesdescriptionslug ?>/">View</a></td>
                     <?php } elseif (\App\Controllers\BaseController::isLive()) { ?>
                         <td><?= $row->metesdescriptionid ?></td>
                     <?php } ?>

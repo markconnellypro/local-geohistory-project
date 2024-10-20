@@ -1,7 +1,6 @@
 <?php if (is_array($query ?? '') && $query !== []) {
     $hasColor ??= false;
     $hasLink ??= false;
-    $state ??= 'usa';
     $title ??= '';
     ?>
 <section>
@@ -38,7 +37,7 @@
                 ?>
                 <tr>
                     <?php if ($hasLink) { ?>
-                        <td<?= ($hasColor ? ' class="folder' . $rowColor . '"' : '') ?>><a href="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/source/<?= $row->sourcecitationslug ?>/">View</a></td>
+                        <td<?= ($hasColor ? ' class="folder' . $rowColor . '"' : '') ?>><a href="/<?= \Config\Services::request()->getLocale() ?>/source/<?= $row->sourcecitationslug ?>/">View</a></td>
                             <?php if (!$hasColor) { ?>
                                 <td><?= $row->sourceabbreviation ?></td>
                                 <?php }

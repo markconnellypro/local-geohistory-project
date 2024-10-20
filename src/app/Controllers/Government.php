@@ -66,7 +66,7 @@ class Government extends BaseController
             $hasMap = ($isCountyOrLower && $query[0]->hasmap === 't');
             $showTimeline = ($query[0]->governmentmapstatustimelapse === 't');
             $statusQuery = $GovernmentMapStatusModel->getDetails();
-            echo view('government/view', ['query' => $query, 'state' => $state, 'statuses' => $statusQuery]);
+            echo view('government/view', ['query' => $query, 'statuses' => $statusQuery]);
             if (!$isHistory) {
                 $query = $SourceCitationModel->getByGovernment($id, $state);
                 if ($query !== []) {
@@ -101,10 +101,10 @@ class Government extends BaseController
             $EventModel = new EventModel();
             if (!$isHistory) {
                 if ($isCountyOrLower) {
-                    echo view('event/table', ['query' => $EventModel->getByGovernmentSuccess($id, $events), 'state' => $state, 'title' => 'Other Successful Event Links', 'tableId' => 'successfulevent']);
+                    echo view('event/table', ['query' => $EventModel->getByGovernmentSuccess($id, $events), 'title' => 'Other Successful Event Links', 'tableId' => 'successfulevent']);
                 }
                 $GovernmentSourceModel = new GovernmentSourceModel();
-                echo view('governmentsource/table', ['query' => $GovernmentSourceModel->getByGovernment($id, $state), 'state' => $state, 'type' => 'government', 'isMultiple' => $isMultiple]);
+                echo view('governmentsource/table', ['query' => $GovernmentSourceModel->getByGovernment($id, $state), 'type' => 'government', 'isMultiple' => $isMultiple]);
                 $query = $GovernmentModel->getNote($id, $state);
                 if ($query !== []) {
                     echo view(ENVIRONMENT . '/government/note', ['query' => $query, 'isMultiple' => $isMultiple]);
@@ -123,7 +123,7 @@ class Government extends BaseController
                 $NationalArchivesModel = new NationalArchivesModel();
                 echo view('government/nationalarchives', ['query' => $NationalArchivesModel->getByGovernment($id, $state), 'isMultiple' => $isMultiple]);
                 if ($isCountyOrLower) {
-                    echo view('event/table', ['query' => $EventModel->getByGovernmentFailure($id, $events), 'state' => $state, 'title' => 'Other Event Links', 'tableId' => 'otherevent']);
+                    echo view('event/table', ['query' => $EventModel->getByGovernmentFailure($id, $events), 'title' => 'Other Event Links', 'tableId' => 'otherevent']);
                 }
                 $query = $GovernmentModel->getOffice($id, $state);
                 if ($query !== []) {
@@ -181,7 +181,7 @@ class Government extends BaseController
                 date_default_timezone_set('America/New_York');
                 $AppModel = new AppModel();
                 $updatedParts = $AppModel->getLastUpdated()[0];
-                echo view('government/end', ['layers' => $layers, 'primaryLayer' => $primaryLayer, 'state' => $state, 'updatedParts' => $updatedParts, 'showTimeline' => $showTimeline]);
+                echo view('government/end', ['layers' => $layers, 'primaryLayer' => $primaryLayer, 'updatedParts' => $updatedParts, 'showTimeline' => $showTimeline]);
                 echo view('leaflet/end');
             }
             echo view('core/footer');

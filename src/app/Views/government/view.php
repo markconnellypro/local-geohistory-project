@@ -1,7 +1,6 @@
 <?php if (is_array($query ?? '') && $query !== []) {
     $isHistory ??= false;
     $row = $query[0];
-    $state ??= 'usa';
     ?>
 <section>
     <?php if (!$isHistory) { ?>
@@ -49,15 +48,15 @@
             </thead>
             <tbody>
                 <tr>
-                    <td><?php if (!is_null($row->governmentcreationevent)) { ?><a href="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/event/<?= $row->governmentcreationevent ?>/"><?= $row->governmentcreationtext ?></a><?php } ?></td>
+                    <td><?php if (!is_null($row->governmentcreationevent)) { ?><a href="/<?= \Config\Services::request()->getLocale() ?>/event/<?= $row->governmentcreationevent ?>/"><?= $row->governmentcreationtext ?></a><?php } ?></td>
                     <?php if ($row->governmentcreationlong !== '') { ?>
                         <td><?= $row->governmentcreationlong ?></td>
                     <?php } ?>
                     <td><?= $row->governmentaltercount ?></td>
-                    <td><?php if (!is_null($row->governmentdissolutionevent)) { ?><a href="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/event/<?= $row->governmentdissolutionevent ?>/"><?= $row->governmentdissolutiontext ?></a><?php } ?></td>
+                    <td><?php if (!is_null($row->governmentdissolutionevent)) { ?><a href="/<?= \Config\Services::request()->getLocale() ?>/event/<?= $row->governmentdissolutionevent ?>/"><?= $row->governmentdissolutiontext ?></a><?php } ?></td>
                     <?php if (\App\Controllers\BaseController::isLive()) { ?>
                         <td>
-                            <form action="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/governmentmapcomplete/" method="post">
+                            <form action="/<?= \Config\Services::request()->getLocale() ?>/governmentmapcomplete/" method="post">
                                 <input type="hidden" name="id" value="<?= $row->governmentid ?>">
                                 <select name="mapcomplete">
                                 <?php if (is_array($statuses ?? '') && $statuses !== []) {

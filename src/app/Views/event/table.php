@@ -1,6 +1,4 @@
-<?php if (is_array($query ?? '') && $query !== []) {
-    $state ??= 'usa';
-    ?>
+<?php if (is_array($query ?? '') && $query !== []) { ?>
 <section>
     <?= (isset($title) && $title !== '' ? '<h2>' . $title . '</h2>' : '') ?>
     <table id="<?= ($tableId ?? 'event') ?>" class="normal cell-border compact stripe">
@@ -21,7 +19,7 @@
         <tbody>
             <?php foreach ($query as $row) { ?>
                 <tr>
-                    <td><a href="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/event/<?= $row->eventslug ?>/">View</a></td>
+                    <td><a href="/<?= \Config\Services::request()->getLocale() ?>/event/<?= $row->eventslug ?>/">View</a></td>
                     <td><?= $row->eventtypeshort ?></td>
                     <td><?= $row->eventlong ?></td>
                     <td><?= $row->eventgranted ?></td>

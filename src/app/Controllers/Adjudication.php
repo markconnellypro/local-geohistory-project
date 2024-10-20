@@ -41,9 +41,9 @@ class Adjudication extends BaseController
             $FilingModel = new FilingModel();
             echo view('adjudication/filing', ['query' => $FilingModel->getByAdjudication($id)]);
             $AdjudicationSourceCitationModel = new AdjudicationSourceCitationModel();
-            echo view('reporter/table', ['query' => $AdjudicationSourceCitationModel->getByAdjudication($id), 'state' => $state, 'hasLink' => true, 'title' => 'Reporter Links']);
+            echo view('reporter/table', ['query' => $AdjudicationSourceCitationModel->getByAdjudication($id), 'hasLink' => true, 'title' => 'Reporter Links']);
             $EventModel = new EventModel();
-            echo view('event/table', ['query' => $EventModel->getByAdjudication($id), 'state' => $state, 'title' => 'Event Links', 'eventRelationship' => true]);
+            echo view('event/table', ['query' => $EventModel->getByAdjudication($id), 'title' => 'Event Links', 'eventRelationship' => true]);
             echo view('core/footer');
         }
 
