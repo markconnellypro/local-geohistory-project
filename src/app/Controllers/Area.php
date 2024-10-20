@@ -6,6 +6,7 @@ use App\Models\AffectedGovernmentGroupModel;
 use App\Models\EventModel;
 use App\Models\GovernmentShapeModel;
 use App\Models\MetesDescriptionModel;
+use CodeIgniter\HTTP\RedirectResponse;
 
 class Area extends BaseController
 {
@@ -76,6 +77,11 @@ class Area extends BaseController
         } else {
             $this->view($state, $query[0]->governmentshapeid, $y, $x, $addressText);
         }
+    }
+
+    public function redirect(int|string $id): RedirectResponse
+    {
+        return redirect()->to('/' . $this->request->getLocale() . '/area/' . $id . '/', 301);
     }
 
     public function view(string $state, int|string $id, float $y = 0, float $x = 0, string $addressText = ''): void

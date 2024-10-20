@@ -6,6 +6,7 @@ use App\Models\AdjudicationModel;
 use App\Models\AdjudicationSourceCitationModel;
 use App\Models\EventModel;
 use App\Models\SourceItemPartModel;
+use CodeIgniter\HTTP\RedirectResponse;
 
 class Reporter extends BaseController
 {
@@ -16,6 +17,11 @@ class Reporter extends BaseController
         echo view('core/header', ['title' => $this->title]);
         echo view('core/norecord');
         echo view('core/footer');
+    }
+
+    public function redirect(int|string $id): RedirectResponse
+    {
+        return redirect()->to('/' . $this->request->getLocale() . '/reporter/' . $id . '/', 301);
     }
 
     public function view(string $state, int|string $id): void

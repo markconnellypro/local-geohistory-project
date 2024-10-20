@@ -12,6 +12,7 @@ use App\Models\MetesDescriptionModel;
 use App\Models\PlssModel;
 use App\Models\RecordingModel;
 use App\Models\SourceCitationModel;
+use CodeIgniter\HTTP\RedirectResponse;
 
 class Event extends BaseController
 {
@@ -22,6 +23,11 @@ class Event extends BaseController
         echo view('core/header', ['title' => $this->title]);
         echo view('core/norecord');
         echo view('core/footer');
+    }
+
+    public function redirect(int|string $id): RedirectResponse
+    {
+        return redirect()->to('/' . $this->request->getLocale() . '/event/' . $id . '/', 301);
     }
 
     public function view(string $state, int|string $id): void

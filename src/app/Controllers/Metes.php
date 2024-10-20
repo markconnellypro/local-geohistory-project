@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Models\MetesDescriptionModel;
+use CodeIgniter\HTTP\RedirectResponse;
 
 class Metes extends BaseController
 {
@@ -13,6 +14,11 @@ class Metes extends BaseController
         echo view('core/header', ['title' => $this->title]);
         echo view('core/norecord');
         echo view('core/footer');
+    }
+
+    public function redirect(int|string $id): RedirectResponse
+    {
+        return redirect()->to('/' . $this->request->getLocale() . '/metes/' . $id . '/', 301);
     }
 
     public function view(string $state, int|string $id): void

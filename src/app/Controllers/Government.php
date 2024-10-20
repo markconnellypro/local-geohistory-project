@@ -10,6 +10,7 @@ use App\Models\GovernmentShapeModel;
 use App\Models\GovernmentSourceModel;
 use App\Models\NationalArchivesModel;
 use App\Models\ResearchLogModel;
+use CodeIgniter\HTTP\RedirectResponse;
 
 class Government extends BaseController
 {
@@ -20,6 +21,11 @@ class Government extends BaseController
         echo view('core/header', ['title' => $this->title]);
         echo view('core/norecord');
         echo view('core/footer');
+    }
+
+    public function redirect(int|string $id): RedirectResponse
+    {
+        return redirect()->to('/' . $this->request->getLocale() . '/government/' . $id . '/', 301);
     }
 
     public function view(string $state, int|string $id, bool $isHistory = false): void
