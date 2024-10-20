@@ -25,11 +25,11 @@ class Adjudication extends BaseController
         return redirect()->to('/' . $this->request->getLocale() . '/adjudication/' . $id . '/', 301);
     }
 
-    public function view(string $state, int|string $id): void
+    public function view(int|string $id): void
     {
         $id = $this->getIdInt($id);
         $AdjudicationModel = new AdjudicationModel();
-        $query = $AdjudicationModel->getDetail($id, $state);
+        $query = $AdjudicationModel->getDetail($id);
         if (count($query) !== 1) {
             $this->noRecord();
         } else {
@@ -46,6 +46,5 @@ class Adjudication extends BaseController
             echo view('event/table', ['query' => $EventModel->getByAdjudication($id), 'title' => 'Event Links', 'eventRelationship' => true]);
             echo view('core/footer');
         }
-
     }
 }

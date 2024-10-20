@@ -15,7 +15,7 @@ class AdjudicationModel extends Model
     // VIEW: extra.adjudicationextracache
     // VIEW: extra.adjudicationgovernmentcache
 
-    public function getDetail(int|string $id, string $state): array
+    public function getDetail(int|string $id): array
     {
         if (!is_int($id)) {
             $id = $this->getSlugId($id);
@@ -48,15 +48,10 @@ class AdjudicationModel extends Model
                 AND adjudication.adjudicationid = ?
             JOIN extra.adjudicationextracache
                 ON adjudication.adjudicationid = adjudicationextracache.adjudicationid
-            LEFT JOIN extra.adjudicationgovernmentcache
-                ON adjudication.adjudicationid = adjudicationgovernmentcache.adjudicationid
-            WHERE governmentrelationstate = ?
-                OR governmentrelationstate IS NULL
         QUERY;
 
         return $this->db->query($query, [
             $id,
-            strtoupper($state),
         ])->getResult();
     }
 
