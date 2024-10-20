@@ -13,7 +13,6 @@ class AdjudicationModel extends Model
     // FUNCTION: extra.tribunalfilingoffice
     // FUNCTION: extra.tribunallong
     // VIEW: extra.adjudicationextracache
-    // VIEW: extra.adjudicationgovernmentcache
 
     public function getDetail(int|string $id): array
     {
