@@ -22,7 +22,7 @@ $title ??= '';
     <?php } ?>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta charset="UTF-8">
-    <title><?= (isset($pageTitle) ? $pageTitle . ' | ' : '') . (isset($pageTitleType) ? $pageTitleType . ' | ' : '') . $title . ' | ' . ($state !== '' && $state !== 'usa' ? strtoupper($state) . ' | ' : '') ?><?= lang('Template.projectName') ?></title>
+    <title><?= (isset($pageTitle) ? $pageTitle . ' | ' : '') . (isset($pageTitleType) ? $pageTitleType . ' | ' : '') . $title ?><?= lang('Template.projectName') ?></title>
     <link rel="preload" href="/asset/font/lora-regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
     <link rel="preload" href="/asset/font/lora-semibold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
     <link rel="preload" href="/asset/font/lora-italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
@@ -49,12 +49,6 @@ $title ??= '';
                 <div id="headertitle"><a href="/<?= \Config\Services::request()->getLocale() ?>/"><?= lang('Template.projectName') ?></a></div>
                 <div id="headerimagenavigation">
                     <div class="headerimageblock">
-                        <?php if ($state !== '' && $state !== 'usa') { ?>
-                            <a href="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/" aria-label="<?= strtoupper($state) ?>">
-                                <?= view('core/svg_icon', ['iconLabel' => strtoupper($state) . ' map icon', 'iconName' => $state, 'iconType' => 'headericon']); ?>
-                                <br><?= strtoupper($state) ?>
-                            </a>
-                        <?php } ?>
                     </div>
                     <nav id="headernavigation">
                         <div id="headernavigationpart">
