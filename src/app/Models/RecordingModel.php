@@ -9,15 +9,15 @@ class RecordingModel extends Model
     // extra.ci_model_event_recording(integer, character varying, character varying)
 
     // FUNCTION: extra.governmentshort
-    // FUNCTION: extra.governmentstatelink
+    // FUNCTION: extra.governmentslug
     // FUNCTION: extra.rangefix
     // FUNCTION: extra.shortdate
 
-    public function getByEvent(int $id, string $state): array
+    public function getByEvent(int $id): array
     {
         $query = <<<QUERY
-            SELECT extra.governmentstatelink(recordingoffice.government, ?, ?) AS government,
-                extra.governmentshort(recordingoffice.government, ?) AS governmentshort,
+            SELECT extra.governmentslug(recordingoffice.government) AS government,
+                extra.governmentshort(recordingoffice.government, '') AS governmentshort,
                 trim(recordingtype.recordingtypelong || CASE
                     WHEN recordingtype.recordingtypetype = '' THEN ''
                     ELSE ' ' || recordingtype.recordingtypetype
@@ -79,9 +79,6 @@ class RecordingModel extends Model
         QUERY;
 
         return $this->db->query($query, [
-            $state,
-            \Config\Services::request()->getLocale(),
-            strtoupper($state),
             $id,
         ])->getResult();
     }

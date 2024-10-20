@@ -13,16 +13,16 @@ class CurrentGovernmentModel extends Model
     // FUNCTION: extra.governmentshort
     // FUNCTION: extra.governmentstatelink
 
-    public function getByEvent(int $id, string $state): array
+    public function getByEvent(int $id): array
     {
         $query = <<<QUERY
-            SELECT COALESCE(extra.governmentstatelink(currentgovernment.governmentsubmunicipality, ?, ?), '') AS governmentsubmunicipality,
-                COALESCE(extra.governmentlong(currentgovernment.governmentsubmunicipality, ?), '') AS governmentsubmunicipalitylong,
-                extra.governmentstatelink(currentgovernment.governmentmunicipality, ?, ?) AS governmentmunicipality,
-                extra.governmentlong(currentgovernment.governmentmunicipality, ?) AS governmentmunicipalitylong,
-                extra.governmentstatelink(currentgovernment.governmentcounty, ?, ?) AS governmentcounty,
-                extra.governmentshort(currentgovernment.governmentcounty, ?) AS governmentcountyshort,
-                extra.governmentstatelink(currentgovernment.governmentstate, ?, ?) AS governmentstate,
+            SELECT COALESCE(extra.governmentslug(currentgovernment.governmentsubmunicipality), '') AS governmentsubmunicipality,
+                COALESCE(extra.governmentlong(currentgovernment.governmentsubmunicipality, ''), '') AS governmentsubmunicipalitylong,
+                extra.governmentslug(currentgovernment.governmentmunicipality) AS governmentmunicipality,
+                extra.governmentlong(currentgovernment.governmentmunicipality, '') AS governmentmunicipalitylong,
+                extra.governmentslug(currentgovernment.governmentcounty) AS governmentcounty,
+                extra.governmentshort(currentgovernment.governmentcounty, '') AS governmentcountyshort,
+                extra.governmentslug(currentgovernment.governmentstate) AS governmentstate,
                 extra.governmentabbreviation(currentgovernment.governmentstate) AS governmentstateabbreviation
             FROM geohistory.currentgovernment
             WHERE currentgovernment.event = ?
@@ -30,17 +30,6 @@ class CurrentGovernmentModel extends Model
         QUERY;
 
         return $this->db->query($query, [
-            $state,
-            \Config\Services::request()->getLocale(),
-            strtoupper($state),
-            $state,
-            \Config\Services::request()->getLocale(),
-            strtoupper($state),
-            $state,
-            \Config\Services::request()->getLocale(),
-            strtoupper($state),
-            $state,
-            \Config\Services::request()->getLocale(),
             $id,
         ])->getResult();
     }

@@ -10,13 +10,13 @@ class AffectedGovernmentGroupModel extends Model
 
     // FUNCTION: extra.governmentformlong
     // FUNCTION: extra.governmentlong
-    // FUNCTION: extra.governmentstatelink
+    // FUNCTION: extra.governmentslug
 
-    public function getByEventForm(int $id, string $state): array
+    public function getByEventForm(int $id): array
     {
         $query = <<<QUERY
-            SELECT DISTINCT extra.governmentstatelink(affectedgovernmentpart.governmentto, ?, ?) AS governmentstatelink,
-                extra.governmentlong(affectedgovernmentpart.governmentto, ?) AS governmentlong,
+            SELECT DISTINCT extra.governmentslug(affectedgovernmentpart.governmentto) AS governmentslug,
+                extra.governmentlong(affectedgovernmentpart.governmentto, '') AS governmentlong,
                 extra.governmentformlong(affectedgovernmentpart.governmentformto, ?) governmentformlong
             FROM geohistory.affectedgovernmentgroup
             JOIN geohistory.affectedgovernmentgrouppart
@@ -29,9 +29,6 @@ class AffectedGovernmentGroupModel extends Model
         QUERY;
 
         return $this->db->query($query, [
-            $state,
-            \Config\Services::request()->getLocale(),
-            strtoupper($state),
             \App\Controllers\BaseController::isLive(),
             $id,
         ])->getResult();
@@ -43,13 +40,16 @@ class AffectedGovernmentGroupModel extends Model
     {
         $query = <<<QUERY
             SELECT DISTINCT affectedgovernmentgroup.affectedgovernmentgroupid AS id,
-                public.st_asgeojson(public.st_buffer(public.st_collect(governmentshape.governmentshapegeometry), 0)) AS geometry
+                public.st_asgeojson(public.st_buffer(public.st_collect(governmentshape.governmentshapegeometry), 0)) AS geometry,
+                lower(array_to_string(array_agg(DISTINCT government.governmentabbreviation ORDER BY government.governmentabbreviation), ',')) AS jurisdictions
             FROM geohistory.affectedgovernmentgroup
             JOIN gis.affectedgovernmentgis
                 ON affectedgovernmentgroup.affectedgovernmentgroupid = affectedgovernmentgis.affectedgovernment
                 AND affectedgovernmentgroup.event = ?
             JOIN gis.governmentshape
                 ON affectedgovernmentgis.governmentshape = governmentshape.governmentshapeid
+            JOIN geohistory.government
+                ON governmentshape.governmentstate = government.governmentid
             GROUP BY 1
             ORDER BY 1
         QUERY;
@@ -61,22 +61,22 @@ class AffectedGovernmentGroupModel extends Model
 
     // extra.ci_model_event_affectedgovernment_part(integer, character varying, character varying)
 
-    // FUNCTION: extra.governmentstatelink
+    // FUNCTION: extra.governmentslug
     // FUNCTION: extra.governmentlong
     // FUNCTION: extra.affectedtypeshort
 
-    public function getByEventGovernment(int $id, string $state): array
+    public function getByEventGovernment(int $id): array
     {
         $query = <<<QUERY
             SELECT DISTINCT affectedgovernmentgrouppart.affectedgovernmentgroup AS id,
                 affectedgovernmentlevel.affectedgovernmentlevellong AS affectedgovernmentlevellong,
                 affectedgovernmentlevel.affectedgovernmentleveldisplayorder AS affectedgovernmentleveldisplayorder,
                 affectedgovernmentlevel.affectedgovernmentlevelgroup = 4 AS includelink,
-                COALESCE(extra.governmentstatelink(affectedgovernmentpart.governmentfrom, ?, ?), '') AS governmentfrom,
-                COALESCE(extra.governmentlong(affectedgovernmentpart.governmentfrom, ?), '') AS governmentfromlong,
+                COALESCE(extra.governmentslug(affectedgovernmentpart.governmentfrom), '') AS governmentfrom,
+                COALESCE(extra.governmentlong(affectedgovernmentpart.governmentfrom, ''), '') AS governmentfromlong,
                 COALESCE(extra.affectedtypeshort(affectedgovernmentpart.affectedtypefrom), '') AS affectedtypefrom,
-                COALESCE(extra.governmentstatelink(affectedgovernmentpart.governmentto, ?, ?), '') AS governmentto,
-                COALESCE(extra.governmentlong(affectedgovernmentpart.governmentto, ?), '') AS governmenttolong,
+                COALESCE(extra.governmentslug(affectedgovernmentpart.governmentto), '') AS governmentto,
+                COALESCE(extra.governmentlong(affectedgovernmentpart.governmentto, ''), '') AS governmenttolong,
                 COALESCE(extra.affectedtypeshort(affectedgovernmentpart.affectedtypeto), '') AS affectedtypeto
             FROM geohistory.affectedgovernmentgroup
             JOIN geohistory.affectedgovernmentgrouppart
@@ -90,12 +90,6 @@ class AffectedGovernmentGroupModel extends Model
         QUERY;
 
         $query = $this->db->query($query, [
-            $state,
-            \Config\Services::request()->getLocale(),
-            strtoupper($state),
-            $state,
-            \Config\Services::request()->getLocale(),
-            strtoupper($state),
             $id,
         ])->getResultArray();
 
@@ -539,10 +533,17 @@ class AffectedGovernmentGroupModel extends Model
         $linkTypes = $kSort;
 
         $hasMap = false;
+        $jurisdictions = [];
 
         if ($gisQuery !== []) {
             $hasMap = true;
             foreach ($gisQuery as $row) {
+                $row['jurisdictions'] = explode(',', $row['jurisdictions']);
+                foreach ($row['jurisdictions'] as $jurisdiction) {
+                    if ($jurisdiction !== '') {
+                        $jurisdictions[$jurisdiction] = true;
+                    }
+                }
                 foreach ($row as $key => $value) {
                     $rows[$row['id']][$key] = $value;
                 }
@@ -553,6 +554,22 @@ class AffectedGovernmentGroupModel extends Model
             $rows[$key] = (object) $value;
         }
 
+        if ($jurisdictions === []) {
+            foreach ($rows as $row) {
+                $jurisdiction = explode('-', $row['From County Link']);
+                if ($jurisdiction[0] !== '') {
+                    $jurisdictions[$jurisdiction[0]] = true;
+                }
+                $jurisdiction = explode('-', $row['To County Link']);
+                if ($jurisdiction[0] !== '') {
+                    $jurisdictions[$jurisdiction[0]] = true;
+                }
+            }
+        }
+
+        $jurisdictions = array_keys($jurisdictions);
+        sort($jurisdictions);
+
         return [
             'affectedGovernment' => [
                 'linkTypes' => $linkTypes,
@@ -560,6 +577,7 @@ class AffectedGovernmentGroupModel extends Model
                 'types' => $types,
             ],
             'hasMap' => $hasMap,
+            'jurisdictions' => $jurisdictions,
         ];
     }
 }

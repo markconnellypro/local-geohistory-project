@@ -38,7 +38,10 @@ $isComplete ??= true;
                                 foreach ($affectedGovernment['linkTypes'] as $fromTo => $levels) {
                                     foreach ($levels as $level) {
                                         if (isset($row->{ucfirst($fromTo) . ' ' . $level . ' Long'})) { ?>
-                                        <?php echo view('core/link', ['link' => str_replace('government', 'governmentmap', $row->{ucfirst($fromTo) . ' ' . $level . ' Link'}) . $id . "/", 'text' => ucfirst($fromTo)]) ?><br>
+                                        <?php echo view('core/link', [
+                                            'link' => '/' . \Config\Services::request()->getLocale() . '/governmentmap/' . $row->{ucfirst($fromTo) . ' ' . $level . ' Link'} . '/' . $id . "/",
+                                            'text' => ucfirst($fromTo)
+                                        ]) ?><br>
                             <?php
                                         }
                                     }
@@ -51,7 +54,10 @@ $isComplete ??= true;
                             foreach ($levels as $level) { ?>
                             <td>
                                 <?php if (isset($row->{ucfirst($fromTo) . ' ' . $level . ' Long'})) { ?>
-                                    <?php echo view('core/link', ['link' => $row->{ucfirst($fromTo) . ' ' . $level . ' Link'}, 'text' => $row->{ucfirst($fromTo) . ' ' . $level . ' Long'}]) ?>
+                                    <?php echo view('core/link', [
+                                        'link' => '/' . \Config\Services::request()->getLocale() . '/government/' . $row->{ucfirst($fromTo) . ' ' . $level . ' Link'} . '/',
+                                        'text' => $row->{ucfirst($fromTo) . ' ' . $level . ' Long'}
+                                    ]) ?>
                                     <br><span class="i"><?= $row->{ucfirst($fromTo) . ' ' . $level . ' Affected'} ?> <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#affectedtype" aria-label="Affected Type Key"><?= view('core/svg_icon', ['iconLabel' => 'key icon', 'iconName' => 'key', 'iconType' => 'keyicontext']); ?></a></span>
                                 <?php } ?>
                             </td>

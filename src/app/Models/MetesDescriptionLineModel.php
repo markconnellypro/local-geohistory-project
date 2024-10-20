@@ -28,7 +28,7 @@ class MetesDescriptionLineModel extends Model
         ])->getResult();
     }
 
-    public function getGeometryByEvent(int $id, string $state): array
+    public function getGeometryByEvent(int $id): array
     {
         return [];
     }

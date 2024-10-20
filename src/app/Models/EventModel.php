@@ -10,14 +10,14 @@ class EventModel extends Model
     // extra.ci_model_event_detail(text, character varying)
 
     // FUNCTION: extra.shortdate
-    // FUNCTION: extra.governmentstatelink
+    // FUNCTION: extra.governmentslug
     // FUNCTION: extra.eventgovernmentcache
     // FUNCTION: extra.governmentrelationcache
 
-    public function getDetail(int|string $id, string $state): array
+    public function getDetail(int|string $id): array
     {
         if (!is_int($id)) {
-            $id = $this->getSlugId($id, $state);
+            $id = $this->getSlugId($id);
         }
 
         $query = <<<QUERY
@@ -41,7 +41,7 @@ class EventModel extends Model
                 other.otherdate,
                 other.otherdatetype,
                 event.eventismapped,
-                extra.governmentstatelink(event.government, ?, 'en') AS government
+                extra.governmentslug(event.government) AS government
             FROM geohistory.event
                 JOIN geohistory.eventgranted
                 ON event.eventgranted = eventgranted.eventgrantedid
@@ -79,23 +79,15 @@ class EventModel extends Model
                                         geohistory.governmentsourceevent
                                     WHERE governmentsource.governmentsourceid = governmentsourceevent.governmentsource AND governmentsource.governmentsourcetype::text = 'Letters Patent'::text AND governmentsourceevent.event = ?) other_2))) other ON 0 = 0
                 LEFT JOIN geohistory.eventeffectivetype ON event.eventeffectivetypepresumedsource = eventeffectivetype.eventeffectivetypeid
-                LEFT JOIN extra.eventgovernmentcache ON event.eventid = eventgovernmentcache.eventid
-                LEFT JOIN extra.governmentrelationcache ON eventgovernmentcache.government = governmentrelationcache.governmentid
             WHERE event.eventid = ?
-                AND (
-                    governmentrelationcache.governmentrelationstate = ? OR 
-                    governmentrelationcache.governmentrelationstate IS NULL
-                )    
         QUERY;
 
         return $this->db->query($query, [
-            $state,
             $id,
             $id,
             $id,
             $id,
             $id,
-            strtoupper($state),
         ])->getResult();
     }
 
@@ -721,7 +713,7 @@ class EventModel extends Model
 
     // extra.eventslugidreplacement(text) - SPLIT INTO TWO
 
-    private function getSlugId(string $id, string $state): int
+    private function getSlugId(string $id): int
     {
         $query = <<<QUERY
             SELECT event.eventid AS id
@@ -738,7 +730,7 @@ class EventModel extends Model
         if (count($query) === 1) {
             $output = $query[0]->id;
         } else {
-            $this->getRetiredSlugRedirect($id, $state);
+            $this->getRetiredSlugRedirect($id);
         }
 
         return $output;
@@ -746,7 +738,7 @@ class EventModel extends Model
 
     // extra.eventslugidreplacement(text) - SPLIT INTO TWO
 
-    private function getRetiredSlugRedirect(int|string $id, string $state): void
+    private function getRetiredSlugRedirect(int|string $id): void
     {
         $query = <<<QUERY
             SELECT DISTINCT event.eventslug
@@ -762,7 +754,7 @@ class EventModel extends Model
 
         if (count($query) === 1) {
             header("HTTP/1.1 301 Moved Permanently");
-            header("Location: /" . \Config\Services::request()->getLocale() . "/" . $state . "/event/" . $query[0]->eventslug . "/");
+            header("Location: /" . \Config\Services::request()->getLocale() . "/event/" . $query[0]->eventslug . "/");
             exit();
         }
     }

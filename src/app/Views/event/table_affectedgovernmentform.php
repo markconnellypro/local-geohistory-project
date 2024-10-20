@@ -26,7 +26,10 @@
     foreach ($query as $row) { ?>
                 <tr>
                     <?php if ($includeGovernment) { ?>
-                        <td><?php echo view('core/link', ['link' => $row->governmentstatelink, 'text' => $row->governmentlong]) ?></td>
+                        <td><?php echo view('core/link', [
+                            'link' => '/' . \Config\Services::request()->getLocale() . '/government/' . $row->governmentslug . '/',
+                            'text' => $row->governmentlong
+                        ]) ?></td>
                     <?php } else { ?>
                         <td data-sort="<?= $row->eventsort ?>"><?= ($isHistory ? $i : '<a href="/' . \Config\Services::request()->getLocale() . '/event/' . $row->eventslug . '/">View</a>') ?></td>
                     <?php }

@@ -21,7 +21,7 @@
                     $row->recordingnumberlocation = null;
                 } ?>
                 <tr>
-                    <td><a href="<?= $row->government ?>"><?= $row->governmentshort ?></a></td>
+                    <td><a href="/<?= \Config\Services::request()->getLocale() ?>/government/<?= $row->government ?>/"><?= $row->governmentshort ?></a></td>
                     <td><?= $row->recordingtype . ($row->hasbothtype === 't' ? '<br>' : '') . $row->recordingnumbertype ?></td>
                     <td><?= $row->recordinglocation . ($row->hasbothtype === 't' ? '<br>' : '') . $row->recordingnumberlocation ?></td>
                     <td><?=
