@@ -22,7 +22,7 @@ class Law extends BaseController
         return redirect()->to('/' . $this->request->getLocale() . '/law/' . $id . '/', 301);
     }
 
-    public function view(string $state, int|string $id): void
+    public function view(int|string $id): void
     {
         if (str_ends_with($id, '-alternate')) {
             $function = 'getByLawAlternateSection';
@@ -32,7 +32,7 @@ class Law extends BaseController
             $LawSectionModel = new \App\Models\LawSectionModel();
         }
         $id = $this->getIdInt($id);
-        $query = $LawSectionModel->getDetail($id, $state);
+        $query = $LawSectionModel->getDetail($id);
         if (count($query) !== 1) {
             $this->noRecord();
         } else {
@@ -54,17 +54,17 @@ class Law extends BaseController
             if ($query !== []) {
                 echo view(ENVIRONMENT . '/usa/newberrylaw', ['query' => $query]);
             }
-            $query = $SourceCitationModel->getByLawState($id, $state);
+            $query = $SourceCitationModel->getByLawState($id);
             if ($query !== []) {
                 echo view(ENVIRONMENT . '/law/ny', ['query' => $query]);
             }
-            $query = $LawGroupSectionModel->getByLawSection($id, $state);
+            $query = $LawGroupSectionModel->getByLawSection($id);
             if ($query !== []) {
                 echo view(ENVIRONMENT . '/lawgroup/table', ['query' => $query, 'includeForm' => false]);
             }
             echo view('law/table', ['query' => $LawSectionModel->getRelated($id), 'title' => 'Related Law', 'type' => 'relationship']);
             $SourceItemPartModel = new SourceItemPartModel();
-            echo view('core/url', ['query' => $SourceItemPartModel->$function($id), 'state' => $state, 'title' => 'Calculated URL']);
+            echo view('core/url', ['query' => $SourceItemPartModel->$function($id), 'title' => 'Calculated URL']);
             $EventModel = new EventModel();
             echo view('event/table', ['query' => $EventModel->$function($id), 'title' => 'Event Links', 'eventRelationship' => true, 'includeLawGroup' => true]);
             echo view('core/footer');

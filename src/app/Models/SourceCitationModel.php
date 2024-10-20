@@ -110,7 +110,7 @@ class SourceCitationModel extends Model
         return [];
     }
 
-    public function getByLawState(int $id, string $state): array
+    public function getByLawState(int $id): array
     {
         return [];
     }

@@ -10,10 +10,9 @@ class LawSectionModel extends Model
     // extra.ci_model_law_detail(text, character varying, boolean)
 
     // FUNCTION: extra.lawsectioncitation
-    // VIEW: extra.lawsectiongovernmentcache
     // VIEW: extra.sourceextra
 
-    public function getDetail(int|string $id, string $state): array
+    public function getDetail(int|string $id): array
     {
         if (!is_int($id)) {
             $id = $this->getSlugId($id);
@@ -39,16 +38,11 @@ class LawSectionModel extends Model
             JOIN geohistory.lawsection
                 ON law.lawid = lawsection.law
                 AND lawsection.lawsectionid = ?
-            LEFT JOIN extra.lawsectiongovernmentcache 
-                ON lawsection.lawsectionid = lawsectiongovernmentcache.lawsectionid
-            WHERE governmentrelationstate = ?
-                OR governmentrelationstate IS NULL
         QUERY;
 
         return $this->db->query($query, [
             \App\Controllers\BaseController::isLive(),
             $id,
-            strtoupper($state),
         ])->getResult();
     }
 
