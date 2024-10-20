@@ -6,7 +6,7 @@ class Bot extends BaseController
 {
     private string $title = 'Bot';
 
-    public function index(string $state = ''): void
+    public function index(): void
     {
         echo view('core/header', ['title' => $this->title]);
         echo view('bot/index');
