@@ -46,41 +46,39 @@ $title ??= '';
         <header class="headerfooter">
             <div id="headertext">
                 <div id="headertitle"><a href="/<?= \Config\Services::request()->getLocale() ?>/"><?= lang('Template.projectName') ?></a></div>
-                <div id="headerimagenavigation">
-                    <div class="headerimageblock">
-                    </div>
+                <?php if ($title !== 'Welcome') { ?>
                     <nav id="headernavigation">
-                        <div id="headernavigationpart">
-                            <div id="headernavigationpartpart">
-                                <div class="keyiconcontainer">
-                                    <a href="/<?= \Config\Services::request()->getLocale() ?>/" aria-label="Return to Home">
-                                        <?= view('core/svg_icon', ['iconLabel' => 'home icon', 'iconName' => 'home', 'iconType' => 'keyiconlarge']); ?>
-                                    </a>
-                                </div>
-                                <div class="keyiconcontainer">
-                                    <a href="/<?= \Config\Services::request()->getLocale() ?>/search/" aria-label="Search">
-                                        <?= view('core/svg_icon', ['iconLabel' => 'magnifying glass icon', 'iconName' => 'search', 'iconType' => 'keyiconlarge']); ?>
-                                    </a>
-                                </div>
-                                <div class="keyiconcontainer">
-                                    <a href="/<?= \Config\Services::request()->getLocale() ?>/about/" aria-label="About">
-                                        <?= view('core/svg_icon', ['iconLabel' => 'about icon', 'iconName' => 'about', 'iconType' => 'keyiconlarge']); ?>
-                                    </a>
-                                </div>
-                                <div class="keyiconcontainer">
-                                    <a href="/<?= \Config\Services::request()->getLocale() ?>/key/" aria-label="Key">
-                                        <?= view('core/svg_icon', ['iconLabel' => 'key icon', 'iconName' => 'key', 'iconType' => 'keyiconlarge']); ?>
-                                    </a>
-                                </div>
-                                <div class="keyiconcontainer">
-                                    <a href="/<?= \Config\Services::request()->getLocale() ?>/statistics/" aria-label="Statistics">
-                                        <?= view('core/svg_icon', ['iconLabel' => 'statistics icon', 'iconName' => 'statistics', 'iconType' => 'keyiconlarge']); ?>
-                                    </a>
+                            <div id="headernavigationpart">
+                                <div id="headernavigationpartpart">
+                                    <div class="keyiconcontainer">
+                                        <a href="/<?= \Config\Services::request()->getLocale() ?>/" aria-label="Return to Home">
+                                            <?= view('core/svg_icon', ['iconLabel' => 'home icon', 'iconName' => 'home', 'iconType' => 'keyiconlarge']); ?>
+                                        </a>
+                                    </div>
+                                    <div class="keyiconcontainer">
+                                        <a href="/<?= \Config\Services::request()->getLocale() ?>/about/" aria-label="About">
+                                            <?= view('core/svg_icon', ['iconLabel' => 'about icon', 'iconName' => 'about', 'iconType' => 'keyiconlarge']); ?>
+                                        </a>
+                                    </div>
+                                    <div class="keyiconcontainer">
+                                        <a href="/<?= \Config\Services::request()->getLocale() ?>/key/" aria-label="Key">
+                                            <?= view('core/svg_icon', ['iconLabel' => 'key icon', 'iconName' => 'key', 'iconType' => 'keyiconlarge']); ?>
+                                        </a>
+                                    </div>
+                                    <div class="keyiconcontainer">
+                                        <a href="/<?= \Config\Services::request()->getLocale() ?>/search/" aria-label="Search">
+                                            <?= view('core/svg_icon', ['iconLabel' => 'search icon', 'iconName' => 'search', 'iconType' => 'keyiconlarge']); ?>
+                                        </a>
+                                    </div>
+                                    <div class="keyiconcontainer">
+                                        <a href="/<?= \Config\Services::request()->getLocale() ?>/statistics/" aria-label="Statistics">
+                                            <?= view('core/svg_icon', ['iconLabel' => 'statistics icon', 'iconName' => 'statistics', 'iconType' => 'keyiconlarge']); ?>
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </nav>
-                </div>
+                        </nav>
+                <?php } ?>
             </div>
         </header>
         <main class="bodytext" <?= (isset($widthOverride) ? ' style="width: ' . $widthOverride . 'px; max-width: ' . $widthOverride . 'px;"' : '') ?>>

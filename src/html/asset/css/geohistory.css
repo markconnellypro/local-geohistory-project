@@ -88,7 +88,7 @@ body {
 }
 
 header .headerfooter {
-    min-height: 110px;
+    min-height: 70px;
     width: 100%;
 }
 
@@ -176,7 +176,6 @@ header A:hover {
 .keyiconcontainer {
     margin: 2px 2px 2px 2px;
     width: 30px;
-    height: 30px;
     vertical-align: middle;
     display: inline-block;
 }
@@ -309,14 +308,26 @@ div.dt-container div.dt-layout-row {
         font-size: 85%;
     }
 
-    #headerimagenavigation {
-        height: 110px;
-        width: 100%;
+    #headertext {
+        width: 94vw;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
     }
 
     #headertitle {
         font-size: 8vw;
         text-align: center;
+        margin-top: 2vw;
+        margin-bottom: 2vw;
+        width: 94vw;
+    }
+
+    #headernavigation {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-evenly;
+        margin-bottom: 2vw;
     }
 
     #welcometext {
@@ -325,31 +336,30 @@ div.dt-container div.dt-layout-row {
 }
 
 @media print and (max-width: 1019px),
-screen and (min-width: 690px) and (max-width: 1019px) {
+screen and (min-width: 690px) {
+    #headertext {
+        height: 70px;
+        width: 94vw;
+        max-width: 960px;
+        margin: 0 auto;
+    }
+
     .bodytext {
         font-size: 90%;
     }
 
-    #headertext {
-        display: flex;
-        flex-direction: row;
-        height: 110px;
-    }
-
     #headertitle {
+        float: left;
         font-size: 200%;
-        text-align: left;
-        width: 416px;
-        margin-right: 40px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        white-space: nowrap;
+        margin-top: 15px;
     }
 
-    #headerimagenavigation {
-        min-width: 175px;
-        width: 100%;
+    #headernavigation {
+        float: right;
+    }
+
+    #headernavigationpart {
+        height: 70px;
     }
 }
 
@@ -363,44 +373,17 @@ screen and (min-width: 690px) and (max-width: 1019px) {
     }
 }
 
-@media (min-width: 1020px) {
-    #headertext {
-        display: flex;
-        flex-direction: row;
-        height: 110px;
-    }
-
-    #headerimagenavigation {
-        width: 544px;
-    }
-
-    .bodytext {
-        font-size: 90%;
-    }
-
-    #headertitle {
-        font-size: 200%;
-        text-align: left;
-        margin-right: 40px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-    }
-}
-
 .headerimageblock {
-    float: left;
-    width: 128px;
+    width: 100px;
     text-align: center;
-    margin-top: 5px;
-    line-height: 15px;
+    margin: 0 auto;
 }
 
 .bodyicon {
     fill: #003A70;
     /* Pantone 654 C */
-    height: auto;
-    width: auto;
+    display: block;
+    margin: 0 auto;
 }
 
 .bodyiconcontainer:link,
@@ -412,15 +395,7 @@ screen and (min-width: 690px) and (max-width: 1019px) {
     /* Pantone 654 C */
 }
 
-#headernavigation {
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-end;
-}
-
 #headernavigationpart {
-    height: 110px;
-    width: 80px;
     display: flex;
     align-items: center;
 }

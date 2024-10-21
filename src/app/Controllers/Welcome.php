@@ -10,9 +10,14 @@ class Welcome extends BaseController
 
     public function index(): void
     {
-        $stateArray = $this->getJurisdictions();
+        $icons = [
+            'about',
+            'key',
+            'search',
+            'statistics',
+        ];
         echo view('core/header', ['state' => '', 'title' => $this->title]);
-        echo view('welcome/index', ['stateArray' => $stateArray]);
+        echo view('welcome/index', ['icons' => $icons]);
         echo view('core/footer');
     }
 
