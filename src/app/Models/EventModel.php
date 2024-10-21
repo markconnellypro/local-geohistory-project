@@ -628,12 +628,11 @@ class EventModel extends Model
 
     public function getSearchByGovernment(array $parameters): array
     {
-        $state = $parameters[0];
-        $government = $parameters[1];
-        $parent = $parameters[2];
-        $eventType = $parameters[3];
-        $year = $parameters[4];
-        $plusMinus = $parameters[5];
+        $government = $parameters[0];
+        $parent = $parameters[1];
+        $eventType = $parameters[2];
+        $year = $parameters[3];
+        $plusMinus = $parameters[4];
 
         $query = <<<QUERY
             WITH alternategovernment AS (
@@ -643,10 +642,6 @@ class EventModel extends Model
                     ON governmentrelationcache.governmentid = alternategovernment.governmentid
                     AND alternategovernment.governmentlevel = alternategovernment.governmentrelationlevel
                     AND governmentrelationcache.governmentlevel > 2
-                    AND (
-                    governmentrelationcache.governmentrelationstate = ?
-                    OR governmentrelationcache.governmentrelationstate IS NULL
-                    )
                     AND governmentrelationcache.governmentshort ILIKE ?
             )
             SELECT DISTINCT event.eventslug,
@@ -687,7 +682,6 @@ class EventModel extends Model
         QUERY;
 
         return $this->db->query($query, [
-            strtoupper($state),
             $government,
             $parent,
             $parent,

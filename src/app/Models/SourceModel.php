@@ -15,18 +15,14 @@ class SourceModel extends Model
 
     // VIEW: extra.adjudicationsourcecitationsourcegovernmentcache
 
-    public function getSearch(string $state): array
+    public function getSearch(): array
     {
         $query = <<<QUERY
             SELECT DISTINCT adjudicationsourcecitationsourcegovernmentcache.sourceshort
                 FROM extra.adjudicationsourcecitationsourcegovernmentcache
-            WHERE (adjudicationsourcecitationsourcegovernmentcache.governmentrelationstate = ?
-                OR adjudicationsourcecitationsourcegovernmentcache.governmentrelationstate IS NULL)
             ORDER BY 1
         QUERY;
 
-        return $this->db->query($query, [
-            strtoupper($state),
-        ])->getResultArray();
+        return $this->db->query($query)->getResultArray();
     }
 }

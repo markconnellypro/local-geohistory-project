@@ -3,7 +3,6 @@ $eventTypeQuery ??= [];
 $governmentIdentifierTypeQuery ??= [];
 $months ??= '';
 $reporterQuery ??= [];
-$state ??= 'usa';
 $tribunalgovernmentshortQuery ??= [];
 ?>
 <fieldset>
@@ -37,7 +36,7 @@ $tribunalgovernmentshortQuery ??= [];
 <fieldset>
     <legend>Search Terms:</legend>
     <div id="forms_event" class="option_select option_indent">
-        <form method="post" action="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/search/event/" class="form_select" id="form_event_government">
+        <form method="post" action="/<?= \Config\Services::request()->getLocale() ?>/search/event/" class="form_select" id="form_event_government">
             <?php
             echo view('search/form_government', ['form' => 'form_event_government']);
 echo view('search/form_governmentparent', ['form' => 'form_event_government']);
@@ -48,7 +47,7 @@ echo view('search/submit', ['type' => 'government']);
         </form>
     </div>
     <div id="forms_government" class="option_select option_indent">
-        <form method="post" action="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/search/government/" class="form_select" id="form_government_government">
+        <form method="post" action="/<?= \Config\Services::request()->getLocale() ?>/search/government/" class="form_select" id="form_government_government">
             <?php
 echo view('search/form_government', ['form' => 'form_government_government']);
 echo view('search/form_governmentparent', ['form' => 'form_government_government']);
@@ -56,13 +55,14 @@ echo view('search/form_governmentlevel', ['type' => 'countymunicipality', 'form'
 echo view('search/submit', ['type' => 'government']);
 ?>
         </form>
-        <form method="post" action="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/search/government/" class="form_select" id="form_government_statewide">
+        <form method="post" action="/<?= \Config\Services::request()->getLocale() ?>/search/government/" class="form_select" id="form_government_statewide">
             <?php
+echo view('search/form_governmentjurisdiction', ['form' => 'form_government_statewide']);
 echo view('search/form_governmentlevel', ['type' => 'statewide', 'form' => 'form_government_statewide']);
 echo view('search/submit', ['type' => 'statewide']);
 ?>
         </form>
-        <form method="post" action="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/search/government/" class="form_select" id="form_government_identifier">
+        <form method="post" action="/<?= \Config\Services::request()->getLocale() ?>/search/government/" class="form_select" id="form_government_identifier">
             <label class="forselectize" for="form_government_identifier_governmentidentifiertype">Identifier Source</label><br>
             <select id="form_government_identifier_governmentidentifiertype" name="governmentidentifiertype" style="width: 300px;" required="required">
             </select>
@@ -96,7 +96,7 @@ echo view('search/submit', ['type' => 'point']);
         </form>
     </div>
     <div id="forms_law" class="option_select option_indent">
-        <form method="post" action="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/search/law/" class="form_select" id="form_law_reference">
+        <form method="post" action="/<?= \Config\Services::request()->getLocale() ?>/search/law/" class="form_select" id="form_law_reference">
             <label for="form_law_reference_yearvolume" class="forselectize">Year/Volume</label><br>
             <input id="form_law_reference_yearvolume" class="selectize-input required stringcheck forselectize" name="yearvolume" type="text" required="required" style="width: 100px;">
             <br>
@@ -110,7 +110,7 @@ echo view('search/submit', ['type' => 'point']);
 echo view('search/submit', ['type' => 'reference']);
 ?>
         </form>
-        <form method="post" action="/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/search/law/" class="form_select" id="form_law_dateevent">
+        <form method="post" action="/<?= \Config\Services::request()->getLocale() ?>/search/law/" class="form_select" id="form_law_dateevent">
             <label for="form_law_dateevent_date" class="forselectize">Date</label><br>
             <input id="form_law_dateevent_date" class="selectize-input required stringcheck forselectize" name="date" type="date" required="required" pattern="\d{4}-\d{2}-\d{2}" title="Date should be formatted as YYYY-MM-DD." style="width: 150px;">
             <br>
@@ -169,6 +169,7 @@ echo view('search/submit', ['type' => 'dateEvent']);
         var $select_government = [];
         var select_governmentparent = [];
         var $select_governmentparent = [];
+        var $select_governmentjurisdiction = [];
 
         $('select[name=government]').each(function(i) {
             $select_government[i] = $(this).selectize({
@@ -191,7 +192,7 @@ echo view('search/submit', ['type' => 'dateEvent']);
                         return callback();
                     }
                     $.ajax({
-                        url: '/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/lookup/government/' + query.toLowerCase() + '/',
+                        url: '/<?= \Config\Services::request()->getLocale() ?>/lookup/government/' + query.toLowerCase() + '/',
                         dataType: 'json',
                         success: function(results) {
                             callback(results);
@@ -209,7 +210,7 @@ echo view('search/submit', ['type' => 'dateEvent']);
                     select_governmentparent[i].load(function(callback) {
                         xhr && xhr.abort();
                         xhr = $.ajax({
-                            url: '/<?= \Config\Services::request()->getLocale() ?>/<?= $state ?>/lookup/governmentparent/' + encodeURIComponent(value.toLowerCase()) + '/',
+                            url: '/<?= \Config\Services::request()->getLocale() ?>/lookup/government-parent/' + encodeURIComponent(value.toLowerCase()) + '/',
                             dataType: 'json',
                             success: function(results) {
                                 callback(results);
@@ -242,7 +243,40 @@ echo view('search/submit', ['type' => 'dateEvent']);
 
             select_governmentparent[i] = $select_governmentparent[i][0].selectize;
             select_government[i] = $select_government[i][0].selectize;
+        });
 
+        $('select[name=governmentjurisdiction]').each(function(i) {
+            $select_governmentjurisdiction[i] = $(this).selectize({
+                selectOnTab: true,
+                closeAfterSelect: true,
+                highlight: false,
+                setFirstOptionActive: true,
+                options: [],
+                valueField: 'governmentshort',
+                labelField: 'governmentshort',
+                searchField: ['governmentsearch', 'governmentshort'],
+                sortField: [{
+                    field: 'governmentshort',
+                    direction: 'asc'
+                }, {
+                    field: '$score'
+                }],
+                load: function(query, callback) {
+                    if (!query.length) {
+                        return callback();
+                    }
+                    $.ajax({
+                        url: '/en/lookup/government-jurisdiction/' + query.toLowerCase() + '/',
+                        dataType: 'json',
+                        success: function(results) {
+                            callback(results);
+                        },
+                        error: function() {
+                            callback();
+                        }
+                    });
+                }
+            });
         });
 
         $('select[name=governmentlevel]').selectize({

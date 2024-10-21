@@ -10,22 +10,17 @@ class GovernmentIdentifierTypeModel extends Model
 
     // VIEW: extra.governmentrelationcache
 
-    public function getSearch(string $state): array
+    public function getSearch(): array
     {
         $query = <<<QUERY
             SELECT DISTINCT split_part(governmentidentifiertype.governmentidentifiertypeshort, ':', 1) AS governmentidentifiertypeshort,
                 governmentidentifiertype.governmentidentifiertypeslug
             FROM geohistory.governmentidentifiertype
-                JOIN geohistory.governmentidentifier
+            JOIN geohistory.governmentidentifier
                 ON governmentidentifiertype.governmentidentifiertypeid = governmentidentifier.governmentidentifiertype
-                JOIN extra.governmentrelationcache
-                ON governmentidentifier.government = governmentrelationcache.governmentid
-                AND governmentrelationcache.governmentrelationstate = ?
             ORDER BY 1
         QUERY;
 
-        return $this->db->query($query, [
-            strtoupper($state),
-        ])->getResultArray();
+        return $this->db->query($query)->getResultArray();
     }
 }

@@ -419,66 +419,75 @@ class GovernmentModel extends Model
 
     // extra.ci_model_search_lookup_government(character varying, character varying)
 
-    // FUNCTION: extra.punctuationnone
-    // FUNCTION: extra.punctuationnonefuzzy
-    // VIEW: extra.governmentextracache
-    // VIEW: extra.governmentrelationcache
+    // FUNCTION: geohistory.punctuationnonefuzzy
 
-    public function getLookupByGovernment(string $state, string $government): array
+    public function getLookupByGovernment(string $government): array
     {
         if (strlen($government) < 3) {
             return [];
         }
 
         $query = <<<QUERY
-            SELECT DISTINCT governmentrelationcache.governmentshort,
-                extra.punctuationnone(governmentrelationcache.governmentshort) AS governmentsearch
-            FROM extra.governmentrelationcache
-            JOIN extra.governmentextracache
-                ON governmentrelationcache.governmentid = governmentextracache.governmentid
-                AND NOT governmentextracache.governmentisplaceholder
-            WHERE governmentrelationcache.governmentlevel > 2
-                AND (governmentrelationcache.governmentrelationstate = ?
-                OR governmentrelationcache.governmentrelationstate IS NULL)
-                AND extra.punctuationnone(governmentrelationcache.governmentshort) LIKE extra.punctuationnonefuzzy(?)
+            SELECT DISTINCT government.governmentshortsearch AS governmentshort,
+                government.governmentsearch
+            FROM geohistory.government
+            WHERE government.governmentstatus <> 'placeholder'
+                AND government.governmentlevel > 2
+                AND government.governmentsearch LIKE geohistory.punctuationnonefuzzy(?)
             ORDER BY 1
         QUERY;
 
         return $this->db->query($query, [
-            strtoupper($state),
-            rawurldecode($government) . '%',
+            rawurldecode($government),
+        ])->getResultArray();
+    }
+
+    // FUNCTION: geohistory.punctuationnonefuzzy
+
+    public function getLookupByGovernmentJurisdiction(string $government): array
+    {
+        if (strlen($government) < 3) {
+            return [];
+        }
+
+        $query = <<<QUERY
+            SELECT DISTINCT government.governmentshortsearch AS governmentshort,
+                government.governmentsearch
+            FROM geohistory.government
+            WHERE government.governmentstatus = ''
+                AND government.governmentlevel = 2
+                AND government.governmentsearch LIKE geohistory.punctuationnonefuzzy(?)
+            ORDER BY 1
+        QUERY;
+
+        return $this->db->query($query, [
+            rawurldecode($government),
         ])->getResultArray();
     }
 
     // extra.ci_model_search_lookup_governmentparent(text, text)
 
     // FUNCTION: extra.punctuationnone
-    // FUNCTION: extra.punctuationnonefuzzy
-    // VIEW: extra.governmentextracache
     // VIEW: extra.governmentrelationcache
 
-    public function getLookupByGovernmentParent(string $state, string $government): array
+    public function getLookupByGovernmentParent(string $government): array
     {
         $query = <<<QUERY
-            SELECT DISTINCT governmentextracache.governmentshort,
-                extra.punctuationnone(governmentrelationcache.governmentshort) AS governmentsearch
-            FROM extra.governmentrelationcache
-            JOIN extra.governmentrelationcache lookupgovernment
-                ON governmentrelationcache.governmentid = lookupgovernment.governmentid
-                AND lookupgovernment.governmentid <> lookupgovernment.governmentrelation
-                AND lookupgovernment.governmentrelationlevel > 2
-                AND lookupgovernment.governmentlevel <> lookupgovernment.governmentrelationlevel
-            JOIN extra.governmentextracache
-                ON lookupgovernment.governmentrelation = governmentextracache.governmentid
-                AND NOT governmentextracache.governmentisplaceholder
-            WHERE (governmentrelationcache.governmentrelationstate = ?
-                OR governmentrelationcache.governmentrelationstate IS NULL)
-                AND extra.punctuationnone(governmentrelationcache.governmentshort) LIKE extra.punctuationnonefuzzy(?)
+            SELECT DISTINCT government.governmentshortsearch AS governmentshort,
+                government.governmentsearch
+            FROM geohistory.government lookupgovernment
+            JOIN extra.governmentrelationcache
+                ON lookupgovernment.governmentid = governmentrelationcache.governmentid
+                AND lookupgovernment.governmentsearch LIKE geohistory.punctuationnone(?)
+            JOIN geohistory.government
+                ON governmentrelationcache.governmentrelation = government.governmentid
+                AND government.governmentstatus <> 'placeholder'
+                AND government.governmentlevel > 1
+                AND government.governmentlevel < governmentrelationcache.governmentlevel
             ORDER BY 1
         QUERY;
 
         return $this->db->query($query, [
-            strtoupper($state),
             rawurldecode($government),
         ])->getResultArray();
     }
@@ -634,28 +643,18 @@ class GovernmentModel extends Model
     // FUNCTION: extra.governmentcurrentleadparent
     // VIEW: governmentrelationcache
 
-    public function getSearch(string $state): array
+    public function getSearch(): array
     {
         $query = <<<QUERY
             SELECT DISTINCT governmentrelationcache.governmentshort,
                 lpad(governmentrelationcache.governmentid::text, 6, '0') AS governmentid,
                 governmentrelationcache.governmentlevel
             FROM extra.governmentrelationcache
-            WHERE (governmentrelationcache.governmentlevel = 3
-                AND (governmentrelationcache.governmentrelationstate = ?
-                OR governmentrelationcache.governmentrelationstate IS NULL))
-                OR (governmentrelationcache.governmentlevel = 2
-                AND governmentrelationcache.governmentrelationstate = ?)
-                OR (governmentrelationcache.governmentlevel = 1
-                AND governmentrelationcache.governmentid = extra.governmentcurrentleadparent(extra.governmentabbreviationid(?)))
+            WHERE governmentrelationcache.governmentlevel <= 3
             ORDER BY governmentrelationcache.governmentlevel, 1
         QUERY;
 
-        return $this->db->query($query, [
-            strtoupper($state),
-            strtoupper($state),
-            strtoupper($state),
-        ])->getResultArray();
+        return $this->db->query($query)->getResultArray();
     }
 
     // extra.ci_model_search_government_government(text, text, text, integer, text, character varying)
@@ -667,11 +666,10 @@ class GovernmentModel extends Model
 
     public function getSearchByGovernment(array $parameters): array
     {
-        $state = $parameters[0];
-        $government = $parameters[1];
-        $parent = $parameters[2];
-        $level = $parameters[3];
-        $type = $parameters[4];
+        $government = $parameters[0];
+        $parent = $parameters[1];
+        $level = $parameters[2];
+        $type = $parameters[3];
 
         $query = <<<QUERY
             WITH selectedgovernment AS (
@@ -684,9 +682,6 @@ class GovernmentModel extends Model
                     ON lookupgovernment.governmentrelation = governmentparentextracache.governmentid
                     AND (? = ''::text OR governmentparentextracache.governmentshort = ?)
                 WHERE (
-                    governmentrelationcache.governmentrelationstate = ?
-                    OR governmentrelationcache.governmentrelationstate IS NULL
-                ) AND (
                     governmentrelationcache.governmentshort ILIKE ?
                     OR (? = 'statewide' AND governmentrelationcache.governmentlevel = 2)
                 )
@@ -722,7 +717,6 @@ class GovernmentModel extends Model
         return $this->db->query($query, [
             $parent,
             $parent,
-            strtoupper($state),
             $government,
             $type,
             $level,

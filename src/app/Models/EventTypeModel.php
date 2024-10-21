@@ -33,29 +33,19 @@ class EventTypeModel extends Model
     // FUNCTION: extra.governmentabbreviationid
     // VIEW: extra.eventgovernmentcache
 
-    public function getSearch(string $state): array
+    public function getSearch(): array
     {
         $query = <<<QUERY
             SELECT DISTINCT eventtype.eventtypeshort,
                 eventtype.eventtypeid,
                 eventtype.eventtypeborders = 'documentation' AS isdocumentation
             FROM geohistory.eventtype
-            LEFT JOIN geohistory.event
-                ON eventtype.eventtypeid = event.eventtype
-            LEFT JOIN extra.eventgovernmentcache
-                ON event.eventid = eventgovernmentcache.eventid
-                AND eventgovernmentcache.government = extra.governmentabbreviationid(?)
-            WHERE (
-                eventtype.eventtypeborders <> 'ignore'
-                AND eventgovernmentcache.eventid IS NOT NULL
-            )
-            OR eventtype.eventtypeborders = 'documentation'
+            WHERE eventtype.eventtypeborders <> 'ignore'
+                OR eventtype.eventtypeborders = 'documentation'
             ORDER BY 3 DESC, 1, 2
         QUERY;
 
-        return $this->db->query($query, [
-            strtoupper($state),
-        ])->getResultArray();
+        return $this->db->query($query)->getResultArray();
     }
 
     // extra.ci_model_statistics_eventtype_list(boolean)

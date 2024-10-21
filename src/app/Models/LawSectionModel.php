@@ -168,18 +168,8 @@ class LawSectionModel extends Model
     {
         $date = $parameters[0];
         $eventType = $parameters[1];
-        $state = $parameters[2];
 
         $query = <<<QUERY
-            WITH source AS (
-                SELECT source.sourceid,
-                sourcegovernment.government
-                FROM geohistory.source
-                LEFT JOIN geohistory.sourcegovernment
-                ON source.sourceid = sourcegovernment.source
-                AND sourcegovernment.sourceorder = 1
-                WHERE source.sourcetype = 'session laws'
-            )
             SELECT lawsectionextracache.lawsectionslug,
                lawsectionextracache.lawsectioncitation,
                lawapproved,
@@ -196,11 +186,9 @@ class LawSectionModel extends Model
                 JOIN geohistory.law
                   ON lawsection.law = law.lawid
                   AND law.lawapproved = ?
-                JOIN source
+                JOIN geohistory.source
                   ON law.source = source.sourceid
-                  AND (extra.governmentabbreviation(source.government) = ?
-                OR source.government = extra.governmentcurrentleadparent(extra.governmentabbreviationid(?))
-                OR source.government IS NULL);
+                  AND source.sourcetype = 'session laws';
         QUERY;
 
         return $this->db->query($query, [
@@ -209,8 +197,6 @@ class LawSectionModel extends Model
             $eventType,
             $eventType,
             $date,
-            strtoupper($state),
-            strtoupper($state),
         ])->getResult();
     }
 
@@ -226,18 +212,8 @@ class LawSectionModel extends Model
         $yearVolume = $parameters[0];
         $page = $parameters[1];
         $numberChapter = $parameters[2];
-        $state = $parameters[3];
 
         $query = <<<QUERY
-            WITH source AS (
-                SELECT source.sourceid,
-                sourcegovernment.government
-                FROM geohistory.source
-                LEFT JOIN geohistory.sourcegovernment
-                ON source.sourceid = sourcegovernment.source
-                AND sourcegovernment.sourceorder = 1
-                WHERE source.sourcetype = 'session laws'
-            )
             SELECT lawsectionextracache.lawsectionslug,
                lawsectionextracache.lawsectioncitation,
                lawapproved,
@@ -250,11 +226,9 @@ class LawSectionModel extends Model
                 JOIN geohistory.law
                   ON lawsection.law = law.lawid
                   AND (law.lawvolume = ? OR left(law.lawapproved, 4) = ?)
-                JOIN source
+                JOIN geohistory.source
                   ON law.source = source.sourceid
-                  AND (extra.governmentabbreviation(source.government) = ?
-                OR source.government = extra.governmentcurrentleadparent(extra.governmentabbreviationid(?))
-                OR source.government IS NULL)
+                  AND source.sourcetype = 'session laws'
              WHERE (0 = ? OR law.lawpage = ? OR (lawsection.lawsectionpagefrom >= ? AND lawsection.lawsectionpageto <= ?))
                AND (0 = ? OR law.lawnumberchapter = ?)
         QUERY;
@@ -262,8 +236,6 @@ class LawSectionModel extends Model
         return $this->db->query($query, [
             $yearVolume,
             $yearVolume,
-            strtoupper($state),
-            strtoupper($state),
             $page,
             $page,
             $page,

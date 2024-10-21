@@ -20,7 +20,9 @@ if (mb_strpos(base_url(), $_ENV['app_baseLocalGeohistoryProjectUrl']) !== false)
 
     foreach ($controllerRegex as $c) {
         $routes->add('{locale}/' . $c . '/(:segment)', ucwords($c) . '::view/$1');
-        $routes->add('{locale}/' . $stateProvinceRegex . '/' . $c . '/(:segment)', ucwords($c) . '::redirect/$2');
+        if ($_ENV['app_jurisdiction'] !== '') {
+            $routes->add('{locale}/' . $stateProvinceRegex . '/' . $c . '/(:segment)', ucwords($c) . '::redirect/$2');
+        }
         $routes->add('{locale}/' . $c, ucwords($c) . '::noRecord');
     }
 
@@ -28,7 +30,7 @@ if (mb_strpos(base_url(), $_ENV['app_baseLocalGeohistoryProjectUrl']) !== false)
         $routes->add('{locale}/' . $stateProvinceRegex, 'Search::redirect');
     }
     $routes->add('{locale}/search', 'Search::index/');
-    $routes->add('{locale}/' . $stateProvinceRegex . '/search/' . $mainSearchRegex, 'Search::view/$1/$2');
+    $routes->add('{locale}/search/' . $mainSearchRegex, 'Search::view/$1');
     $routes->add('{locale}/search/(:segment)', 'Search::noRecord');
 
     $routes->add('{locale}/address', 'Area::address');
@@ -53,9 +55,10 @@ if (mb_strpos(base_url(), $_ENV['app_baseLocalGeohistoryProjectUrl']) !== false)
     $routes->add('{locale}/statistics/report/', 'Statistics::view');
     $routes->add('{locale}/statistics/', 'Statistics::index');
 
-    $routes->add('{locale}/' . $stateProvinceRegex . '/lookup/government/(:segment)', 'Search::governmentlookup/$1/$2/government');
-    $routes->add('{locale}/' . $stateProvinceRegex . '/lookup/governmentparent/(:segment)', 'Search::governmentlookup/$1/$2/governmentparent');
-    $routes->add('{locale}/' . $stateProvinceRegex . '/lookup/tribunal/(:num)', 'Search::tribunallookup/$1');
+    $routes->add('{locale}/lookup/government/(:segment)', 'Search::governmentlookup/$1/');
+    $routes->add('{locale}/lookup/government-jurisdiction/(:segment)', 'Search::governmentlookup/$1/jurisdiction');
+    $routes->add('{locale}/lookup/government-parent/(:segment)', 'Search::governmentlookup/$1/parent');
+    $routes->add('{locale}/lookup/tribunal/(:num)', 'Search::tribunallookup');
 }
 
 /*

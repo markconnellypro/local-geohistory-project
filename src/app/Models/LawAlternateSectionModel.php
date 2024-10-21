@@ -13,7 +13,7 @@ class LawAlternateSectionModel extends Model
     // VIEW: extra.lawsectiongovernmentcache
     // VIEW: extra.sourceextra
 
-    public function getDetail(int|string $id, string $state): array
+    public function getDetail(int|string $id): array
     {
         if (!is_int($id)) {
             $id = $this->getSlugId($id);
@@ -41,16 +41,11 @@ class LawAlternateSectionModel extends Model
             JOIN geohistory.lawalternatesection
                 ON lawalternate.lawalternateid = lawalternatesection.lawalternate
                 AND lawalternatesection.lawalternatesectionid = ?
-            LEFT JOIN extra.lawsectiongovernmentcache 
-                ON lawalternatesection.lawsection = lawsectiongovernmentcache.lawsectionid
-            WHERE governmentrelationstate = ?
-                OR governmentrelationstate IS NULL
         QUERY;
 
         return $this->db->query($query, [
             \App\Controllers\BaseController::isLive(),
             $id,
-            strtoupper($state),
         ])->getResult();
     }
 

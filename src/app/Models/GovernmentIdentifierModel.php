@@ -97,13 +97,10 @@ class GovernmentIdentifierModel extends Model
 
     // extra.ci_model_search_governmentidentifier_identifier(character varying, character varying, character varying)
 
-    // VIEW: extra.governmentrelationcache
-
     public function getSearchByIdentifier(array $parameters): array
     {
         $type = $parameters[0];
         $identifier = $parameters[1];
-        $state = $parameters[2];
 
         $query = <<<QUERY
             SELECT DISTINCT governmentidentifiertype.governmentidentifiertypetype,
@@ -114,9 +111,6 @@ class GovernmentIdentifierModel extends Model
             FROM geohistory.governmentidentifier
             JOIN geohistory.governmentidentifiertype
                 ON governmentidentifier.governmentidentifiertype = governmentidentifiertype.governmentidentifiertypeid
-            JOIN extra.governmentrelationcache
-                ON governmentidentifier.government = governmentrelationcache.governmentid
-                AND governmentrelationcache.governmentrelationstate = ?
                 AND governmentidentifiertype.governmentidentifiertypeshort = ?
             WHERE lower(governmentidentifier.governmentidentifier) = ?
                 OR lower(governmentidentifier.governmentidentifierprefix || governmentidentifiertype.governmentidentifiertypeprefixdelimiter || governmentidentifier.governmentidentifier) = ?
@@ -131,7 +125,6 @@ class GovernmentIdentifierModel extends Model
         QUERY;
 
         return $this->db->query($query, [
-            strtoupper($state),
             $type,
             strtolower($identifier),
             strtolower($identifier),
