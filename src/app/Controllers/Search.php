@@ -93,7 +93,7 @@ class Search extends BaseController
         echo view('core/footer');
     }
 
-    public function redirect(int|string $id): RedirectResponse
+    public function redirect(): RedirectResponse
     {
         return redirect()->to('/' . $this->request->getLocale() . '/search/', 301);
     }

@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Models\EventTypeModel;
+use CodeIgniter\HTTP\RedirectResponse;
 
 class Statistics extends BaseController
 {
@@ -41,6 +42,11 @@ class Statistics extends BaseController
         echo view('core/header', ['title' => $this->title]);
         echo view('core/norecord');
         echo view('core/footer');
+    }
+
+    public function redirect(): RedirectResponse
+    {
+        return redirect()->to('/' . $this->request->getLocale() . '/statistics/', 301);
     }
 
     public function view(string $state = ''): void

@@ -28,7 +28,8 @@ if (mb_strpos(base_url(), $_ENV['app_baseLocalGeohistoryProjectUrl']) !== false)
 
     if ($_ENV['app_jurisdiction'] !== '') {
         $routes->add('{locale}/('. $_ENV['app_jurisdiction'] . ')/about', 'About::redirect/$1');
-        $routes->add('{locale}/('. $_ENV['app_jurisdiction'] . ')', 'Search::redirect/$1');
+        $routes->add('{locale}/('. $_ENV['app_jurisdiction'] . ')/statistics', 'Statistics::redirect');
+        $routes->add('{locale}/('. $_ENV['app_jurisdiction'] . ')', 'Search::redirect');
     }
 
     $routes->add('{locale}/lookup/government/(:segment)', 'Search::governmentlookup/$1/');
@@ -57,8 +58,6 @@ if (mb_strpos(base_url(), $_ENV['app_baseLocalGeohistoryProjectUrl']) !== false)
     $routes->add('{locale}/map-overlay', 'Map::overlayStyle');
     $routes->add('{locale}/map-tile/(:num)/(:num)/(:num)', 'Map::tile/$1/$2/$3');
 
-    $routes->add('{locale}/' . $stateProvinceRegex . '/statistics/report/', 'Statistics::view/$1');
-    $routes->add('{locale}/' . $stateProvinceRegex . '/statistics/', 'Statistics::index/$1');
     $routes->add('{locale}/statistics/report/', 'Statistics::view');
     $routes->add('{locale}/statistics/', 'Statistics::index');
 }
