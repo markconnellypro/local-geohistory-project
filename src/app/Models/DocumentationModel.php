@@ -8,7 +8,7 @@ class DocumentationModel extends Model
 {
     // extra.ci_model_about(character varying)
 
-    public function getAboutDetail(string $state): array
+    public function getAboutDetail(string $jurisdiction): array
     {
         $query = <<<QUERY
             SELECT documentation.documentationshort AS keyshort,
@@ -20,8 +20,24 @@ class DocumentationModel extends Model
         QUERY;
 
         return $this->db->query($query, [
-            'about_' . $state,
+            'about_' . $jurisdiction,
         ])->getResult();
+    }
+
+    public function getAboutJurisdiction(): array
+    {
+        $query = <<<QUERY
+            SELECT DISTINCT government.governmentshort,
+                lower(government.governmentabbreviation) AS governmentabbreviation
+            FROM geohistory.documentation
+            JOIN geohistory.government
+                ON upper(split_part(documentation.documentationtype, '_', 2)) = government.governmentabbreviation
+                AND government.governmentstatus = ''
+            WHERE documentation.documentationtype ~ '^about_[a-z]+'
+            ORDER BY 2, 1
+        QUERY;
+
+        return $this->db->query($query)->getResult();
     }
 
     public function getDisclaimer(): array
