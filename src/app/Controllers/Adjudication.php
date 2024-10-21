@@ -11,7 +11,7 @@ use CodeIgniter\HTTP\RedirectResponse;
 
 class Adjudication extends BaseController
 {
-    private string $title = 'Adjudication Detail';
+    private string $title = 'Adjudication';
 
     public function noRecord(): void
     {

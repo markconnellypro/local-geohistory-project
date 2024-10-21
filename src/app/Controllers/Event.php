@@ -16,7 +16,7 @@ use CodeIgniter\HTTP\RedirectResponse;
 
 class Event extends BaseController
 {
-    private string $title = 'Event Detail';
+    private string $title = 'Event';
 
     public function noRecord(): void
     {

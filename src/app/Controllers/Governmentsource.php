@@ -9,7 +9,7 @@ use CodeIgniter\HTTP\RedirectResponse;
 
 class Governmentsource extends BaseController
 {
-    private string $title = 'Government Source Detail';
+    private string $title = 'Government Source';
 
     public function noRecord(): void
     {

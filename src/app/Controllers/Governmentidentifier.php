@@ -7,7 +7,7 @@ use CodeIgniter\HTTP\RedirectResponse;
 
 class Governmentidentifier extends BaseController
 {
-    private string $title = 'Government Identifier Detail';
+    private string $title = 'Government Identifier';
 
     public function noRecord(): void
     {

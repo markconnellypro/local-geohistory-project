@@ -12,7 +12,7 @@ class Area extends BaseController
 {
     private string $extraAttribution = '';
 
-    private string $title = 'Area Detail';
+    private string $title = 'Area';
 
     public function address(): void
     {

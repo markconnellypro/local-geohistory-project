@@ -10,7 +10,7 @@ use CodeIgniter\HTTP\RedirectResponse;
 
 class Source extends BaseController
 {
-    private string $title = 'Source Detail';
+    private string $title = 'Source';
 
     public function noRecord(): void
     {

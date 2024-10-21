@@ -14,7 +14,7 @@ use CodeIgniter\HTTP\RedirectResponse;
 
 class Government extends BaseController
 {
-    private string $title = 'Government Detail';
+    private string $title = 'Government';
 
     public function noRecord(): void
     {

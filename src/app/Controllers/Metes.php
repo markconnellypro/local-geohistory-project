@@ -8,7 +8,7 @@ use CodeIgniter\HTTP\RedirectResponse;
 
 class Metes extends BaseController
 {
-    private string $title = 'Metes and Bounds Description Detail';
+    private string $title = 'Metes and Bounds Description';
 
     public function noRecord(): void
     {

@@ -8,7 +8,7 @@ use CodeIgniter\HTTP\RedirectResponse;
 
 class Law extends BaseController
 {
-    private string $title = 'Law Detail';
+    private string $title = 'Law';
 
     public function noRecord(): void
     {

@@ -10,7 +10,7 @@ use CodeIgniter\HTTP\RedirectResponse;
 
 class Reporter extends BaseController
 {
-    private string $title = 'Reporter Details';
+    private string $title = 'Reporter';
 
     public function noRecord(): void
     {
