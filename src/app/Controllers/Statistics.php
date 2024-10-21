@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Models\EventTypeModel;
+use App\Models\GovernmentModel;
 use CodeIgniter\HTTP\RedirectResponse;
 
 class Statistics extends BaseController
@@ -25,19 +26,20 @@ class Statistics extends BaseController
         'mapped_review' => 'Reviewed Municipalities',
     ];
 
-    public function index(string $state = ''): void
+    public function index(): void
     {
         echo view('core/header', ['title' => $this->title]);
         echo view('core/ui');
         $EventTypeModel = new EventTypeModel();
+        $GovernmentModel = new GovernmentModel();
         echo view('statistics/index', [
-            'state' => $state,
-            'eventTypeQuery' => $EventTypeModel->getManyByStatistics($state)
+            'eventTypeQuery' => $EventTypeModel->getManyByStatistics(),
+            'jurisdictions' => $GovernmentModel->getByStatisticsJurisdiction(),
         ]);
         echo view('core/footer');
     }
 
-    public function noRecord(string $state = ''): void
+    public function noRecord(): void
     {
         echo view('core/header', ['title' => $this->title]);
         echo view('core/norecord');
@@ -49,7 +51,7 @@ class Statistics extends BaseController
         return redirect()->to('/' . $this->request->getLocale() . '/statistics/', 301);
     }
 
-    public function view(string $state = ''): void
+    public function view(): void
     {
         echo view('core/header', ['title' => $this->title]);
 
@@ -131,7 +133,8 @@ class Statistics extends BaseController
             $searchParameter['Year' . $dateRangePlural] = $dateRange;
         }
 
-        $fields[] = $state;
+        $jurisdiction = $this->request->getPost('governmentjurisdiction') ?? '';
+        $fields[] = $jurisdiction;
 
         $types = [
             'createddissolved' => 'Government',
@@ -140,7 +143,7 @@ class Statistics extends BaseController
         ];
         $model = "App\\Models\\" . $types[$for] . 'Model';
         $model = new $model();
-        $type = 'getByStatistics' . ($state === '' ? 'Nation' : 'State') . 'Whole';
+        $type = 'getByStatistics' . ($jurisdiction === '' ? 'Nation' : 'State') . 'Whole';
 
         $wholeQuery = $model->$type($fields);
         if ($wholeQuery[0]->datarow === '["x"]') {
@@ -160,7 +163,7 @@ class Statistics extends BaseController
             'isContemporaneous' => ($searchParameter['Grouped By'] === 'Contemporaneous Jurisdictions'),
             'notEvent' => ($searchParameter['Metric'] === 'Events by Event Type'),
             'query' => $query,
-            'state' => $state,
+            'jurisdiction' => $jurisdiction,
         ]);
         echo view('core/chartjs', ['query' => $wholeQuery, 'xLabel' => 'Year', 'yLabel' => ($for === 'createddissolved' ? 'Governments' : 'Events')]);
         echo view('core/footer');

@@ -68,11 +68,11 @@ class GovernmentShapeModel extends Model
     public function getByStatisticsNationPart(array $parameters): array
     {
         $by = $parameters[3];
-        $state = $parameters[4];
-        if ($state === '') {
-            $state = implode(',', \App\Controllers\BaseController::getJurisdictions());
+        $jurisdiction = $parameters[4];
+        if ($jurisdiction === '') {
+            $jurisdiction = implode(',', \App\Controllers\BaseController::getJurisdictions());
         }
-        $state = '{' . strtoupper($state) . '}';
+        $jurisdiction = '{' . strtoupper($jurisdiction) . '}';
 
         $query = <<<QUERY
             WITH eventdata AS (
@@ -112,7 +112,7 @@ class GovernmentShapeModel extends Model
 
         return $this->db->query($query, [
             $by,
-            $state,
+            $jurisdiction,
         ])->getResult();
     }
 
@@ -162,7 +162,7 @@ class GovernmentShapeModel extends Model
     public function getByStatisticsStatePart(array $parameters): array
     {
         $by = $parameters[3];
-        $state = strtoupper($parameters[4]);
+        $jurisdiction = strtoupper($parameters[4]);
 
         $query = <<<QUERY
             WITH eventdata AS (
@@ -197,7 +197,7 @@ class GovernmentShapeModel extends Model
 
         return $this->db->query($query, [
             $by,
-            $state,
+            $jurisdiction,
         ])->getResult();
     }
 
@@ -208,7 +208,7 @@ class GovernmentShapeModel extends Model
     public function getByStatisticsStateWhole(array $parameters): array
     {
         $by = $parameters[3];
-        $state = strtoupper($parameters[4]);
+        $jurisdiction = strtoupper($parameters[4]);
 
         $query = <<<QUERY
             WITH eventdata AS (
@@ -237,8 +237,8 @@ class GovernmentShapeModel extends Model
 
         return $this->db->query($query, [
             $by,
-            $state,
-            $state,
+            $jurisdiction,
+            $jurisdiction,
         ])->getResult();
     }
 

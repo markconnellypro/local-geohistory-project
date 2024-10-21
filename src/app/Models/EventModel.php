@@ -405,11 +405,11 @@ class EventModel extends Model
         $from = $parameters[1];
         $to = $parameters[2];
         $by = $parameters[3];
-        $state = $parameters[4];
-        if ($state === '') {
-            $state = implode(',', \App\Controllers\BaseController::getJurisdictions());
+        $jurisdiction = $parameters[4];
+        if ($jurisdiction === '') {
+            $jurisdiction = implode(',', \App\Controllers\BaseController::getJurisdictions());
         }
-        $state = '{' . strtoupper($state) . '}';
+        $jurisdiction = '{' . strtoupper($jurisdiction) . '}';
 
         $query = <<<QUERY
             WITH eventdata AS (
@@ -455,7 +455,7 @@ class EventModel extends Model
         return $this->db->query($query, [
             $for,
             $by,
-            $state,
+            $jurisdiction,
             $from,
             $to,
         ])->getResult();
@@ -521,7 +521,7 @@ class EventModel extends Model
         $from = $parameters[1];
         $to = $parameters[2];
         $by = $parameters[3];
-        $state = strtoupper($parameters[4]);
+        $jurisdiction = strtoupper($parameters[4]);
 
         $query = <<<QUERY
             WITH eventdata AS (
@@ -562,7 +562,7 @@ class EventModel extends Model
         return $this->db->query($query, [
             $for,
             $by,
-            $state,
+            $jurisdiction,
             $from,
             $to,
         ])->getResult();
@@ -578,7 +578,7 @@ class EventModel extends Model
         $from = $parameters[1];
         $to = $parameters[2];
         $by = $parameters[3];
-        $state = strtoupper($parameters[4]);
+        $jurisdiction = strtoupper($parameters[4]);
 
         $query = <<<QUERY
             WITH eventdata AS (
@@ -613,10 +613,10 @@ class EventModel extends Model
         return $this->db->query($query, [
             $for,
             $by,
-            $state,
+            $jurisdiction,
             $from,
             $to,
-            $state,
+            $jurisdiction,
         ])->getResult();
     }
 

@@ -53,27 +53,19 @@ class EventTypeModel extends Model
 
     // VIEW: extra.statistics_eventtype
 
-    public function getManyByStatistics(string $state): array
+    public function getManyByStatistics(): array
     {
-        if ($state === '') {
-            $state = str_replace('|', ',', getenv('app_jurisdiction'));
-        }
-        $state = '{' . strtoupper($state) . '}';
-
         $query = <<<QUERY
             SELECT DISTINCT eventtype.eventtypeshort,
                 eventtype.eventtypeid
             FROM geohistory.eventtype
-                JOIN extra.statistics_eventtype
+            JOIN extra.statistics_eventtype
                 ON eventtype.eventtypeid = statistics_eventtype.eventtype
-                AND statistics_eventtype.governmentstate = ANY (?)
             WHERE eventtype.eventtypeborders NOT IN ('documentation', 'ignore')
             ORDER BY 1, 2
         QUERY;
 
-        return $this->db->query($query, [
-            $state,
-        ])->getResultArray();
+        return $this->db->query($query)->getResultArray();
     }
 
     // extra_removed.ci_model_statistics_eventtype(text)

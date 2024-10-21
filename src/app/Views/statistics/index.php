@@ -1,7 +1,5 @@
-<?php $eventTypeQuery ??= [];
-$state ??= 'usa';
-?>
-<form method="post" action="/<?= \Config\Services::request()->getLocale() ?>/<?= $state . ($state === '' ? '' : '/') ?>statistics/report/">
+<?php $eventTypeQuery ??= []; ?>
+<form method="post" action="/<?= \Config\Services::request()->getLocale() ?>/statistics/report/">
     <fieldset>
         <legend>Metric:</legend>
         <div class="option_radio_indent">
@@ -17,15 +15,6 @@ $state ??= 'usa';
             <?php } ?>
         </div>
     </fieldset>
-    <?php /*
-        <fieldset>
-            <legend>Group By:</legend>
-            <div class="option_radio_indent">
-                <input type="radio" name="by" id="by_current" value="current" checked="checked"><label for="by_current">Current Jurisdictions</label><br>
-                <input type="radio" name="by" id="by_historic" value="historic"><label for="by_historic">Historic Jurisdictions</label>
-            </div>
-        </fieldset>
-    <?php */ ?>
         <input type="hidden" name="by" value="historic">
     <fieldset>
         <legend>Filters:</legend>
@@ -35,6 +24,11 @@ $state ??= 'usa';
                 echo view('search/form_eventtype', ['isRequired' => false, 'form' => '']);
 ?>
             </div>
+            <br>
+            <label class="forselectize" for="governmentjurisdiction">Jurisdiction</label><br>
+            <select name="governmentjurisdiction" class="forselectize" style="width: 300px;">
+            </select>
+            <br>
             <label class="forselectize" for="from">Year(s)</label><br>
             <input id="from" class="selectize-input" name="from" type="number" step="1" style="width: 100px;">
             <label for="to">&ndash;</label>
@@ -46,9 +40,9 @@ $state ??= 'usa';
 </form>
 <script>
     var eventTypeList = <?= json_encode($eventTypeQuery); ?>;
+    var jurisdictionList = <?= json_encode($jurisdictions); ?>;
 
     $(function() {
-
         $('input[type=radio][name=for]').change(function() {
             if ($(this).val() == 'eventtype') {
                 $('.option_select').css('display', 'inherit');
@@ -72,5 +66,14 @@ $state ??= 'usa';
             searchField: 'eventtypeshort'
         });
 
+        $('select[name=governmentjurisdiction]').selectize({
+            selectOnTab: true,
+            closeAfterSelect: true,
+            highlight: false,
+            options: jurisdictionList,
+            valueField: 'governmentabbreviation',
+            labelField: 'governmentshort',
+            searchField: 'governmentshort'
+        });
     });
 </script>

@@ -9,12 +9,6 @@ use CodeIgniter\Router\RouteCollection;
 $routes->add('robots.txt', 'Bot::robotsTxt');
 
 if (mb_strpos(base_url(), $_ENV['app_baseLocalGeohistoryProjectUrl']) !== false) {
-    if ($_ENV['app_jurisdiction'] !== '') {
-        $stateProvinceRegex = '('. $_ENV['app_jurisdiction'] . ')';
-    } else {
-        $stateProvinceRegex = '(:segment)';
-    }
-
     $controllerRegex = ['adjudication', 'area', 'event', 'government', 'governmentsource', 'law', 'metes', 'reporter', 'source'];
     $mainSearchRegex = '(event|government|adjudication|law)';
 

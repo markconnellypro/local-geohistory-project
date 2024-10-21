@@ -147,6 +147,21 @@ class GovernmentModel extends Model
         ])->getResult();
     }
 
+    public function getByStatisticsJurisdiction(): array
+    {
+        $query = <<<QUERY
+            SELECT DISTINCT government.governmentshort,
+                lower(government.governmentabbreviation) AS governmentabbreviation
+            FROM geohistory.government
+            JOIN extra.statistics_eventtype
+                ON government.governmentabbreviation = statistics_eventtype.governmentstate
+                AND government.governmentstatus = ''
+                AND government.governmentlevel = 2
+        QUERY;
+
+        return $this->db->query($query)->getResultArray();
+    }
+
     // extra.ci_model_statistics_createddissolved_nation_part(character varying, integer, integer, character varying, boolean)
 
     // FUNCTION: extra.governmentabbreviation
@@ -158,11 +173,11 @@ class GovernmentModel extends Model
         $from = $parameters[1];
         $to = $parameters[2];
         $by = $parameters[3];
-        $state = $parameters[4];
-        if ($state === '') {
-            $state = implode(',', \App\Controllers\BaseController::getJurisdictions());
+        $jurisdiction = $parameters[4];
+        if ($jurisdiction === '') {
+            $jurisdiction = implode(',', \App\Controllers\BaseController::getJurisdictions());
         }
-        $state = '{' . strtoupper($state) . '}';
+        $jurisdiction = '{' . strtoupper($jurisdiction) . '}';
 
         $query = <<<QUERY
             WITH eventdata AS (
@@ -217,7 +232,7 @@ class GovernmentModel extends Model
             $for,
             $for,
             $by,
-            $state,
+            $jurisdiction,
             $from,
             $to,
             $for,
@@ -296,7 +311,7 @@ class GovernmentModel extends Model
         $from = $parameters[1];
         $to = $parameters[2];
         $by = $parameters[3];
-        $state = strtoupper($parameters[4]);
+        $jurisdiction = strtoupper($parameters[4]);
 
         $query = <<<QUERY
             WITH eventdata AS (
@@ -346,7 +361,7 @@ class GovernmentModel extends Model
             $for,
             $for,
             $by,
-            $state,
+            $jurisdiction,
             $from,
             $to,
             $for,
@@ -364,7 +379,7 @@ class GovernmentModel extends Model
         $from = $parameters[1];
         $to = $parameters[2];
         $by = $parameters[3];
-        $state = strtoupper($parameters[4]);
+        $jurisdiction = strtoupper($parameters[4]);
 
         $query = <<<QUERY
             WITH eventdata AS (
@@ -408,12 +423,12 @@ class GovernmentModel extends Model
             $for,
             $for,
             $by,
-            $state,
+            $jurisdiction,
             $from,
             $to,
             $for,
             $for,
-            $state,
+            $jurisdiction,
         ])->getResult();
     }
 
