@@ -27,7 +27,8 @@ if (mb_strpos(base_url(), $_ENV['app_baseLocalGeohistoryProjectUrl']) !== false)
     }
 
     if ($_ENV['app_jurisdiction'] !== '') {
-        $routes->add('{locale}/('. $_ENV['app_jurisdiction'] . ')', 'Search::redirect');
+        $routes->add('{locale}/('. $_ENV['app_jurisdiction'] . ')/about', 'About::redirect/$1');
+        $routes->add('{locale}/('. $_ENV['app_jurisdiction'] . ')', 'Search::redirect/$1');
     }
 
     $routes->add('{locale}/lookup/government/(:segment)', 'Search::governmentlookup/$1/');
@@ -35,7 +36,7 @@ if (mb_strpos(base_url(), $_ENV['app_baseLocalGeohistoryProjectUrl']) !== false)
     $routes->add('{locale}/lookup/government-parent/(:segment)', 'Search::governmentlookup/$1/parent');
     $routes->add('{locale}/lookup/tribunal/(:num)', 'Search::tribunallookup');
 
-    $routes->add('{locale}/search', 'Search::index/');
+    $routes->add('{locale}/search', 'Search::index');
     $routes->add('{locale}/search/' . $mainSearchRegex, 'Search::view/$1');
     $routes->add('{locale}/search/(:segment)', 'Search::noRecord');
 

@@ -95,7 +95,7 @@ class Search extends BaseController
 
     public function redirect(int|string $id): RedirectResponse
     {
-        return redirect()->to('/search/', 301);
+        return redirect()->to('/' . $this->request->getLocale() . '/search/', 301);
     }
 
     public function view(string $category): void
