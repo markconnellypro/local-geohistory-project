@@ -51,7 +51,7 @@ class AdjudicationLocationModel extends BaseModel
         $query = $this->db->query($query, [
             $id,
         ]);
-        
+
         return $this->getObject($query);
     }
 }
