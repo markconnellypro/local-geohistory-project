@@ -8,6 +8,7 @@ use CodeIgniter\Filters\FilterInterface;
 
 class LanguageRedirect implements FilterInterface
 {
+    #[\Override]
     public function before(RequestInterface $request, $arguments = null): void
     {
         $segments = $request->getUri()->getSegments();
@@ -20,6 +21,7 @@ class LanguageRedirect implements FilterInterface
         }
     }
 
+    #[\Override]
     public function after(RequestInterface $request, ResponseInterface $response, $arguments = null): void
     {
     }

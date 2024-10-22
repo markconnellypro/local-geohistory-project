@@ -12,6 +12,7 @@ class IncomingRequest extends BaseIncomingRequest
      *
      * @return IncomingRequest
      */
+    #[\Override]
     public function setLocale(string $locale)
     {
         // If it's not a valid locale, set it
