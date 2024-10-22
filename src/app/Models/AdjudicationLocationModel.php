@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use CodeIgniter\Model;
+use App\Models\BaseModel;
 
-class AdjudicationLocationModel extends Model
+class AdjudicationLocationModel extends BaseModel
 {
     // extra.ci_model_adjudication_location(integer)
 
@@ -48,8 +48,10 @@ class AdjudicationLocationModel extends Model
             ORDER BY adjudicationlocation.adjudicationlocationid
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             $id,
-        ])->getResult();
+        ]);
+        
+        return $this->getObject($query);
     }
 }

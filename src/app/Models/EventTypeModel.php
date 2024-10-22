@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use CodeIgniter\Model;
+use App\Models\BaseModel;
 
-class EventTypeModel extends Model
+class EventTypeModel extends BaseModel
 {
     // extra.ci_model_key_eventtype()
 
@@ -25,7 +25,9 @@ class EventTypeModel extends Model
             ORDER BY 2, 1
         QUERY;
 
-        return $this->db->query($query)->getResult();
+        $query = $this->db->query($query);
+
+        return $this->getObject($query);
     }
 
     // extra.ci_model_search_form_eventtype(character varying)
@@ -42,7 +44,9 @@ class EventTypeModel extends Model
             ORDER BY 3 DESC, 1, 2
         QUERY;
 
-        return $this->db->query($query)->getResultArray();
+        $query = $this->db->query($query);
+
+        return $this->getArray($query);
     }
 
     // extra.ci_model_statistics_eventtype_list(boolean)
@@ -62,7 +66,9 @@ class EventTypeModel extends Model
             ORDER BY 1, 2
         QUERY;
 
-        return $this->db->query($query)->getResultArray();
+        $query = $this->db->query($query);
+
+        return $this->getArray($query);
     }
 
     // extra_removed.ci_model_statistics_eventtype(text)
@@ -78,8 +84,10 @@ class EventTypeModel extends Model
             ORDER BY 1, 2
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             $eventType,
-        ])->getResult();
+        ]);
+
+        return $this->getObject($query);
     }
 }

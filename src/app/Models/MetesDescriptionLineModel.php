@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use CodeIgniter\Model;
+use App\Models\BaseModel;
 
-class MetesDescriptionLineModel extends Model
+class MetesDescriptionLineModel extends BaseModel
 {
     // extra.ci_model_metes_row(integer)
 
@@ -23,9 +23,11 @@ class MetesDescriptionLineModel extends Model
             ORDER BY metesdescriptionline.metesdescriptionline
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             $id,
-        ])->getResult();
+        ]);
+
+        return $this->getObject($query);
     }
 
     public function getGeometryByEvent(int $id): array

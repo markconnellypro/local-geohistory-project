@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use CodeIgniter\Model;
+use App\Models\BaseModel;
 
-class LawAlternateSectionModel extends Model
+class LawAlternateSectionModel extends BaseModel
 {
     // extra.ci_model_lawalternate_detail(integer, character varying, boolean)
     // extra.ci_model_lawalternate_detail(text, character varying, boolean)
@@ -42,10 +42,12 @@ class LawAlternateSectionModel extends Model
                 AND lawalternatesection.lawalternatesectionid = ?
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             \App\Controllers\BaseController::isLive(),
             $id,
-        ])->getResult();
+        ]);
+
+        return $this->getObject($query);
     }
 
     // extra.ci_model_lawalternate_related(integer)
@@ -123,12 +125,14 @@ class LawAlternateSectionModel extends Model
             ORDER BY 4, 3
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             $id,
             $id,
             $id,
             $id,
-        ])->getResult();
+        ]);
+
+        return $this->getObject($query);
     }
 
     // extra.lawalternatesectionslugid(text)
@@ -145,7 +149,9 @@ class LawAlternateSectionModel extends Model
 
         $query = $this->db->query($query, [
             $id,
-        ])->getResult();
+        ]);
+
+        $query = $this->getObject($query);
 
         $id = -1;
 

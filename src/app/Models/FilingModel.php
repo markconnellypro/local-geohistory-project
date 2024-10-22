@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use CodeIgniter\Model;
+use App\Models\BaseModel;
 
-class FilingModel extends Model
+class FilingModel extends BaseModel
 {
     // extra.ci_model_adjudication_filing(integer, boolean)
 
@@ -32,9 +32,11 @@ class FilingModel extends Model
             ORDER BY filing.filingid
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             \App\Controllers\BaseController::isLive(),
             $id,
-        ])->getResult();
+        ]);
+
+        return $this->getObject($query);
     }
 }

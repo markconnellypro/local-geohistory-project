@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use CodeIgniter\Model;
+use App\Models\BaseModel;
 
-class EventRelationshipModel extends Model
+class EventRelationshipModel extends BaseModel
 {
     // extra.ci_model_key_eventrelationship()
 
@@ -18,6 +18,8 @@ class EventRelationshipModel extends Model
             ORDER BY 2, 1
         QUERY;
 
-        return $this->db->query($query)->getResult();
+        $query = $this->db->query($query);
+
+        return $this->getObject($query);
     }
 }

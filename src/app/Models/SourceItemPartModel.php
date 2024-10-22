@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use CodeIgniter\Model;
+use App\Models\BaseModel;
 
-class SourceItemPartModel extends Model
+class SourceItemPartModel extends BaseModel
 {
     // extra.ci_model_reporter_url(integer)
 
@@ -34,9 +34,11 @@ class SourceItemPartModel extends Model
                 AND adjudicationsourcecitation.adjudicationsourcecitationid = ?
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             $id,
-        ])->getResult();
+        ]);
+
+        return $this->getObject($query);
     }
 
     // extra.ci_model_governmentsource_url(integer)
@@ -74,9 +76,11 @@ class SourceItemPartModel extends Model
             AND governmentsource.governmentsourceid = ?
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             $id,
-        ])->getResult();
+        ]);
+
+        return $this->getObject($query);
     }
 
     // extra.ci_model_lawalternate_url(integer, boolean)
@@ -129,10 +133,12 @@ class SourceItemPartModel extends Model
             AND (? OR NOT sourceitem.sourceitemlocal)
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             $id,
             \App\Controllers\BaseController::isLive(),
-        ])->getResult();
+        ]);
+
+        return $this->getObject($query);
     }
 
     // extra.ci_model_law_url(integer, boolean)
@@ -183,10 +189,12 @@ class SourceItemPartModel extends Model
             AND (? OR NOT sourceitem.sourceitemlocal)
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             $id,
             \App\Controllers\BaseController::isLive(),
-        ])->getResult();
+        ]);
+
+        return $this->getObject($query);
     }
 
     // extra.ci_model_source_url(integer)
@@ -222,8 +230,10 @@ class SourceItemPartModel extends Model
             AND sourcecitation.sourcecitationid = ?
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             $id,
-        ])->getResult();
+        ]);
+
+        return $this->getObject($query);
     }
 }

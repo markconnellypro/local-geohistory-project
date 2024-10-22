@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use CodeIgniter\Model;
+use App\Models\BaseModel;
 
-class AffectedGovernmentGroupModel extends Model
+class AffectedGovernmentGroupModel extends BaseModel
 {
     // extra.ci_model_event_affectedgovernmentform(integer, character varying, boolean, character varying)
 
@@ -28,10 +28,12 @@ class AffectedGovernmentGroupModel extends Model
             ORDER BY 3, 2
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             \App\Controllers\BaseController::isLive(),
             $id,
-        ])->getResult();
+        ]);
+
+        return $this->getObject($query);
     }
 
     // extra.ci_model_event_affectedgovernment(integer)
@@ -54,9 +56,11 @@ class AffectedGovernmentGroupModel extends Model
             ORDER BY 1
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             $id,
-        ])->getResultArray();
+        ]);
+
+        return $this->getArray($query);
     }
 
     // extra.ci_model_event_affectedgovernment_part(integer, character varying, character varying)
@@ -91,7 +95,9 @@ class AffectedGovernmentGroupModel extends Model
 
         $query = $this->db->query($query, [
             $id,
-        ])->getResultArray();
+        ]);
+
+        $query = $this->getArray($query);
 
         $gisQuery = $this->getByEventGeometry($id);
 
@@ -133,10 +139,12 @@ class AffectedGovernmentGroupModel extends Model
             ORDER BY 1, 4
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             \App\Controllers\BaseController::isLive(),
             $id,
-        ])->getResult();
+        ]);
+
+        return $this->getObject($query);
     }
 
     // extra.ci_model_government_affectedgovernment(integer, character varying, character varying)
@@ -289,13 +297,15 @@ class AffectedGovernmentGroupModel extends Model
             ORDER BY 1, 4, 5, 7
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             $id,
             $id,
             $id,
             $id,
             $id,
-        ])->getResult();
+        ]);
+
+        return $this->getObject($query);
     }
 
     // extra.ci_model_area_affectedgovernment(v_governmentshape integer, v_state character varying, v_locale character varying)
@@ -478,10 +488,12 @@ class AffectedGovernmentGroupModel extends Model
             ORDER BY 37
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             $id,
             $id,
-        ])->getResult();
+        ]);
+
+        return $this->getObject($query);
     }
 
     public function getProcess(array $query, array $gisQuery = []): array

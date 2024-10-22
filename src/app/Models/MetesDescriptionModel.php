@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use CodeIgniter\Model;
+use App\Models\BaseModel;
 
-class MetesDescriptionModel extends Model
+class MetesDescriptionModel extends BaseModel
 {
     // extra.ci_model_metes_detail(integer, character varying)
     // extra.ci_model_metes_detail(text, character varying)
@@ -61,9 +61,11 @@ class MetesDescriptionModel extends Model
             GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             $id,
-        ])->getResult();
+        ]);
+
+        return $this->getObject($query);
     }
 
     // extra.ci_model_event_metesdescription(integer)
@@ -86,9 +88,11 @@ class MetesDescriptionModel extends Model
             ORDER BY 5;
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             $id,
-        ])->getResult();
+        ]);
+
+        return $this->getObject($query);
     }
 
     // extra.ci_model_area_metesdescription(integer)
@@ -117,9 +121,11 @@ class MetesDescriptionModel extends Model
             ORDER BY 5
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             $id,
-        ])->getResult();
+        ]);
+
+        return $this->getObject($query);
     }
 
     // extra.metesdescriptionslugid(text)
@@ -136,7 +142,9 @@ class MetesDescriptionModel extends Model
 
         $query = $this->db->query($query, [
             $id,
-        ])->getResult();
+        ]);
+
+        $query = $this->getObject($query);
 
         $id = -1;
 

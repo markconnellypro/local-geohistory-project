@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use CodeIgniter\Model;
+use App\Models\BaseModel;
 
-class LawSectionModel extends Model
+class LawSectionModel extends BaseModel
 {
     // extra.ci_model_law_detail(integer, character varying, boolean)
     // extra.ci_model_law_detail(text, character varying, boolean)
@@ -40,10 +40,12 @@ class LawSectionModel extends Model
                 AND lawsection.lawsectionid = ?
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             \App\Controllers\BaseController::isLive(),
             $id,
-        ])->getResult();
+        ]);
+
+        return $this->getObject($query);
     }
 
     // extra.ci_model_event_law(integer)
@@ -75,9 +77,11 @@ class LawSectionModel extends Model
             ORDER BY 4, 2, 1
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             $id,
-        ])->getResult();
+        ]);
+
+        return $this->getObject($query);
     }
 
     // extra.ci_model_law_related(integer)
@@ -149,12 +153,14 @@ class LawSectionModel extends Model
             ORDER BY 4, 3
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             $id,
             $id,
             $id,
             $id,
-        ])->getResult();
+        ]);
+
+        return $this->getObject($query);
     }
 
     // extra.ci_model_search_law_dateevent(character varying, text, character varying)
@@ -188,13 +194,15 @@ class LawSectionModel extends Model
                   AND source.sourcetype = 'session laws';
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             $eventType,
             $eventType,
             $eventType,
             $eventType,
             $date,
-        ])->getResult();
+        ]);
+
+        return $this->getObject($query);
     }
 
     // extra_removed.ci_model_search_law_reference(character varying, integer, integer, character varying)
@@ -227,7 +235,7 @@ class LawSectionModel extends Model
                AND (0 = ? OR law.lawnumberchapter = ?)
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             $yearVolume,
             $yearVolume,
             $page,
@@ -236,7 +244,9 @@ class LawSectionModel extends Model
             $page,
             $numberChapter,
             $numberChapter,
-        ])->getResult();
+        ]);
+
+        return $this->getObject($query);
     }
 
     // extra.lawsectionslugid(text)
@@ -253,7 +263,9 @@ class LawSectionModel extends Model
 
         $query = $this->db->query($query, [
             $id,
-        ])->getResult();
+        ]);
+
+        $query = $this->getObject($query);
 
         $id = -1;
 

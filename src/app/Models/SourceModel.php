@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use CodeIgniter\Model;
+use App\Models\BaseModel;
 
-class SourceModel extends Model
+class SourceModel extends BaseModel
 {
     public function getByGovernment(int $id): array
     {
@@ -23,6 +23,8 @@ class SourceModel extends Model
             ORDER BY 1
         QUERY;
 
-        return $this->db->query($query)->getResultArray();
+        $query = $this->db->query($query);
+
+        return $this->getArray($query);
     }
 }

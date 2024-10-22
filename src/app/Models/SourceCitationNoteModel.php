@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use CodeIgniter\Model;
+use App\Models\BaseModel;
 
-class SourceCitationNoteModel extends Model
+class SourceCitationNoteModel extends BaseModel
 {
     // extra.ci_model_source_note(integer)
 
@@ -30,9 +30,11 @@ class SourceCitationNoteModel extends Model
             ORDER BY 1, 2;
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             $id,
             $id,
-        ])->getResult();
+        ]);
+
+        return $this->getObject($query);
     }
 }

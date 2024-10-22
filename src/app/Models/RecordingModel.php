@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use CodeIgniter\Model;
+use App\Models\BaseModel;
 
-class RecordingModel extends Model
+class RecordingModel extends BaseModel
 {
     // extra.ci_model_event_recording(integer, character varying, character varying)
 
@@ -78,8 +78,10 @@ class RecordingModel extends Model
             ORDER BY 1, 6
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             $id,
-        ])->getResult();
+        ]);
+
+        return $this->getObject($query);
     }
 }

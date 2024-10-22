@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use CodeIgniter\Model;
+use App\Models\BaseModel;
 
-class SourceCitationModel extends Model
+class SourceCitationModel extends BaseModel
 {
     // extra.ci_model_source_detail(integer, character varying)
     // extra.ci_model_source_detail(text, character varying)
@@ -47,9 +47,11 @@ class SourceCitationModel extends Model
                 AND sourcecitation.sourcecitationid = ?
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             $id,
-        ])->getResult();
+        ]);
+        
+        return $this->getObject($query);
     }
 
     // extra.ci_model_event_source(integer)
@@ -89,9 +91,11 @@ class SourceCitationModel extends Model
             ORDER BY 1, 6, 7, 10
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             $id,
-        ])->getResult();
+        ]);
+
+        return $this->getObject($query);
     }
 
     public function getByGovernment(int $id, array $jurisdictions): array
@@ -123,7 +127,9 @@ class SourceCitationModel extends Model
 
         $query = $this->db->query($query, [
             $id,
-        ])->getResult();
+        ]);
+
+        $query = $this->getObject($query);
 
         $id = -1;
 

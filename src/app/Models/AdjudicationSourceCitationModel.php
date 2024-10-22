@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use CodeIgniter\Model;
+use App\Models\BaseModel;
 
-class AdjudicationSourceCitationModel extends Model
+class AdjudicationSourceCitationModel extends BaseModel
 {
     // extra.ci_model_reporter_detail(integer, character varying)
     // extra.ci_model_reporter_detail(text, character varying)
@@ -43,9 +43,11 @@ class AdjudicationSourceCitationModel extends Model
                 AND adjudicationsourcecitation.adjudicationsourcecitationid = ?
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             $id,
-        ])->getResult();
+        ]);
+
+        return $this->getObject($query);
     }
 
     // extra.ci_model_adjudication_source(integer)
@@ -73,9 +75,11 @@ class AdjudicationSourceCitationModel extends Model
                 ON adjudicationsourcecitation.adjudicationsourcecitationid = adjudicationsourcecitationextracache.adjudicationsourcecitationid
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             $id,
-        ])->getResult();
+        ]);
+
+        return $this->getObject($query);
     }
 
     // VIEW: extra.adjudicationsourcecitationextracache
@@ -90,7 +94,9 @@ class AdjudicationSourceCitationModel extends Model
 
         $query = $this->db->query($query, [
             $id,
-        ])->getResult();
+        ]);
+
+        $query = $this->getObject($query);
 
         $id = -1;
 

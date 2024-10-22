@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use CodeIgniter\Model;
+use App\Models\BaseModel;
 
-class GovernmentSourceModel extends Model
+class GovernmentSourceModel extends BaseModel
 {
     // extra.ci_model_governmentsource_detail(integer, character varying, boolean, character varying)
     // extra.ci_model_governmentsource_detail(text, character varying, boolean, character varying)
@@ -91,10 +91,12 @@ class GovernmentSourceModel extends Model
             WHERE governmentsource.governmentsourceid = ?
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             \App\Controllers\BaseController::isLive(),
             $id
-        ])->getResult();
+        ]);
+
+        return $this->getObject($query);
     }
 
     // extra.ci_model_event_governmentsource(integer, character varying, boolean, character varying)
@@ -174,10 +176,12 @@ class GovernmentSourceModel extends Model
             ORDER BY 12
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             \App\Controllers\BaseController::isLive(),
             $id,
-        ])->getResult();
+        ]);
+
+        return $this->getObject($query);
     }
 
     // extra.ci_model_government_governmentsource(integer, character varying, boolean)
@@ -259,10 +263,12 @@ class GovernmentSourceModel extends Model
             ORDER BY 11
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             \App\Controllers\BaseController::isLive(),
             $id,
-        ])->getResult();
+        ]);
+
+        return $this->getObject($query);
     }
 
     // extra.governmentsourceslugid(text)
@@ -280,7 +286,9 @@ class GovernmentSourceModel extends Model
 
         $query = $this->db->query($query, [
             $id,
-        ])->getResult();
+        ]);
+
+        $query = $this->getObject($query);
 
         $id = -1;
 

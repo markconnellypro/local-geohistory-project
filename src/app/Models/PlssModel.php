@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use CodeIgniter\Model;
+use App\Models\BaseModel;
 
-class PlssModel extends Model
+class PlssModel extends BaseModel
 {
     // extra.ci_model_event_plss(integer)
 
@@ -32,8 +32,10 @@ class PlssModel extends Model
                 WHERE event = ?
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             $id,
-        ])->getResult();
+        ]);
+
+        return $this->getObject($query);
     }
 }

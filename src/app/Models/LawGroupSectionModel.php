@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use CodeIgniter\Model;
+use App\Models\BaseModel;
 
-class LawGroupSectionModel extends Model
+class LawGroupSectionModel extends BaseModel
 {
     public function getByLawSection(int $id): array
     {

@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use CodeIgniter\Model;
+use App\Models\BaseModel;
 
-class GovernmentIdentifierModel extends Model
+class GovernmentIdentifierModel extends BaseModel
 {
     // extra.ci_model_governmentidentifier_detail(text, text, text)
 
@@ -25,11 +25,13 @@ class GovernmentIdentifierModel extends Model
             GROUP BY 1, 2, 3, 4;
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             \Config\Services::request()->getLocale(),
             $type,
             strtolower($id),
-        ])->getResult();
+        ]);
+
+        return $this->getObject($query);
     }
 
     // extra.ci_model_government_identifier(integer, character varying, character varying)
@@ -55,10 +57,12 @@ class GovernmentIdentifierModel extends Model
                 AND governmentsubstitutecache.governmentsubstitute = ?
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             \Config\Services::request()->getLocale(),
             $id,
-        ])->getResult();
+        ]);
+
+        return $this->getObject($query);
     }
 
     public function getCensus(string $ids): array
@@ -88,11 +92,13 @@ class GovernmentIdentifierModel extends Model
                 AND governmentidentifier.governmentidentifierid <> ALL (?);
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             \Config\Services::request()->getLocale(),
             $governments,
             $governmentidentifierids,
-        ])->getResult();
+        ]);
+
+        return $this->getObject($query);
     }
 
     // extra.ci_model_search_governmentidentifier_identifier(character varying, character varying, character varying)
@@ -124,13 +130,15 @@ class GovernmentIdentifierModel extends Model
                 )
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             $type,
             strtolower($identifier),
             strtolower($identifier),
             strtolower($identifier),
             (int) $identifier,
             (int) $identifier,
-        ])->getResult();
+        ]);
+
+        return $this->getObject($query);
     }
 }

@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use CodeIgniter\Model;
+use App\Models\BaseModel;
 
-class CurrentGovernmentModel extends Model
+class CurrentGovernmentModel extends BaseModel
 {
     // extra.ci_model_event_currentgovernment(integer, character varying, character varying)
 
@@ -29,8 +29,10 @@ class CurrentGovernmentModel extends Model
             ORDER BY 8, 6, 4, 2
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             $id,
-        ])->getResult();
+        ]);
+
+        return $this->getObject($query);
     }
 }

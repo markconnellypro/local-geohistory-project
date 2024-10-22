@@ -2,10 +2,10 @@
 
 namespace App\Models;
 
-use CodeIgniter\Model;
+use App\Models\BaseModel;
 use stdClass;
 
-class AppModel extends Model
+class AppModel extends BaseModel
 {
     // extra.ci_model_lastrefresh()
 
@@ -20,12 +20,14 @@ class AppModel extends Model
             FROM extra.lastrefresh;
         QUERY;
 
-        $query = $this->db->query($query)->getResult();
+        $query = $this->db->query($query);
 
-        if (count($query) === 1) {
-            return $query;
+        $query = $this->getObject($query);
+
+        if (count($query) > 1) {
+            return [];
         }
 
-        return [];
+        return $query;
     }
 }

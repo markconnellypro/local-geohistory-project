@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use CodeIgniter\Model;
+use App\Models\BaseModel;
 
-class GovernmentModel extends Model
+class GovernmentModel extends BaseModel
 {
     // extra.ci_model_government_detail(integer, character varying, boolean)
     // extra.ci_model_government_detail(text, character varying, boolean)
@@ -95,12 +95,14 @@ class GovernmentModel extends Model
             WHERE government.governmentid = ?
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             $id,
             $id,
             $id,
             $id,
-        ])->getResult();
+        ]);
+
+        return $this->getObject($query);
     }
 
     // extra.governmentabbreviationid(text)
@@ -116,7 +118,9 @@ class GovernmentModel extends Model
 
         $query = $this->db->query($query, [
             strtoupper($id),
-        ])->getResult();
+        ]);
+
+        $query = $this->getObject($query);
 
         $id = -1;
 
@@ -142,9 +146,11 @@ class GovernmentModel extends Model
             WHERE governmentidentifier.governmentidentifierid = ANY (?);
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             $ids
-        ])->getResult();
+        ]);
+
+        return $this->getObject($query);
     }
 
     public function getByStatisticsJurisdiction(): array
@@ -159,7 +165,9 @@ class GovernmentModel extends Model
                 AND government.governmentlevel = 2
         QUERY;
 
-        return $this->db->query($query)->getResultArray();
+        $query = $this->db->query($query);
+
+        return $this->getArray($query);
     }
 
     // extra.ci_model_statistics_createddissolved_nation_part(character varying, integer, integer, character varying, boolean)
@@ -227,7 +235,7 @@ class GovernmentModel extends Model
             ORDER BY 1
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             $for,
             $for,
             $for,
@@ -237,7 +245,9 @@ class GovernmentModel extends Model
             $to,
             $for,
             $for,
-        ])->getResult();
+        ]);
+
+        return $this->getObject($query);
     }
 
     // extra.ci_model_statistics_createddissolved_nation_whole(character varying, integer, integer, character varying, boolean)
@@ -288,7 +298,7 @@ class GovernmentModel extends Model
                 ON xvalue.x = eventdata.x
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             $for,
             $for,
             $for,
@@ -298,7 +308,9 @@ class GovernmentModel extends Model
             $to,
             $for,
             $for,
-        ])->getResult();
+        ]);
+
+        return $this->getObject($query);
     }
 
     // extra.ci_model_statistics_createddissolved_state_part(character varying, integer, integer, character varying, character varying)
@@ -356,7 +368,7 @@ class GovernmentModel extends Model
             ORDER BY 1
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             $for,
             $for,
             $for,
@@ -366,7 +378,9 @@ class GovernmentModel extends Model
             $to,
             $for,
             $for,
-        ])->getResult();
+        ]);
+
+        return $this->getObject($query);
     }
 
     // extra.ci_model_statistics_createddissolved_state_whole(character varying, integer, integer, character varying, character varying)
@@ -418,7 +432,7 @@ class GovernmentModel extends Model
                 ON xvalue.x = eventdata.x
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             $for,
             $for,
             $for,
@@ -429,7 +443,9 @@ class GovernmentModel extends Model
             $for,
             $for,
             $jurisdiction,
-        ])->getResult();
+        ]);
+
+        return $this->getObject($query);
     }
 
     // extra.ci_model_search_lookup_government(character varying, character varying)
@@ -450,9 +466,11 @@ class GovernmentModel extends Model
             ORDER BY 1
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             rawurldecode($government),
-        ])->getResultArray();
+        ]);
+
+        return $this->getArray($query);
     }
 
     public function getLookupByGovernmentJurisdiction(string $government): array
@@ -471,9 +489,11 @@ class GovernmentModel extends Model
             ORDER BY 1
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             rawurldecode($government),
-        ])->getResultArray();
+        ]);
+
+        return $this->getArray($query);
     }
 
     // extra.ci_model_search_lookup_governmentparent(text, text)
@@ -497,9 +517,11 @@ class GovernmentModel extends Model
             ORDER BY 1
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             rawurldecode($government),
-        ])->getResultArray();
+        ]);
+
+        return $this->getArray($query);
     }
 
     public function getNote(int $id): array
@@ -635,7 +657,7 @@ class GovernmentModel extends Model
             ORDER BY 3 DESC, 2, 4, 1
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             $id,
             $id,
             $id,
@@ -644,7 +666,9 @@ class GovernmentModel extends Model
             $id,
             $id,
             $id,
-        ])->getResult();
+        ]);
+
+        return $this->getObject($query);
     }
 
     // extra.ci_model_search_form_tribunalgovernmentshort(character varying)
@@ -662,7 +686,9 @@ class GovernmentModel extends Model
             ORDER BY governmentrelationcache.governmentlevel, 1
         QUERY;
 
-        return $this->db->query($query)->getResultArray();
+        $query = $this->db->query($query);
+
+        return $this->getArray($query);
     }
 
     // extra.ci_model_search_government_government(text, text, text, integer, text, character varying)
@@ -722,7 +748,7 @@ class GovernmentModel extends Model
             ORDER BY 2
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             $parent,
             $parent,
             $government,
@@ -731,7 +757,9 @@ class GovernmentModel extends Model
             $type,
             $level,
             $type
-        ])->getResult();
+        ]);
+
+        return $this->getObject($query);
     }
 
     public function getSchoolDistrict(int $id): array
@@ -759,7 +787,9 @@ class GovernmentModel extends Model
 
         $query = $this->db->query($query, [
             $id,
-        ])->getResult();
+        ]);
+
+        $query = $this->getObject($query);
 
         $id = '';
 
@@ -785,7 +815,9 @@ class GovernmentModel extends Model
 
         $query = $this->db->query($query, [
             $id,
-        ])->getResult();
+        ]);
+
+        $query = $this->getObject($query);
 
         $id = -1;
 

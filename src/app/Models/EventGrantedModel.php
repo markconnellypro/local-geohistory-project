@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use CodeIgniter\Model;
+use App\Models\BaseModel;
 
-class EventGrantedModel extends Model
+class EventGrantedModel extends BaseModel
 {
     // extra.ci_model_key_eventgranted()
 
@@ -18,6 +18,8 @@ class EventGrantedModel extends Model
             ORDER BY 2, 1
         QUERY;
 
-        return $this->db->query($query)->getResult();
+        $query = $this->db->query($query);
+
+        return $this->getObject($query);
     }
 }

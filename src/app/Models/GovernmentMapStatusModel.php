@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use CodeIgniter\Model;
+use App\Models\BaseModel;
 
-class GovernmentMapStatusModel extends Model
+class GovernmentMapStatusModel extends BaseModel
 {
     public function getDetails(): array
     {

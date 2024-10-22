@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use CodeIgniter\Model;
+use App\Models\BaseModel;
 
-class AdjudicationModel extends Model
+class AdjudicationModel extends BaseModel
 {
     // extra.ci_model_adjudication_detail(character varying, character varying)
     // extra.ci_model_adjudication_detail(integer, character varying)
@@ -49,9 +49,11 @@ class AdjudicationModel extends Model
                 ON adjudication.adjudicationid = adjudicationextracache.adjudicationid
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             $id,
-        ])->getResult();
+        ]);
+
+        return $this->getObject($query);
     }
 
     // extra.ci_model_reporter_adjudication(integer)
@@ -83,9 +85,11 @@ class AdjudicationModel extends Model
                 AND adjudicationsourcecitation.adjudicationsourcecitationid = ?
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             $id,
-        ])->getResult();
+        ]);
+
+        return $this->getObject($query);
     }
 
     // extra.ci_model_event_adjudication(integer)
@@ -120,9 +124,11 @@ class AdjudicationModel extends Model
             WHERE adjudicationevent.event = ?
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             $id,
-        ])->getResult();
+        ]);
+
+        return $this->getObject($query);
     }
 
     // extra.adjudicationslugid(text)
@@ -139,7 +145,9 @@ class AdjudicationModel extends Model
 
         $query = $this->db->query($query, [
             $id,
-        ])->getResult();
+        ]);
+
+        $query = $this->getObject($query);
 
         $id = -1;
 

@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use CodeIgniter\Model;
+use App\Models\BaseModel;
 
-class DocumentationModel extends Model
+class DocumentationModel extends BaseModel
 {
     // extra.ci_model_about(character varying)
 
@@ -19,9 +19,11 @@ class DocumentationModel extends Model
             ORDER BY 2, 1
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             'about_' . $jurisdiction,
-        ])->getResult();
+        ]);
+
+        return $this->getObject($query);
     }
 
     public function getAboutJurisdiction(): array
@@ -37,7 +39,9 @@ class DocumentationModel extends Model
             ORDER BY 2, 1
         QUERY;
 
-        return $this->db->query($query)->getResult();
+        $query = $this->db->query($query);
+
+        return $this->getObject($query);
     }
 
     public function getDisclaimer(): array
@@ -52,7 +56,9 @@ class DocumentationModel extends Model
             ORDER BY 1
         QUERY;
 
-        return $this->db->query($query)->getResult();
+        $query = $this->db->query($query);
+
+        return $this->getObject($query);
     }
 
     public function getKey(string $type): array
@@ -67,8 +73,10 @@ class DocumentationModel extends Model
             ORDER BY 2, 1
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             $type,
-        ])->getResult();
+        ]);
+
+        return $this->getObject($query);
     }
 }

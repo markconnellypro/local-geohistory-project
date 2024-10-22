@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use CodeIgniter\Model;
+use App\Models\BaseModel;
 
-class ResearchLogModel extends Model
+class ResearchLogModel extends BaseModel
 {
     // extra.ci_model_government_researchlog(integer, character varying, boolean)
 
@@ -47,12 +47,14 @@ class ResearchLogModel extends Model
             ORDER BY researchlogtype.researchlogtypelong, researchlog.researchlogfrom, researchlogdatesort    
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             \App\Controllers\BaseController::isLive(),
             \App\Controllers\BaseController::isLive(),
             \App\Controllers\BaseController::isLive(),
             $id,
             \App\Controllers\BaseController::isLive(),
-        ])->getResult();
+        ]);
+
+        return $this->getObject($query);
     }
 }

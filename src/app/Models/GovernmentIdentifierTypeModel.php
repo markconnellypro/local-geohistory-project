@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use CodeIgniter\Model;
+use App\Models\BaseModel;
 
-class GovernmentIdentifierTypeModel extends Model
+class GovernmentIdentifierTypeModel extends BaseModel
 {
     // extra.ci_model_search_form_governmentidentifiertype(character varying)
 
@@ -19,6 +19,8 @@ class GovernmentIdentifierTypeModel extends Model
             ORDER BY 1
         QUERY;
 
-        return $this->db->query($query)->getResultArray();
+        $query = $this->db->query($query);
+
+        return $this->getArray($query);
     }
 }

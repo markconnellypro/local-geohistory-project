@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use CodeIgniter\Model;
+use App\Models\BaseModel;
 
-class GovernmentPopulationModel extends Model
+class GovernmentPopulationModel extends BaseModel
 {
     public function getByGovernment(int $id): array
     {

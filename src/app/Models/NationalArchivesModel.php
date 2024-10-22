@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use CodeIgniter\Model;
+use App\Models\BaseModel;
 
-class NationalArchivesModel extends Model
+class NationalArchivesModel extends BaseModel
 {
     // extra.ci_model_government_nationalarchives(integer, character varying)
 
@@ -58,9 +58,11 @@ class NationalArchivesModel extends Model
             ORDER BY 1, 3, 4
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             $id,
             $id,
-        ])->getResult();
+        ]);
+
+        return $this->getObject($query);
     }
 }

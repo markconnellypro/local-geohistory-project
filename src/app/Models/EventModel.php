@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use CodeIgniter\Model;
+use App\Models\BaseModel;
 
-class EventModel extends Model
+class EventModel extends BaseModel
 {
     // extra.ci_model_event_detail(integer, character varying)
     // extra.ci_model_event_detail(text, character varying)
@@ -80,13 +80,15 @@ class EventModel extends Model
             WHERE event.eventid = ?
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             $id,
             $id,
             $id,
             $id,
             $id,
-        ])->getResult();
+        ]);
+
+        return $this->getObject($query);
     }
 
     // extra.ci_model_adjudication_event(integer)
@@ -115,9 +117,11 @@ class EventModel extends Model
             ORDER BY event.eventsort, event.eventlong
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             $id,
-        ])->getResult();
+        ]);
+
+        return $this->getObject($query);
     }
 
     // extra.ci_model_reporter_event(integer)
@@ -145,9 +149,11 @@ class EventModel extends Model
             ORDER BY event.eventsort, event.eventlong;
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             $id,
-        ])->getResult();
+        ]);
+
+        return $this->getObject($query);
     }
 
     // extra.ci_model_government_event_failure(integer, integer[])
@@ -181,10 +187,12 @@ class EventModel extends Model
             ORDER BY event.eventsort, event.eventlong
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             '{' . implode(',', $events) . '}',
             $id,
-        ])->getResult();
+        ]);
+
+        return $this->getObject($query);
     }
 
     // extra.ci_model_area_event_failure(integer, integer[])
@@ -223,11 +231,13 @@ class EventModel extends Model
             ORDER BY event.eventsort, event.eventlong
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             '{' . implode(',', $events) . '}',
             $id,
             $id,
-        ])->getResult();
+        ]);
+
+        return $this->getObject($query);
     }
 
     // extra.ci_model_governmentsource_event(integer)
@@ -253,9 +263,11 @@ class EventModel extends Model
             ORDER BY event.eventsort, event.eventlong
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             $id,
-        ])->getResult();
+        ]);
+
+        return $this->getObject($query);
     }
 
     // extra.ci_model_government_event_success(integer, integer[])
@@ -288,10 +300,12 @@ class EventModel extends Model
             ORDER BY event.eventsort, event.eventlong;
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             '{' . implode(',', $events) . '}',
             $id,
-        ])->getResult();
+        ]);
+
+        return $this->getObject($query);
     }
 
     // extra.ci_model_lawalternate_event(integer)
@@ -325,9 +339,11 @@ class EventModel extends Model
             ORDER BY event.eventsort, event.eventlong
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             $id,
-        ])->getResult();
+        ]);
+
+        return $this->getObject($query);
     }
 
     // extra.ci_model_law_event(integer)
@@ -359,9 +375,11 @@ class EventModel extends Model
             ORDER BY event.eventsort, event.eventlong;
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             $id,
-        ])->getResult();
+        ]);
+
+        return $this->getObject($query);
     }
 
     // extra.ci_model_source_event(integer)
@@ -387,9 +405,11 @@ class EventModel extends Model
             ORDER BY event.eventsort, event.eventlong
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             $id,
-        ])->getResult();
+        ]);
+
+        return $this->getObject($query);
     }
 
     // extra.ci_model_statistics_eventtype_nation_part(text, integer, integer, character varying, boolean)
@@ -450,13 +470,15 @@ class EventModel extends Model
             ORDER BY 1
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             $for,
             $by,
             $jurisdiction,
             $from,
             $to,
-        ])->getResult();
+        ]);
+
+        return $this->getObject($query);
     }
 
     // extra.ci_model_statistics_eventtype_nation_whole(text, integer, integer, character varying, boolean)
@@ -500,13 +522,15 @@ class EventModel extends Model
                 ON xvalue.x = eventdata.x
             QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             $for,
             $by,
             ENVIRONMENT,
             $from,
             $to,
-        ])->getResult();
+        ]);
+
+        return $this->getObject($query);
     }
 
     // extra.ci_model_statistics_eventtype_state_part(text, integer, integer, character varying, character varying)
@@ -557,13 +581,15 @@ class EventModel extends Model
             ORDER BY 1
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             $for,
             $by,
             $jurisdiction,
             $from,
             $to,
-        ])->getResult();
+        ]);
+
+        return $this->getObject($query);
     }
 
     // extra.ci_model_statistics_eventtype_state_whole(text, integer, integer, character varying, character varying)
@@ -608,14 +634,16 @@ class EventModel extends Model
                 ON xvalue.x = eventdata.x
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             $for,
             $by,
             $jurisdiction,
             $from,
             $to,
             $jurisdiction,
-        ])->getResult();
+        ]);
+
+        return $this->getObject($query);
     }
 
     // extra.ci_model_search_event_government(text, text, text, text, integer, integer)
@@ -679,7 +707,7 @@ class EventModel extends Model
                 ORDER BY event.eventsort, event.eventlong
         QUERY;
 
-        return $this->db->query($query, [
+        $query = $this->db->query($query, [
             $government,
             $parent,
             $parent,
@@ -700,7 +728,9 @@ class EventModel extends Model
             $plusMinus,
             $year,
             $plusMinus,
-        ])->getResult();
+        ]);
+
+        return $this->getObject($query);
     }
 
     // extra.eventslugidreplacement(text) - SPLIT INTO TWO
@@ -715,7 +745,9 @@ class EventModel extends Model
 
         $query = $this->db->query($query, [
             $id,
-        ])->getResult();
+        ]);
+
+        $query = $this->getObject($query);
 
         $output = -1;
 
@@ -742,7 +774,9 @@ class EventModel extends Model
 
         $query = $this->db->query($query, [
             $id,
-        ])->getResult();
+        ]);
+
+        $query = $this->getObject($query);
 
         if (count($query) === 1) {
             header("HTTP/1.1 301 Moved Permanently");
