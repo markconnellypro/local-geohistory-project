@@ -60,7 +60,7 @@ class Map extends BaseController
         $jurisdictions = explode(',', $jurisdictions);
         $jurisdictions = array_unique($jurisdictions);
         foreach ($jurisdictions as $key => $jurisdiction) {
-            if (!(preg_match('/^[a-z\-]{2,}$/', $jurisdiction) === 1)) {
+            if (preg_match('/^[a-z\-]{2,}$/', $jurisdiction) !== 1) {
                 unset($jurisdictions[$key]);
             }
         }

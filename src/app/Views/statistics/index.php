@@ -1,4 +1,7 @@
-<?php $eventTypeQuery ??= []; ?>
+<?php
+$eventTypeQuery ??= [];
+$jurisdictions ??= [];
+?>
 <form method="post" action="/<?= \Config\Services::request()->getLocale() ?>/statistics/report/">
     <fieldset>
         <legend>Metric:</legend>

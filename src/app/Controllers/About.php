@@ -18,7 +18,7 @@ class About extends BaseController
             $jurisdictions = $DocumentationModel->getAboutJurisdiction();
         }
         $query = $DocumentationModel->getAboutDetail($jurisdiction);
-        if (count($query) === 0) {
+        if ($query === []) {
             echo view('core/norecord');
         } else {
             echo view('about/index', ['query' => $query, 'jurisdictions' => $jurisdictions]);

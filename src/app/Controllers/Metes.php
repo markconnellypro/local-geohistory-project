@@ -32,7 +32,7 @@ class Metes extends BaseController
         } else {
             $id = $areaQuery[0]->metesdescriptionid;
             $jurisdictions = explode(',', $areaQuery[0]->jurisdictions);
-            if ($jurisdictions === [] || $jurisdictions === ['']) {
+            if ($jurisdictions === ['']) {
                 $AffectedGovernmentGroupModel = new AffectedGovernmentGroupModel();
                 $jurisdictions = $AffectedGovernmentGroupModel->getByEventGovernment($areaQuery[0]->eventid);
                 $jurisdictions = $jurisdictions['jurisdictions'];
