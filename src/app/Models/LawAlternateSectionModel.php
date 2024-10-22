@@ -10,7 +10,6 @@ class LawAlternateSectionModel extends Model
     // extra.ci_model_lawalternate_detail(text, character varying, boolean)
 
     // FUNCTION: extra.lawalternatesectioncitation
-    // VIEW: extra.lawsectiongovernmentcache
     // VIEW: extra.sourceextra
 
     public function getDetail(int|string $id): array

@@ -13,7 +13,6 @@ class GovernmentShapeModel extends Model
     // FUNCTION: extra.governmentlong
     // FUNCTION: extra.governmentshort
     // FUNCTION: extra.governmentslug
-    // VIEW: extra.areagovernmentcache
 
     public function getDetail(int|string $id): array
     {

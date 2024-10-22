@@ -159,9 +159,6 @@ class LawSectionModel extends Model
 
     // extra.ci_model_search_law_dateevent(character varying, text, character varying)
 
-    // FUNCTION: extra.governmentabbreviation
-    // FUNCTION: extra.governmentabbreviationid
-    // FUNCTION: extra.governmentcurrentleadparent
     // VIEW: extra.lawsectionextracache
 
     public function getSearchByDateEvent(array $parameters): array
@@ -202,9 +199,6 @@ class LawSectionModel extends Model
 
     // extra_removed.ci_model_search_law_reference(character varying, integer, integer, character varying)
 
-    // FUNCTION: extra.governmentabbreviation
-    // FUNCTION: extra.governmentabbreviationid
-    // FUNCTION: extra.governmentcurrentleadparent
     // VIEW: extra.lawsectionextracache
 
     public function getSearchByReference(array $parameters): array

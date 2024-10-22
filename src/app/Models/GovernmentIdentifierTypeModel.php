@@ -8,8 +8,6 @@ class GovernmentIdentifierTypeModel extends Model
 {
     // extra.ci_model_search_form_governmentidentifiertype(character varying)
 
-    // VIEW: extra.governmentrelationcache
-
     public function getSearch(): array
     {
         $query = <<<QUERY

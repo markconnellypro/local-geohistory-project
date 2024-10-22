@@ -30,9 +30,6 @@ class EventTypeModel extends Model
 
     // extra.ci_model_search_form_eventtype(character varying)
 
-    // FUNCTION: extra.governmentabbreviationid
-    // VIEW: extra.eventgovernmentcache
-
     public function getSearch(): array
     {
         $query = <<<QUERY

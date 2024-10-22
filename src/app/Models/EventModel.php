@@ -11,8 +11,6 @@ class EventModel extends Model
 
     // FUNCTION: extra.shortdate
     // FUNCTION: extra.governmentslug
-    // FUNCTION: extra.eventgovernmentcache
-    // FUNCTION: extra.governmentrelationcache
 
     public function getDetail(int|string $id): array
     {

@@ -48,14 +48,14 @@ class AdjudicationSourceCitationModel extends Model
         ])->getResult();
     }
 
+    // extra.ci_model_adjudication_source(integer)
+
+    // FUNCTION: extra.rangefix
+    // FUNCTION: extra.shortdate
+    // VIEW: extra.adjudicationsourcecitationextracache
+
     public function getByAdjudication(int $id): array
     {
-        // extra.ci_model_adjudication_source(integer)
-
-        // FUNCTION: extra.rangefix
-        // FUNCTION: extra.shortdate
-        // VIEW: extra.adjudicationsourcecitationextracache
-
         $query = <<<QUERY
             SELECT adjudicationsourcecitationextracache.adjudicationsourcecitationslug,
                 source.sourceshort,
@@ -77,6 +77,8 @@ class AdjudicationSourceCitationModel extends Model
             $id,
         ])->getResult();
     }
+
+    // VIEW: extra.adjudicationsourcecitationextracache
 
     private function getSlugId(string $id): int
     {

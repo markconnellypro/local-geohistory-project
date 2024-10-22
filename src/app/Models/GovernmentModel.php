@@ -434,8 +434,6 @@ class GovernmentModel extends Model
 
     // extra.ci_model_search_lookup_government(character varying, character varying)
 
-    // FUNCTION: geohistory.punctuationnonefuzzy
-
     public function getLookupByGovernment(string $government): array
     {
         if (strlen($government) < 3) {
@@ -456,8 +454,6 @@ class GovernmentModel extends Model
             rawurldecode($government),
         ])->getResultArray();
     }
-
-    // FUNCTION: geohistory.punctuationnonefuzzy
 
     public function getLookupByGovernmentJurisdiction(string $government): array
     {
@@ -482,7 +478,6 @@ class GovernmentModel extends Model
 
     // extra.ci_model_search_lookup_governmentparent(text, text)
 
-    // FUNCTION: extra.punctuationnone
     // VIEW: extra.governmentrelationcache
 
     public function getLookupByGovernmentParent(string $government): array
@@ -654,8 +649,6 @@ class GovernmentModel extends Model
 
     // extra.ci_model_search_form_tribunalgovernmentshort(character varying)
 
-    // FUNCTION: extra.governmentabbreviationid
-    // FUNCTION: extra.governmentcurrentleadparent
     // VIEW: governmentrelationcache
 
     public function getSearch(): array
