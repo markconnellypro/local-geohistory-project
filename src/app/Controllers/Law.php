@@ -24,7 +24,7 @@ class Law extends BaseController
 
     public function view(int|string $id): void
     {
-        if (str_ends_with($id, '-alternate')) {
+        if (is_string($id) && str_ends_with($id, '-alternate')) {
             $function = 'getByLawAlternateSection';
             $LawSectionModel = new \App\Models\LawAlternateSectionModel();
         } else {
