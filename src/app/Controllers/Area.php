@@ -86,7 +86,7 @@ class Area extends BaseController
 
     public function view(int|string $id, float $y = 0, float $x = 0, string $addressText = ''): void
     {
-        if (($this->isLive() || $y !== 0.0 || $x !== 0.0) && preg_match('/^\d{1,9}$/', $id)) {
+        if (($this->isLive() || $y !== 0.0 || $x !== 0.0) && is_string($id) && preg_match('/^\d{1,9}$/', $id) === 1) {
             $id = (int) $id;
         }
         $GovernmentShapeModel = new GovernmentShapeModel();
