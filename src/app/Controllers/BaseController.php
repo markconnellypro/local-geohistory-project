@@ -52,8 +52,12 @@ abstract class BaseController extends Controller
 
     public static function isInternetExplorer(): bool
     {
-        $agent = \Config\Services::request()->getUserAgent();
-        return $agent->getBrowser() === 'Internet Explorer';
+        $agent = \Config\Services::request();
+        if (method_exists($agent, 'getUserAgent')) {
+            $agent = $agent->getUserAgent();
+            return $agent->getBrowser() === 'Internet Explorer';
+        }
+        return false;
     }
 
     public static function getJurisdictions(): array
@@ -95,7 +99,7 @@ abstract class BaseController extends Controller
 
     protected function getIdInt(int|string $id): int|string
     {
-        if (static::isLive() && preg_match('/^\d{1,9}$/', $id)) {
+        if (static::isLive() && is_string($id) && preg_match('/^\d{1,9}$/', $id) === 1) {
             $id = (int) $id;
         }
         return $id;

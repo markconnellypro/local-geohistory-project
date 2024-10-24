@@ -11,7 +11,7 @@ class AppModel extends BaseModel
 
     // FUNCTION: extra.fulldate
 
-    public function getLastUpdated(): array|stdClass
+    public function getLastUpdated(): array
     {
         $query = <<<QUERY
             SELECT extra.fulldate(lastrefreshdate::text) AS fulldate,
