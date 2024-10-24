@@ -1,7 +1,8 @@
 <?php if (is_array($query ?? '') && $query !== []) {
     $jurisdictions ??= [];
     ?>
-<section id="key">
+<section id="table-of-contents">
+    <h2>Table of Contents</h2>
     <?php foreach ($query as $row) { ?>
         <a href="#<?= $row->keysort ?>"><?= $row->keyshort ?></a><br>
     <?php } ?>

@@ -1,4 +1,5 @@
-<section id="key">
+<section id="table-of-contents">
+    <h2>Table of Contents</h2>
     <a href="#date">Date</a><br>
     <a href="#name-abbreviation">Name and Abbreviation</a><br>
     <?php if (is_array($keys ?? '') && $keys !== []) {
