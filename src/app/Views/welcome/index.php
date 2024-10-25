@@ -1,5 +1,6 @@
 <?php
 $icons ??= [];
+$welcome ??= '';
 ?>
 <div class="push">&nbsp;</div>
 <div id="welcomecontainer">
