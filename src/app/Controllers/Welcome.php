@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Models\DocumentationModel;
 use CodeIgniter\HTTP\RedirectResponse;
 
 class Welcome extends BaseController
@@ -17,7 +18,8 @@ class Welcome extends BaseController
             'statistics',
         ];
         echo view('core/header', ['state' => '', 'title' => $this->title]);
-        echo view('welcome/index', ['icons' => $icons]);
+        $DocumentationModel = new DocumentationModel();
+        echo view('welcome/index', ['icons' => $icons, 'welcome' => $DocumentationModel->getWelcome()]);
         echo view('core/footer');
     }
 

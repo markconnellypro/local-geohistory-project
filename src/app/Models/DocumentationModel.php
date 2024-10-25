@@ -79,4 +79,25 @@ class DocumentationModel extends BaseModel
 
         return $this->getObject($query);
     }
+
+    public function getWelcome(): string
+    {
+        $query = <<<QUERY
+            SELECT documentation.documentationlong
+            FROM geohistory.documentation
+            WHERE documentation.documentationtype = 'welcome'
+            ORDER BY 1
+            LIMIT 1
+        QUERY;
+
+        $query = $this->db->query($query);
+
+        $query = $this->getObject($query);
+
+        if (count($query) === 1) {
+            return $query[0]->documentationlong;
+        }
+
+        return '';
+    }
 }
