@@ -506,18 +506,71 @@ class GovernmentModel extends BaseModel
             SELECT DISTINCT government.governmentshort,
                 government.governmentsearch
             FROM geohistory.government lookupgovernment
-            JOIN extra.governmentrelationcache
-                ON lookupgovernment.governmentid = governmentrelationcache.governmentid
-                AND lookupgovernment.governmentsearch LIKE geohistory.punctuationnone(?)
             JOIN geohistory.government
-                ON governmentrelationcache.governmentrelation = government.governmentid
+                ON lookupgovernment.governmentcurrentleadparent = government.governmentid
                 AND government.governmentstatus <> 'placeholder'
-                AND government.governmentlevel > 2
-                AND government.governmentlevel < governmentrelationcache.governmentlevel
+                AND lookupgovernment.governmentsearch LIKE geohistory.punctuationnonefuzzy(?)
+            UNION DISTINCT
+            SELECT DISTINCT government.governmentshort,
+                government.governmentsearch
+            FROM geohistory.government lookupgovernment
+            JOIN geohistory.governmentothercurrentparent
+                ON lookupgovernment.governmentid = governmentothercurrentparent.government
+                AND lookupgovernment.governmentsearch LIKE geohistory.punctuationnonefuzzy(?)
+            JOIN geohistory.government
+                ON governmentothercurrentparent.governmentothercurrentparent = government.governmentid
+                AND government.governmentstatus <> 'placeholder'
+            UNION DISTINCT
+            SELECT DISTINCT government.governmentshort,
+                government.governmentsearch
+            FROM geohistory.government lookupgovernment
+            JOIN geohistory.affectedgovernmentpart lookuppart
+                ON lookupgovernment.governmentid = lookuppart.governmentfrom
+                AND lookupgovernment.governmentsearch LIKE geohistory.punctuationnonefuzzy(?)
+            JOIN geohistory.affectedgovernmentgrouppart lookupgrouppart
+                ON lookuppart.affectedgovernmentpartid = lookupgrouppart.affectedgovernmentpart
+            JOIN geohistory.affectedgovernmentlevel lookuplevel
+                ON lookupgrouppart.affectedgovernmentlevel = lookuplevel.affectedgovernmentlevelid
+                AND lookuplevel.affectedgovernmentlevelgroup > 3
+            JOIN geohistory.affectedgovernmentgrouppart
+                ON lookupgrouppart.affectedgovernmentgroup = affectedgovernmentgrouppart.affectedgovernmentgroup
+            JOIN geohistory.affectedgovernmentlevel
+                ON affectedgovernmentgrouppart.affectedgovernmentlevel = affectedgovernmentlevel.affectedgovernmentlevelid
+                AND lookuplevel.affectedgovernmentlevelgroup = 3
+            JOIN geohistory.affectedgovernmentpart
+                ON affectedgovernmentgrouppart.affectedgovernmentpart = affectedgovernmentpart.affectedgovernmentpartid
+            JOIN geohistory.government
+                ON affectedgovernmentpart.governmentfrom = government.governmentid
+                AND government.governmentstatus <> 'placeholder'
+            UNION DISTINCT
+            SELECT DISTINCT government.governmentshort,
+                government.governmentsearch
+            FROM geohistory.government lookupgovernment
+            JOIN geohistory.affectedgovernmentpart lookuppart
+                ON lookupgovernment.governmentid = lookuppart.governmentto
+                AND lookupgovernment.governmentsearch LIKE geohistory.punctuationnonefuzzy(?)
+            JOIN geohistory.affectedgovernmentgrouppart lookupgrouppart
+                ON lookuppart.affectedgovernmentpartid = lookupgrouppart.affectedgovernmentpart
+            JOIN geohistory.affectedgovernmentlevel lookuplevel
+                ON lookupgrouppart.affectedgovernmentlevel = lookuplevel.affectedgovernmentlevelid
+                AND lookuplevel.affectedgovernmentlevelgroup > 3
+            JOIN geohistory.affectedgovernmentgrouppart
+                ON lookupgrouppart.affectedgovernmentgroup = affectedgovernmentgrouppart.affectedgovernmentgroup
+            JOIN geohistory.affectedgovernmentlevel
+                ON affectedgovernmentgrouppart.affectedgovernmentlevel = affectedgovernmentlevel.affectedgovernmentlevelid
+                AND lookuplevel.affectedgovernmentlevelgroup = 3
+            JOIN geohistory.affectedgovernmentpart
+                ON affectedgovernmentgrouppart.affectedgovernmentpart = affectedgovernmentpart.affectedgovernmentpartid
+            JOIN geohistory.government
+                ON affectedgovernmentpart.governmentto = government.governmentid
+                AND government.governmentstatus <> 'placeholder'
             ORDER BY 1
         QUERY;
 
         $query = $this->db->query($query, [
+            rawurldecode($government),
+            rawurldecode($government),
+            rawurldecode($government),
             rawurldecode($government),
         ]);
 
