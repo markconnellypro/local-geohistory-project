@@ -21,7 +21,7 @@ class CurrentGovernmentModel extends BaseModel
                 extra.governmentslug(currentgovernment.governmentmunicipality) AS governmentmunicipality,
                 extra.governmentlong(currentgovernment.governmentmunicipality) AS governmentmunicipalitylong,
                 extra.governmentslug(currentgovernment.governmentcounty) AS governmentcounty,
-                extra.governmentshort(currentgovernment.governmentcounty, '') AS governmentcountyshort,
+                extra.governmentshort(currentgovernment.governmentcounty) AS governmentcountyshort,
                 extra.governmentslug(currentgovernment.governmentstate) AS governmentstate,
                 extra.governmentabbreviation(currentgovernment.governmentstate) AS governmentstateabbreviation
             FROM geohistory.currentgovernment

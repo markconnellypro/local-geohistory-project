@@ -17,7 +17,7 @@ class RecordingModel extends BaseModel
     {
         $query = <<<QUERY
             SELECT extra.governmentslug(recordingoffice.government) AS government,
-                extra.governmentshort(recordingoffice.government, '') AS governmentshort,
+                extra.governmentshort(recordingoffice.government) AS governmentshort,
                 trim(recordingtype.recordingtypelong || CASE
                     WHEN recordingtype.recordingtypetype = '' THEN ''
                     ELSE ' ' || recordingtype.recordingtypetype

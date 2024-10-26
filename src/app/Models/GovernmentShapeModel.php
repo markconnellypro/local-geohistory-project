@@ -27,7 +27,7 @@ class GovernmentShapeModel extends BaseModel
                 extra.governmentslug(governmentshape.governmentmunicipality) AS governmentmunicipality,
                 extra.governmentlong(governmentshape.governmentmunicipality) AS governmentmunicipalitylong,
                 extra.governmentslug(governmentshape.governmentcounty) AS governmentcounty,
-                extra.governmentshort(governmentshape.governmentcounty, '') AS governmentcountyshort,
+                extra.governmentshort(governmentshape.governmentcounty) AS governmentcountyshort,
                 extra.governmentslug(governmentshape.governmentstate) AS governmentstate,
                 extra.governmentabbreviation(governmentshape.governmentstate) AS governmentstateabbreviation,
                 governmentshape.governmentshapeid AS id,
@@ -406,7 +406,7 @@ class GovernmentShapeModel extends BaseModel
             extra.governmentslug(governmentshape.governmentmunicipality) AS municipality,
             extra.governmentlong(governmentshape.governmentmunicipality) AS municipalitylong,
             extra.governmentslug(governmentshape.governmentcounty) AS county,
-            extra.governmentshort(governmentshape.governmentcounty, '') AS countyshort,
+            extra.governmentshort(governmentshape.governmentcounty) AS countyshort,
             st_asgeojson(governmentshape.governmentshapegeometry) AS geometry,
             CASE
                 WHEN NOT (ARRAY[governmentshape.governmentcounty, governmentshape.governmentmunicipality, governmentshape.governmentshapeplsstownship, governmentshape.governmentschooldistrict, governmentshape.governmentsubmunicipality, governmentshape.governmentward] && ARRAY[?::integer]) AND governmentshapeevent.governmentshapeid IS NOT NULL AND governmentshapeevent.eventstatus = 'proposed' THEN 1
