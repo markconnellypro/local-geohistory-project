@@ -33,7 +33,7 @@ class ResearchLogModel extends BaseModel
                     WHEN ? THEN researchlog.researchlognotes
                     ELSE ''
                 END AS researchlognotes,
-                extra.governmentlong(researchlog.government, '') AS governmentlong
+                extra.governmentlong(researchlog.government) AS governmentlong
             FROM geohistory.researchlog
             JOIN geohistory.researchlogtype
                 ON researchlog.researchlogtype = researchlogtype.researchlogtypeid

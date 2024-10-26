@@ -23,7 +23,7 @@ class NationalArchivesModel extends BaseModel
                 nationalarchives.nationalarchivesunitto,
                 'https://catalog.archives.gov/id/' || nationalarchives.nationalarchivesunit || '?objectPage=' || nationalarchives.nationalarchivesunitfrom AS url,
                 nationalarchives.nationalarchivesexamined,
-                extra.governmentlong(nationalarchives.government, '') AS governmentlong
+                extra.governmentlong(nationalarchives.government) AS governmentlong
             FROM geohistory.nationalarchives
             JOIN geohistory.source
                 ON nationalarchives.source = source.sourceid
@@ -41,7 +41,7 @@ class NationalArchivesModel extends BaseModel
                 NULL::integer AS nationalarchivesunitto,
                 '' AS url,
                 censusmap.censusmapexamined AS nationalarchivesexamined,
-                extra.governmentlong(censusmap.government, '') AS governmentlong
+                extra.governmentlong(censusmap.government) AS governmentlong
             FROM geohistory.censusmap
             JOIN geohistory.source
                 ON source.sourceshort = 'Cns.Mp.'

@@ -16,7 +16,7 @@ class AffectedGovernmentGroupModel extends BaseModel
     {
         $query = <<<QUERY
             SELECT DISTINCT extra.governmentslug(affectedgovernmentpart.governmentto) AS governmentslug,
-                extra.governmentlong(affectedgovernmentpart.governmentto, '') AS governmentlong,
+                extra.governmentlong(affectedgovernmentpart.governmentto) AS governmentlong,
                 extra.governmentformlong(affectedgovernmentpart.governmentformto, ?) governmentformlong
             FROM geohistory.affectedgovernmentgroup
             JOIN geohistory.affectedgovernmentgrouppart
@@ -77,10 +77,10 @@ class AffectedGovernmentGroupModel extends BaseModel
                 affectedgovernmentlevel.affectedgovernmentleveldisplayorder AS affectedgovernmentleveldisplayorder,
                 affectedgovernmentlevel.affectedgovernmentlevelgroup = 4 AS includelink,
                 COALESCE(extra.governmentslug(affectedgovernmentpart.governmentfrom), '') AS governmentfrom,
-                COALESCE(extra.governmentlong(affectedgovernmentpart.governmentfrom, ''), '') AS governmentfromlong,
+                COALESCE(extra.governmentlong(affectedgovernmentpart.governmentfrom), '') AS governmentfromlong,
                 COALESCE(extra.affectedtypeshort(affectedgovernmentpart.affectedtypefrom), '') AS affectedtypefrom,
                 COALESCE(extra.governmentslug(affectedgovernmentpart.governmentto), '') AS governmentto,
-                COALESCE(extra.governmentlong(affectedgovernmentpart.governmentto, ''), '') AS governmenttolong,
+                COALESCE(extra.governmentlong(affectedgovernmentpart.governmentto), '') AS governmenttolong,
                 COALESCE(extra.affectedtypeshort(affectedgovernmentpart.affectedtypeto), '') AS affectedtypeto
             FROM geohistory.affectedgovernmentgroup
             JOIN geohistory.affectedgovernmentgrouppart
@@ -121,7 +121,7 @@ class AffectedGovernmentGroupModel extends BaseModel
                 event.eventeffectivetext AS eventeffective,
                 event.eventeffective AS eventeffectivesort,
                 NOT eventgranted.eventgrantedcertainty AS eventreconstructed,
-                extra.governmentlong(affectedgovernmentpart.governmentto, '') AS governmentaffectedlong
+                extra.governmentlong(affectedgovernmentpart.governmentto) AS governmentaffectedlong
             FROM geohistory.event
             JOIN geohistory.eventgranted
                 ON event.eventgranted = eventgranted.eventgrantedid
@@ -165,7 +165,7 @@ class AffectedGovernmentGroupModel extends BaseModel
                     WHEN affectedgovernment.affectedtypesamewithin THEN ' (Within)'
                     ELSE ''
                 END AS affectedtypesame,
-                extra.governmentlong(affectedgovernment.government, '') AS governmentlong,
+                extra.governmentlong(affectedgovernment.government) AS governmentlong,
                 CASE
                     WHEN affectedgovernment.government = ANY (extra.governmentsubstitutedcache(?)) THEN ''
                     ELSE extra.governmentslug(affectedgovernment.government)
@@ -178,7 +178,7 @@ class AffectedGovernmentGroupModel extends BaseModel
                 event.eventeffectivetext AS eventeffective,
                 event.eventeffective AS eventeffectivesort,
                 NOT eventgranted.eventgrantedcertainty AS eventreconstructed,
-                extra.governmentlong(affectedgovernment.governmentaffected, '') AS governmentaffectedlong
+                extra.governmentlong(affectedgovernment.governmentaffected) AS governmentaffectedlong
             FROM (
                 -- To-From
                     SELECT DISTINCT affectedgovernmentgroup.event,
@@ -323,7 +323,7 @@ class AffectedGovernmentGroupModel extends BaseModel
                 SELECT event.eventid,
                 event.eventslug,
                 extra.governmentslug(affectedgovernment_reconstructed.municipalityfrom) AS municipalityfrom,
-                extra.governmentlong(affectedgovernment_reconstructed.municipalityfrom, '') AS municipalityfromlong,
+                extra.governmentlong(affectedgovernment_reconstructed.municipalityfrom) AS municipalityfromlong,
                 extra.affectedtypeshort(affectedgovernment_reconstructed.affectedtypemunicipalityfrom) AS affectedtypemunicipalityfrom,
                 extra.governmentslug(affectedgovernment_reconstructed.countyfrom) AS countyfrom,
                 extra.governmentshort(affectedgovernment_reconstructed.countyfrom, '') AS countyfromshort,
@@ -332,7 +332,7 @@ class AffectedGovernmentGroupModel extends BaseModel
                 extra.governmentabbreviation(affectedgovernment_reconstructed.statefrom) AS statefromabbreviation,
                 extra.affectedtypeshort(affectedgovernment_reconstructed.affectedtypestatefrom) AS affectedtypestatefrom,
                 extra.governmentslug(affectedgovernment_reconstructed.municipalityto) AS municipalityto,
-                extra.governmentlong(affectedgovernment_reconstructed.municipalityto, '') AS municipalitytolong,
+                extra.governmentlong(affectedgovernment_reconstructed.municipalityto) AS municipalitytolong,
                 extra.affectedtypeshort(affectedgovernment_reconstructed.affectedtypemunicipalityto) AS affectedtypemunicipalityto,
                 extra.governmentslug(affectedgovernment_reconstructed.countyto) AS countyto,
                 extra.governmentshort(affectedgovernment_reconstructed.countyto, '') AS countytoshort,
@@ -345,10 +345,10 @@ class AffectedGovernmentGroupModel extends BaseModel
                     OR affectedgovernment_reconstructed.subcountyfrom IS NOT NULL
                     OR affectedgovernment_reconstructed.subcountyto IS NOT NULL THEN TRUE ELSE FALSE END AS textflag,
                 COALESCE(extra.governmentslug(affectedgovernment_reconstructed.submunicipalityfrom), '') AS submunicipalityfrom,
-                COALESCE(extra.governmentlong(affectedgovernment_reconstructed.submunicipalityfrom, ''), '') AS submunicipalityfromlong,
+                COALESCE(extra.governmentlong(affectedgovernment_reconstructed.submunicipalityfrom), '') AS submunicipalityfromlong,
                 COALESCE(extra.affectedtypeshort(affectedgovernment_reconstructed.affectedtypesubmunicipalityfrom), '') AS affectedtypesubmunicipalityfrom,
                 COALESCE(extra.governmentslug(affectedgovernment_reconstructed.submunicipalityto), '') AS submunicipalityto,
-                COALESCE(extra.governmentlong(affectedgovernment_reconstructed.submunicipalityto, ''), '') AS submunicipalitytolong,
+                COALESCE(extra.governmentlong(affectedgovernment_reconstructed.submunicipalityto), '') AS submunicipalitytolong,
                 COALESCE(extra.affectedtypeshort(affectedgovernment_reconstructed.affectedtypesubmunicipalityto), '') AS affectedtypesubmunicipalityto,
                 COALESCE(extra.governmentslug(affectedgovernment_reconstructed.subcountyfrom), '') AS subcountyfrom,
                 COALESCE(extra.governmentshort(affectedgovernment_reconstructed.subcountyfrom, ''), '') AS subcountyfromshort,
@@ -375,9 +375,9 @@ class AffectedGovernmentGroupModel extends BaseModel
                 -- Taken from GovernmentShapeModel->getDetail
                 SELECT DISTINCT governmentshape.governmentshapeid,
                     COALESCE(extra.governmentslug(governmentshape.governmentsubmunicipality), '') AS governmentsubmunicipality,
-                    COALESCE(extra.governmentlong(governmentshape.governmentsubmunicipality, ''), '') AS governmentsubmunicipalitylong,
+                    COALESCE(extra.governmentlong(governmentshape.governmentsubmunicipality), '') AS governmentsubmunicipalitylong,
                     extra.governmentslug(governmentshape.governmentmunicipality) AS governmentmunicipality,
-                    extra.governmentlong(governmentshape.governmentmunicipality, '') AS governmentmunicipalitylong,
+                    extra.governmentlong(governmentshape.governmentmunicipality) AS governmentmunicipalitylong,
                     extra.governmentslug(governmentshape.governmentcounty) AS governmentcounty,
                     extra.governmentshort(governmentshape.governmentcounty, '') AS governmentcountyshort,
                     extra.governmentslug(governmentshape.governmentstate) AS governmentstate,

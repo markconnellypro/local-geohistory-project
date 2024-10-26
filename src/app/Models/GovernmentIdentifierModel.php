@@ -48,7 +48,7 @@ class GovernmentIdentifierModel extends BaseModel
                 governmentidentifier.governmentidentifierprefix || governmentidentifiertype.governmentidentifiertypeprefixdelimiter || governmentidentifier.governmentidentifier AS governmentidentifier,
                 governmentidentifier.governmentidentifierstatus,
                 replace(replace(governmentidentifiertype.governmentidentifiertypeurl, '<Identifier>', governmentidentifier.governmentidentifierprefix || governmentidentifiertype.governmentidentifiertypeprefixdelimiter || governmentidentifier.governmentidentifier), '<Language>', ?) AS governmentidentifiertypeurl,
-                extra.governmentlong(governmentidentifier.government, '') AS governmentlong
+                extra.governmentlong(governmentidentifier.government) AS governmentlong
             FROM geohistory.governmentidentifier
                 JOIN geohistory.governmentidentifiertype
                 ON governmentidentifier.governmentidentifiertype = governmentidentifiertype.governmentidentifiertypeid

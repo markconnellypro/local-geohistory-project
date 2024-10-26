@@ -26,7 +26,7 @@ class GovernmentModel extends BaseModel
 
         $query = <<<QUERY
             SELECT government.governmentid,
-                extra.governmentlong(government.governmentid, '') AS governmentlong,
+                extra.governmentlong(government.governmentid) AS governmentlong,
                     CASE
                         WHEN government.governmentcurrentform IS NULL THEN government.governmenttype
                         ELSE governmentform.governmentformlongextended
@@ -48,7 +48,7 @@ class GovernmentModel extends BaseModel
                         WHEN governmentchangecountcache.creation = 1
                             AND array_length(governmentchangecountcache.creationas, 1) = 1
                             AND government.governmentid <> governmentchangecountcache.creationas[1]
-                            THEN extra.governmentlong(governmentchangecountcache.creationas[1], '')
+                            THEN extra.governmentlong(governmentchangecountcache.creationas[1])
                         ELSE ''
                     END AS governmentcreationlong,
                 governmentchangecountcache.altertotal AS governmentaltercount,
@@ -140,7 +140,7 @@ class GovernmentModel extends BaseModel
     {
         $query = <<<QUERY
             SELECT extra.governmentslug(governmentidentifier.government) governmentslug,
-                extra.governmentlong(governmentidentifier.government, '--') AS governmentlong,
+                extra.governmentlong(governmentidentifier.government) AS governmentlong,
                 governmentidentifier.governmentidentifierstatus AS governmentparentstatus
             FROM geohistory.governmentidentifier
             WHERE governmentidentifier.governmentidentifierid = ANY (?);
@@ -551,7 +551,7 @@ class GovernmentModel extends BaseModel
                         ELSE government.governmentid
                     END) AS governmentslug,
                 'government' AS governmentslugtype,
-                extra.governmentlong(governmentparentcache.governmentparent, '') AS governmentlong,
+                extra.governmentlong(governmentparentcache.governmentparent) AS governmentlong,
                 'Parent' AS governmentrelationship,
                     CASE
                         WHEN government.governmentstatus = ANY (ARRAY['alternate', 'language']) THEN 'variant'
@@ -580,7 +580,7 @@ class GovernmentModel extends BaseModel
                         ELSE government.governmentid
                     END) AS governmentslug,
                 'government' AS governmentslugtype,
-                extra.governmentlong(governmentparentcache.governmentid, '') AS governmentlong,
+                extra.governmentlong(governmentparentcache.governmentid) AS governmentlong,
                 'Child' AS governmentrelationship,
                     CASE
                         WHEN government.governmentstatus = ANY (ARRAY['alternate', 'language']) THEN 'variant'
@@ -611,7 +611,7 @@ class GovernmentModel extends BaseModel
                 UNION
                 SELECT DISTINCT event.eventslug AS governmentslug,
                 'event' AS governmentslugtype,
-                extra.governmentlong(government.governmentid, '') AS governmentlong,
+                extra.governmentlong(government.governmentid) AS governmentlong,
                     CASE
                         WHEN government.governmentstatus = ANY (ARRAY['alternate', 'language']) THEN 'Variant'
                         ELSE 'Historic'
@@ -724,7 +724,7 @@ class GovernmentModel extends BaseModel
                     WHEN government.governmentstatus IN ('alternate', 'language') THEN government.governmentsubstitute
                     ELSE government.governmentid
                 END) AS governmentslug,
-                extra.governmentlong(government.governmentid, '') AS governmentlong
+                extra.governmentlong(government.governmentid) AS governmentlong
                 FROM selectedgovernment
                 JOIN extra.governmentrelationcache
                 ON selectedgovernment.governmentid = governmentrelationcache.governmentid 
@@ -737,7 +737,7 @@ class GovernmentModel extends BaseModel
                     WHEN government.governmentstatus IN ('alternate', 'language') THEN government.governmentsubstitute
                     ELSE government.governmentid
                 END) AS governmentslug,
-                extra.governmentlong(government.governmentid, '') AS governmentlong
+                extra.governmentlong(government.governmentid) AS governmentlong
                 FROM selectedgovernment
                 JOIN extra.governmentrelationcache
                 ON selectedgovernment.governmentid = governmentrelationcache.governmentrelation

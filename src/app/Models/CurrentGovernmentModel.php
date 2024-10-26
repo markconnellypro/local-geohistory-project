@@ -17,9 +17,9 @@ class CurrentGovernmentModel extends BaseModel
     {
         $query = <<<QUERY
             SELECT COALESCE(extra.governmentslug(currentgovernment.governmentsubmunicipality), '') AS governmentsubmunicipality,
-                COALESCE(extra.governmentlong(currentgovernment.governmentsubmunicipality, ''), '') AS governmentsubmunicipalitylong,
+                COALESCE(extra.governmentlong(currentgovernment.governmentsubmunicipality), '') AS governmentsubmunicipalitylong,
                 extra.governmentslug(currentgovernment.governmentmunicipality) AS governmentmunicipality,
-                extra.governmentlong(currentgovernment.governmentmunicipality, '') AS governmentmunicipalitylong,
+                extra.governmentlong(currentgovernment.governmentmunicipality) AS governmentmunicipalitylong,
                 extra.governmentslug(currentgovernment.governmentcounty) AS governmentcounty,
                 extra.governmentshort(currentgovernment.governmentcounty, '') AS governmentcountyshort,
                 extra.governmentslug(currentgovernment.governmentstate) AS governmentstate,
