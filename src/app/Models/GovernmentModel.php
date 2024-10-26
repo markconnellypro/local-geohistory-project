@@ -512,7 +512,7 @@ class GovernmentModel extends BaseModel
             JOIN geohistory.government
                 ON governmentrelationcache.governmentrelation = government.governmentid
                 AND government.governmentstatus <> 'placeholder'
-                AND government.governmentlevel > 1
+                AND government.governmentlevel > 2
                 AND government.governmentlevel < governmentrelationcache.governmentlevel
             ORDER BY 1
         QUERY;
