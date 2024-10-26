@@ -380,7 +380,7 @@ class GovernmentShapeModel extends BaseModel
                         'eventdatetext', governmentshapeeventparts.eventdatetext,
                         'eventtextsortdate', governmentshapeeventparts.eventtextsortdate,
                         'eventgovernmentlong', CASE
-                            WHEN governmentshapeeventearliest.mineventsort = governmentshapeeventparts.eventsort OR governmentshapeeventparts.eventstatus = 'name' THEN extra.governmentlong(governmentshapeeventparts.governmentto, '')
+                            WHEN governmentshapeeventearliest.mineventsort = governmentshapeeventparts.eventsort OR governmentshapeeventparts.eventstatus = 'name' THEN extra.governmentlong(governmentshapeeventparts.governmentto)
                             ELSE NULL
                         END)) AS eventjson
                     FROM governmentshapeeventparts,
