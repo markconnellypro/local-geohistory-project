@@ -14,7 +14,6 @@ class GovernmentModel extends BaseModel
     // FUNCTION: extra.governmentsubstitutedcache
     // VIEW: extra.giscache
     // VIEW: extra.governmentchangecountcache
-    // VIEW: extra.governmentextracache
     // VIEW: extra.governmenthasmappedeventcache
     // VIEW: extra.governmentsubstitutecache
 
@@ -61,11 +60,12 @@ class GovernmentModel extends BaseModel
                 government.governmentmapstatus,
                 governmentmapstatus.governmentmapstatustimelapse,
                 governmentsubstitutecache.governmentsubstitutemultiple,
-                governmentextracache.governmentsubstituteslug,
+                CASE
+                    WHEN government.governmentslug <> government.governmentslugsubstitute THEN government.governmentslugsubstitute
+                    ELSE NULL
+                END AS governmentslugsubstitute, 
                 government.governmentcurrentleadstate
             FROM geohistory.government
-            JOIN extra.governmentextracache
-                ON government.governmentid = governmentextracache.governmentid
             JOIN geohistory.governmentmapstatus
                 ON government.governmentmapstatus = governmentmapstatus.governmentmapstatusid
             JOIN extra.governmentsubstitutecache
@@ -748,7 +748,6 @@ class GovernmentModel extends BaseModel
 
     // FUNCTION: extra.governmentlong
     // FUNCTION: extra.governmentslug
-    // VIEW: extra.governmentextracache
     // VIEW: extra.governmentrelationcache
 
     public function getSearchByGovernment(array $parameters): array
@@ -765,9 +764,9 @@ class GovernmentModel extends BaseModel
                 JOIN extra.governmentrelationcache lookupgovernment
                     ON governmentrelationcache.governmentid = lookupgovernment.governmentid
                     AND lookupgovernment.governmentid <> lookupgovernment.governmentrelation
-                JOIN extra.governmentextracache governmentparentextracache
-                    ON lookupgovernment.governmentrelation = governmentparentextracache.governmentid
-                    AND (? = ''::text OR governmentparentextracache.governmentshort = ?)
+                JOIN geohistory.government governmentparent
+                    ON lookupgovernment.governmentrelation = governmentparent.governmentid
+                    AND (? = ''::text OR governmentparent.governmentshort = ?)
                 WHERE (
                     governmentrelationcache.governmentshort ILIKE ?
                     OR (? = 'statewide' AND governmentrelationcache.governmentlevel = 2)
@@ -825,17 +824,12 @@ class GovernmentModel extends BaseModel
     // extra.governmentslug(integer)
     // NOT REMOVED
 
-    // VIEW: extra.governmentextracache
-
     public function getSlug(int $id): string
     {
         $query = <<<QUERY
-            SELECT CASE
-                WHEN governmentextracache.governmentsubstituteslug IS NULL THEN governmentextracache.governmentslug
-                ELSE governmentextracache.governmentsubstituteslug
-            END AS id
-            FROM extra.governmentextracache
-            WHERE governmentextracache.governmentid = ?
+            SELECT geohistory.governmentslugsubstitute AS id
+            FROM geohistory.government
+            WHERE government.governmentid = ?
         QUERY;
 
         $query = $this->db->query($query, [
@@ -856,14 +850,12 @@ class GovernmentModel extends BaseModel
     // extra.governmentslugid(text)
     // NOT REMOVED
 
-    // VIEW: extra.governmentextracache
-
     protected function getSlugId(string $id): int
     {
         $query = <<<QUERY
-            SELECT governmentextracache.governmentid AS id
-                FROM extra.governmentextracache
-            WHERE governmentextracache.governmentslug = ?
+            SELECT government.governmentid AS id
+                FROM geohistory.government
+            WHERE government.governmentslug = ?
         QUERY;
 
         $query = $this->db->query($query, [

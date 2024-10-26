@@ -649,7 +649,6 @@ class EventModel extends BaseModel
     // extra.ci_model_search_event_government(text, text, text, text, integer, integer)
 
     // VIEW: extra.eventgovernmentcache
-    // VIEW: extra.governmentextracache
     // VIEW: extra.governmentrelationcache
 
     public function getSearchByGovernment(array $parameters): array
@@ -687,15 +686,15 @@ class EventModel extends BaseModel
                     AND NOT eventgranted.eventgrantedplaceholder
                 JOIN geohistory.eventtype
                     ON event.eventtype = eventtype.eventtypeid  
-                JOIN extra.governmentextracache
-                    ON alternategovernment.governmentid = governmentextracache.governmentid
-                    AND NOT governmentextracache.governmentisplaceholder
+                JOIN geohistory.government
+                    ON alternategovernment.governmentid = government.governmentid
+                    AND government.governmentstatus <> 'placeholder'
                 JOIN extra.governmentrelationcache lookupgovernment
                     ON alternategovernment.governmentid = lookupgovernment.governmentid
                     AND lookupgovernment.governmentid <> lookupgovernment.governmentrelation
-                JOIN extra.governmentextracache governmentparentextracache
-                    ON lookupgovernment.governmentrelation = governmentparentextracache.governmentid
-                    AND (? = ''::text OR governmentparentextracache.governmentshort ILIKE ?)
+                JOIN geohistory.government governmentparent
+                    ON lookupgovernment.governmentrelation = governmentparent.governmentid
+                    AND (? = ''::text OR governmentparent.governmentshort ILIKE ?)
                 WHERE (? = ''::text 
                     OR ? = 'Any Type'::text
                     OR (? = 'Only Border Changes'::text AND eventtype.eventtypeborders ~~ 'yes%')

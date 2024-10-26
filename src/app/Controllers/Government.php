@@ -51,9 +51,9 @@ class Government extends BaseController
         $query = $GovernmentModel->getDetail($id);
         if (count($query) !== 1 || $query[0]->governmentlevel === 'placeholder') {
             $this->noRecord();
-        } elseif (!is_null($query[0]->governmentsubstituteslug)) {
+        } elseif (!is_null($query[0]->governmentslugsubstitute)) {
             header("HTTP/1.1 301 Moved Permanently");
-            header("Location: /" . $this->request->getLocale() . "/government/" . $query[0]->governmentsubstituteslug . "/");
+            header("Location: /" . $this->request->getLocale() . "/government/" . $query[0]->governmentslugsubstitute . "/");
             exit();
         } else {
             $id = $query[0]->governmentid;
