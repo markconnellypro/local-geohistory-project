@@ -192,7 +192,7 @@ echo view('search/submit', ['type' => 'dateEvent']);
                         return callback();
                     }
                     $.ajax({
-                        url: '/<?= \Config\Services::request()->getLocale() ?>/lookup/government/' + query.toLowerCase() + '/',
+                        url: '/<?= \Config\Services::request()->getLocale() ?>/lookup/government/' + query.toLowerCase().replace(/[^a-z0-9]/g, '') + '/',
                         dataType: 'json',
                         success: function(results) {
                             callback(results);
@@ -210,7 +210,7 @@ echo view('search/submit', ['type' => 'dateEvent']);
                     select_governmentparent[i].load(function(callback) {
                         xhr && xhr.abort();
                         xhr = $.ajax({
-                            url: '/<?= \Config\Services::request()->getLocale() ?>/lookup/government-parent/' + encodeURIComponent(value.toLowerCase()) + '/',
+                            url: '/<?= \Config\Services::request()->getLocale() ?>/lookup/government-parent/' + encodeURIComponent(value.toLowerCase().replace(/[^a-z0-9]/g, '')) + '/',
                             dataType: 'json',
                             success: function(results) {
                                 callback(results);

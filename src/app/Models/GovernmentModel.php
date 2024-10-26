@@ -457,7 +457,7 @@ class GovernmentModel extends BaseModel
         }
 
         $query = <<<QUERY
-            SELECT DISTINCT government.governmentshortsearch AS governmentshort,
+            SELECT DISTINCT government.governmentshort,
                 government.governmentsearch
             FROM geohistory.government
             WHERE government.governmentstatus <> 'placeholder'
@@ -480,7 +480,7 @@ class GovernmentModel extends BaseModel
         }
 
         $query = <<<QUERY
-            SELECT DISTINCT government.governmentshortsearch AS governmentshort,
+            SELECT DISTINCT government.governmentshort,
                 government.governmentsearch
             FROM geohistory.government
             WHERE government.governmentstatus = ''
@@ -503,7 +503,7 @@ class GovernmentModel extends BaseModel
     public function getLookupByGovernmentParent(string $government): array
     {
         $query = <<<QUERY
-            SELECT DISTINCT government.governmentshortsearch AS governmentshort,
+            SELECT DISTINCT government.governmentshort,
                 government.governmentsearch
             FROM geohistory.government lookupgovernment
             JOIN extra.governmentrelationcache
