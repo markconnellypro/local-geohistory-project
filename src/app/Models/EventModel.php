@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\BaseModel;
+use App\Models\GovernmentModel;
 
 class EventModel extends BaseModel
 {
@@ -154,6 +155,106 @@ class EventModel extends BaseModel
         ]);
 
         return $this->getObject($query);
+    }
+
+    // replace extra.eventgovernment(cache)
+
+    public function getIdByGovernment(string $government, string $parent = ''): string
+    {
+        $GovernmentModel = new GovernmentModel();
+        if ($parent === '') {
+            $government = $GovernmentModel->getFromShortByGovernment($government);
+        } else {
+            $government = $GovernmentModel->getFromShortByGovernmentParent($government, $parent);
+        }
+
+        $query = <<<QUERY
+            WITH governments AS (
+                SELECT governmentid
+                FROM geohistory.government
+                WHERE governmentid = ANY (?)
+            )
+            SELECT DISTINCT affectedgovernmentgroup.event AS eventid
+            FROM geohistory.affectedgovernmentgroup
+            JOIN geohistory.affectedgovernmentgrouppart
+                ON affectedgovernmentgroup.affectedgovernmentgroupid = affectedgovernmentgrouppart.affectedgovernmentgroup
+            JOIN geohistory.affectedgovernmentpart
+                ON affectedgovernmentgrouppart.affectedgovernmentpart = affectedgovernmentpart.affectedgovernmentpartid
+            JOIN governments
+                ON (
+                    COALESCE(affectedgovernmentpart.governmentfrom, -1) = governments.governmentid
+                    OR COALESCE(affectedgovernmentpart.governmentto, -1) = governments.governmentid
+                )
+            UNION
+            SELECT DISTINCT currentgovernment.event AS eventid
+            FROM geohistory.currentgovernment
+            JOIN governments
+                ON (
+                    COALESCE(currentgovernment.governmentsubmunicipality, -1) = governments.governmentid
+                    OR currentgovernment.governmentmunicipality = governments.governmentid
+                    OR currentgovernment.governmentcounty = governments.governmentid
+                    OR currentgovernment.governmentstate = governments.governmentid
+                )
+            UNION
+            SELECT DISTINCT event.eventid
+            FROM geohistory.event
+            JOIN governments
+                ON event.government = governments.governmentid
+            UNION
+            SELECT DISTINCT governmentsourceevent.event AS eventid
+            FROM geohistory.governmentsourceevent
+            JOIN geohistory.governmentsource
+                ON governmentsourceevent.governmentsource = governmentsource.governmentsourceid
+            JOIN governments
+                ON governmentsource.government = governments.governmentid
+            UNION
+            SELECT DISTINCT affectedgovernmentgroup.event AS eventid
+            FROM geohistory.affectedgovernmentgroup
+            JOIN gis.affectedgovernmentgis
+                ON affectedgovernmentgroup.affectedgovernmentgroupid = affectedgovernmentgis.affectedgovernment
+            JOIN gis.governmentshape
+                ON affectedgovernmentgis.governmentshape = governmentshape.governmentshapeid
+            JOIN governments
+                ON (
+                    COALESCE(governmentshape.governmentschooldistrict, -1) = governments.governmentid
+                    OR COALESCE(governmentshape.governmentshapeplsstownship, -1) = governments.governmentid
+                    OR COALESCE(governmentshape.governmentsubmunicipality, -1) = governments.governmentid
+                    OR COALESCE(governmentshape.governmentward, -1) = governments.governmentid
+                    OR governmentshape.governmentmunicipality = governments.governmentid
+                    OR governmentshape.governmentcounty = governments.governmentid
+                    OR governmentshape.governmentstate = governments.governmentid
+                )
+            UNION
+            SELECT DISTINCT metesdescription.event AS eventid
+            FROM geohistory.metesdescription
+            JOIN gis.metesdescriptiongis
+                ON metesdescription.metesdescriptionid = metesdescriptiongis.metesdescription
+            JOIN gis.governmentshape
+                ON metesdescriptiongis.governmentshape = governmentshape.governmentshapeid
+            JOIN governments
+                ON (
+                    COALESCE(governmentshape.governmentschooldistrict, -1) = governments.governmentid
+                    OR COALESCE(governmentshape.governmentshapeplsstownship, -1) = governments.governmentid
+                    OR COALESCE(governmentshape.governmentsubmunicipality, -1) = governments.governmentid
+                    OR COALESCE(governmentshape.governmentward, -1) = governments.governmentid
+                    OR governmentshape.governmentmunicipality = governments.governmentid
+                    OR governmentshape.governmentcounty = governments.governmentid
+                    OR governmentshape.governmentstate = governments.governmentid
+                )
+        QUERY;
+
+        $query = $this->db->query($query, [
+            $government,
+        ]);
+
+        $result = [];
+
+        $query = $this->getObject($query);
+        foreach ($query as $row) {
+            $result[] = $row->eventid;
+        }
+
+        return '{' . implode(',', $result) . '}';
     }
 
     // extra.ci_model_government_event_failure(integer, integer[])
@@ -655,20 +756,14 @@ class EventModel extends BaseModel
     {
         $government = $parameters[0];
         $parent = $parameters[1];
+        $events = $this->getIdByGovernment($government, $parent);
         $eventType = $parameters[2];
         $year = $parameters[3];
         $plusMinus = $parameters[4];
 
+        // Get event
+
         $query = <<<QUERY
-            WITH alternategovernment AS (
-                SELECT DISTINCT alternategovernment.governmentrelation AS governmentid
-                FROM extra.governmentrelationcache
-                JOIN extra.governmentrelationcache alternategovernment
-                    ON governmentrelationcache.governmentid = alternategovernment.governmentid
-                    AND alternategovernment.governmentlevel = alternategovernment.governmentrelationlevel
-                    AND governmentrelationcache.governmentlevel > 2
-                    AND governmentrelationcache.governmentshort ILIKE ?
-            )
             SELECT DISTINCT event.eventslug,
                 eventtype.eventtypeshort,
                 event.eventlong,
@@ -676,26 +771,14 @@ class EventModel extends BaseModel
                 eventgranted.eventgrantedshort AS eventgranted,
                 event.eventeffectivetext AS eventeffective,
                 event.eventsort
-                FROM alternategovernment
-                JOIN extra.eventgovernmentcache      
-                    ON alternategovernment.governmentid = eventgovernmentcache.government
-                JOIN geohistory.event
-                    ON eventgovernmentcache.eventid = event.eventid
+                FROM geohistory.event
                 JOIN geohistory.eventgranted
                     ON event.eventgranted = eventgranted.eventgrantedid
                     AND NOT eventgranted.eventgrantedplaceholder
                 JOIN geohistory.eventtype
                     ON event.eventtype = eventtype.eventtypeid  
-                JOIN geohistory.government
-                    ON alternategovernment.governmentid = government.governmentid
-                    AND government.governmentstatus <> 'placeholder'
-                JOIN extra.governmentrelationcache lookupgovernment
-                    ON alternategovernment.governmentid = lookupgovernment.governmentid
-                    AND lookupgovernment.governmentid <> lookupgovernment.governmentrelation
-                JOIN geohistory.government governmentparent
-                    ON lookupgovernment.governmentrelation = governmentparent.governmentid
-                    AND (? = ''::text OR governmentparent.governmentshort ILIKE ?)
-                WHERE (? = ''::text 
+                WHERE event.eventid = ANY (?)
+                AND (? = ''::text 
                     OR ? = 'Any Type'::text
                     OR (? = 'Only Border Changes'::text AND eventtype.eventtypeborders ~~ 'yes%')
                     OR eventtype.eventtypeshort = ?)
@@ -707,9 +790,7 @@ class EventModel extends BaseModel
         QUERY;
 
         $query = $this->db->query($query, [
-            $government,
-            $parent,
-            $parent,
+            $events,
             $eventType,
             $eventType,
             $eventType,
