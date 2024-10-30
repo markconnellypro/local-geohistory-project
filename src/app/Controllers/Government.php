@@ -58,6 +58,7 @@ class Government extends BaseController
         } else {
             $id = $query[0]->governmentid;
             $isMultiple = ($query[0]->governmentsubstitutemultiple === 't');
+            $allId = $GovernmentModel->getIdByGovernment($id);
             echo view('core/header', ['title' => $this->title, 'pageTitle' => $query[0]->governmentlong]);
             $isMunicipalityOrLower = ($query[0]->governmentlevel === 'municipality or lower');
             $isCountyOrLower = ($query[0]->governmentlevel === 'municipality or lower' || $query[0]->governmentlevel === 'county');
@@ -103,11 +104,18 @@ class Government extends BaseController
             $events = array_unique($events);
             $EventModel = new EventModel();
             if (!$isHistory) {
-                if ($isCountyOrLower) {
-                    echo view('event/table', ['query' => $EventModel->getByGovernmentSuccess($id, $events), 'title' => 'Other Successful Event Links', 'tableId' => 'successfulevent']);
-                }
                 $GovernmentSourceModel = new GovernmentSourceModel();
-                echo view('governmentsource/table', ['query' => $GovernmentSourceModel->getByGovernment($id), 'type' => 'government', 'isMultiple' => $isMultiple]);
+                $query = $GovernmentSourceModel->getByGovernment($id);
+                echo view('governmentsource/table', ['query' => $query, 'type' => 'government', 'isMultiple' => $isMultiple]);
+                foreach ($query as $row) {
+                    $row->eventid = explode(',', str_replace(['{', '}'], '', $row->eventid));
+                    foreach ($row->eventid as $rowRow) {
+                        $events[] = $rowRow;
+                    }
+                }
+                if ($isCountyOrLower) {
+                    echo view('event/table', ['query' => $EventModel->getByGovernmentOther($allId, $events), 'title' => 'Other Event Links', 'tableId' => 'eventother']);
+                }
                 $query = $GovernmentModel->getNote($id);
                 if ($query !== []) {
                     echo view(ENVIRONMENT . '/government/note', ['query' => $query, 'isMultiple' => $isMultiple]);
@@ -125,9 +133,6 @@ class Government extends BaseController
                 echo view('government/researchlog', ['query' => $ResearchLogModel->getByGovernment($id), 'isMultiple' => $isMultiple]);
                 $NationalArchivesModel = new NationalArchivesModel();
                 echo view('government/nationalarchives', ['query' => $NationalArchivesModel->getByGovernment($id), 'isMultiple' => $isMultiple]);
-                if ($isCountyOrLower) {
-                    echo view('event/table', ['query' => $EventModel->getByGovernmentFailure($id, $events), 'title' => 'Other Event Links', 'tableId' => 'otherevent']);
-                }
                 $query = $GovernmentModel->getOffice($id);
                 if ($query !== []) {
                     echo view(ENVIRONMENT . '/government/office', ['query' => $query, 'isMultiple' => $isMultiple]);

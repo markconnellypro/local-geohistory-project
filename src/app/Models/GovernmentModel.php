@@ -448,7 +448,31 @@ class GovernmentModel extends BaseModel
         return $this->getObject($query);
     }
 
+    public function getIdByGovernment(int $government): string
+    {
+        $query = <<<QUERY
+            SELECT DISTINCT government.governmentid
+            FROM geohistory.government lookupgovernment
+            JOIN geohistory.government
+                ON lookupgovernment.governmentslugsubstitute = government.governmentslugsubstitute
+                AND government.governmentstatus <> 'placeholder'
+                AND lookupgovernment.governmentid = ?
+            ORDER BY 1
+        QUERY;
 
+        $query = $this->db->query($query, [
+            $government,
+        ]);
+
+        $result = [];
+
+        $query = $this->getObject($query);
+        foreach ($query as $row) {
+            $result[] = $row->governmentid;
+        }
+
+        return '{' . implode(',', $result) . '}';
+    }
 
     public function getIdByGovernmentShort(string $government): string
     {

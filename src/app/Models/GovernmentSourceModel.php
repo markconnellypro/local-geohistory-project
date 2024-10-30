@@ -194,6 +194,7 @@ class GovernmentSourceModel extends BaseModel
     {
         $query = <<<QUERY
             SELECT DISTINCT array_agg(event.eventslug) AS eventslug,
+                array_agg(event.eventid) AS eventid,
                 governmentsource.governmentsourcetype,
                 governmentsource.governmentsourcenumber,
                     CASE
@@ -259,8 +260,8 @@ class GovernmentSourceModel extends BaseModel
                 ON governmentsource.governmentsourceid = governmentsourceevent.governmentsource
             LEFT JOIN geohistory.event
                 ON governmentsourceevent.event = event.eventid
-            GROUP BY 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18
-            ORDER BY 11
+            GROUP BY 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19
+            ORDER BY 12
         QUERY;
 
         $query = $this->db->query($query, [

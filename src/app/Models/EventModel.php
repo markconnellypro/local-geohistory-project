@@ -158,12 +158,12 @@ class EventModel extends BaseModel
     }
 
     // extra.ci_model_government_event_failure(integer, integer[])
+    // extra.ci_model_government_event_success(integer, integer[])
 
-    // VIEW: extra.eventgovernmentcache
-    // VIEW: extra.governmentsubstitutecache
-
-    public function getByGovernmentFailure(int $id, array $events): array
+    public function getByGovernmentOther(string $allId, array $omitEvents): array
     {
+        $events = $this->getIdByGovernment($allId);
+
         $query = <<<QUERY
             SELECT DISTINCT event.eventslug,
                 eventtype.eventtypeshort,
@@ -175,22 +175,17 @@ class EventModel extends BaseModel
             FROM geohistory.event
             JOIN geohistory.eventgranted
                 ON event.eventgranted = eventgranted.eventgrantedid
-                AND NOT eventgranted.eventgrantedsuccess
                 AND NOT eventgranted.eventgrantedplaceholder
             JOIN geohistory.eventtype
                 ON event.eventtype = eventtype.eventtypeid
-            JOIN extra.eventgovernmentcache
-                ON event.eventid = eventgovernmentcache.eventid
-            JOIN extra.governmentsubstitutecache
-                ON eventgovernmentcache.government = governmentsubstitutecache.governmentid
-            WHERE event.eventid <> ALL (?)
-                AND governmentsubstitutecache.governmentsubstitute = ?
+            WHERE event.eventid = ANY (?)
+                AND event.eventid <> ALL (?)
             ORDER BY event.eventsort, event.eventlong
         QUERY;
 
         $query = $this->db->query($query, [
-            '{' . implode(',', $events) . '}',
-            $id,
+            $events,
+            '{' . implode(',', $omitEvents) . '}',
         ]);
 
         return $this->getObject($query);
@@ -265,44 +260,6 @@ class EventModel extends BaseModel
         QUERY;
 
         $query = $this->db->query($query, [
-            $id,
-        ]);
-
-        return $this->getObject($query);
-    }
-
-    // extra.ci_model_government_event_success(integer, integer[])
-
-    // VIEW: extra.eventgovernmentcache
-    // VIEW: extra.governmentsubstitutecache
-
-    public function getByGovernmentSuccess(int $id, array $events): array
-    {
-        $query = <<<QUERY
-            SELECT DISTINCT event.eventslug,
-                eventtype.eventtypeshort,
-                event.eventlong,
-                event.eventyear,
-                eventgranted.eventgrantedshort AS eventgranted,
-                event.eventeffectivetext AS eventeffective,
-                event.eventsort
-            FROM geohistory.event
-            JOIN geohistory.eventgranted
-                ON event.eventgranted = eventgranted.eventgrantedid
-                AND eventgranted.eventgrantedsuccess   
-            JOIN geohistory.eventtype
-                ON event.eventtype = eventtype.eventtypeid
-            JOIN extra.eventgovernmentcache
-                ON event.eventid = eventgovernmentcache.eventid
-            JOIN extra.governmentsubstitutecache
-                ON eventgovernmentcache.government = governmentsubstitutecache.governmentid
-            WHERE event.eventid <> ALL (?)
-                AND governmentsubstitutecache.governmentsubstitute = ?
-            ORDER BY event.eventsort, event.eventlong;
-        QUERY;
-
-        $query = $this->db->query($query, [
-            '{' . implode(',', $events) . '}',
             $id,
         ]);
 
@@ -649,15 +606,8 @@ class EventModel extends BaseModel
 
     // replace extra.eventgovernment(cache)
 
-    public function getIdByGovernment(string $government, string $parent = ''): string
+    public function getIdByGovernment(string $government): string
     {
-        $GovernmentModel = new GovernmentModel();
-        if ($parent === '') {
-            $government = $GovernmentModel->getIdByGovernmentShort($government);
-        } else {
-            $government = $GovernmentModel->getIdByGovernmentShortParent($government, $parent);
-        }
-
         $query = <<<QUERY
             WITH governments AS (
                 SELECT governmentid
@@ -781,16 +731,25 @@ class EventModel extends BaseModel
         return '{' . implode(',', $result) . '}';
     }
 
-    // extra.ci_model_search_event_government(text, text, text, text, integer, integer)
+    public function getIdByGovernmentShort(string $government, string $parent = ''): string
+    {
+        $GovernmentModel = new GovernmentModel();
+        if ($parent === '') {
+            $government = $GovernmentModel->getIdByGovernmentShort($government);
+        } else {
+            $government = $GovernmentModel->getIdByGovernmentShortParent($government, $parent);
+        }
 
-    // VIEW: extra.eventgovernmentcache
-    // VIEW: extra.governmentrelationcache
+        return $this->getIdByGovernment($government);
+    }
+
+    // extra.ci_model_search_event_government(text, text, text, text, integer, integer)
 
     public function getSearchByGovernment(array $parameters): array
     {
         $government = $parameters[0];
         $parent = $parameters[1];
-        $events = $this->getIdByGovernment($government, $parent);
+        $events = $this->getIdByGovernmentShort($government, $parent);
         $eventType = $parameters[2];
         $year = $parameters[3];
         $plusMinus = $parameters[4];
