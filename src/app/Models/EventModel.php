@@ -174,6 +174,28 @@ class EventModel extends BaseModel
                 FROM geohistory.government
                 WHERE governmentid = ANY (?)
             )
+            SELECT DISTINCT adjudicationevent.event AS eventid
+            FROM geohistory.adjudicationevent
+            JOIN geohistory.adjudicationlocation
+                ON adjudicationevent.adjudication = adjudicationlocation.adjudication
+            JOIN geohistory.adjudicationlocationtype
+                ON adjudicationlocation.adjudicationlocationtype = adjudicationlocationtype.adjudicationlocationtypeid
+            JOIN geohistory.tribunal
+                ON adjudicationlocationtype.tribunal = tribunal.tribunalid
+            JOIN governments
+                ON tribunal.government = governments.governmentid
+            UNION
+            SELECT DISTINCT adjudicationevent.event AS eventid
+            FROM geohistory.adjudicationevent
+            JOIN geohistory.adjudication
+                ON adjudicationevent.adjudication = adjudication.adjudicationid
+            JOIN geohistory.adjudicationtype
+                ON adjudication.adjudicationtype = adjudicationtype.adjudicationtypeid
+            JOIN geohistory.tribunal
+                ON adjudicationtype.tribunal = tribunal.tribunalid
+            JOIN governments
+                ON tribunal.government = governments.governmentid
+            UNION
             SELECT DISTINCT affectedgovernmentgroup.event AS eventid
             FROM geohistory.affectedgovernmentgroup
             JOIN geohistory.affectedgovernmentgrouppart
@@ -184,6 +206,23 @@ class EventModel extends BaseModel
                 ON (
                     COALESCE(affectedgovernmentpart.governmentfrom, -1) = governments.governmentid
                     OR COALESCE(affectedgovernmentpart.governmentto, -1) = governments.governmentid
+                )
+            UNION
+            SELECT DISTINCT affectedgovernmentgroup.event AS eventid
+            FROM geohistory.affectedgovernmentgroup
+            JOIN gis.affectedgovernmentgis
+                ON affectedgovernmentgroup.affectedgovernmentgroupid = affectedgovernmentgis.affectedgovernment
+            JOIN gis.governmentshape
+                ON affectedgovernmentgis.governmentshape = governmentshape.governmentshapeid
+            JOIN governments
+                ON (
+                    COALESCE(governmentshape.governmentschooldistrict, -1) = governments.governmentid
+                    OR COALESCE(governmentshape.governmentshapeplsstownship, -1) = governments.governmentid
+                    OR COALESCE(governmentshape.governmentsubmunicipality, -1) = governments.governmentid
+                    OR COALESCE(governmentshape.governmentward, -1) = governments.governmentid
+                    OR governmentshape.governmentmunicipality = governments.governmentid
+                    OR governmentshape.governmentcounty = governments.governmentid
+                    OR governmentshape.governmentstate = governments.governmentid
                 )
             UNION
             SELECT DISTINCT currentgovernment.event AS eventid
@@ -208,22 +247,17 @@ class EventModel extends BaseModel
             JOIN governments
                 ON governmentsource.government = governments.governmentid
             UNION
-            SELECT DISTINCT affectedgovernmentgroup.event AS eventid
-            FROM geohistory.affectedgovernmentgroup
-            JOIN gis.affectedgovernmentgis
-                ON affectedgovernmentgroup.affectedgovernmentgroupid = affectedgovernmentgis.affectedgovernment
-            JOIN gis.governmentshape
-                ON affectedgovernmentgis.governmentshape = governmentshape.governmentshapeid
+            SELECT DISTINCT lawsectionevent.event AS eventid
+            FROM geohistory.lawsectionevent
+            JOIN geohistory.lawsection
+                ON lawsectionevent.lawsection = lawsection.lawsectionid
+            JOIN geohistory.law
+                ON lawsection.law = law.lawid
+            JOIN geohistory.sourcegovernment
+                ON law.source = sourcegovernment.source
+                AND sourcegovernment.sourceorder = 1
             JOIN governments
-                ON (
-                    COALESCE(governmentshape.governmentschooldistrict, -1) = governments.governmentid
-                    OR COALESCE(governmentshape.governmentshapeplsstownship, -1) = governments.governmentid
-                    OR COALESCE(governmentshape.governmentsubmunicipality, -1) = governments.governmentid
-                    OR COALESCE(governmentshape.governmentward, -1) = governments.governmentid
-                    OR governmentshape.governmentmunicipality = governments.governmentid
-                    OR governmentshape.governmentcounty = governments.governmentid
-                    OR governmentshape.governmentstate = governments.governmentid
-                )
+                ON sourcegovernment.government = governments.governmentid
             UNION
             SELECT DISTINCT metesdescription.event AS eventid
             FROM geohistory.metesdescription
