@@ -13,13 +13,12 @@ class SourceModel extends BaseModel
 
     // extra.ci_model_search_form_reporter(character varying)
 
-    // VIEW: extra.adjudicationsourcecitationsourcegovernmentcache
-
     public function getSearch(): array
     {
         $query = <<<QUERY
-            SELECT DISTINCT adjudicationsourcecitationsourcegovernmentcache.sourceshort
-                FROM extra.adjudicationsourcecitationsourcegovernmentcache
+            SELECT DISTINCT source.sourceshort
+            FROM geohistory.source
+            WHERE source.sourcetype = 'court reporters'
             ORDER BY 1
         QUERY;
 
