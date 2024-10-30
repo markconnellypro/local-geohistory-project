@@ -448,6 +448,127 @@ class GovernmentModel extends BaseModel
         return $this->getObject($query);
     }
 
+
+
+    public function getIdByGovernmentShort(string $government): string
+    {
+        $query = <<<QUERY
+            SELECT DISTINCT government.governmentid
+            FROM geohistory.government lookupgovernment
+            JOIN geohistory.government
+                ON lookupgovernment.governmentslugsubstitute = government.governmentslugsubstitute
+                AND government.governmentstatus <> 'placeholder'
+                AND lookupgovernment.governmentshort = ?
+            ORDER BY 1
+        QUERY;
+
+        $query = $this->db->query($query, [
+            $government,
+        ]);
+
+        $result = [];
+
+        $query = $this->getObject($query);
+        foreach ($query as $row) {
+            $result[] = $row->governmentid;
+        }
+
+        return '{' . implode(',', $result) . '}';
+    }
+
+    // replace extra.governmentparent(cache), extra.governmentrelation(cache)
+
+    public function getIdByGovernmentShortParent(string $government, string $parent): string
+    {
+        $government = $this->getIdByGovernmentShort($government);
+        $parent = $this->getIdByGovernmentShort($parent);
+
+        $query = <<<QUERY
+            SELECT DISTINCT government.governmentid
+            FROM geohistory.government
+            JOIN geohistory.government governmentparent
+                ON government.governmentcurrentleadparent = governmentparent.governmentid
+                AND governmentparent.governmentstatus <> 'placeholder'
+                AND government.governmentid = ANY (?)
+                AND governmentparent.governmentid = ANY (?)
+            UNION DISTINCT
+            SELECT DISTINCT government.governmentid
+            FROM geohistory.government
+            JOIN geohistory.governmentothercurrentparent
+                ON government.governmentid = governmentothercurrentparent.government
+                AND government.governmentid = ANY (?)
+            JOIN geohistory.government governmentparent
+                ON governmentothercurrentparent.governmentothercurrentparent = governmentparent.governmentid
+                AND governmentparent.governmentstatus <> 'placeholder'
+                AND governmentparent.governmentid = ANY (?)
+            UNION DISTINCT
+            SELECT DISTINCT government.governmentid
+            FROM geohistory.government
+            JOIN geohistory.affectedgovernmentpart lookuppart
+                ON government.governmentid = lookuppart.governmentfrom
+                AND government.governmentid = ANY (?)
+            JOIN geohistory.affectedgovernmentgrouppart lookupgrouppart
+                ON lookuppart.affectedgovernmentpartid = lookupgrouppart.affectedgovernmentpart
+            JOIN geohistory.affectedgovernmentlevel lookuplevel
+                ON lookupgrouppart.affectedgovernmentlevel = lookuplevel.affectedgovernmentlevelid
+                AND lookuplevel.affectedgovernmentlevelgroup > 3
+            JOIN geohistory.affectedgovernmentgrouppart
+                ON lookupgrouppart.affectedgovernmentgroup = affectedgovernmentgrouppart.affectedgovernmentgroup
+            JOIN geohistory.affectedgovernmentlevel
+                ON affectedgovernmentgrouppart.affectedgovernmentlevel = affectedgovernmentlevel.affectedgovernmentlevelid
+                AND lookuplevel.affectedgovernmentlevelgroup = 3
+            JOIN geohistory.affectedgovernmentpart
+                ON affectedgovernmentgrouppart.affectedgovernmentpart = affectedgovernmentpart.affectedgovernmentpartid
+            JOIN geohistory.government governmentparent
+                ON affectedgovernmentpart.governmentfrom = governmentparent.governmentid
+                AND governmentparent.governmentstatus <> 'placeholder'
+                AND governmentparent.governmentid = ANY (?)
+            UNION DISTINCT
+            SELECT DISTINCT government.governmentid
+            FROM geohistory.government
+            JOIN geohistory.affectedgovernmentpart lookuppart
+                ON government.governmentid = lookuppart.governmentto
+                AND government.governmentid = ANY (?)
+            JOIN geohistory.affectedgovernmentgrouppart lookupgrouppart
+                ON lookuppart.affectedgovernmentpartid = lookupgrouppart.affectedgovernmentpart
+            JOIN geohistory.affectedgovernmentlevel lookuplevel
+                ON lookupgrouppart.affectedgovernmentlevel = lookuplevel.affectedgovernmentlevelid
+                AND lookuplevel.affectedgovernmentlevelgroup > 3
+            JOIN geohistory.affectedgovernmentgrouppart
+                ON lookupgrouppart.affectedgovernmentgroup = affectedgovernmentgrouppart.affectedgovernmentgroup
+            JOIN geohistory.affectedgovernmentlevel
+                ON affectedgovernmentgrouppart.affectedgovernmentlevel = affectedgovernmentlevel.affectedgovernmentlevelid
+                AND lookuplevel.affectedgovernmentlevelgroup = 3
+            JOIN geohistory.affectedgovernmentpart
+                ON affectedgovernmentgrouppart.affectedgovernmentpart = affectedgovernmentpart.affectedgovernmentpartid
+            JOIN geohistory.government governmentparent
+                ON affectedgovernmentpart.governmentto = governmentparent.governmentid
+                AND governmentparent.governmentstatus <> 'placeholder'
+                AND governmentparent.governmentid = ANY (?)
+            ORDER BY 1
+        QUERY;
+
+        $query = $this->db->query($query, [
+            $government,
+            $parent,
+            $government,
+            $parent,
+            $government,
+            $parent,
+            $government,
+            $parent,
+        ]);
+
+        $result = [];
+
+        $query = $this->getObject($query);
+        foreach ($query as $row) {
+            $result[] = $row->governmentid;
+        }
+
+        return '{' . implode(',', $result) . '}';
+    }
+
     // extra.ci_model_search_lookup_government(character varying, character varying)
 
     public function getLookupByGovernment(string $government): array
@@ -575,125 +696,6 @@ class GovernmentModel extends BaseModel
         ]);
 
         return $this->getArray($query);
-    }
-
-    public function getIdByGovernmentShort(string $government): string
-    {
-        $query = <<<QUERY
-            SELECT DISTINCT government.governmentid
-            FROM geohistory.government lookupgovernment
-            JOIN geohistory.government
-                ON lookupgovernment.governmentslugsubstitute = government.governmentslugsubstitute
-                AND government.governmentstatus <> 'placeholder'
-                AND lookupgovernment.governmentshort = ?
-            ORDER BY 1
-        QUERY;
-
-        $query = $this->db->query($query, [
-            $government,
-        ]);
-
-        $result = [];
-
-        $query = $this->getObject($query);
-        foreach ($query as $row) {
-            $result[] = $row->governmentid;
-        }
-
-        return '{' . implode(',', $result) . '}';
-    }
-
-    // replace extra.governmentparent(cache), extra.governmentrelation(cache)
-
-    public function getIdByGovernmentShortParent(string $government, string $parent): string
-    {
-        $government = $this->getIdByGovernmentShort($government);
-        $parent = $this->getIdByGovernmentShort($parent);
-
-        $query = <<<QUERY
-            SELECT DISTINCT government.governmentid
-            FROM geohistory.government
-            JOIN geohistory.government governmentparent
-                ON government.governmentcurrentleadparent = governmentparent.governmentid
-                AND governmentparent.governmentstatus <> 'placeholder'
-                AND government.governmentid = ANY (?)
-                AND governmentparent.governmentid = ANY (?)
-            UNION DISTINCT
-            SELECT DISTINCT government.governmentid
-            FROM geohistory.government
-            JOIN geohistory.governmentothercurrentparent
-                ON government.governmentid = governmentothercurrentparent.government
-                AND government.governmentid = ANY (?)
-            JOIN geohistory.government governmentparent
-                ON governmentothercurrentparent.governmentothercurrentparent = governmentparent.governmentid
-                AND governmentparent.governmentstatus <> 'placeholder'
-                AND governmentparent.governmentid = ANY (?)
-            UNION DISTINCT
-            SELECT DISTINCT government.governmentid
-            FROM geohistory.government
-            JOIN geohistory.affectedgovernmentpart lookuppart
-                ON government.governmentid = lookuppart.governmentfrom
-                AND government.governmentid = ANY (?)
-            JOIN geohistory.affectedgovernmentgrouppart lookupgrouppart
-                ON lookuppart.affectedgovernmentpartid = lookupgrouppart.affectedgovernmentpart
-            JOIN geohistory.affectedgovernmentlevel lookuplevel
-                ON lookupgrouppart.affectedgovernmentlevel = lookuplevel.affectedgovernmentlevelid
-                AND lookuplevel.affectedgovernmentlevelgroup > 3
-            JOIN geohistory.affectedgovernmentgrouppart
-                ON lookupgrouppart.affectedgovernmentgroup = affectedgovernmentgrouppart.affectedgovernmentgroup
-            JOIN geohistory.affectedgovernmentlevel
-                ON affectedgovernmentgrouppart.affectedgovernmentlevel = affectedgovernmentlevel.affectedgovernmentlevelid
-                AND lookuplevel.affectedgovernmentlevelgroup = 3
-            JOIN geohistory.affectedgovernmentpart
-                ON affectedgovernmentgrouppart.affectedgovernmentpart = affectedgovernmentpart.affectedgovernmentpartid
-            JOIN geohistory.government governmentparent
-                ON affectedgovernmentpart.governmentfrom = governmentparent.governmentid
-                AND governmentparent.governmentstatus <> 'placeholder'
-                AND governmentparent.governmentid = ANY (?)
-            UNION DISTINCT
-            SELECT DISTINCT government.governmentid
-            FROM geohistory.government
-            JOIN geohistory.affectedgovernmentpart lookuppart
-                ON government.governmentid = lookuppart.governmentto
-                AND government.governmentid = ANY (?)
-            JOIN geohistory.affectedgovernmentgrouppart lookupgrouppart
-                ON lookuppart.affectedgovernmentpartid = lookupgrouppart.affectedgovernmentpart
-            JOIN geohistory.affectedgovernmentlevel lookuplevel
-                ON lookupgrouppart.affectedgovernmentlevel = lookuplevel.affectedgovernmentlevelid
-                AND lookuplevel.affectedgovernmentlevelgroup > 3
-            JOIN geohistory.affectedgovernmentgrouppart
-                ON lookupgrouppart.affectedgovernmentgroup = affectedgovernmentgrouppart.affectedgovernmentgroup
-            JOIN geohistory.affectedgovernmentlevel
-                ON affectedgovernmentgrouppart.affectedgovernmentlevel = affectedgovernmentlevel.affectedgovernmentlevelid
-                AND lookuplevel.affectedgovernmentlevelgroup = 3
-            JOIN geohistory.affectedgovernmentpart
-                ON affectedgovernmentgrouppart.affectedgovernmentpart = affectedgovernmentpart.affectedgovernmentpartid
-            JOIN geohistory.government governmentparent
-                ON affectedgovernmentpart.governmentto = governmentparent.governmentid
-                AND governmentparent.governmentstatus <> 'placeholder'
-                AND governmentparent.governmentid = ANY (?)
-            ORDER BY 1
-        QUERY;
-
-        $query = $this->db->query($query, [
-            $government,
-            $parent,
-            $government,
-            $parent,
-            $government,
-            $parent,
-            $government,
-            $parent,
-        ]);
-
-        $result = [];
-
-        $query = $this->getObject($query);
-        foreach ($query as $row) {
-            $result[] = $row->governmentid;
-        }
-
-        return '{' . implode(',', $result) . '}';
     }
 
     public function getNote(int $id): array

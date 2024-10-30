@@ -157,140 +157,6 @@ class EventModel extends BaseModel
         return $this->getObject($query);
     }
 
-    // replace extra.eventgovernment(cache)
-
-    public function getIdByGovernment(string $government, string $parent = ''): string
-    {
-        $GovernmentModel = new GovernmentModel();
-        if ($parent === '') {
-            $government = $GovernmentModel->getIdByGovernmentShort($government);
-        } else {
-            $government = $GovernmentModel->getIdByGovernmentShortParent($government, $parent);
-        }
-
-        $query = <<<QUERY
-            WITH governments AS (
-                SELECT governmentid
-                FROM geohistory.government
-                WHERE governmentid = ANY (?)
-            )
-            SELECT DISTINCT adjudicationevent.event AS eventid
-            FROM geohistory.adjudicationevent
-            JOIN geohistory.adjudicationlocation
-                ON adjudicationevent.adjudication = adjudicationlocation.adjudication
-            JOIN geohistory.adjudicationlocationtype
-                ON adjudicationlocation.adjudicationlocationtype = adjudicationlocationtype.adjudicationlocationtypeid
-            JOIN geohistory.tribunal
-                ON adjudicationlocationtype.tribunal = tribunal.tribunalid
-            JOIN governments
-                ON tribunal.government = governments.governmentid
-            UNION
-            SELECT DISTINCT adjudicationevent.event AS eventid
-            FROM geohistory.adjudicationevent
-            JOIN geohistory.adjudication
-                ON adjudicationevent.adjudication = adjudication.adjudicationid
-            JOIN geohistory.adjudicationtype
-                ON adjudication.adjudicationtype = adjudicationtype.adjudicationtypeid
-            JOIN geohistory.tribunal
-                ON adjudicationtype.tribunal = tribunal.tribunalid
-            JOIN governments
-                ON tribunal.government = governments.governmentid
-            UNION
-            SELECT DISTINCT affectedgovernmentgroup.event AS eventid
-            FROM geohistory.affectedgovernmentgroup
-            JOIN geohistory.affectedgovernmentgrouppart
-                ON affectedgovernmentgroup.affectedgovernmentgroupid = affectedgovernmentgrouppart.affectedgovernmentgroup
-            JOIN geohistory.affectedgovernmentpart
-                ON affectedgovernmentgrouppart.affectedgovernmentpart = affectedgovernmentpart.affectedgovernmentpartid
-            JOIN governments
-                ON (
-                    COALESCE(affectedgovernmentpart.governmentfrom, -1) = governments.governmentid
-                    OR COALESCE(affectedgovernmentpart.governmentto, -1) = governments.governmentid
-                )
-            UNION
-            SELECT DISTINCT affectedgovernmentgroup.event AS eventid
-            FROM geohistory.affectedgovernmentgroup
-            JOIN gis.affectedgovernmentgis
-                ON affectedgovernmentgroup.affectedgovernmentgroupid = affectedgovernmentgis.affectedgovernment
-            JOIN gis.governmentshape
-                ON affectedgovernmentgis.governmentshape = governmentshape.governmentshapeid
-            JOIN governments
-                ON (
-                    COALESCE(governmentshape.governmentschooldistrict, -1) = governments.governmentid
-                    OR COALESCE(governmentshape.governmentshapeplsstownship, -1) = governments.governmentid
-                    OR COALESCE(governmentshape.governmentsubmunicipality, -1) = governments.governmentid
-                    OR COALESCE(governmentshape.governmentward, -1) = governments.governmentid
-                    OR governmentshape.governmentmunicipality = governments.governmentid
-                    OR governmentshape.governmentcounty = governments.governmentid
-                    OR governmentshape.governmentstate = governments.governmentid
-                )
-            UNION
-            SELECT DISTINCT currentgovernment.event AS eventid
-            FROM geohistory.currentgovernment
-            JOIN governments
-                ON (
-                    COALESCE(currentgovernment.governmentsubmunicipality, -1) = governments.governmentid
-                    OR currentgovernment.governmentmunicipality = governments.governmentid
-                    OR currentgovernment.governmentcounty = governments.governmentid
-                    OR currentgovernment.governmentstate = governments.governmentid
-                )
-            UNION
-            SELECT DISTINCT event.eventid
-            FROM geohistory.event
-            JOIN governments
-                ON event.government = governments.governmentid
-            UNION
-            SELECT DISTINCT governmentsourceevent.event AS eventid
-            FROM geohistory.governmentsourceevent
-            JOIN geohistory.governmentsource
-                ON governmentsourceevent.governmentsource = governmentsource.governmentsourceid
-            JOIN governments
-                ON governmentsource.government = governments.governmentid
-            UNION
-            SELECT DISTINCT lawsectionevent.event AS eventid
-            FROM geohistory.lawsectionevent
-            JOIN geohistory.lawsection
-                ON lawsectionevent.lawsection = lawsection.lawsectionid
-            JOIN geohistory.law
-                ON lawsection.law = law.lawid
-            JOIN geohistory.sourcegovernment
-                ON law.source = sourcegovernment.source
-                AND sourcegovernment.sourceorder = 1
-            JOIN governments
-                ON sourcegovernment.government = governments.governmentid
-            UNION
-            SELECT DISTINCT metesdescription.event AS eventid
-            FROM geohistory.metesdescription
-            JOIN gis.metesdescriptiongis
-                ON metesdescription.metesdescriptionid = metesdescriptiongis.metesdescription
-            JOIN gis.governmentshape
-                ON metesdescriptiongis.governmentshape = governmentshape.governmentshapeid
-            JOIN governments
-                ON (
-                    COALESCE(governmentshape.governmentschooldistrict, -1) = governments.governmentid
-                    OR COALESCE(governmentshape.governmentshapeplsstownship, -1) = governments.governmentid
-                    OR COALESCE(governmentshape.governmentsubmunicipality, -1) = governments.governmentid
-                    OR COALESCE(governmentshape.governmentward, -1) = governments.governmentid
-                    OR governmentshape.governmentmunicipality = governments.governmentid
-                    OR governmentshape.governmentcounty = governments.governmentid
-                    OR governmentshape.governmentstate = governments.governmentid
-                )
-        QUERY;
-
-        $query = $this->db->query($query, [
-            $government,
-        ]);
-
-        $result = [];
-
-        $query = $this->getObject($query);
-        foreach ($query as $row) {
-            $result[] = $row->eventid;
-        }
-
-        return '{' . implode(',', $result) . '}';
-    }
-
     // extra.ci_model_government_event_failure(integer, integer[])
 
     // VIEW: extra.eventgovernmentcache
@@ -779,6 +645,140 @@ class EventModel extends BaseModel
         ]);
 
         return $this->getObject($query);
+    }
+
+    // replace extra.eventgovernment(cache)
+
+    public function getIdByGovernment(string $government, string $parent = ''): string
+    {
+        $GovernmentModel = new GovernmentModel();
+        if ($parent === '') {
+            $government = $GovernmentModel->getIdByGovernmentShort($government);
+        } else {
+            $government = $GovernmentModel->getIdByGovernmentShortParent($government, $parent);
+        }
+
+        $query = <<<QUERY
+            WITH governments AS (
+                SELECT governmentid
+                FROM geohistory.government
+                WHERE governmentid = ANY (?)
+            )
+            SELECT DISTINCT adjudicationevent.event AS eventid
+            FROM geohistory.adjudicationevent
+            JOIN geohistory.adjudicationlocation
+                ON adjudicationevent.adjudication = adjudicationlocation.adjudication
+            JOIN geohistory.adjudicationlocationtype
+                ON adjudicationlocation.adjudicationlocationtype = adjudicationlocationtype.adjudicationlocationtypeid
+            JOIN geohistory.tribunal
+                ON adjudicationlocationtype.tribunal = tribunal.tribunalid
+            JOIN governments
+                ON tribunal.government = governments.governmentid
+            UNION
+            SELECT DISTINCT adjudicationevent.event AS eventid
+            FROM geohistory.adjudicationevent
+            JOIN geohistory.adjudication
+                ON adjudicationevent.adjudication = adjudication.adjudicationid
+            JOIN geohistory.adjudicationtype
+                ON adjudication.adjudicationtype = adjudicationtype.adjudicationtypeid
+            JOIN geohistory.tribunal
+                ON adjudicationtype.tribunal = tribunal.tribunalid
+            JOIN governments
+                ON tribunal.government = governments.governmentid
+            UNION
+            SELECT DISTINCT affectedgovernmentgroup.event AS eventid
+            FROM geohistory.affectedgovernmentgroup
+            JOIN geohistory.affectedgovernmentgrouppart
+                ON affectedgovernmentgroup.affectedgovernmentgroupid = affectedgovernmentgrouppart.affectedgovernmentgroup
+            JOIN geohistory.affectedgovernmentpart
+                ON affectedgovernmentgrouppart.affectedgovernmentpart = affectedgovernmentpart.affectedgovernmentpartid
+            JOIN governments
+                ON (
+                    COALESCE(affectedgovernmentpart.governmentfrom, -1) = governments.governmentid
+                    OR COALESCE(affectedgovernmentpart.governmentto, -1) = governments.governmentid
+                )
+            UNION
+            SELECT DISTINCT affectedgovernmentgroup.event AS eventid
+            FROM geohistory.affectedgovernmentgroup
+            JOIN gis.affectedgovernmentgis
+                ON affectedgovernmentgroup.affectedgovernmentgroupid = affectedgovernmentgis.affectedgovernment
+            JOIN gis.governmentshape
+                ON affectedgovernmentgis.governmentshape = governmentshape.governmentshapeid
+            JOIN governments
+                ON (
+                    COALESCE(governmentshape.governmentschooldistrict, -1) = governments.governmentid
+                    OR COALESCE(governmentshape.governmentshapeplsstownship, -1) = governments.governmentid
+                    OR COALESCE(governmentshape.governmentsubmunicipality, -1) = governments.governmentid
+                    OR COALESCE(governmentshape.governmentward, -1) = governments.governmentid
+                    OR governmentshape.governmentmunicipality = governments.governmentid
+                    OR governmentshape.governmentcounty = governments.governmentid
+                    OR governmentshape.governmentstate = governments.governmentid
+                )
+            UNION
+            SELECT DISTINCT currentgovernment.event AS eventid
+            FROM geohistory.currentgovernment
+            JOIN governments
+                ON (
+                    COALESCE(currentgovernment.governmentsubmunicipality, -1) = governments.governmentid
+                    OR currentgovernment.governmentmunicipality = governments.governmentid
+                    OR currentgovernment.governmentcounty = governments.governmentid
+                    OR currentgovernment.governmentstate = governments.governmentid
+                )
+            UNION
+            SELECT DISTINCT event.eventid
+            FROM geohistory.event
+            JOIN governments
+                ON event.government = governments.governmentid
+            UNION
+            SELECT DISTINCT governmentsourceevent.event AS eventid
+            FROM geohistory.governmentsourceevent
+            JOIN geohistory.governmentsource
+                ON governmentsourceevent.governmentsource = governmentsource.governmentsourceid
+            JOIN governments
+                ON governmentsource.government = governments.governmentid
+            UNION
+            SELECT DISTINCT lawsectionevent.event AS eventid
+            FROM geohistory.lawsectionevent
+            JOIN geohistory.lawsection
+                ON lawsectionevent.lawsection = lawsection.lawsectionid
+            JOIN geohistory.law
+                ON lawsection.law = law.lawid
+            JOIN geohistory.sourcegovernment
+                ON law.source = sourcegovernment.source
+                AND sourcegovernment.sourceorder = 1
+            JOIN governments
+                ON sourcegovernment.government = governments.governmentid
+            UNION
+            SELECT DISTINCT metesdescription.event AS eventid
+            FROM geohistory.metesdescription
+            JOIN gis.metesdescriptiongis
+                ON metesdescription.metesdescriptionid = metesdescriptiongis.metesdescription
+            JOIN gis.governmentshape
+                ON metesdescriptiongis.governmentshape = governmentshape.governmentshapeid
+            JOIN governments
+                ON (
+                    COALESCE(governmentshape.governmentschooldistrict, -1) = governments.governmentid
+                    OR COALESCE(governmentshape.governmentshapeplsstownship, -1) = governments.governmentid
+                    OR COALESCE(governmentshape.governmentsubmunicipality, -1) = governments.governmentid
+                    OR COALESCE(governmentshape.governmentward, -1) = governments.governmentid
+                    OR governmentshape.governmentmunicipality = governments.governmentid
+                    OR governmentshape.governmentcounty = governments.governmentid
+                    OR governmentshape.governmentstate = governments.governmentid
+                )
+        QUERY;
+
+        $query = $this->db->query($query, [
+            $government,
+        ]);
+
+        $result = [];
+
+        $query = $this->getObject($query);
+        foreach ($query as $row) {
+            $result[] = $row->eventid;
+        }
+
+        return '{' . implode(',', $result) . '}';
     }
 
     // extra.ci_model_search_event_government(text, text, text, text, integer, integer)
