@@ -163,9 +163,9 @@ class EventModel extends BaseModel
     {
         $GovernmentModel = new GovernmentModel();
         if ($parent === '') {
-            $government = $GovernmentModel->getFromShortByGovernment($government);
+            $government = $GovernmentModel->getIdByGovernmentShort($government);
         } else {
-            $government = $GovernmentModel->getFromShortByGovernmentParent($government, $parent);
+            $government = $GovernmentModel->getIdByGovernmentShortParent($government, $parent);
         }
 
         $query = <<<QUERY

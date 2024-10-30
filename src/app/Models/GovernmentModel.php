@@ -577,7 +577,7 @@ class GovernmentModel extends BaseModel
         return $this->getArray($query);
     }
 
-    public function getFromSubstitute(string $governments): string
+    public function getIdByGovernmentShort(string $government): string
     {
         $query = <<<QUERY
             SELECT DISTINCT government.governmentid
@@ -585,31 +585,7 @@ class GovernmentModel extends BaseModel
             JOIN geohistory.government
                 ON lookupgovernment.governmentslugsubstitute = government.governmentslugsubstitute
                 AND government.governmentstatus <> 'placeholder'
-                AND lookupgovernment.governmentid = ANY (?)
-            ORDER BY 1
-        QUERY;
-
-        $query = $this->db->query($query, [
-            $governments,
-        ]);
-
-        $result = [];
-
-        $query = $this->getObject($query);
-        foreach ($query as $row) {
-            $result[] = $row->governmentid;
-        }
-
-        return '{' . implode(',', $result) . '}';
-    }
-
-    public function getFromShortByGovernment(string $government): string
-    {
-        $query = <<<QUERY
-            SELECT DISTINCT government.governmentid
-            FROM geohistory.government
-            WHERE government.governmentstatus <> 'placeholder'
-            AND government.governmentshort = ?
+                AND lookupgovernment.governmentshort = ?
             ORDER BY 1
         QUERY;
 
@@ -624,37 +600,40 @@ class GovernmentModel extends BaseModel
             $result[] = $row->governmentid;
         }
 
-        return $this->getFromSubstitute('{' . implode(',', $result) . '}');
+        return '{' . implode(',', $result) . '}';
     }
 
     // replace extra.governmentparent(cache), extra.governmentrelation(cache)
 
-    public function getFromShortByGovernmentParent(string $government, string $parent): string
+    public function getIdByGovernmentShortParent(string $government, string $parent): string
     {
+        $government = $this->getIdByGovernmentShort($government);
+        $parent = $this->getIdByGovernmentShort($parent);
+
         $query = <<<QUERY
             SELECT DISTINCT government.governmentid
             FROM geohistory.government
             JOIN geohistory.government governmentparent
                 ON government.governmentcurrentleadparent = governmentparent.governmentid
                 AND governmentparent.governmentstatus <> 'placeholder'
-                AND government.governmentshort = ?
-                AND governmentparent.governmentshort = ?
+                AND government.governmentid = ANY (?)
+                AND governmentparent.governmentid = ANY (?)
             UNION DISTINCT
             SELECT DISTINCT government.governmentid
             FROM geohistory.government
             JOIN geohistory.governmentothercurrentparent
                 ON government.governmentid = governmentothercurrentparent.government
-                AND government.governmentshort = ?
+                AND government.governmentid = ANY (?)
             JOIN geohistory.government governmentparent
                 ON governmentothercurrentparent.governmentothercurrentparent = governmentparent.governmentid
                 AND governmentparent.governmentstatus <> 'placeholder'
-                AND governmentparent.governmentshort = ?
+                AND governmentparent.governmentid = ANY (?)
             UNION DISTINCT
             SELECT DISTINCT government.governmentid
             FROM geohistory.government
             JOIN geohistory.affectedgovernmentpart lookuppart
                 ON government.governmentid = lookuppart.governmentfrom
-                AND government.governmentshort = ?
+                AND government.governmentid = ANY (?)
             JOIN geohistory.affectedgovernmentgrouppart lookupgrouppart
                 ON lookuppart.affectedgovernmentpartid = lookupgrouppart.affectedgovernmentpart
             JOIN geohistory.affectedgovernmentlevel lookuplevel
@@ -670,13 +649,13 @@ class GovernmentModel extends BaseModel
             JOIN geohistory.government governmentparent
                 ON affectedgovernmentpart.governmentfrom = governmentparent.governmentid
                 AND governmentparent.governmentstatus <> 'placeholder'
-                AND governmentparent.governmentshort = ?
+                AND governmentparent.governmentid = ANY (?)
             UNION DISTINCT
             SELECT DISTINCT government.governmentid
             FROM geohistory.government
             JOIN geohistory.affectedgovernmentpart lookuppart
                 ON government.governmentid = lookuppart.governmentto
-                AND government.governmentshort = ?
+                AND government.governmentid = ANY (?)
             JOIN geohistory.affectedgovernmentgrouppart lookupgrouppart
                 ON lookuppart.affectedgovernmentpartid = lookupgrouppart.affectedgovernmentpart
             JOIN geohistory.affectedgovernmentlevel lookuplevel
@@ -692,7 +671,7 @@ class GovernmentModel extends BaseModel
             JOIN geohistory.government governmentparent
                 ON affectedgovernmentpart.governmentto = governmentparent.governmentid
                 AND governmentparent.governmentstatus <> 'placeholder'
-                AND governmentparent.governmentshort = ?
+                AND governmentparent.governmentid = ANY (?)
             ORDER BY 1
         QUERY;
 
@@ -714,7 +693,7 @@ class GovernmentModel extends BaseModel
             $result[] = $row->governmentid;
         }
 
-        return $this->getFromSubstitute('{' . implode(',', $result) . '}');
+        return '{' . implode(',', $result) . '}';
     }
 
     public function getNote(int $id): array
