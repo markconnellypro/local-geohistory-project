@@ -17,7 +17,7 @@ class AppModel extends BaseModel
             SELECT extra.fulldate(lastrefreshdate::text) AS fulldate,
                 to_char(lastrefreshdate, 'J') AS sortdate,
                 to_char(lastrefreshdate, 'Mon FMDD, YYYY') AS sortdatetext
-            FROM extra.lastrefresh;
+            FROM geohistory.lastrefresh;
         QUERY;
 
         $query = $this->db->query($query);
