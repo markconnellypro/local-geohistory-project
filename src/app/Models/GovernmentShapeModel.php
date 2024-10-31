@@ -255,16 +255,14 @@ class GovernmentShapeModel extends BaseModel
 
     // extra.ci_model_government_current(integer)
 
-    // VIEW: extra.giscache
-
     public function getCurrentByGovernment(int $id): array
     {
         $query = <<<QUERY
-            SELECT giscache.government AS id,
-                public.st_asgeojson(public.st_boundary(geometry), 5) AS geometry
-            FROM extra.giscache
-            WHERE giscache.government = ?
-            GROUP BY 1, 2;
+            SELECT governmentshapecache.government AS id,
+                public.st_asgeojson(public.st_boundary(public.st_union(governmentshapecache.geometry)), 5) AS geometry
+            FROM gis.governmentshapecache
+            WHERE governmentshapecache.government = ?
+            GROUP BY 1
         QUERY;
 
         $query = $this->db->query($query, [

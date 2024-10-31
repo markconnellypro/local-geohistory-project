@@ -12,7 +12,6 @@ class GovernmentModel extends BaseModel
     // FUNCTION: extra.governmentlevel
     // FUNCTION: extra.governmentlong
     // FUNCTION: extra.governmentsubstitutedcache
-    // VIEW: extra.giscache
     // VIEW: extra.governmentchangecountcache
     // VIEW: extra.governmenthasmappedeventcache
     // VIEW: extra.governmentsubstitutecache
@@ -83,9 +82,9 @@ class GovernmentModel extends BaseModel
             LEFT OUTER JOIN
                 (
                 SELECT DISTINCT true AS hasmap
-                    FROM extra.giscache
-                    WHERE extra.governmentlevel(giscache.government) > 2
-                        AND giscache.government = ANY (extra.governmentsubstitutedcache(?))
+                    FROM gis.governmentshapecache
+                    WHERE extra.governmentlevel(governmentshapecache.government) > 2
+                        AND governmentshapecache.government = ANY (extra.governmentsubstitutedcache(?))
                     UNION
                     SELECT DISTINCT true AS hasmap
                     FROM extra.governmenthasmappedeventcache
