@@ -50,31 +50,28 @@ class LawAlternateSectionModel extends BaseModel
     // extra.ci_model_lawalternate_related(integer)
 
     // VIEW: extra.lawalternatesectionextracache
-    // VIEW: extra.lawsectionextracache
 
     public function getRelated(int $id): array
     {
         $query = <<<QUERY
-            SELECT DISTINCT lawsectionextracache.lawsectionslug,
+            SELECT DISTINCT lawsection.lawsectionslug,
                 law.lawapproved,
-                lawsectionextracache.lawsectioncitation,
+                lawsection.lawsectioncitation,
                 'Amends'::text AS lawsectioneventrelationship,
                 lawsection.lawsectionfrom,
                 law.lawnumberchapter
             FROM geohistory.law
             JOIN geohistory.lawsection
-                ON law.lawid = lawsection.law
-            JOIN extra.lawsectionextracache
-                ON lawsection.lawsectionid = lawsectionextracache.lawsectionid    
+                ON law.lawid = lawsection.law   
             JOIN geohistory.lawsection currentlawsection
                 ON lawsection.lawsectionid = currentlawsection.lawsectionamend
             JOIN geohistory.lawalternatesection
                 ON currentlawsection.lawsectionid = lawalternatesection.lawsection
                 AND lawalternatesection.lawalternatesectionid = ?
             UNION
-            SELECT DISTINCT lawsectionextracache.lawsectionslug,
+            SELECT DISTINCT lawsection.lawsectionslug,
                 law.lawapproved,
-                lawsectionextracache.lawsectioncitation,
+                lawsection.lawsectioncitation,
                 'Amended By'::text AS lawsectioneventrelationship,
                 lawsection.lawsectionfrom,
                 law.lawnumberchapter
@@ -84,20 +81,16 @@ class LawAlternateSectionModel extends BaseModel
             JOIN geohistory.lawalternatesection
                 ON lawsection.lawsectionamend = lawalternatesection.lawsection
                 AND lawalternatesection.lawalternatesectionid = ?
-            JOIN extra.lawsectionextracache
-                ON lawsection.lawsectionid = lawsectionextracache.lawsectionid
             UNION
-            SELECT DISTINCT lawsectionextracache.lawsectionslug,
+            SELECT DISTINCT lawsection.lawsectionslug,
                 law.lawapproved,
-                lawsectionextracache.lawsectioncitation,
+                lawsection.lawsectioncitation,
                 'Lead'::text AS lawsectioneventrelationship,
                 lawsection.lawsectionfrom,
                 law.lawnumberchapter
             FROM geohistory.law
             JOIN geohistory.lawsection
                 ON law.lawid = lawsection.law
-            JOIN extra.lawsectionextracache
-                ON lawsection.lawsectionid = lawsectionextracache.lawsectionid
             JOIN geohistory.lawalternatesection
                 ON lawsection.lawsectionid = lawalternatesection.lawsection
                 AND lawalternatesection.lawalternatesectionid = ?

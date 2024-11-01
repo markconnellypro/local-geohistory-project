@@ -47,14 +47,12 @@ class LawSectionModel extends BaseModel
 
     // extra.ci_model_event_law(integer)
 
-    // VIEW: extra.lawsectionextracache
-
     public function getByEvent(int $id): array
     {
         $query = <<<QUERY
-            SELECT DISTINCT lawsectionextracache.lawsectionslug,
+            SELECT DISTINCT lawsection.lawsectionslug,
                 law.lawapproved,
-                lawsectionextracache.lawsectioncitation,
+                lawsection.lawsectioncitation,
                 eventrelationship.eventrelationshipshort AS lawsectioneventrelationship,
                 lawsection.lawsectionfrom,
                 law.lawnumberchapter,
@@ -62,8 +60,6 @@ class LawSectionModel extends BaseModel
             FROM geohistory.law
             JOIN geohistory.lawsection
                 ON law.lawid = lawsection.law   
-            JOIN extra.lawsectionextracache
-                ON lawsection.lawsectionid = lawsectionextracache.lawsectionid
             JOIN geohistory.lawsectionevent
                 ON lawsection.lawsectionid = lawsectionevent.lawsection 
                 AND lawsectionevent.event = ?
@@ -86,29 +82,26 @@ class LawSectionModel extends BaseModel
     // FUNCTION: extra.lawcitation
     // FUNCTION: extra.rangefix
     // VIEW: extra.lawalternatesectionextracache
-    // VIEW: extra.lawsectionextracache
 
     public function getRelated(int $id): array
     {
         $query = <<<QUERY
-            SELECT DISTINCT lawsectionextracache.lawsectionslug,
+            SELECT DISTINCT lawsection.lawsectionslug,
                 law.lawapproved,
-                lawsectionextracache.lawsectioncitation,
+                lawsection.lawsectioncitation,
                 'Amends'::text AS lawsectioneventrelationship,
                 lawsection.lawsectionfrom,
                 law.lawnumberchapter
             FROM geohistory.law
             JOIN geohistory.lawsection
-                ON law.lawid = lawsection.law
-            JOIN extra.lawsectionextracache
-                ON lawsection.lawsectionid = lawsectionextracache.lawsectionid     
+                ON law.lawid = lawsection.law   
             JOIN geohistory.lawsection currentlawsection
                 ON lawsection.lawsectionid = currentlawsection.lawsectionamend
                 AND currentlawsection.lawsectionid = ?
             UNION
-            SELECT DISTINCT lawsectionextracache.lawsectionslug,
+            SELECT DISTINCT lawsection.lawsectionslug,
                 law.lawapproved,
-                lawsectionextracache.lawsectioncitation,
+                lawsection.lawsectioncitation,
                 'Amended By'::text AS lawsectioneventrelationship,
                 lawsection.lawsectionfrom,
                 law.lawnumberchapter
@@ -116,8 +109,6 @@ class LawSectionModel extends BaseModel
             JOIN geohistory.lawsection
                 ON law.lawid = lawsection.law
                 AND lawsection.lawsectionamend = ?
-            JOIN extra.lawsectionextracache
-                ON lawsection.lawsectionid = lawsectionextracache.lawsectionid
             UNION
             SELECT DISTINCT lawalternatesectionextracache.lawsectionslug,
                 law.lawapproved,
@@ -162,21 +153,17 @@ class LawSectionModel extends BaseModel
 
     // extra.ci_model_search_law_dateevent(character varying, text, character varying)
 
-    // VIEW: extra.lawsectionextracache
-
     public function getSearchByDateEvent(array $parameters): array
     {
         $date = $parameters[0];
         $eventType = $parameters[1];
 
         $query = <<<QUERY
-            SELECT lawsectionextracache.lawsectionslug,
-               lawsectionextracache.lawsectioncitation,
+            SELECT lawsection.lawsectionslug,
+               lawsection.lawsectioncitation,
                lawapproved,
                eventtypeshort
               FROM geohistory.lawsection
-                JOIN extra.lawsectionextracache
-                  ON lawsection.lawsectionid = lawsectionextracache.lawsectionid
                 JOIN geohistory.eventtype
                   ON lawsection.eventtype = eventtype.eventtypeid
                   AND (? = ''::text 
@@ -204,8 +191,6 @@ class LawSectionModel extends BaseModel
 
     // extra_removed.ci_model_search_law_reference(character varying, integer, integer, character varying)
 
-    // VIEW: extra.lawsectionextracache
-
     public function getSearchByReference(array $parameters): array
     {
         $yearVolume = $parameters[0];
@@ -213,13 +198,11 @@ class LawSectionModel extends BaseModel
         $numberChapter = $parameters[2];
 
         $query = <<<QUERY
-            SELECT lawsectionextracache.lawsectionslug,
-               lawsectionextracache.lawsectioncitation,
+            SELECT lawsection.lawsectionslug,
+               lawsection.lawsectioncitation,
                lawapproved,
                eventtypeshort
-              FROM geohistory.lawsection
-                JOIN extra.lawsectionextracache
-                  ON lawsection.lawsectionid = lawsectionextracache.lawsectionid   
+              FROM geohistory.lawsection  
                 JOIN geohistory.eventtype
                   ON lawsection.eventtype = eventtype.eventtypeid
                 JOIN geohistory.law
@@ -248,14 +231,12 @@ class LawSectionModel extends BaseModel
 
     // extra.lawsectionslugid(text)
 
-    // VIEW: extra.lawsectionextracache
-
     private function getSlugId(string $id): int
     {
         $query = <<<QUERY
-            SELECT lawsectionextracache.lawsectionid AS id
-                FROM extra.lawsectionextracache
-            WHERE lawsectionextracache.lawsectionslug = ?
+            SELECT lawsection.lawsectionid AS id
+                FROM geohistory.lawsection
+            WHERE lawsection.lawsectionslug = ?
         QUERY;
 
         $query = $this->db->query($query, [
