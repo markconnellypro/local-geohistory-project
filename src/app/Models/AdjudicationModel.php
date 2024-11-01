@@ -12,7 +12,6 @@ class AdjudicationModel extends BaseModel
     // FUNCTION: extra.shortdate
     // FUNCTION: extra.tribunalfilingoffice
     // FUNCTION: extra.tribunallong
-    // VIEW: extra.adjudicationextracache
 
     public function getDetail(int|string $id): array
     {
@@ -38,15 +37,13 @@ class AdjudicationModel extends BaseModel
                 adjudication.adjudicationshort,
                 adjudication.adjudicationnotes,
                 extra.tribunalfilingoffice(tribunal.tribunalid) AS tribunalfilingoffice,
-                adjudicationextracache.adjudicationtitle
+                adjudication.adjudicationtitle
             FROM geohistory.adjudicationtype
             JOIN geohistory.tribunal
                 ON adjudicationtype.tribunal = tribunal.tribunalid
             JOIN geohistory.adjudication
                 ON adjudicationtype.adjudicationtypeid = adjudication.adjudicationtype
                 AND adjudication.adjudicationid = ?
-            JOIN extra.adjudicationextracache
-                ON adjudication.adjudicationid = adjudicationextracache.adjudicationid
         QUERY;
 
         $query = $this->db->query($query, [
@@ -60,12 +57,11 @@ class AdjudicationModel extends BaseModel
 
     // FUNCTION: extra.shortdate
     // FUNCTION: extra.tribunallong
-    // VIEW: extra.adjudicationextracache
 
     public function getByAdjudicationSourceCitation(int $id): array
     {
         $query = <<<QUERY
-            SELECT adjudicationextracache.adjudicationslug,
+            SELECT adjudication.adjudicationslug,
                 adjudicationtype.adjudicationtypelong,
                 extra.tribunallong(adjudicationtype.tribunal) AS tribunallong,
                 adjudication.adjudicationnumber,
@@ -76,8 +72,6 @@ class AdjudicationModel extends BaseModel
                 END) AS adjudicationterm,
                 adjudication.adjudicationterm AS adjudicationtermsort
             FROM geohistory.adjudication
-            JOIN extra.adjudicationextracache
-                ON adjudication.adjudicationid = adjudicationextracache.adjudicationid
             JOIN geohistory.adjudicationtype
                 ON adjudication.adjudicationtype = adjudicationtype.adjudicationtypeid
             JOIN geohistory.adjudicationsourcecitation
@@ -96,12 +90,11 @@ class AdjudicationModel extends BaseModel
 
     // FUNCTION: extra.tribunallong
     // FUNCTION: extra.shortdate
-    // VIEW: extra.adjudicationextracache
 
     public function getByEvent(int $id): array
     {
         $query = <<<QUERY
-            SELECT adjudicationextracache.adjudicationslug,
+            SELECT adjudication.adjudicationslug,
                 adjudicationtype.adjudicationtypelong,
                 extra.tribunallong(adjudicationtype.tribunal) AS tribunallong,
                 adjudication.adjudicationnumber,
@@ -117,8 +110,6 @@ class AdjudicationModel extends BaseModel
                 ON adjudicationevent.eventrelationship = eventrelationship.eventrelationshipid
             JOIN geohistory.adjudication
                 ON adjudicationevent.adjudication = adjudication.adjudicationid
-            JOIN extra.adjudicationextracache
-                ON adjudication.adjudicationid = adjudicationextracache.adjudicationid
             JOIN geohistory.adjudicationtype
                 ON adjudication.adjudicationtype = adjudicationtype.adjudicationtypeid
             WHERE adjudicationevent.event = ?
@@ -133,14 +124,12 @@ class AdjudicationModel extends BaseModel
 
     // extra.adjudicationslugid(text)
 
-    // VIEW: extra.adjudicationextracache
-
     private function getSlugId(string $id): int
     {
         $query = <<<QUERY
-            SELECT adjudicationextracache.adjudicationid AS id
-                FROM extra.adjudicationextracache
-            WHERE adjudicationextracache.adjudicationslug = ?
+            SELECT adjudication.adjudicationid AS id
+                FROM geohistory.adjudication
+            WHERE adjudication.adjudicationslug = ?
         QUERY;
 
         $query = $this->db->query($query, [
