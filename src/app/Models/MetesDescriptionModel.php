@@ -9,8 +9,6 @@ class MetesDescriptionModel extends BaseModel
     // extra.ci_model_metes_detail(integer, character varying)
     // extra.ci_model_metes_detail(text, character varying)
 
-    // VIEW: extra.metesdescriptionextracache
-
     public function getDetail(int|string $id): array
     {
         if (!is_int($id)) {
@@ -23,7 +21,7 @@ class MetesDescriptionModel extends BaseModel
                     metesdescription.metesdescriptiontype,
                     metesdescription.metesdescriptionsource,
                     metesdescription.metesdescriptionbeginningpoint,
-                    metesdescriptionextracache.metesdescriptionlong,
+                    metesdescription.metesdescriptionlong,
                     metesdescription.metesdescriptionacres,
                         CASE
                             WHEN metesdescription.metesdescriptionlongitude = 0::numeric AND metesdescription.metesdescriptionlatitude = 0::numeric THEN false
@@ -44,8 +42,6 @@ class MetesDescriptionModel extends BaseModel
                     ON event.eventgranted = eventgranted.eventgrantedid
                 JOIN geohistory.eventtype
                     ON event.eventtype = eventtype.eventtypeid
-                LEFT JOIN extra.metesdescriptionextracache
-                    ON metesdescription.metesdescriptionid = metesdescriptionextracache.metesdescriptionid
                 WHERE metesdescription.metesdescriptionid = ?
             )
             SELECT metesdescriptionpart.*,
@@ -70,22 +66,18 @@ class MetesDescriptionModel extends BaseModel
 
     // extra.ci_model_event_metesdescription(integer)
 
-    // VIEW: extra.metesdescriptionextracache
-
     public function getByEvent(int $id): array
     {
         $query = <<<QUERY
-            SELECT metesdescriptionextracache.metesdescriptionslug,
+            SELECT metesdescription.metesdescriptionslug,
                 metesdescription.metesdescriptiontype,
                 metesdescription.metesdescriptionsource,
                 metesdescription.metesdescriptionbeginningpoint,
-                metesdescriptionextracache.metesdescriptionlong,
+                metesdescription.metesdescriptionlong,
                 metesdescription.metesdescriptionacres
             FROM geohistory.metesdescription
-            JOIN extra.metesdescriptionextracache
-                ON metesdescription.metesdescriptionid = metesdescriptionextracache.metesdescriptionid
             WHERE metesdescription.event = ?
-            ORDER BY 5;
+            ORDER BY 5
         QUERY;
 
         $query = $this->db->query($query, [
@@ -97,22 +89,18 @@ class MetesDescriptionModel extends BaseModel
 
     // extra.ci_model_area_metesdescription(integer)
 
-    // VIEW: extra.metesdescriptionextracache
-
     public function getByGovernmentShape(int $id): array
     {
         $query = <<<QUERY
-            SELECT metesdescriptionextracache.metesdescriptionslug,
+            SELECT metesdescription.metesdescriptionslug,
                 metesdescription.metesdescriptiontype,
                 metesdescription.metesdescriptionsource,
                 metesdescription.metesdescriptionbeginningpoint,
-                metesdescriptionextracache.metesdescriptionlong,
+                metesdescription.metesdescriptionlong,
                 metesdescription.metesdescriptionacres,
                 metesdescription.event,
                 event.eventslug
             FROM geohistory.metesdescription
-            JOIN extra.metesdescriptionextracache
-                ON metesdescription.metesdescriptionid = metesdescriptionextracache.metesdescriptionid
             JOIN gis.metesdescriptiongis
                 ON metesdescription.metesdescriptionid = metesdescriptiongis.metesdescription
             JOIN geohistory.event
@@ -130,14 +118,12 @@ class MetesDescriptionModel extends BaseModel
 
     // extra.metesdescriptionslugid(text)
 
-    // VIEW: extra.metesdescriptionextracache
-
     private function getSlugId(string $id): int
     {
         $query = <<<QUERY
-            SELECT metesdescriptionextracache.metesdescriptionid AS id
-                FROM extra.metesdescriptionextracache
-            WHERE metesdescriptionextracache.metesdescriptionslug = ?
+            SELECT metesdescription.metesdescriptionid AS id
+                FROM geohistory.metesdescription
+            WHERE metesdescription.metesdescriptionslug = ?
         QUERY;
 
         $query = $this->db->query($query, [
