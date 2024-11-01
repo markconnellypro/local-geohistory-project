@@ -454,7 +454,7 @@ class GovernmentShapeModel extends BaseModel
     {
         $query = <<<QUERY
             SELECT governmentshape.governmentshapeid AS id
-                FROM geohistory.governmentshape
+                FROM gis.governmentshape
             WHERE governmentshape.governmentshapeslug = ?
         QUERY;
 
