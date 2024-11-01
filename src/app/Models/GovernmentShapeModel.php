@@ -279,7 +279,6 @@ class GovernmentShapeModel extends BaseModel
     // FUNCTION: extra.governmentlong
     // FUNCTION: extra.governmentslug
     // FUNCTION: extra.plsstownshipshort
-    // VIEW: extra.governmentshapeextracache
     // VIEW: extra.governmentsubstitutecache
 
     public function getPartByGovernment(int $id): array
@@ -394,7 +393,7 @@ class GovernmentShapeModel extends BaseModel
             )
             SELECT
             CASE
-                WHEN governmentshapeextracache.governmentshapeslug IS NOT NULL THEN governmentshapeextracache.governmentshapeslug
+                WHEN governmentshape.governmentshapeslug IS NOT NULL THEN governmentshape.governmentshapeslug
                 ELSE governmentshape.governmentshapeid::text
             END AS governmentshapeslug,
             '' AS plsstownship,
@@ -417,8 +416,6 @@ class GovernmentShapeModel extends BaseModel
                 ELSE governmentshapeevent.eventjson
             END AS eventjson
             FROM gis.governmentshape
-            LEFT JOIN extra.governmentshapeextracache
-            ON governmentshape.governmentshapeid = governmentshapeextracache.governmentshapeid
             LEFT JOIN governmentshapeevent
             ON governmentshape.governmentshapeid = governmentshapeevent.governmentshapeid
             WHERE governmentshape.governmentmunicipality = ? OR
@@ -453,14 +450,12 @@ class GovernmentShapeModel extends BaseModel
 
     // extra.governmentshapeslugid(text)
 
-    // VIEW: extra.governmentshapeextracache
-
     private function getSlugId(string $id): int
     {
         $query = <<<QUERY
-            SELECT governmentshapeextracache.governmentshapeid AS id
-                FROM extra.governmentshapeextracache
-            WHERE governmentshapeextracache.governmentshapeslug = ?
+            SELECT governmentshape.governmentshapeid AS id
+                FROM geohistory.governmentshape
+            WHERE governmentshape.governmentshapeslug = ?
         QUERY;
 
         $query = $this->db->query($query, [
