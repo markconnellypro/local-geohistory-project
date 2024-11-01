@@ -9,8 +9,6 @@ class LawAlternateSectionModel extends BaseModel
     // extra.ci_model_lawalternate_detail(integer, character varying, boolean)
     // extra.ci_model_lawalternate_detail(text, character varying, boolean)
 
-    // FUNCTION: extra.lawalternatesectioncitation
-
     public function getDetail(int|string $id): array
     {
         if (!is_int($id)) {
@@ -20,7 +18,7 @@ class LawAlternateSectionModel extends BaseModel
         $query = <<<QUERY
             SELECT DISTINCT lawalternatesection.lawalternatesectionid AS lawsectionid,
                 lawalternatesection.lawalternatesectionpagefrom AS lawsectionpagefrom,
-                extra.lawalternatesectioncitation(lawalternatesection.lawalternatesectionid) AS lawsectioncitation,
+                lawalternatesection.lawalternatesectioncitation AS lawsectioncitation,
                 CASE
                     WHEN (NOT ?) AND left(law.lawtitle, 1) = '~' THEN ''
                     ELSE law.lawtitle
@@ -48,8 +46,6 @@ class LawAlternateSectionModel extends BaseModel
     }
 
     // extra.ci_model_lawalternate_related(integer)
-
-    // VIEW: extra.lawalternatesectionextracache
 
     public function getRelated(int $id): array
     {
@@ -95,9 +91,9 @@ class LawAlternateSectionModel extends BaseModel
                 ON lawsection.lawsectionid = lawalternatesection.lawsection
                 AND lawalternatesection.lawalternatesectionid = ?
             UNION
-            SELECT DISTINCT lawalternatesectionextracache.lawsectionslug,
+            SELECT DISTINCT lawalternatesection.lawalternatesectionslug AS lawsectionslug,
                 law.lawapproved,
-                lawalternatesectionextracache.lawsectioncitation,
+                lawalternatesection.lawalternatesectioncitation AS lawsectioncitation,
                 'Alternate'::text AS lawsectioneventrelationship,
                 lawsection.lawsectionfrom,
                 law.lawnumberchapter
@@ -110,8 +106,6 @@ class LawAlternateSectionModel extends BaseModel
                 ON lawalternatesection.lawsection = currentlawsection.lawsection
                 AND lawalternatesection.lawalternatesectionid <> currentlawsection.lawalternatesectionid
                 AND currentlawsection.lawalternatesectionid = ?
-            JOIN extra.lawalternatesectionextracache
-                ON lawalternatesection.lawalternatesectionid = lawalternatesectionextracache.lawsectionid
             ORDER BY 4, 3
         QUERY;
 
@@ -127,14 +121,12 @@ class LawAlternateSectionModel extends BaseModel
 
     // extra.lawalternatesectionslugid(text)
 
-    // VIEW: extra.lawalternatesectionextracache
-
     private function getSlugId(string $id): int
     {
         $query = <<<QUERY
-            SELECT lawalternatesectionextracache.lawsectionid AS id
-                FROM extra.lawalternatesectionextracache
-            WHERE lawalternatesectionextracache.lawsectionslug = ?
+            SELECT lawalternatesection.lawsectionid AS id
+                FROM geohistory.lawalternatesection
+            WHERE lawalternatesection.lawalternatesectionslug = ?
         QUERY;
 
         $query = $this->db->query($query, [

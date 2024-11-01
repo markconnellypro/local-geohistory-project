@@ -78,7 +78,6 @@ class LawSectionModel extends BaseModel
     // extra.ci_model_law_related(integer)
 
     // FUNCTION: extra.rangefix
-    // VIEW: extra.lawalternatesectionextracache
 
     public function getRelated(int $id): array
     {
@@ -107,9 +106,9 @@ class LawSectionModel extends BaseModel
                 ON law.lawid = lawsection.law
                 AND lawsection.lawsectionamend = ?
             UNION
-            SELECT DISTINCT lawalternatesectionextracache.lawsectionslug,
+            SELECT DISTINCT lawalternatesection.lawalternatesectionslug AS lawsectionslug,
                 law.lawapproved,
-                lawalternatesectionextracache.lawsectioncitation,
+                lawalternatesection.lawalternatesectioncitation AS lawsectioncitation,
                 'Alternate'::text AS lawsectioneventrelationship,
                 lawsection.lawsectionfrom,
                 law.lawnumberchapter
@@ -119,8 +118,6 @@ class LawSectionModel extends BaseModel
             JOIN geohistory.lawalternatesection
                 ON lawsection.lawsectionid = lawalternatesection.lawsection
                 AND lawalternatesection.lawsection = ?
-            JOIN extra.lawalternatesectionextracache
-                ON lawalternatesection.lawalternatesectionid = lawalternatesectionextracache.lawsectionid
             UNION
             SELECT DISTINCT NULL AS lawsectionslug,
                 law.lawapproved,
