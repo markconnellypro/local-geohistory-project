@@ -10,7 +10,6 @@ class LawSectionModel extends BaseModel
     // extra.ci_model_law_detail(text, character varying, boolean)
 
     // FUNCTION: extra.lawsectioncitation
-    // VIEW: extra.sourceextra
 
     public function getDetail(int|string $id): array
     {
@@ -28,11 +27,9 @@ class LawSectionModel extends BaseModel
                 END AS lawtitle,
                 law.lawurl AS url,
                 source.sourcetype,
-                sourceextra.sourceabbreviation,
-                sourceextra.sourcefullcitation
+                source.sourceabbreviation,
+                source.sourcefullcitation
             FROM geohistory.source
-            JOIN extra.sourceextra
-                ON source.sourceid = sourceextra.sourceid
             JOIN geohistory.law
                 ON source.sourceid = law.source
             JOIN geohistory.lawsection

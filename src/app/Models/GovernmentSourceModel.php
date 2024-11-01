@@ -11,7 +11,6 @@ class GovernmentSourceModel extends BaseModel
 
     // FUNCTION: extra.rangefix
     // FUNCTION: extra.shortdate
-    // VIEW: extra.sourceextra
 
     public function getDetail(int|string $id): array
     {
@@ -76,9 +75,9 @@ class GovernmentSourceModel extends BaseModel
                     WHEN governmentsource.sourcecitationpagefrom = '' OR governmentsource.sourcecitationpagefrom = '0' THEN ''
                     ELSE ' p. ' || extra.rangefix(governmentsource.sourcecitationpagefrom, governmentsource.sourcecitationpageto)
                 END) AS sourcecitationlocation,
-                sourceextra.sourceabbreviation,
+                source.sourceabbreviation,
                 source.sourcetype,
-                sourceextra.sourcefullcitation,
+                source.sourcefullcitation,
                 source.sourceid,
                 'sourceitem' AS linktype
             FROM geohistory.governmentsource
@@ -86,8 +85,6 @@ class GovernmentSourceModel extends BaseModel
                 ON governmentsource.government = government.governmentid
             JOIN geohistory.source
                 ON governmentsource.source = source.sourceid
-            JOIN extra.sourceextra
-                ON source.sourceid = sourceextra.sourceid
             WHERE governmentsource.governmentsourceid = ?
         QUERY;
 

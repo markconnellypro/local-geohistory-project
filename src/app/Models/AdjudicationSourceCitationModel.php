@@ -11,7 +11,6 @@ class AdjudicationSourceCitationModel extends BaseModel
 
     // FUNCTION: extra.rangefix
     // FUNCTION: extra.shortdate
-    // VIEW: extra.sourceextra
 
     public function getDetail(int|string $id): array
     {
@@ -22,7 +21,7 @@ class AdjudicationSourceCitationModel extends BaseModel
         $query = <<<QUERY
             SELECT DISTINCT adjudicationsourcecitation.adjudicationsourcecitationid,
                 source.sourceshort,
-                sourceextra.sourceabbreviation,
+                source.sourceabbreviation,
                 adjudicationsourcecitation.adjudicationsourcecitationvolume,
                 extra.rangefix(adjudicationsourcecitation.adjudicationsourcecitationpagefrom::text, adjudicationsourcecitation.adjudicationsourcecitationpageto::text) AS adjudicationsourcecitationpage,
                 adjudicationsourcecitation.adjudicationsourcecitationyear,
@@ -34,10 +33,8 @@ class AdjudicationSourceCitationModel extends BaseModel
                 adjudicationsourcecitation.adjudicationsourcecitationdissentjudge,
                 adjudicationsourcecitation.adjudicationsourcecitationurl AS url,
                 source.sourcetype,
-                sourceextra.sourcefullcitation
+                source.sourcefullcitation
             FROM geohistory.source
-            JOIN extra.sourceextra
-                ON source.sourceid = sourceextra.sourceid
             JOIN geohistory.adjudicationsourcecitation
                 ON source.sourceid = adjudicationsourcecitation.source
                 AND adjudicationsourcecitation.adjudicationsourcecitationid = ?

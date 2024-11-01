@@ -11,7 +11,6 @@ class SourceCitationModel extends BaseModel
 
     // FUNCTION: extra.rangefix
     // FUNCTION: extra.shortdate
-    // VIEW: extra.sourceextra
 
     public function getDetail(int|string $id): array
     {
@@ -21,7 +20,7 @@ class SourceCitationModel extends BaseModel
 
         $query = <<<QUERY
             SELECT DISTINCT sourcecitation.sourcecitationid,
-                sourceextra.sourceabbreviation,
+                source.sourceabbreviation,
                 sourcecitation.sourcecitationdatetype || 
                     CASE WHEN sourcecitation.sourcecitationdatetype = '' THEN '' ELSE ' ' END ||
                     extra.shortdate(sourcecitation.sourcecitationdate) AS sourcecitationdate,
@@ -36,12 +35,10 @@ class SourceCitationModel extends BaseModel
                 sourcecitation.sourcecitationperson,
                 sourcecitation.sourcecitationurl AS url,
                 source.sourcetype,
-                sourceextra.sourcefullcitation,
+                source.sourcefullcitation,
                 source.sourceid,
                 'sourceitem' AS linktype
             FROM geohistory.source
-            JOIN extra.sourceextra
-                ON source.sourceid = sourceextra.sourceid
             JOIN geohistory.sourcecitation
                 ON source.sourceid = sourcecitation.source
                 AND sourcecitation.sourcecitationid = ?
@@ -59,13 +56,12 @@ class SourceCitationModel extends BaseModel
     // FUNCTION: extra.shortdate
     // FUNCTION: extra.rangefix
     // VIEW: extra.sourcecitationextracache
-    // VIEW: extra.sourceextra
 
     public function getByEvent(int $id): array
     {
         $query = <<<QUERY
             SELECT sourcecitationextracache.sourcecitationslug,
-                sourceextra.sourceabbreviation,
+                source.sourceabbreviation,
                 sourcecitation.sourcecitationdatetype || 
                     CASE WHEN sourcecitation.sourcecitationdatetype = '' THEN '' ELSE ' ' END ||
                     extra.shortdate(sourcecitation.sourcecitationdate) AS sourcecitationdate,
@@ -79,8 +75,6 @@ class SourceCitationModel extends BaseModel
                 sourcecitation.sourcecitationtypetitle,
                 sourcecitation.sourcecitationperson
             FROM geohistory.source
-            JOIN extra.sourceextra
-                ON source.sourceid = sourceextra.sourceid
             JOIN geohistory.sourcecitation
                 ON source.sourceid = sourcecitation.source
             JOIN extra.sourcecitationextracache

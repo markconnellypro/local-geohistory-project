@@ -10,12 +10,11 @@ class NationalArchivesModel extends BaseModel
 
     // FUNCTION: extra.governmentlong
     // VIEW: extra.governmentsubstitutecache
-    // VIEW: extra.sourceextra
 
     public function getByGovernment(int $id): array
     {
         $query = <<<QUERY
-            SELECT DISTINCT sourceextra.sourceabbreviation,
+            SELECT DISTINCT source.sourceabbreviation,
                 nationalarchives.nationalarchivesset,
                 nationalarchives.nationalarchivesgovernmentname || ' ' || nationalarchives.nationalarchivesgovernmenttype AS nationalarchivesgovernment,
                 nationalarchives.nationalarchivesunit,
@@ -27,13 +26,11 @@ class NationalArchivesModel extends BaseModel
             FROM geohistory.nationalarchives
             JOIN geohistory.source
                 ON nationalarchives.source = source.sourceid
-            JOIN extra.sourceextra
-                ON source.sourceid = sourceextra.sourceid
             JOIN extra.governmentsubstitutecache
                 ON nationalarchives.government = governmentsubstitutecache.governmentid
                 AND governmentsubstitutecache.governmentsubstitute = ?
             UNION DISTINCT
-            SELECT DISTINCT sourceextra.sourceabbreviation,
+            SELECT DISTINCT source.sourceabbreviation,
                 censusmap.censusmapyear::character varying AS nationalarchivesset,
                 censusmap.censusmapgovernmentname AS nationalarchivesgovernment,
                 NULL::integer AS nationalarchivesunit,
@@ -45,8 +42,6 @@ class NationalArchivesModel extends BaseModel
             FROM geohistory.censusmap
             JOIN geohistory.source
                 ON source.sourceshort = 'Cns.Mp.'
-            JOIN extra.sourceextra
-                ON source.sourceid = sourceextra.sourceid
             LEFT JOIN geohistory.nationalarchives
                 ON censusmap.government = nationalarchives.government
                 AND source.sourceid = nationalarchives.source
