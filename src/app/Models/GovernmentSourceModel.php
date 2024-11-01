@@ -100,7 +100,6 @@ class GovernmentSourceModel extends BaseModel
 
     // FUNCTION: extra.rangefix
     // FUNCTION: extra.shortdate
-    // VIEW: extra.governmentsourceextracache
 
     public function getByEvent(int $id): array
     {
@@ -128,7 +127,10 @@ class GovernmentSourceModel extends BaseModel
                 governmentsource.governmentsourcebody,
                 governmentsource.governmentsourceterm,
                 governmentsource.governmentsourceapproved,
-                governmentsourceextracache.governmentsourceslug,
+                CASE
+                    WHEN governmentsource.hassource THEN governmentsource.governmentsourceslug
+                    ELSE NULL
+                END AS governmentsourceslug,
                 trim(CASE
                     WHEN governmentsource.governmentsourcevolumetype = '' OR governmentsource.governmentsourcevolume = '' THEN ''
                     ELSE governmentsource.governmentsourcevolumetype
@@ -167,9 +169,6 @@ class GovernmentSourceModel extends BaseModel
             JOIN geohistory.governmentsourceevent
                 ON governmentsource.governmentsourceid = governmentsourceevent.governmentsource
                 AND governmentsourceevent.event = ?
-            LEFT JOIN extra.governmentsourceextracache
-                ON governmentsource.governmentsourceid = governmentsourceextracache.governmentsourceid
-                AND governmentsourceextracache.hassource
             ORDER BY 12
         QUERY;
 
@@ -271,15 +270,13 @@ class GovernmentSourceModel extends BaseModel
 
     // extra.governmentsourceslugid(text)
 
-    // VIEW: extra.governmentsourceextracache
-
     private function getSlugId(string $id): int
     {
         $query = <<<QUERY
-            SELECT governmentsourceextracache.governmentsourceid AS id
-                FROM extra.governmentsourceextracache
-            WHERE governmentsourceextracache.governmentsourceslug = ?
-                AND governmentsourceextracache.hassource
+            SELECT governmentsource.governmentsourceid AS id
+                FROM geohistory.governmentsource
+            WHERE governmentsource.governmentsourceslug = ?
+                AND governmentsource.hassource
         QUERY;
 
         $query = $this->db->query($query, [
