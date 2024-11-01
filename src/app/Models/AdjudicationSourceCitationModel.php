@@ -51,12 +51,11 @@ class AdjudicationSourceCitationModel extends BaseModel
 
     // FUNCTION: extra.rangefix
     // FUNCTION: extra.shortdate
-    // VIEW: extra.adjudicationsourcecitationextracache
 
     public function getByAdjudication(int $id): array
     {
         $query = <<<QUERY
-            SELECT adjudicationsourcecitationextracache.adjudicationsourcecitationslug,
+            SELECT adjudicationsourcecitation.adjudicationsourcecitationslug,
                 source.sourceshort,
                 adjudicationsourcecitation.adjudicationsourcecitationvolume,
                 extra.rangefix(adjudicationsourcecitation.adjudicationsourcecitationpagefrom::text, adjudicationsourcecitation.adjudicationsourcecitationpageto::text) AS adjudicationsourcecitationpage,
@@ -68,8 +67,6 @@ class AdjudicationSourceCitationModel extends BaseModel
             JOIN geohistory.adjudicationsourcecitation
                 ON adjudicationsourcecitation.source = source.sourceid
                 AND adjudicationsourcecitation.adjudication = ?
-            JOIN extra.adjudicationsourcecitationextracache
-                ON adjudicationsourcecitation.adjudicationsourcecitationid = adjudicationsourcecitationextracache.adjudicationsourcecitationid
         QUERY;
 
         $query = $this->db->query($query, [
@@ -79,14 +76,12 @@ class AdjudicationSourceCitationModel extends BaseModel
         return $this->getObject($query);
     }
 
-    // VIEW: extra.adjudicationsourcecitationextracache
-
     private function getSlugId(string $id): int
     {
         $query = <<<QUERY
-            SELECT adjudicationsourcecitationextracache.adjudicationsourcecitationid AS id
-                FROM extra.adjudicationsourcecitationextracache
-            WHERE adjudicationsourcecitationextracache.adjudicationsourcecitationslug = ?
+            SELECT adjudicationsourcecitation.adjudicationsourcecitationid AS id
+                FROM geohistory.adjudicationsourcecitation
+            WHERE adjudicationsourcecitation.adjudicationsourcecitationslug = ?
         QUERY;
 
         $query = $this->db->query($query, [
