@@ -9,8 +9,6 @@ class LawSectionModel extends BaseModel
     // extra.ci_model_law_detail(integer, character varying, boolean)
     // extra.ci_model_law_detail(text, character varying, boolean)
 
-    // FUNCTION: extra.lawsectioncitation
-
     public function getDetail(int|string $id): array
     {
         if (!is_int($id)) {
@@ -20,7 +18,7 @@ class LawSectionModel extends BaseModel
         $query = <<<QUERY
             SELECT DISTINCT lawsection.lawsectionid,
                 lawsection.lawsectionpagefrom,
-                extra.lawsectioncitation(lawsection.lawsectionid) AS lawsectioncitation,
+                lawsection.lawsectioncitation,
                 CASE
                     WHEN (NOT ?) AND left(law.lawtitle, 1) = '~' THEN ''
                     ELSE law.lawtitle
@@ -79,7 +77,6 @@ class LawSectionModel extends BaseModel
 
     // extra.ci_model_law_related(integer)
 
-    // FUNCTION: extra.lawcitation
     // FUNCTION: extra.rangefix
     // VIEW: extra.lawalternatesectionextracache
 
@@ -127,7 +124,7 @@ class LawSectionModel extends BaseModel
             UNION
             SELECT DISTINCT NULL AS lawsectionslug,
                 law.lawapproved,
-                extra.lawcitation(law.lawid) AS lawsectioncitation,
+                law.lawcitation AS lawsectioncitation,
                 'Amended To Add ' || lawsection.lawsectionnewsymbol || CASE
                     WHEN lawsection.lawsectionnewfrom <> lawsection.lawsectionnewto THEN lawsection.lawsectionnewsymbol
                     ELSE ''
