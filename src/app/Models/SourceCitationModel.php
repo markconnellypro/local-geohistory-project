@@ -55,12 +55,11 @@ class SourceCitationModel extends BaseModel
 
     // FUNCTION: extra.shortdate
     // FUNCTION: extra.rangefix
-    // VIEW: extra.sourcecitationextracache
 
     public function getByEvent(int $id): array
     {
         $query = <<<QUERY
-            SELECT sourcecitationextracache.sourcecitationslug,
+            SELECT sourcecitation.sourcecitationslug,
                 source.sourceabbreviation,
                 sourcecitation.sourcecitationdatetype || 
                     CASE WHEN sourcecitation.sourcecitationdatetype = '' THEN '' ELSE ' ' END ||
@@ -77,8 +76,6 @@ class SourceCitationModel extends BaseModel
             FROM geohistory.source
             JOIN geohistory.sourcecitation
                 ON source.sourceid = sourcecitation.source
-            JOIN extra.sourcecitationextracache
-                ON sourcecitation.sourcecitationid = sourcecitationextracache.sourcecitationid
             JOIN geohistory.sourcecitationevent
                 ON sourcecitation.sourcecitationid = sourcecitationevent.sourcecitation 
                 AND sourcecitationevent.event = ?
@@ -109,14 +106,12 @@ class SourceCitationModel extends BaseModel
 
     // extra.sourcecitationslugid(text)
 
-    // VIEW: extra.sourcecitationextracache
-
     private function getSlugId(string $id): int
     {
         $query = <<<QUERY
-            SELECT sourcecitationextracache.sourcecitationid AS id
-                FROM extra.sourcecitationextracache
-            WHERE sourcecitationextracache.sourcecitationslug = ?
+            SELECT sourcecitation.sourcecitationid AS id
+                FROM geohistory.sourcecitation
+            WHERE sourcecitation.sourcecitationslug = ?
         QUERY;
 
         $query = $this->db->query($query, [
