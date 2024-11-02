@@ -24,9 +24,9 @@
                                             ':</span> ' . $row->researchlognotes) ?>
                     </td>
                     <td data-sort="<?= $row->researchlogdatesort ?>"><?= $row->researchlogdate ?></td>
-                    <td data-sort="<?= $row->researchlogrange ?>">
+                    <td data-sort="<?= $row->researchlogyear ?>">
                         <?= ($row->researchlogvolume === '' ? '' : 'bk. ') . $row->researchlogvolume .
-                            ($row->researchlogrange === '' ? '' : ' (' . $row->researchlogrange . ')') ?>
+                            ($row->researchlogyear === '' ? '' : ' (' . $row->researchlogyear . ')') ?>
                     </td>
                 </tr>
             <?php } ?>

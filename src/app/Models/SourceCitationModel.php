@@ -29,7 +29,7 @@ class SourceCitationModel extends BaseModel
                 extra.shortdate(sourcecitation.sourcecitationdaterange) AS sourcecitationdaterange,
                 sourcecitation.sourcecitationdaterange AS sourcecitationdaterangesort,
                 sourcecitation.sourcecitationvolume,
-                geohistory.rangeformat(sourcecitation.sourcecitationpagefrom, sourcecitation.sourcecitationpageto) AS sourcecitationpage,
+                sourcecitation.sourcecitationpage,
                 sourcecitation.sourcecitationtypetitle,
                 sourcecitation.sourcecitationperson,
                 sourcecitation.sourcecitationurl AS url,
@@ -68,7 +68,7 @@ class SourceCitationModel extends BaseModel
                 extra.shortdate(sourcecitation.sourcecitationdaterange) AS sourcecitationdaterange,
                 sourcecitation.sourcecitationdaterange AS sourcecitationdaterangesort,
                 sourcecitation.sourcecitationvolume,
-                geohistory.rangeformat(sourcecitation.sourcecitationpagefrom, sourcecitation.sourcecitationpageto) AS sourcecitationpage,
+                sourcecitation.sourcecitationpage,
                 sourcecitation.sourcecitationtypetitle,
                 sourcecitation.sourcecitationperson
             FROM geohistory.source

@@ -123,7 +123,7 @@ class LawSectionModel extends BaseModel
                 'Amended To Add ' || lawsection.lawsectionnewsymbol || CASE
                     WHEN lawsection.lawsectionnewfrom <> lawsection.lawsectionnewto THEN lawsection.lawsectionnewsymbol
                     ELSE ''
-                END || ' ' || geohistory.rangeformat(lawsection.lawsectionnewfrom, lawsection.lawsectionnewto) AS lawsectioneventrelationship,
+                END || ' ' || lawsection.lawsectionnewsection AS lawsectioneventrelationship,
                 lawsection.lawsectionnewfrom AS lawsectionfrom,
                 law.lawnumberchapter
             FROM geohistory.law

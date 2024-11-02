@@ -58,7 +58,7 @@ class RecordingModel extends BaseModel
                 eventrelationship.eventrelationshipshort AS recordingeventrelationship,
                 recording.recordingrepositoryshort,
                 recording.recordingrepositoryitemnumber,
-                geohistory.rangeformat(recording.recordingrepositoryitemfrom::text, recording.recordingrepositoryitemto::text) AS recordingrepositoryitemrange,
+                recording.recordingrepositoryitemrange,
                 recording.recordingrepositoryitemlocation,
                 recording.recordingrepositoryseries,
                 recording.recordingrepositorycontainer

@@ -25,8 +25,8 @@ class ResearchLogModel extends BaseModel
                     ELSE ''
                 END AS researchlogdate,
                 researchlog.researchlogdate AS researchlogdatesort,
-                geohistory.rangeformat(researchlog.researchlogvolumefrom, researchlog.researchlogvolumeto) AS researchlogvolume,
-                geohistory.rangeformat(researchlog.researchlogfrom, researchlog.researchlogto) AS researchlogrange,
+                researchlog.researchlogvolume,
+                researchlog.researchlogyear,
                 researchlog.researchlogismissing,
                 CASE
                     WHEN ? THEN researchlog.researchlognotes

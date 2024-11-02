@@ -16,7 +16,7 @@ class AdjudicationLocationModel extends BaseModel
         $query = <<<QUERY
             SELECT adjudicationlocationtype.adjudicationlocationtypelong,
                 adjudicationlocation.adjudicationlocationvolume,
-                geohistory.rangeformat(adjudicationlocation.adjudicationlocationpagefrom, adjudicationlocation.adjudicationlocationpageto) AS adjudicationlocationpage,
+                adjudicationlocation.adjudicationlocationpage,
                 adjudicationlocationtype.adjudicationlocationtypevolumetype,
                 adjudicationlocationtype.adjudicationlocationtypepagetype,
                 adjudicationlocationtype.adjudicationlocationtypearchiveseries,
