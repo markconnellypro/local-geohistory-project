@@ -9,11 +9,6 @@ class GovernmentShapeModel extends BaseModel
     // extra.ci_model_area_currentgovernment(v_governmentshapeid integer, v_state character varying, v_locale character varying)
     // extra.ci_model_area_currentgovernment(v_governmentshapeid text, v_state character varying, v_locale character varying)
 
-    // FUNCTION: extra.governmentabbreviation
-    // FUNCTION: extra.governmentlong
-    // FUNCTION: extra.governmentshort
-    // FUNCTION: extra.governmentslug
-
     public function getDetail(int|string $id): array
     {
         if (!is_int($id)) {
@@ -22,17 +17,25 @@ class GovernmentShapeModel extends BaseModel
 
         $query = <<<QUERY
             SELECT DISTINCT governmentshape.governmentshapeid,
-                COALESCE(extra.governmentslug(governmentshape.governmentsubmunicipality), '') AS governmentsubmunicipality,
-                COALESCE(extra.governmentlong(governmentshape.governmentsubmunicipality), '') AS governmentsubmunicipalitylong,
-                extra.governmentslug(governmentshape.governmentmunicipality) AS governmentmunicipality,
-                extra.governmentlong(governmentshape.governmentmunicipality) AS governmentmunicipalitylong,
-                extra.governmentslug(governmentshape.governmentcounty) AS governmentcounty,
-                extra.governmentshort(governmentshape.governmentcounty) AS governmentcountyshort,
-                extra.governmentslug(governmentshape.governmentstate) AS governmentstate,
-                extra.governmentabbreviation(governmentshape.governmentstate) AS governmentstateabbreviation,
+                COALESCE(governmentsubmunicipality.governmentslug, '') AS governmentsubmunicipality,
+                COALESCE(governmentsubmunicipality.governmentlong, '') AS governmentsubmunicipalitylong,
+                governmentmunicipality.governmentslug AS governmentmunicipality,
+                governmentmunicipality.governmentlong AS governmentmunicipalitylong,
+                governmentcounty.governmentslug AS governmentcounty,
+                governmentcounty.governmentshort AS governmentcountyshort,
+                governmentstate.governmentslug AS governmentstate,
+                governmentstate.governmentabbreviation AS governmentstateabbreviation,
                 governmentshape.governmentshapeid AS id,
                 public.st_asgeojson(governmentshape.governmentshapegeometry) AS geometry
             FROM gis.governmentshape
+            JOIN geohistory.government governmentmunicipality
+                ON governmentshape.governmentmunicipality = governmentmunicipality.governmentid
+            JOIN geohistory.government governmentcounty
+                ON governmentshape.governmentcounty = governmentcounty.governmentid
+            JOIN geohistory.government governmentstate
+                ON governmentshape.governmentstate = governmentstate.governmentid
+            LEFT JOIN geohistory.government governmentsubmunicipality
+                ON governmentshape.governmentsubmunicipality = governmentsubmunicipality.governmentid
             WHERE governmentshape.governmentshapeid = ?
             ORDER BY 8, 6, 4, 2
         QUERY;
@@ -65,7 +68,6 @@ class GovernmentShapeModel extends BaseModel
 
     // extra.ci_model_statistics_mapped_nation_part(character varying, integer, integer, character varying, boolean)
 
-    // FUNCTION: extra.governmentabbreviation
     // VIEW: extra.statistics_mapped
 
     public function getByStatisticsNationPart(array $parameters): array
@@ -80,16 +82,18 @@ class GovernmentShapeModel extends BaseModel
         $query = <<<QUERY
             WITH eventdata AS (
                 SELECT DISTINCT min(governmentidentifier.governmentidentifier) AS series,
-                statistics_mapped.governmentstate AS actualseries,
-                0 AS x,
-                statistics_mapped.percentmapped::numeric AS y
+                    statistics_mapped.governmentstate AS actualseries,
+                    0 AS x,
+                    statistics_mapped.percentmapped::numeric AS y
                 FROM extra.statistics_mapped
+                JOIN geohistory.government
+                    ON statistics_mapped.governmentstate = government.governmentabbreviation
                 JOIN geohistory.governmentidentifier
-                    ON statistics_mapped.governmentstate = extra.governmentabbreviation(governmentidentifier.government)
+                    ON government.governmentid = governmentidentifier.government
                     AND governmentidentifier.governmentidentifiertype = 1
                 WHERE statistics_mapped.governmenttype = 'state'
-                AND statistics_mapped.grouptype = ?
-                AND statistics_mapped.governmentstate = ANY (?)
+                    AND statistics_mapped.grouptype = ?
+                    AND statistics_mapped.governmentstate = ANY (?)
                 GROUP BY 2, 3, 4
             ), xvalue AS (
                 SELECT DISTINCT eventdata.series,
@@ -275,9 +279,6 @@ class GovernmentShapeModel extends BaseModel
     // extra.ci_model_government_shape(integer, character varying, character varying)
 
     // FUNCTION: extra.emptytonull
-    // FUNCTION: extra.governmentshort
-    // FUNCTION: extra.governmentlong
-    // FUNCTION: extra.governmentslug
     // FUNCTION: extra.plsstownshipshort
     // VIEW: extra.governmentsubstitutecache
 
@@ -377,11 +378,13 @@ class GovernmentShapeModel extends BaseModel
                         'eventdatetext', governmentshapeeventparts.eventdatetext,
                         'eventtextsortdate', governmentshapeeventparts.eventtextsortdate,
                         'eventgovernmentlong', CASE
-                            WHEN governmentshapeeventearliest.mineventsort = governmentshapeeventparts.eventsort OR governmentshapeeventparts.eventstatus = 'name' THEN extra.governmentlong(governmentshapeeventparts.governmentto)
+                            WHEN governmentshapeeventearliest.mineventsort = governmentshapeeventparts.eventsort OR governmentshapeeventparts.eventstatus = 'name' THEN government.governmentlong
                             ELSE NULL
                         END)) AS eventjson
-                    FROM governmentshapeeventparts,
-                        governmentshapeeventearliest
+                    FROM governmentshapeeventearliest,
+                        governmentshapeeventparts
+                    LEFT JOIN geohistory.government
+                        ON governmentshapeeventparts.governmentto = government.governmentid
             ), governmentshapeevent AS (
                     SELECT governmentshapeeventjsonparts.governmentshapeid,
                     lasteventstatus.eventstatus,
@@ -398,12 +401,12 @@ class GovernmentShapeModel extends BaseModel
             END AS governmentshapeslug,
             '' AS plsstownship,
             COALESCE(extra.plsstownshipshort(governmentshape.governmentshapeplsstownship), '') AS plsstownshipshort,
-            COALESCE(extra.governmentslug(governmentshape.governmentsubmunicipality), '') AS submunicipality,
-            COALESCE(extra.governmentlong(governmentshape.governmentsubmunicipality), '') AS submunicipalitylong,
-            extra.governmentslug(governmentshape.governmentmunicipality) AS municipality,
-            extra.governmentlong(governmentshape.governmentmunicipality) AS municipalitylong,
-            extra.governmentslug(governmentshape.governmentcounty) AS county,
-            extra.governmentshort(governmentshape.governmentcounty) AS countyshort,
+            COALESCE(governmentsubmunicipality.governmentslug, '') AS submunicipality,
+            COALESCE(governmentsubmunicipality.governmentlong, '') AS submunicipalitylong,
+            governmentmunicipality.governmentslug AS municipality,
+            governmentmunicipality.governmentlong AS municipalitylong,
+            governmentcounty.governmentslug AS county,
+            governmentcounty.governmentshort AS countyshort,
             st_asgeojson(governmentshape.governmentshapegeometry) AS geometry,
             CASE
                 WHEN NOT (ARRAY[governmentshape.governmentcounty, governmentshape.governmentmunicipality, governmentshape.governmentshapeplsstownship, governmentshape.governmentschooldistrict, governmentshape.governmentsubmunicipality, governmentshape.governmentward] && ARRAY[?::integer]) AND governmentshapeevent.governmentshapeid IS NOT NULL AND governmentshapeevent.eventstatus = 'proposed' THEN 1
@@ -416,6 +419,12 @@ class GovernmentShapeModel extends BaseModel
                 ELSE governmentshapeevent.eventjson
             END AS eventjson
             FROM gis.governmentshape
+            JOIN geohistory.government governmentmunicipality
+                ON governmentshape.governmentmunicipality = governmentmunicipality.governmentid
+            JOIN geohistory.government governmentcounty
+                ON governmentshape.governmentcounty = governmentcounty.governmentid
+            LEFT JOIN geohistory.government governmentsubmunicipality
+                ON governmentshape.governmentsubmunicipality = governmentsubmunicipality.governmentid
             LEFT JOIN governmentshapeevent
             ON governmentshape.governmentshapeid = governmentshapeevent.governmentshapeid
             WHERE governmentshape.governmentmunicipality = ? OR
