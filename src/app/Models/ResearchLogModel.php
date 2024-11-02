@@ -8,7 +8,6 @@ class ResearchLogModel extends BaseModel
 {
     // extra.ci_model_government_researchlog(integer, character varying, boolean)
 
-    // FUNCTION: extra.governmentlong
     // FUNCTION: extra.shortdate
     // VIEW: extra.governmentsubstitutecache
 
@@ -32,10 +31,12 @@ class ResearchLogModel extends BaseModel
                     WHEN ? THEN researchlog.researchlognotes
                     ELSE ''
                 END AS researchlognotes,
-                extra.governmentlong(researchlog.government) AS governmentlong
+                government.governmentlong
             FROM geohistory.researchlog
             JOIN geohistory.researchlogtype
                 ON researchlog.researchlogtype = researchlogtype.researchlogtypeid
+            JOIN geohistory.government
+                ON researchlog.government = government.governmentid
             JOIN extra.governmentsubstitutecache
                 ON researchlog.government = governmentsubstitutecache.governmentid
                 AND governmentsubstitutecache.governmentsubstitute = ?

@@ -36,7 +36,6 @@ class GovernmentIdentifierModel extends BaseModel
 
     // extra.ci_model_government_identifier(integer, character varying, character varying)
 
-    // FUNCTION: extra.governmentlong
     // VIEW: extra.governmentsubstitutecache
 
     public function getByGovernment(int $id): array
@@ -48,11 +47,13 @@ class GovernmentIdentifierModel extends BaseModel
                 governmentidentifier.governmentidentifierprefix || governmentidentifiertype.governmentidentifiertypeprefixdelimiter || governmentidentifier.governmentidentifier AS governmentidentifier,
                 governmentidentifier.governmentidentifierstatus,
                 replace(replace(governmentidentifiertype.governmentidentifiertypeurl, '<Identifier>', governmentidentifier.governmentidentifierprefix || governmentidentifiertype.governmentidentifiertypeprefixdelimiter || governmentidentifier.governmentidentifier), '<Language>', ?) AS governmentidentifiertypeurl,
-                extra.governmentlong(governmentidentifier.government) AS governmentlong
+                government.governmentlong
             FROM geohistory.governmentidentifier
-                JOIN geohistory.governmentidentifiertype
+            JOIN geohistory.government
+                ON governmentidentifier.government = government.governmentid
+            JOIN geohistory.governmentidentifiertype
                 ON governmentidentifier.governmentidentifiertype = governmentidentifiertype.governmentidentifiertypeid
-                JOIN extra.governmentsubstitutecache
+            JOIN extra.governmentsubstitutecache
                 ON governmentidentifier.government = governmentsubstitutecache.governmentid
                 AND governmentsubstitutecache.governmentsubstitute = ?
         QUERY;
