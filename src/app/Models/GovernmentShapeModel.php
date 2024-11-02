@@ -515,7 +515,7 @@ class GovernmentShapeModel extends BaseModel
             $z,
             $z,
             $x,
-            $y,         
+            $y,
         ]);
 
         return $this->getObject($query);
