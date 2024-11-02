@@ -8,23 +8,26 @@ class CurrentGovernmentModel extends BaseModel
 {
     // extra.ci_model_event_currentgovernment(integer, character varying, character varying)
 
-    // FUNCTION: extra.governmentabbreviation
-    // FUNCTION: extra.governmentlong
-    // FUNCTION: extra.governmentshort
-    // FUNCTION: extra.governmentslug
-
     public function getByEvent(int $id): array
     {
         $query = <<<QUERY
-            SELECT COALESCE(extra.governmentslug(currentgovernment.governmentsubmunicipality), '') AS governmentsubmunicipality,
-                COALESCE(extra.governmentlong(currentgovernment.governmentsubmunicipality), '') AS governmentsubmunicipalitylong,
-                extra.governmentslug(currentgovernment.governmentmunicipality) AS governmentmunicipality,
-                extra.governmentlong(currentgovernment.governmentmunicipality) AS governmentmunicipalitylong,
-                extra.governmentslug(currentgovernment.governmentcounty) AS governmentcounty,
-                extra.governmentshort(currentgovernment.governmentcounty) AS governmentcountyshort,
-                extra.governmentslug(currentgovernment.governmentstate) AS governmentstate,
-                extra.governmentabbreviation(currentgovernment.governmentstate) AS governmentstateabbreviation
+            SELECT COALESCE(governmentsubmunicipality.governmentslugsubstitute, '') AS governmentsubmunicipality,
+                COALESCE(governmentsubmunicipality.governmentlong, '') AS governmentsubmunicipalitylong,
+                governmentmunicipality.governmentslugsubstitute AS governmentmunicipality,
+                governmentmunicipality.governmentlong AS governmentmunicipalitylong,
+                governmentcounty.governmentslugsubstitute AS governmentcounty,
+                governmentcounty.governmentshort AS governmentcountyshort,
+                governmentstate.governmentslugsubstitute AS governmentstate,
+                governmentstate.governmentabbreviation AS governmentstateabbreviation
             FROM geohistory.currentgovernment
+            JOIN geohistory.government governmentmunicipality
+                ON currentgovernment.governmentmunicipality = governmentmunicipality.governmentid
+            JOIN geohistory.government governmentcounty
+                ON currentgovernment.governmentcounty = governmentcounty.governmentid
+            JOIN geohistory.government governmentstate
+                ON currentgovernment.governmentstate = governmentstate.governmentid
+            LEFT JOIN geohistory.government governmentsubmunicipality
+                ON currentgovernment.governmentsubmunicipality = governmentsubmunicipality.governmentid
             WHERE currentgovernment.event = ?
             ORDER BY 8, 6, 4, 2
         QUERY;

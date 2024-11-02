@@ -24,7 +24,7 @@ class GovernmentModel extends BaseModel
 
         $query = <<<QUERY
             SELECT government.governmentid,
-                extra.governmentlong(government.governmentid) AS governmentlong,
+                government.governmentlong,
                     CASE
                         WHEN government.governmentcurrentform IS NULL THEN government.governmenttype
                         ELSE governmentform.governmentformlongextended
@@ -132,16 +132,15 @@ class GovernmentModel extends BaseModel
 
     // extra.ci_model_governmentidentifier_government(integer[], character varying)
 
-    // FUNCTION: extra.governmentlong
-    // FUNCTION: extra.governmentslug
-
     public function getByGovernmentIdentifier(string $ids): array
     {
         $query = <<<QUERY
-            SELECT extra.governmentslug(governmentidentifier.government) governmentslug,
-                extra.governmentlong(governmentidentifier.government) AS governmentlong,
+            SELECT government.governmentslugsubstitute AS governmentslug,
+                government.governmentlong,
                 governmentidentifier.governmentidentifierstatus AS governmentparentstatus
             FROM geohistory.governmentidentifier
+            JOIN geohistory.government
+                ON governmentidentifier.government = government.governmentid
             WHERE governmentidentifier.governmentidentifierid = ANY (?);
         QUERY;
 
@@ -734,7 +733,6 @@ class GovernmentModel extends BaseModel
     // extra.ci_model_government_related(integer, character varying, character varying)
 
     // FUNCTION: extra.governmentlong
-    // FUNCTION: extra.governmentslug
     // VIEW: extra.governmentparentcache
     // VIEW: extra.governmentsubstitutecache
 
@@ -742,11 +740,7 @@ class GovernmentModel extends BaseModel
     {
         $query = <<<QUERY
             WITH relationpart AS (
-                SELECT DISTINCT extra.governmentslug(
-                    CASE
-                        WHEN government.governmentstatus = ANY (ARRAY['alternate', 'language']) THEN government.governmentsubstitute
-                        ELSE government.governmentid
-                    END) AS governmentslug,
+                SELECT DISTINCT government.governmentslugsubstitute AS governmentslug,
                 'government' AS governmentslugtype,
                 extra.governmentlong(governmentparentcache.governmentparent) AS governmentlong,
                 'Parent' AS governmentrelationship,
@@ -771,11 +765,7 @@ class GovernmentModel extends BaseModel
                     LEFT JOIN geohistory.governmentmapstatus ON government.governmentmapstatus = governmentmapstatus.governmentmapstatusid AND governmentmapstatus.governmentmapstatusreviewed AND (government.governmentstatus <> ALL (ARRAY['proposed', 'unincorporated']))
                 WHERE governmentparentcache.governmentparentstatus <> 'placeholder' AND governmentparentcache.governmentparent IS NOT NULL
                 UNION
-                SELECT DISTINCT extra.governmentslug(
-                    CASE
-                        WHEN government.governmentstatus = ANY (ARRAY['alternate', 'language']) THEN government.governmentsubstitute
-                        ELSE government.governmentid
-                    END) AS governmentslug,
+                SELECT DISTINCT government.governmentslugsubstitute AS governmentslug,
                 'government' AS governmentslugtype,
                 extra.governmentlong(governmentparentcache.governmentid) AS governmentlong,
                 'Child' AS governmentrelationship,
@@ -808,7 +798,7 @@ class GovernmentModel extends BaseModel
                 UNION
                 SELECT DISTINCT event.eventslug AS governmentslug,
                 'event' AS governmentslugtype,
-                extra.governmentlong(government.governmentid) AS governmentlong,
+                government.governmentlong,
                     CASE
                         WHEN government.governmentstatus = ANY (ARRAY['alternate', 'language']) THEN 'Variant'
                         ELSE 'Historic'
@@ -890,8 +880,6 @@ class GovernmentModel extends BaseModel
 
     // extra.ci_model_search_government_government(text, text, text, integer, text, character varying)
 
-    // FUNCTION: extra.governmentlong
-    // FUNCTION: extra.governmentslug
     // VIEW: extra.governmentrelationcache
 
     public function getSearchByGovernment(array $parameters): array
@@ -916,11 +904,8 @@ class GovernmentModel extends BaseModel
                     OR (? = 'statewide' AND governmentrelationcache.governmentlevel = 2)
                 )
             )
-            SELECT DISTINCT extra.governmentslug(CASE
-                    WHEN government.governmentstatus IN ('alternate', 'language') THEN government.governmentsubstitute
-                    ELSE government.governmentid
-                END) AS governmentslug,
-                extra.governmentlong(government.governmentid) AS governmentlong
+            SELECT DISTINCT government.governmentslugsubstitute AS governmentslug,
+                government.governmentlong
                 FROM selectedgovernment
                 JOIN extra.governmentrelationcache
                 ON selectedgovernment.governmentid = governmentrelationcache.governmentid 
@@ -929,11 +914,8 @@ class GovernmentModel extends BaseModel
                 JOIN geohistory.government
                 ON governmentrelationcache.governmentrelation = government.governmentid
             UNION DISTINCT
-            SELECT DISTINCT extra.governmentslug(CASE
-                    WHEN government.governmentstatus IN ('alternate', 'language') THEN government.governmentsubstitute
-                    ELSE government.governmentid
-                END) AS governmentslug,
-                extra.governmentlong(government.governmentid) AS governmentlong
+            SELECT DISTINCT government.governmentslugsubstitute AS governmentslug,
+                government.governmentlong
                 FROM selectedgovernment
                 JOIN extra.governmentrelationcache
                 ON selectedgovernment.governmentid = governmentrelationcache.governmentrelation

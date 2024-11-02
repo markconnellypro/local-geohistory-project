@@ -8,15 +8,13 @@ class RecordingModel extends BaseModel
 {
     // extra.ci_model_event_recording(integer, character varying, character varying)
 
-    // FUNCTION: extra.governmentshort
-    // FUNCTION: extra.governmentslug
     // FUNCTION: extra.shortdate
 
     public function getByEvent(int $id): array
     {
         $query = <<<QUERY
-            SELECT extra.governmentslug(recordingoffice.government) AS government,
-                extra.governmentshort(recordingoffice.government) AS governmentshort,
+            SELECT government.governmentslugsubstitute AS government,
+                government.governmentshort,
                 trim(recordingtype.recordingtypelong || CASE
                     WHEN recordingtype.recordingtypetype = '' THEN ''
                     ELSE ' ' || recordingtype.recordingtypetype
@@ -70,6 +68,8 @@ class RecordingModel extends BaseModel
                 ON recordingevent.eventrelationship = eventrelationship.eventrelationshipid
             JOIN geohistory.recordingoffice
                 ON recording.recordingoffice = recordingoffice.recordingofficeid
+            JOIN geohistory.government
+                ON recordingoffice.government = government.governmentid
             LEFT JOIN geohistory.recordingtype
                 ON recording.recordingtype = recordingtype.recordingtypeid
             LEFT JOIN geohistory.recordingtype recordingnumbertype

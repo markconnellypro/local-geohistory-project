@@ -11,7 +11,6 @@ class EventModel extends BaseModel
     // extra.ci_model_event_detail(text, character varying)
 
     // FUNCTION: extra.shortdate
-    // FUNCTION: extra.governmentslug
 
     public function getDetail(int|string $id): array
     {
@@ -40,7 +39,7 @@ class EventModel extends BaseModel
                 other.otherdate,
                 other.otherdatetype,
                 event.eventismapped,
-                extra.governmentslug(event.government) AS government
+                government.governmentslugsubstitute AS government
             FROM geohistory.event
                 JOIN geohistory.eventgranted
                 ON event.eventgranted = eventgranted.eventgrantedid
@@ -48,6 +47,8 @@ class EventModel extends BaseModel
                 ON event.eventmethod = eventmethod.eventmethodid 
                 JOIN geohistory.eventtype
                 ON event.eventtype = eventtype.eventtypeid
+                LEFT JOIN geohistory.government
+                    ON event.government = government.governmentid
                 LEFT JOIN ( SELECT other_1.otherdate,
                         other_1.otherdatetype
                     FROM ( SELECT DISTINCT extra.shortdate(filing.filingdate) AS otherdate,

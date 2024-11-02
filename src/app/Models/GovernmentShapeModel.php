@@ -17,13 +17,13 @@ class GovernmentShapeModel extends BaseModel
 
         $query = <<<QUERY
             SELECT DISTINCT governmentshape.governmentshapeid,
-                COALESCE(governmentsubmunicipality.governmentslug, '') AS governmentsubmunicipality,
+                COALESCE(governmentsubmunicipality.governmentslugsubstitute, '') AS governmentsubmunicipality,
                 COALESCE(governmentsubmunicipality.governmentlong, '') AS governmentsubmunicipalitylong,
-                governmentmunicipality.governmentslug AS governmentmunicipality,
+                governmentmunicipality.governmentslugsubstitute AS governmentmunicipality,
                 governmentmunicipality.governmentlong AS governmentmunicipalitylong,
-                governmentcounty.governmentslug AS governmentcounty,
+                governmentcounty.governmentslugsubstitute AS governmentcounty,
                 governmentcounty.governmentshort AS governmentcountyshort,
-                governmentstate.governmentslug AS governmentstate,
+                governmentstate.governmentslugsubstitute AS governmentstate,
                 governmentstate.governmentabbreviation AS governmentstateabbreviation,
                 governmentshape.governmentshapeid AS id,
                 public.st_asgeojson(governmentshape.governmentshapegeometry) AS geometry
@@ -401,11 +401,11 @@ class GovernmentShapeModel extends BaseModel
             END AS governmentshapeslug,
             '' AS plsstownship,
             COALESCE(extra.plsstownshipshort(governmentshape.governmentshapeplsstownship), '') AS plsstownshipshort,
-            COALESCE(governmentsubmunicipality.governmentslug, '') AS submunicipality,
+            COALESCE(governmentsubmunicipality.governmentslugsubstitute, '') AS submunicipality,
             COALESCE(governmentsubmunicipality.governmentlong, '') AS submunicipalitylong,
-            governmentmunicipality.governmentslug AS municipality,
+            governmentmunicipality.governmentslugsubstitute AS municipality,
             governmentmunicipality.governmentlong AS municipalitylong,
-            governmentcounty.governmentslug AS county,
+            governmentcounty.governmentslugsubstitute AS county,
             governmentcounty.governmentshort AS countyshort,
             st_asgeojson(governmentshape.governmentshapegeometry) AS geometry,
             CASE

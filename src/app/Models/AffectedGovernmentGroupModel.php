@@ -8,16 +8,12 @@ class AffectedGovernmentGroupModel extends BaseModel
 {
     // extra.ci_model_event_affectedgovernmentform(integer, character varying, boolean, character varying)
 
-    // FUNCTION: extra.governmentformlong
-    // FUNCTION: extra.governmentlong
-    // FUNCTION: extra.governmentslug
-
     public function getByEventForm(int $id): array
     {
         $query = <<<QUERY
-            SELECT DISTINCT extra.governmentslug(affectedgovernmentpart.governmentto) AS governmentslug,
-                extra.governmentlong(affectedgovernmentpart.governmentto) AS governmentlong,
-                extra.governmentformlong(affectedgovernmentpart.governmentformto, ?) governmentformlong
+            SELECT DISTINCT government.governmentslugsubstitute AS governmentslug,
+                government.governmentlong,
+                governmentform.governmentformlong
             FROM geohistory.affectedgovernmentgroup
             JOIN geohistory.affectedgovernmentgrouppart
                 ON affectedgovernmentgroup.event = ?
@@ -25,6 +21,10 @@ class AffectedGovernmentGroupModel extends BaseModel
             JOIN geohistory.affectedgovernmentpart
                 ON affectedgovernmentgrouppart.affectedgovernmentpart = affectedgovernmentpart.affectedgovernmentpartid
                 AND affectedgovernmentpart.governmentformto IS NOT NULL
+            JOIN geohistory.government
+                ON affectedgovernmentpart.governmentto = government.governmentid
+            JOIN geohistory.governmentform
+                ON affectedgovernmentpart.governmentformto = governmentform.governmentformid
             ORDER BY 3, 2
         QUERY;
 
@@ -65,10 +65,6 @@ class AffectedGovernmentGroupModel extends BaseModel
 
     // extra.ci_model_event_affectedgovernment_part(integer, character varying, character varying)
 
-    // FUNCTION: extra.governmentslug
-    // FUNCTION: extra.governmentlong
-    // FUNCTION: extra.affectedtypeshort
-
     public function getByEventGovernment(int $id): array
     {
         $query = <<<QUERY
@@ -76,12 +72,12 @@ class AffectedGovernmentGroupModel extends BaseModel
                 affectedgovernmentlevel.affectedgovernmentlevellong AS affectedgovernmentlevellong,
                 affectedgovernmentlevel.affectedgovernmentleveldisplayorder AS affectedgovernmentleveldisplayorder,
                 affectedgovernmentlevel.affectedgovernmentlevelgroup = 4 AS includelink,
-                COALESCE(extra.governmentslug(affectedgovernmentpart.governmentfrom), '') AS governmentfrom,
-                COALESCE(extra.governmentlong(affectedgovernmentpart.governmentfrom), '') AS governmentfromlong,
-                COALESCE(extra.affectedtypeshort(affectedgovernmentpart.affectedtypefrom), '') AS affectedtypefrom,
-                COALESCE(extra.governmentslug(affectedgovernmentpart.governmentto), '') AS governmentto,
-                COALESCE(extra.governmentlong(affectedgovernmentpart.governmentto), '') AS governmenttolong,
-                COALESCE(extra.affectedtypeshort(affectedgovernmentpart.affectedtypeto), '') AS affectedtypeto
+                COALESCE(governmentfrom.governmentslugsubstitute, '') AS governmentfrom,
+                COALESCE(governmentfrom.governmentlong, '') AS governmentfromlong,
+                COALESCE(affectedtypefrom.affectedtypeshort, '') AS affectedtypefrom,
+                COALESCE(governmentto.governmentslugsubstitute, '') AS governmentto,
+                COALESCE(governmentto.governmentlong, '') AS governmenttolong,
+                COALESCE(affectedtypefrom.affectedtypeshort, '') AS affectedtypeto
             FROM geohistory.affectedgovernmentgroup
             JOIN geohistory.affectedgovernmentgrouppart
                 ON affectedgovernmentgroup.affectedgovernmentgroupid = affectedgovernmentgrouppart.affectedgovernmentgroup
@@ -90,6 +86,14 @@ class AffectedGovernmentGroupModel extends BaseModel
                 ON affectedgovernmentgrouppart.affectedgovernmentlevel = affectedgovernmentlevel.affectedgovernmentlevelid
             JOIN geohistory.affectedgovernmentpart
                 ON affectedgovernmentgrouppart.affectedgovernmentpart = affectedgovernmentpart.affectedgovernmentpartid
+            LEFT JOIN geohistory.affectedtype affectedtypefrom
+                ON affectedgovernmentpart.affectedtypefrom = affectedtypefrom.affectedtypeid
+            LEFT JOIN geohistory.affectedtype affectedtypeto
+                ON affectedgovernmentpart.affectedtypeto = affectedtypeto.affectedtypeid
+            LEFT JOIN geohistory.government governmentfrom
+                ON affectedgovernmentpart.governmentfrom = governmentfrom.governmentid
+            LEFT JOIN geohistory.government governmentto
+                ON affectedgovernmentpart.governmentto = governmentto.governmentid
             ORDER BY 1, 2
         QUERY;
 
@@ -150,8 +154,6 @@ class AffectedGovernmentGroupModel extends BaseModel
     // extra.ci_model_government_affectedgovernment(integer, character varying, character varying)
     // NOT REMOVED
 
-    // FUNCTION: extra.governmentlong
-    // FUNCTION: extra.governmentslug
     // FUNCTION: extra.governmentsubstitutedcache
     // VIEW: extra.governmentsubstitutecache
 
@@ -165,10 +167,10 @@ class AffectedGovernmentGroupModel extends BaseModel
                     WHEN affectedgovernment.affectedtypesamewithin THEN ' (Within)'
                     ELSE ''
                 END AS affectedtypesame,
-                extra.governmentlong(affectedgovernment.government) AS governmentlong,
+                government.governmentlong,
                 CASE
                     WHEN affectedgovernment.government = ANY (extra.governmentsubstitutedcache(?)) THEN ''
-                    ELSE extra.governmentslug(affectedgovernment.government)
+                    ELSE government.governmentslugsubstitute
                 END AS governmentslug,
                 affectedtypeother.affectedtypeshort || CASE
                     WHEN affectedgovernment.affectedtypeotherwithin THEN ' (Within)'
@@ -178,7 +180,7 @@ class AffectedGovernmentGroupModel extends BaseModel
                 event.eventeffectivetext AS eventeffective,
                 event.eventeffective AS eventeffectivesort,
                 NOT eventgranted.eventgrantedcertainty AS eventreconstructed,
-                extra.governmentlong(affectedgovernment.governmentaffected) AS governmentaffectedlong
+                governmentaffected.governmentlong AS governmentaffectedlong
             FROM (
                 -- To-From
                     SELECT DISTINCT affectedgovernmentgroup.event,
@@ -271,14 +273,18 @@ class AffectedGovernmentGroupModel extends BaseModel
                         AND otherpart.governmentfrom IS NOT NULL
             ) AS affectedgovernment
                 JOIN geohistory.event
-                ON affectedgovernment.event = event.eventid
+                    ON affectedgovernment.event = event.eventid
                 JOIN geohistory.eventgranted
-                ON event.eventgranted = eventgranted.eventgrantedid
-                AND eventgranted.eventgrantedsuccess
+                    ON event.eventgranted = eventgranted.eventgrantedid
+                    AND eventgranted.eventgrantedsuccess
                 JOIN geohistory.affectedtype affectedtypesame
-                ON affectedgovernment.affectedtypesame = affectedtypesame.affectedtypeid
+                    ON affectedgovernment.affectedtypesame = affectedtypesame.affectedtypeid
                 JOIN geohistory.affectedtype affectedtypeother
-                ON affectedgovernment.affectedtypeother = affectedtypeother.affectedtypeid
+                    ON affectedgovernment.affectedtypeother = affectedtypeother.affectedtypeid
+                JOIN geohistory.government
+                    ON affectedgovernment.government = government.governmentid
+                JOIN geohistory.government governmentaffected
+                    ON affectedgovernment.governmentaffected = governmentaffected.governmentid
             WHERE affectedgovernment.government <> affectedgovernment.governmentaffected
                 AND NOT (
                 (
@@ -374,17 +380,25 @@ class AffectedGovernmentGroupModel extends BaseModel
             ), currentgovernment AS (
                 -- Taken from GovernmentShapeModel->getDetail
                 SELECT DISTINCT governmentshape.governmentshapeid,
-                    COALESCE(extra.governmentslug(governmentshape.governmentsubmunicipality), '') AS governmentsubmunicipality,
-                    COALESCE(extra.governmentlong(governmentshape.governmentsubmunicipality), '') AS governmentsubmunicipalitylong,
-                    extra.governmentslug(governmentshape.governmentmunicipality) AS governmentmunicipality,
-                    extra.governmentlong(governmentshape.governmentmunicipality) AS governmentmunicipalitylong,
-                    extra.governmentslug(governmentshape.governmentcounty) AS governmentcounty,
-                    extra.governmentshort(governmentshape.governmentcounty) AS governmentcountyshort,
-                    extra.governmentslug(governmentshape.governmentstate) AS governmentstate,
-                    extra.governmentabbreviation(governmentshape.governmentstate) AS governmentstateabbreviation,
+                    COALESCE(governmentsubmunicipality.governmentslugsubstitute, '') AS governmentsubmunicipality,
+                    COALESCE(governmentsubmunicipality.governmentlong, '') AS governmentsubmunicipalitylong,
+                    governmentmunicipality.governmentslugsubstitute AS governmentmunicipality,
+                    governmentmunicipality.governmentlong AS governmentmunicipalitylong,
+                    governmentcounty.governmentslugsubstitute AS governmentcounty,
+                    governmentcounty.governmentshort AS governmentcountyshort,
+                    governmentstate.governmentslugsubstitute AS governmentstate,
+                    governmentstate.governmentabbreviation AS governmentstateabbreviation,
                     governmentshape.governmentshapeid AS id,
                     public.st_asgeojson(governmentshape.governmentshapegeometry) AS geometry
                 FROM gis.governmentshape
+                JOIN geohistory.government governmentmunicipality
+                    ON governmentshape.governmentmunicipality = governmentmunicipality.governmentid
+                JOIN geohistory.government governmentcounty
+                    ON governmentshape.governmentcounty = governmentcounty.governmentid
+                JOIN geohistory.government governmentstate
+                    ON governmentshape.governmentstate = governmentstate.governmentid
+                LEFT JOIN geohistory.government governmentsubmunicipality
+                    ON governmentshape.governmentsubmunicipality = governmentsubmunicipality.governmentid
                 WHERE governmentshape.governmentshapeid = ?
             )
             SELECT eventid, eventslug, municipalityfrom, municipalityfromlong, affectedtypemunicipalityfrom, countyfrom, countyfromshort, affectedtypecountyfrom, statefrom, statefromabbreviation, affectedtypestatefrom, municipalityto, municipalitytolong, affectedtypemunicipalityto, countyto, countytoshort, affectedtypecountyto, stateto, statetoabbreviation, affectedtypestateto, textflag, submunicipalityfrom, submunicipalityfromlong, affectedtypesubmunicipalityfrom, submunicipalityto, submunicipalitytolong, affectedtypesubmunicipalityto, subcountyfrom, subcountyfromshort, affectedtypesubcountyfrom, subcountyto, subcountytoshort, affectedtypesubcountyto, eventyear, eventeffective, eventsort, 

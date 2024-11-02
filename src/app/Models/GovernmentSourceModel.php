@@ -19,7 +19,7 @@ class GovernmentSourceModel extends BaseModel
 
         $query = <<<QUERY
             SELECT DISTINCT governmentsource.governmentsourceid,
-                government.governmentslug,
+                government.governmentslugsubstitute AS governmentslug,
                 government.governmentlong,
                 governmentsource.governmentsourcetype,
                 governmentsource.governmentsourcenumber,
@@ -102,7 +102,7 @@ class GovernmentSourceModel extends BaseModel
     public function getByEvent(int $id): array
     {
         $query = <<<QUERY
-            SELECT DISTINCT government.governmentslug,
+            SELECT DISTINCT government.governmentslugsubstitute AS governmentslug,
                 government.governmentlong,
                 governmentsource.governmentsourcetype,
                 governmentsource.governmentsourcenumber,
