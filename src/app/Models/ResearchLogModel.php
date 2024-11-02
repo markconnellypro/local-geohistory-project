@@ -9,7 +9,6 @@ class ResearchLogModel extends BaseModel
     // extra.ci_model_government_researchlog(integer, character varying, boolean)
 
     // FUNCTION: extra.governmentlong
-    // FUNCTION: extra.rangefix
     // FUNCTION: extra.shortdate
     // VIEW: extra.governmentsubstitutecache
 
@@ -26,8 +25,8 @@ class ResearchLogModel extends BaseModel
                     ELSE ''
                 END AS researchlogdate,
                 researchlog.researchlogdate AS researchlogdatesort,
-                extra.rangefix(researchlog.researchlogvolumefrom, researchlog.researchlogvolumeto) AS researchlogvolume,
-                extra.rangefix(researchlog.researchlogfrom, researchlog.researchlogto) AS researchlogrange,
+                geohistory.rangeformat(researchlog.researchlogvolumefrom, researchlog.researchlogvolumeto) AS researchlogvolume,
+                geohistory.rangeformat(researchlog.researchlogfrom, researchlog.researchlogto) AS researchlogrange,
                 researchlog.researchlogismissing,
                 CASE
                     WHEN ? THEN researchlog.researchlognotes

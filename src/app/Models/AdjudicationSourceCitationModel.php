@@ -9,7 +9,6 @@ class AdjudicationSourceCitationModel extends BaseModel
     // extra.ci_model_reporter_detail(integer, character varying)
     // extra.ci_model_reporter_detail(text, character varying)
 
-    // FUNCTION: extra.rangefix
     // FUNCTION: extra.shortdate
 
     public function getDetail(int|string $id): array
@@ -23,7 +22,7 @@ class AdjudicationSourceCitationModel extends BaseModel
                 source.sourceshort,
                 source.sourceabbreviation,
                 adjudicationsourcecitation.adjudicationsourcecitationvolume,
-                extra.rangefix(adjudicationsourcecitation.adjudicationsourcecitationpagefrom::text, adjudicationsourcecitation.adjudicationsourcecitationpageto::text) AS adjudicationsourcecitationpage,
+                geohistory.rangeformat(adjudicationsourcecitation.adjudicationsourcecitationpagefrom::text, adjudicationsourcecitation.adjudicationsourcecitationpageto::text) AS adjudicationsourcecitationpage,
                 adjudicationsourcecitation.adjudicationsourcecitationyear,
                 extra.shortdate(adjudicationsourcecitation.adjudicationsourcecitationdate) AS adjudicationsourcecitationdate,
                 adjudicationsourcecitation.adjudicationsourcecitationdate AS adjudicationsourcecitationdatesort,
@@ -49,7 +48,6 @@ class AdjudicationSourceCitationModel extends BaseModel
 
     // extra.ci_model_adjudication_source(integer)
 
-    // FUNCTION: extra.rangefix
     // FUNCTION: extra.shortdate
 
     public function getByAdjudication(int $id): array
@@ -58,7 +56,7 @@ class AdjudicationSourceCitationModel extends BaseModel
             SELECT adjudicationsourcecitation.adjudicationsourcecitationslug,
                 source.sourceshort,
                 adjudicationsourcecitation.adjudicationsourcecitationvolume,
-                extra.rangefix(adjudicationsourcecitation.adjudicationsourcecitationpagefrom::text, adjudicationsourcecitation.adjudicationsourcecitationpageto::text) AS adjudicationsourcecitationpage,
+                geohistory.rangeformat(adjudicationsourcecitation.adjudicationsourcecitationpagefrom::text, adjudicationsourcecitation.adjudicationsourcecitationpageto::text) AS adjudicationsourcecitationpage,
                 adjudicationsourcecitation.adjudicationsourcecitationyear,
                 extra.shortdate(adjudicationsourcecitation.adjudicationsourcecitationdate) AS adjudicationsourcecitationdate,
                 adjudicationsourcecitation.adjudicationsourcecitationdate AS adjudicationsourcecitationdatesort,

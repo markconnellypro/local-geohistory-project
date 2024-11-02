@@ -8,7 +8,6 @@ class AdjudicationLocationModel extends BaseModel
 {
     // extra.ci_model_adjudication_location(integer)
 
-    // FUNCTION: extra.rangefix
     // FUNCTION: extra.tribunallong
     // FUNCTION: extra.tribunalfilingoffice
 
@@ -17,7 +16,7 @@ class AdjudicationLocationModel extends BaseModel
         $query = <<<QUERY
             SELECT adjudicationlocationtype.adjudicationlocationtypelong,
                 adjudicationlocation.adjudicationlocationvolume,
-                extra.rangefix(adjudicationlocation.adjudicationlocationpagefrom, adjudicationlocation.adjudicationlocationpageto) AS adjudicationlocationpage,
+                geohistory.rangeformat(adjudicationlocation.adjudicationlocationpagefrom, adjudicationlocation.adjudicationlocationpageto) AS adjudicationlocationpage,
                 adjudicationlocationtype.adjudicationlocationtypevolumetype,
                 adjudicationlocationtype.adjudicationlocationtypepagetype,
                 adjudicationlocationtype.adjudicationlocationtypearchiveseries,

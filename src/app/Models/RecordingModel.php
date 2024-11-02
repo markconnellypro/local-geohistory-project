@@ -10,7 +10,6 @@ class RecordingModel extends BaseModel
 
     // FUNCTION: extra.governmentshort
     // FUNCTION: extra.governmentslug
-    // FUNCTION: extra.rangefix
     // FUNCTION: extra.shortdate
 
     public function getByEvent(int $id): array
@@ -59,7 +58,7 @@ class RecordingModel extends BaseModel
                 eventrelationship.eventrelationshipshort AS recordingeventrelationship,
                 recording.recordingrepositoryshort,
                 recording.recordingrepositoryitemnumber,
-                extra.rangefix(recording.recordingrepositoryitemfrom::text, recording.recordingrepositoryitemto::text) AS recordingrepositoryitemrange,
+                geohistory.rangeformat(recording.recordingrepositoryitemfrom::text, recording.recordingrepositoryitemto::text) AS recordingrepositoryitemrange,
                 recording.recordingrepositoryitemlocation,
                 recording.recordingrepositoryseries,
                 recording.recordingrepositorycontainer

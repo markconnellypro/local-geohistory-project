@@ -9,7 +9,6 @@ class GovernmentSourceModel extends BaseModel
     // extra.ci_model_governmentsource_detail(integer, character varying, boolean, character varying)
     // extra.ci_model_governmentsource_detail(text, character varying, boolean, character varying)
 
-    // FUNCTION: extra.rangefix
     // FUNCTION: extra.shortdate
 
     public function getDetail(int|string $id): array
@@ -57,7 +56,7 @@ class GovernmentSourceModel extends BaseModel
                 END ||
                 CASE
                     WHEN governmentsource.governmentsourcepagefrom = '' OR governmentsource.governmentsourcepagefrom = '0' THEN ''
-                    ELSE ' p. ' || extra.rangefix(governmentsource.governmentsourcepagefrom, governmentsource.governmentsourcepageto)
+                    ELSE ' p. ' || geohistory.rangeformat(governmentsource.governmentsourcepagefrom, governmentsource.governmentsourcepageto)
                 END) AS governmentsourcelocation,
                 trim(CASE
                     WHEN governmentsource.sourcecitationvolumetype = '' OR governmentsource.sourcecitationvolume = '' THEN ''
@@ -73,7 +72,7 @@ class GovernmentSourceModel extends BaseModel
                 END ||
                 CASE
                     WHEN governmentsource.sourcecitationpagefrom = '' OR governmentsource.sourcecitationpagefrom = '0' THEN ''
-                    ELSE ' p. ' || extra.rangefix(governmentsource.sourcecitationpagefrom, governmentsource.sourcecitationpageto)
+                    ELSE ' p. ' || geohistory.rangeformat(governmentsource.sourcecitationpagefrom, governmentsource.sourcecitationpageto)
                 END) AS sourcecitationlocation,
                 source.sourceabbreviation,
                 source.sourcetype,
@@ -98,7 +97,6 @@ class GovernmentSourceModel extends BaseModel
 
     // extra.ci_model_event_governmentsource(integer, character varying, boolean, character varying)
 
-    // FUNCTION: extra.rangefix
     // FUNCTION: extra.shortdate
 
     public function getByEvent(int $id): array
@@ -145,7 +143,7 @@ class GovernmentSourceModel extends BaseModel
                 END ||
                 CASE
                     WHEN governmentsource.governmentsourcepagefrom = '' OR governmentsource.governmentsourcepagefrom = '0' THEN ''
-                    ELSE ' p. ' || extra.rangefix(governmentsource.governmentsourcepagefrom, governmentsource.governmentsourcepageto)
+                    ELSE ' p. ' || geohistory.rangeformat(governmentsource.governmentsourcepagefrom, governmentsource.governmentsourcepageto)
                 END) AS governmentsourcelocation,
                 trim(CASE
                     WHEN governmentsource.sourcecitationvolumetype = '' OR governmentsource.sourcecitationvolume = '' THEN ''
@@ -161,7 +159,7 @@ class GovernmentSourceModel extends BaseModel
                 END ||
                 CASE
                     WHEN governmentsource.sourcecitationpagefrom = '' OR governmentsource.sourcecitationpagefrom = '0' THEN ''
-                    ELSE ' p. ' || extra.rangefix(governmentsource.sourcecitationpagefrom, governmentsource.sourcecitationpageto)
+                    ELSE ' p. ' || geohistory.rangeformat(governmentsource.sourcecitationpagefrom, governmentsource.sourcecitationpageto)
                 END) AS sourcecitationlocation
             FROM geohistory.governmentsource
             JOIN geohistory.government
@@ -182,7 +180,6 @@ class GovernmentSourceModel extends BaseModel
 
     // extra.ci_model_government_governmentsource(integer, character varying, boolean)
 
-    // FUNCTION: extra.rangefix
     // FUNCTION: extra.shortdate
     // VIEW: extra.governmentsubstitutecache
 
@@ -226,7 +223,7 @@ class GovernmentSourceModel extends BaseModel
                 END ||
                 CASE
                     WHEN governmentsource.governmentsourcepagefrom = '' OR governmentsource.governmentsourcepagefrom = '0' THEN ''
-                    ELSE ' p. ' || extra.rangefix(governmentsource.governmentsourcepagefrom, governmentsource.governmentsourcepageto)
+                    ELSE ' p. ' || geohistory.rangeformat(governmentsource.governmentsourcepagefrom, governmentsource.governmentsourcepageto)
                 END) AS governmentsourcelocation,
                 trim(CASE
                     WHEN governmentsource.sourcecitationvolumetype = '' OR governmentsource.sourcecitationvolume = '' THEN ''
@@ -242,7 +239,7 @@ class GovernmentSourceModel extends BaseModel
                 END ||
                 CASE
                     WHEN governmentsource.sourcecitationpagefrom = '' OR governmentsource.sourcecitationpagefrom = '0' THEN ''
-                    ELSE ' p. ' || extra.rangefix(governmentsource.sourcecitationpagefrom, governmentsource.sourcecitationpageto)
+                    ELSE ' p. ' || geohistory.rangeformat(governmentsource.sourcecitationpagefrom, governmentsource.sourcecitationpageto)
                 END) AS sourcecitationlocation,
                 government.governmentlong,
                 '' AS governmentslug

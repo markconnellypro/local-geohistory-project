@@ -9,7 +9,6 @@ class SourceCitationModel extends BaseModel
     // extra.ci_model_source_detail(integer, character varying)
     // extra.ci_model_source_detail(text, character varying)
 
-    // FUNCTION: extra.rangefix
     // FUNCTION: extra.shortdate
 
     public function getDetail(int|string $id): array
@@ -30,7 +29,7 @@ class SourceCitationModel extends BaseModel
                 extra.shortdate(sourcecitation.sourcecitationdaterange) AS sourcecitationdaterange,
                 sourcecitation.sourcecitationdaterange AS sourcecitationdaterangesort,
                 sourcecitation.sourcecitationvolume,
-                extra.rangefix(sourcecitation.sourcecitationpagefrom, sourcecitation.sourcecitationpageto) AS sourcecitationpage,
+                geohistory.rangeformat(sourcecitation.sourcecitationpagefrom, sourcecitation.sourcecitationpageto) AS sourcecitationpage,
                 sourcecitation.sourcecitationtypetitle,
                 sourcecitation.sourcecitationperson,
                 sourcecitation.sourcecitationurl AS url,
@@ -54,7 +53,6 @@ class SourceCitationModel extends BaseModel
     // extra.ci_model_event_source(integer)
 
     // FUNCTION: extra.shortdate
-    // FUNCTION: extra.rangefix
 
     public function getByEvent(int $id): array
     {
@@ -70,7 +68,7 @@ class SourceCitationModel extends BaseModel
                 extra.shortdate(sourcecitation.sourcecitationdaterange) AS sourcecitationdaterange,
                 sourcecitation.sourcecitationdaterange AS sourcecitationdaterangesort,
                 sourcecitation.sourcecitationvolume,
-                extra.rangefix(sourcecitation.sourcecitationpagefrom, sourcecitation.sourcecitationpageto) AS sourcecitationpage,
+                geohistory.rangeformat(sourcecitation.sourcecitationpagefrom, sourcecitation.sourcecitationpageto) AS sourcecitationpage,
                 sourcecitation.sourcecitationtypetitle,
                 sourcecitation.sourcecitationperson
             FROM geohistory.source

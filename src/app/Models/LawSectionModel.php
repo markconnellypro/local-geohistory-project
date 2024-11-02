@@ -77,8 +77,6 @@ class LawSectionModel extends BaseModel
 
     // extra.ci_model_law_related(integer)
 
-    // FUNCTION: extra.rangefix
-
     public function getRelated(int $id): array
     {
         $query = <<<QUERY
@@ -125,7 +123,7 @@ class LawSectionModel extends BaseModel
                 'Amended To Add ' || lawsection.lawsectionnewsymbol || CASE
                     WHEN lawsection.lawsectionnewfrom <> lawsection.lawsectionnewto THEN lawsection.lawsectionnewsymbol
                     ELSE ''
-                END || ' ' || extra.rangefix(lawsection.lawsectionnewfrom, lawsection.lawsectionnewto) AS lawsectioneventrelationship,
+                END || ' ' || geohistory.rangeformat(lawsection.lawsectionnewfrom, lawsection.lawsectionnewto) AS lawsectioneventrelationship,
                 lawsection.lawsectionnewfrom AS lawsectionfrom,
                 law.lawnumberchapter
             FROM geohistory.law
