@@ -954,7 +954,7 @@ class GovernmentModel extends BaseModel
     public function getSlug(int $id): string
     {
         $query = <<<QUERY
-            SELECT geohistory.governmentslugsubstitute AS id
+            SELECT government.governmentslugsubstitute AS id
             FROM geohistory.government
             WHERE government.governmentid = ?
         QUERY;
