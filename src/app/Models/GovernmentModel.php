@@ -170,7 +170,6 @@ class GovernmentModel extends BaseModel
 
     // extra.ci_model_statistics_createddissolved_nation_part(character varying, integer, integer, character varying, boolean)
 
-    // FUNCTION: extra.governmentabbreviation
     // VIEW: extra.statistics_createddissolved
 
     public function getByStatisticsNationPart(array $parameters): array
@@ -197,8 +196,10 @@ class GovernmentModel extends BaseModel
                         ELSE 0::integer
                     END AS y
                     FROM extra.statistics_createddissolved
+                    JOIN geohistory.government
+                        ON statistics_createddissolved.governmentstate = government.governmentabbreviation
                     JOIN geohistory.governmentidentifier
-                        ON statistics_createddissolved.governmentstate = extra.governmentabbreviation(governmentidentifier.government)
+                        ON government.governmentid = governmentidentifier.government
                         AND governmentidentifier.governmentidentifiertype = 1
                     WHERE statistics_createddissolved.governmenttype = 'state'
                     AND statistics_createddissolved.grouptype = ?

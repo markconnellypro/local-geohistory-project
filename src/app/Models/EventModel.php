@@ -373,7 +373,6 @@ class EventModel extends BaseModel
 
     // extra.ci_model_statistics_eventtype_nation_part(text, integer, integer, character varying, boolean)
 
-    // FUNCTION: extra.governmentabbreviation
     // VIEW: extra.statistics_eventtype
 
     public function getByStatisticsNationPart(array $parameters): array
@@ -398,8 +397,10 @@ class EventModel extends BaseModel
                 JOIN geohistory.eventtype
                     ON statistics_eventtype.eventtype = eventtype.eventtypeid
                     AND eventtype.eventtypeshort = ?
+                JOIN geohistory.government
+                    ON statistics_eventtype.governmentstate = government.governmentabbreviation
                 JOIN geohistory.governmentidentifier
-                    ON statistics_eventtype.governmentstate = extra.governmentabbreviation(governmentidentifier.government)
+                    ON government.governmentid = governmentidentifier.government
                     AND governmentidentifier.governmentidentifiertype = 1
                 WHERE statistics_eventtype.governmenttype = 'state'
                 AND statistics_eventtype.grouptype = ?
