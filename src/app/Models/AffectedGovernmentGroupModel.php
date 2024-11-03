@@ -110,8 +110,6 @@ class AffectedGovernmentGroupModel extends BaseModel
 
     // extra.ci_model_government_affectedgovernmentform(integer, character varying, boolean)
 
-    // FUNCTION: extra.governmentformlong
-    // FUNCTION: extra.governmentlong
     // VIEW: extra.governmentsubstitute
 
     public function getByGovernmentForm(int $id): array
@@ -120,12 +118,12 @@ class AffectedGovernmentGroupModel extends BaseModel
             SELECT DISTINCT event.eventsort,
                 event.eventid AS event,
                 event.eventslug,
-                extra.governmentformlong(affectedgovernmentpart.governmentformto, ?) governmentformlong,
+                governmentform.governmentformlong,
                 event.eventyear,
                 event.eventeffectivetext AS eventeffective,
                 event.eventeffective AS eventeffectivesort,
                 NOT eventgranted.eventgrantedcertainty AS eventreconstructed,
-                extra.governmentlong(affectedgovernmentpart.governmentto) AS governmentaffectedlong
+                government.governmentlong AS governmentaffectedlong
             FROM geohistory.event
             JOIN geohistory.eventgranted
                 ON event.eventgranted = eventgranted.eventgrantedid
@@ -137,6 +135,10 @@ class AffectedGovernmentGroupModel extends BaseModel
             JOIN geohistory.affectedgovernmentpart
                 ON affectedgovernmentgrouppart.affectedgovernmentpart = affectedgovernmentpart.affectedgovernmentpartid
                 AND affectedgovernmentpart.governmentformto IS NOT NULL
+            JOIN geohistory.government
+                ON affectedgovernmentpart.governmentto = government.governmentid
+            JOIN geohistory.governmentform
+                ON affectedgovernmentpart.governmentformto = governmentform.governmentformid
             JOIN extra.governmentsubstitute
                 ON affectedgovernmentpart.governmentto = governmentsubstitute.governmentid
                 AND governmentsubstitute.governmentsubstitute = ?
