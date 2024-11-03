@@ -27,7 +27,7 @@ class GovernmentModel extends BaseModel
                 government.governmentlong,
                     CASE
                         WHEN government.governmentcurrentform IS NULL THEN government.governmenttype
-                        ELSE governmentform.governmentformlongextended
+                        ELSE governmentform.governmentformlong
                     END AS governmenttype,
                     CASE
                         WHEN government.governmentstatus IN ('placeholder') THEN 'placeholder'::text
