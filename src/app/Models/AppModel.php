@@ -9,18 +9,18 @@ class AppModel extends BaseModel
 {
     // extra.ci_model_lastrefresh()
 
-    // FUNCTION: extra.fulldate
-
     public function getLastUpdated(): array
     {
         $query = <<<QUERY
-            SELECT extra.fulldate(lastrefreshdate::text) AS fulldate,
+            SELECT calendar.historicdatetextformat(lastrefreshdate::calendar.historicdate, 'long', ?) AS fulldate,
                 to_char(lastrefreshdate, 'J') AS sortdate,
                 to_char(lastrefreshdate, 'Mon FMDD, YYYY') AS sortdatetext
             FROM geohistory.lastrefresh;
         QUERY;
 
-        $query = $this->db->query($query);
+        $query = $this->db->query($query, [
+            \Config\Services::request()->getLocale()
+        ]);
 
         $query = $this->getObject($query);
 
