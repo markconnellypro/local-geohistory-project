@@ -9,8 +9,6 @@ class GovernmentModel extends BaseModel
     // extra.ci_model_government_detail(integer, character varying, boolean)
     // extra.ci_model_government_detail(text, character varying, boolean)
 
-    // FUNCTION: extra.governmentlevel
-    // FUNCTION: extra.governmentlong
     // FUNCTION: extra.governmentsubstitutedcache
     // VIEW: extra.governmentchangecountcache
     // VIEW: extra.governmenthasmappedeventcache
@@ -46,7 +44,7 @@ class GovernmentModel extends BaseModel
                         WHEN governmentchangecountcache.creation = 1
                             AND array_length(governmentchangecountcache.creationas, 1) = 1
                             AND government.governmentid <> governmentchangecountcache.creationas[1]
-                            THEN extra.governmentlong(governmentchangecountcache.creationas[1])
+                            THEN creationas.governmentlong
                         ELSE ''
                     END AS governmentcreationlong,
                 governmentchangecountcache.altertotal AS governmentaltercount,
@@ -83,7 +81,9 @@ class GovernmentModel extends BaseModel
                 (
                 SELECT DISTINCT true AS hasmap
                     FROM gis.governmentshapecache
-                    WHERE extra.governmentlevel(governmentshapecache.government) > 2
+                    JOIN geohistory.government
+                        ON governmentshapecache.government = government.governmentid
+                        AND government.governmentlevel > 2
                         AND governmentshapecache.government = ANY (extra.governmentsubstitutedcache(?))
                     UNION
                     SELECT DISTINCT true AS hasmap
@@ -91,6 +91,8 @@ class GovernmentModel extends BaseModel
                     WHERE governmentsubstitute = ?
                 ) AS hasmaptable
                 ON 0 = 0
+            LEFT JOIN geohistory.government creationas
+                ON governmentchangecountcache.creationas[1] = creationas.governmentid
             WHERE government.governmentid = ?
         QUERY;
 
@@ -733,7 +735,6 @@ class GovernmentModel extends BaseModel
 
     // extra.ci_model_government_related(integer, character varying, character varying)
 
-    // FUNCTION: extra.governmentlong
     // VIEW: extra.governmentparentcache
     // VIEW: extra.governmentsubstitutecache
 
@@ -743,7 +744,7 @@ class GovernmentModel extends BaseModel
             WITH relationpart AS (
                 SELECT DISTINCT government.governmentslugsubstitute AS governmentslug,
                 'government' AS governmentslugtype,
-                extra.governmentlong(governmentparentcache.governmentparent) AS governmentlong,
+                government.governmentlong,
                 'Parent' AS governmentrelationship,
                     CASE
                         WHEN government.governmentstatus = ANY (ARRAY['alternate', 'language']) THEN 'variant'
@@ -758,17 +759,20 @@ class GovernmentModel extends BaseModel
                     END AS governmentcolor,
                 governmentparentcache.governmentid = ? AS isgovernmentsubstitute
                 FROM extra.governmentparentcache
-                    JOIN geohistory.government
+                JOIN geohistory.government
                     ON governmentparentcache.governmentparent = government.governmentid
-                    JOIN extra.governmentsubstitutecache
+                JOIN extra.governmentsubstitutecache
                     ON governmentparentcache.governmentid = governmentsubstitutecache.governmentid
                     AND governmentsubstitutecache.governmentsubstitute = ?
-                    LEFT JOIN geohistory.governmentmapstatus ON government.governmentmapstatus = governmentmapstatus.governmentmapstatusid AND governmentmapstatus.governmentmapstatusreviewed AND (government.governmentstatus <> ALL (ARRAY['proposed', 'unincorporated']))
+                LEFT JOIN geohistory.governmentmapstatus
+                    ON government.governmentmapstatus = governmentmapstatus.governmentmapstatusid
+                    AND governmentmapstatus.governmentmapstatusreviewed
+                    AND (government.governmentstatus <> ALL (ARRAY['proposed', 'unincorporated']))
                 WHERE governmentparentcache.governmentparentstatus <> 'placeholder' AND governmentparentcache.governmentparent IS NOT NULL
                 UNION
                 SELECT DISTINCT government.governmentslugsubstitute AS governmentslug,
                 'government' AS governmentslugtype,
-                extra.governmentlong(governmentparentcache.governmentid) AS governmentlong,
+                leadgovernment.governmentlong,
                 'Child' AS governmentrelationship,
                     CASE
                         WHEN government.governmentstatus = ANY (ARRAY['alternate', 'language']) THEN 'variant'
@@ -783,15 +787,15 @@ class GovernmentModel extends BaseModel
                     END AS governmentcolor,
                 governmentparentcache.governmentparent = ? AS isgovernmentsubstitute
                 FROM extra.governmentparentcache
-                    JOIN geohistory.government leadgovernment
+                JOIN geohistory.government leadgovernment
                     ON governmentparentcache.governmentparent = leadgovernment.governmentid
-                    JOIN geohistory.government
+                JOIN geohistory.government
                     ON governmentparentcache.governmentid = government.governmentid
                     AND NOT (leadgovernment.governmentlevel < 3 AND (government.governmentlevel - leadgovernment.governmentlevel) > 1)
-                    JOIN extra.governmentsubstitutecache
+                JOIN extra.governmentsubstitutecache
                     ON governmentparentcache.governmentparent = governmentsubstitutecache.governmentid
                     AND governmentsubstitutecache.governmentsubstitute = ?
-                    LEFT JOIN geohistory.governmentmapstatus
+                LEFT JOIN geohistory.governmentmapstatus
                     ON government.governmentmapstatus = governmentmapstatus.governmentmapstatusid
                     AND governmentmapstatus.governmentmapstatusreviewed
                     AND (government.governmentstatus <> ALL (ARRAY['proposed', 'unincorporated']))
@@ -811,14 +815,14 @@ class GovernmentModel extends BaseModel
                 'none' AS governmentcolor,
                 government.governmentid = ? AS isgovernmentsubstitute
                 FROM geohistory.government
-                    JOIN extra.governmentsubstitutecache
+                JOIN extra.governmentsubstitutecache
                     ON government.governmentid = governmentsubstitutecache.governmentid
                     AND governmentsubstitutecache.governmentsubstitute = ?
                     AND government.governmentid <> governmentsubstitutecache.governmentsubstitute
-                    LEFT JOIN geohistory.event
+                LEFT JOIN geohistory.event
                     ON government.governmentid = event.government
-                ), relationrank AS (
-                    SELECT relationpart.governmentslug,
+            ), relationrank AS (
+                SELECT relationpart.governmentslug,
                     relationpart.governmentslugtype,
                     relationpart.governmentlong,
                     relationpart.governmentrelationship,
@@ -832,14 +836,14 @@ class GovernmentModel extends BaseModel
                             WHEN relationpart.governmentparentstatus = 'variant' THEN 4
                             ELSE 5
                         END)) AS roworder
-                    FROM relationpart
-                )
+                FROM relationpart
+            )
             SELECT relationrank.governmentslug,
-            relationrank.governmentslugtype,
-            relationrank.governmentlong,
-            relationrank.governmentrelationship,
-            relationrank.governmentparentstatus,
-            relationrank.governmentcolor
+                relationrank.governmentslugtype,
+                relationrank.governmentlong,
+                relationrank.governmentrelationship,
+                relationrank.governmentparentstatus,
+                relationrank.governmentcolor
             FROM relationrank
             WHERE relationrank.roworder = 1
             ORDER BY 3 DESC, 2, 4, 1
