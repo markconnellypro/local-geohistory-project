@@ -12,14 +12,14 @@ class AppModel extends BaseModel
     public function getLastUpdated(): array
     {
         $query = <<<QUERY
-            SELECT calendar.historicdatetextformat(lastrefreshdate::calendar.historicdate, 'long', ?) AS fulldate,
+            SELECT calendar.historicdatetextformat(lastrefreshdate::calendar.historicdatetext::calendar.historicdate, 'long', ?) AS fulldate,
                 to_char(lastrefreshdate, 'J') AS sortdate,
                 to_char(lastrefreshdate, 'Mon FMDD, YYYY') AS sortdatetext
-            FROM geohistory.lastrefresh;
+            FROM geohistory.lastrefresh
         QUERY;
 
         $query = $this->db->query($query, [
-            \Config\Services::request()->getLocale()
+            \Config\Services::request()->getLocale(),
         ]);
 
         $query = $this->getObject($query);
