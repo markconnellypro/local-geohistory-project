@@ -10,8 +10,6 @@ class EventModel extends BaseModel
     // extra.ci_model_event_detail(integer, character varying)
     // extra.ci_model_event_detail(text, character varying)
 
-    // FUNCTION: extra.shortdate
-
     public function getDetail(int|string $id): array
     {
         if (!is_int($id)) {
@@ -51,20 +49,20 @@ class EventModel extends BaseModel
                     ON event.government = government.governmentid
                 LEFT JOIN ( SELECT other_1.otherdate,
                         other_1.otherdatetype
-                    FROM ( SELECT DISTINCT extra.shortdate(filing.filingdate) AS otherdate,
+                    FROM ( SELECT DISTINCT calendar.historicdatetextformat(filing.filingdate::calendar.historicdate, 'short', ?) AS otherdate,
                                 'Final Decree'::text AS otherdatetype
                             FROM geohistory.adjudicationevent,
                                 geohistory.filing,
                                 geohistory.filingtype
                             WHERE adjudicationevent.adjudication = filing.adjudication AND filing.filingtype = filingtype.filingtypeid AND filingtype.filingtypefinalrecording AND adjudicationevent.event = ?
                             UNION
-                            SELECT DISTINCT extra.shortdate(governmentsource.governmentsourcedate) AS otherdate,
+                            SELECT DISTINCT calendar.historicdatetextformat(governmentsource.governmentsourcedate::calendar.historicdate, 'short', ?) AS otherdate,
                                 'Letters Patent'::text AS otherdatetype
                             FROM geohistory.governmentsource,
                                 geohistory.governmentsourceevent
                             WHERE governmentsource.governmentsourceid = governmentsourceevent.governmentsource AND governmentsource.governmentsourcetype::text = 'Letters Patent'::text AND governmentsourceevent.event = ?) other_1
                     WHERE 1 = (( SELECT count(*) AS rowct
-                            FROM ( SELECT DISTINCT extra.shortdate(filing.filingdate) AS otherdate,
+                            FROM ( SELECT DISTINCT calendar.historicdatetextformat(filing.filingdate::calendar.historicdate, 'short', ?) AS otherdate,
                                         'Final Decree'::text AS otherdatetype,
                                         true AS isother
                                     FROM geohistory.adjudicationevent,
@@ -72,7 +70,7 @@ class EventModel extends BaseModel
                                         geohistory.filingtype
                                     WHERE adjudicationevent.adjudication = filing.adjudication AND filing.filingtype = filingtype.filingtypeid AND filingtype.filingtypefinalrecording AND adjudicationevent.event = ?
                                     UNION
-                                    SELECT DISTINCT extra.shortdate(governmentsource.governmentsourcedate) AS otherdate,
+                                    SELECT DISTINCT calendar.historicdatetextformat(governmentsource.governmentsourcedate::calendar.historicdate, 'short', ?) AS otherdate,
                                         'Letters Patent'::text AS otherdatetype,
                                         true AS isother
                                     FROM geohistory.governmentsource,
@@ -83,9 +81,13 @@ class EventModel extends BaseModel
         QUERY;
 
         $query = $this->db->query($query, [
+            \Config\Services::request()->getLocale(),
             $id,
+            \Config\Services::request()->getLocale(),
             $id,
+            \Config\Services::request()->getLocale(),
             $id,
+            \Config\Services::request()->getLocale(),
             $id,
             $id,
         ]);

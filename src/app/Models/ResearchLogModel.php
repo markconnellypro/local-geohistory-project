@@ -8,7 +8,6 @@ class ResearchLogModel extends BaseModel
 {
     // extra.ci_model_government_researchlog(integer, character varying, boolean)
 
-    // FUNCTION: extra.shortdate
     // VIEW: extra.governmentsubstitutecache
 
     public function getByGovernment(int $id): array
@@ -20,7 +19,7 @@ class ResearchLogModel extends BaseModel
                     ELSE ''
                 END AS researchlogtypelong,
                 CASE
-                    WHEN (? OR researchlogtype.researchlogtypeisspecificdate) THEN extra.shortdate(researchlog.researchlogdate)
+                    WHEN (? OR researchlogtype.researchlogtypeisspecificdate) THEN calendar.historicdatetextformat(researchlog.researchlogdate::calendar.historicdate, 'short', ?)
                     ELSE ''
                 END AS researchlogdate,
                 researchlog.researchlogdate AS researchlogdatesort,
@@ -50,6 +49,7 @@ class ResearchLogModel extends BaseModel
         $query = $this->db->query($query, [
             \App\Controllers\BaseController::isLive(),
             \App\Controllers\BaseController::isLive(),
+            \Config\Services::request()->getLocale(),
             \App\Controllers\BaseController::isLive(),
             $id,
             \App\Controllers\BaseController::isLive(),

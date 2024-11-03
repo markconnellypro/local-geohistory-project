@@ -8,18 +8,16 @@ class FilingModel extends BaseModel
 {
     // extra.ci_model_adjudication_filing(integer, boolean)
 
-    // FUNCTION: extra.shortdate
-
     public function getByAdjudication(int $id): array
     {
         $query = <<<QUERY
             SELECT filingtype.filingtypelong,
                 filing.filingspecific,
-                extra.shortdate(filing.filingdate) AS filingdate,
+                calendar.historicdatetextformat(filing.filingdate::calendar.historicdate, 'short', ?) AS filingdate,
                 filing.filingdate AS filingdatesort,
-                extra.shortdate(filing.filingfiled) AS filingfiled,
+                calendar.historicdatetextformat(filing.filingfiled::calendar.historicdate, 'short', ?) AS filingfiled,
                 filing.filingfiled AS filingfiledsort,
-                extra.shortdate(filing.filingother) AS filingother,
+                calendar.historicdatetextformat(filing.filingother::calendar.historicdate, 'short', ?) AS filingother,
                 filing.filingother AS filingothersort,
                 filing.filingothertype,
                 filing.filingnotes,
@@ -33,6 +31,9 @@ class FilingModel extends BaseModel
         QUERY;
 
         $query = $this->db->query($query, [
+            \Config\Services::request()->getLocale(),
+            \Config\Services::request()->getLocale(),
+            \Config\Services::request()->getLocale(),
             \App\Controllers\BaseController::isLive(),
             $id,
         ]);

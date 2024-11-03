@@ -9,8 +9,6 @@ class AdjudicationSourceCitationModel extends BaseModel
     // extra.ci_model_reporter_detail(integer, character varying)
     // extra.ci_model_reporter_detail(text, character varying)
 
-    // FUNCTION: extra.shortdate
-
     public function getDetail(int|string $id): array
     {
         if (!is_int($id)) {
@@ -24,7 +22,7 @@ class AdjudicationSourceCitationModel extends BaseModel
                 adjudicationsourcecitation.adjudicationsourcecitationvolume,
                 adjudicationsourcecitation.adjudicationsourcecitationpage,
                 adjudicationsourcecitation.adjudicationsourcecitationyear,
-                extra.shortdate(adjudicationsourcecitation.adjudicationsourcecitationdate) AS adjudicationsourcecitationdate,
+                calendar.historicdatetextformat(adjudicationsourcecitation.adjudicationsourcecitationdate::calendar.historicdate, 'short', ?) AS adjudicationsourcecitationdate,
                 adjudicationsourcecitation.adjudicationsourcecitationdate AS adjudicationsourcecitationdatesort,
                 adjudicationsourcecitation.adjudicationsourcecitationtitle,
                 adjudicationsourcecitation.adjudicationsourcecitationauthor,
@@ -40,6 +38,7 @@ class AdjudicationSourceCitationModel extends BaseModel
         QUERY;
 
         $query = $this->db->query($query, [
+            \Config\Services::request()->getLocale(),
             $id,
         ]);
 
@@ -47,8 +46,6 @@ class AdjudicationSourceCitationModel extends BaseModel
     }
 
     // extra.ci_model_adjudication_source(integer)
-
-    // FUNCTION: extra.shortdate
 
     public function getByAdjudication(int $id): array
     {
@@ -58,7 +55,7 @@ class AdjudicationSourceCitationModel extends BaseModel
                 adjudicationsourcecitation.adjudicationsourcecitationvolume,
                 adjudicationsourcecitation.adjudicationsourcecitationpage,
                 adjudicationsourcecitation.adjudicationsourcecitationyear,
-                extra.shortdate(adjudicationsourcecitation.adjudicationsourcecitationdate) AS adjudicationsourcecitationdate,
+                calendar.historicdatetextformat(adjudicationsourcecitation.adjudicationsourcecitationdate::calendar.historicdate, 'short', ?) AS adjudicationsourcecitationdate,
                 adjudicationsourcecitation.adjudicationsourcecitationdate AS adjudicationsourcecitationdatesort,
                 adjudicationsourcecitation.adjudicationsourcecitationtitle
             FROM geohistory.source
@@ -68,6 +65,7 @@ class AdjudicationSourceCitationModel extends BaseModel
         QUERY;
 
         $query = $this->db->query($query, [
+            \Config\Services::request()->getLocale(),
             $id,
         ]);
 

@@ -8,8 +8,6 @@ class RecordingModel extends BaseModel
 {
     // extra.ci_model_event_recording(integer, character varying, character varying)
 
-    // FUNCTION: extra.shortdate
-
     public function getByEvent(int $id): array
     {
         $query = <<<QUERY
@@ -51,7 +49,7 @@ class RecordingModel extends BaseModel
                     ELSE ' no. ' || recording.recordingnumber || recording.recordingnumbertext
                 END) AS recordingnumberlocation,
                 recordingtype.recordingtypeid IS NOT NULL AND recordingnumbertype.recordingtypeid IS NOT NULL AS hasbothtype,
-                extra.shortdate(recording.recordingdate) AS recordingdate,
+                calendar.historicdatetextformat(recording.recordingdate::calendar.historicdate, 'short', ?) AS recordingdate,
                 recording.recordingdate AS recordingdatesort,
                 eventrelationship.eventrelationshipshort AS recordingeventrelationship,
                 recording.recordingrepositoryshort,
@@ -78,6 +76,7 @@ class RecordingModel extends BaseModel
         QUERY;
 
         $query = $this->db->query($query, [
+            \Config\Services::request()->getLocale(),
             $id,
         ]);
 

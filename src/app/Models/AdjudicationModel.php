@@ -9,7 +9,6 @@ class AdjudicationModel extends BaseModel
     // extra.ci_model_adjudication_detail(character varying, character varying)
     // extra.ci_model_adjudication_detail(integer, character varying)
 
-    // FUNCTION: extra.shortdate
     // FUNCTION: extra.tribunalfilingoffice
     // FUNCTION: extra.tribunallong
 
@@ -24,11 +23,11 @@ class AdjudicationModel extends BaseModel
                 adjudicationtype.adjudicationtypelong,
                 extra.tribunallong(tribunal.tribunalid) AS tribunallong,
                 adjudication.adjudicationnumber,
-                extra.shortdate(adjudication.adjudicationterm || CASE
+                calendar.historicdatetextformat((adjudication.adjudicationterm || CASE
                     WHEN length(adjudication.adjudicationterm) = 4 THEN '-~07-~28'
                     WHEN length(adjudication.adjudicationterm) = 7 THEN '-~28'
                     ELSE ''
-                END) AS adjudicationterm,
+                END)::calendar.historicdate, 'short', ?) AS adjudicationterm,
                 CASE
                     WHEN adjudication.adjudicationlong = '' AND adjudication.adjudicationshort = '' AND adjudication.adjudicationnotes = '' THEN FALSE
                     ELSE TRUE
@@ -47,6 +46,7 @@ class AdjudicationModel extends BaseModel
         QUERY;
 
         $query = $this->db->query($query, [
+            \Config\Services::request()->getLocale(),
             $id,
         ]);
 
@@ -55,7 +55,6 @@ class AdjudicationModel extends BaseModel
 
     // extra.ci_model_reporter_adjudication(integer)
 
-    // FUNCTION: extra.shortdate
     // FUNCTION: extra.tribunallong
 
     public function getByAdjudicationSourceCitation(int $id): array
@@ -65,11 +64,11 @@ class AdjudicationModel extends BaseModel
                 adjudicationtype.adjudicationtypelong,
                 extra.tribunallong(adjudicationtype.tribunal) AS tribunallong,
                 adjudication.adjudicationnumber,
-                extra.shortdate(adjudication.adjudicationterm || CASE
+                calendar.historicdatetextformat((adjudication.adjudicationterm || CASE
                     WHEN length(adjudication.adjudicationterm) = 4 THEN '-~07-~28'
                     WHEN length(adjudication.adjudicationterm) = 7 THEN '-~28'
                     ELSE ''
-                END) AS adjudicationterm,
+                END)::calendar.historicdate, 'short', ?) AS adjudicationterm,
                 adjudication.adjudicationterm AS adjudicationtermsort
             FROM geohistory.adjudication
             JOIN geohistory.adjudicationtype
@@ -80,6 +79,7 @@ class AdjudicationModel extends BaseModel
         QUERY;
 
         $query = $this->db->query($query, [
+            \Config\Services::request()->getLocale(),
             $id,
         ]);
 
@@ -89,7 +89,6 @@ class AdjudicationModel extends BaseModel
     // extra.ci_model_event_adjudication(integer)
 
     // FUNCTION: extra.tribunallong
-    // FUNCTION: extra.shortdate
 
     public function getByEvent(int $id): array
     {
@@ -98,11 +97,11 @@ class AdjudicationModel extends BaseModel
                 adjudicationtype.adjudicationtypelong,
                 extra.tribunallong(adjudicationtype.tribunal) AS tribunallong,
                 adjudication.adjudicationnumber,
-                extra.shortdate(adjudication.adjudicationterm || CASE
+                calendar.historicdatetextformat((adjudication.adjudicationterm || CASE
                     WHEN length(adjudication.adjudicationterm) = 4 THEN '-~07-~28'
                     WHEN length(adjudication.adjudicationterm) = 7 THEN '-~28'
                     ELSE ''
-                END) AS adjudicationterm,
+                END)::calendar.historicdate, 'short', ?) AS adjudicationterm,
                 adjudication.adjudicationterm AS adjudicationtermsort,
                 eventrelationship.eventrelationshipshort AS eventrelationship
             FROM geohistory.adjudicationevent
@@ -116,6 +115,7 @@ class AdjudicationModel extends BaseModel
         QUERY;
 
         $query = $this->db->query($query, [
+            \Config\Services::request()->getLocale(),
             $id,
         ]);
 

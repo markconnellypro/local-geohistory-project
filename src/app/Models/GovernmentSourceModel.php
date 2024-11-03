@@ -6,32 +6,20 @@ use App\Models\BaseModel;
 
 class GovernmentSourceModel extends BaseModel
 {
-    // extra.ci_model_governmentsource_detail(integer, character varying, boolean, character varying)
-    // extra.ci_model_governmentsource_detail(text, character varying, boolean, character varying)
-
-    // FUNCTION: extra.shortdate
-
-    public function getDetail(int|string $id): array
+    private function getFields(): string
     {
-        if (!is_int($id)) {
-            $id = $this->getSlugId($id);
-        }
-
-        $query = <<<QUERY
-            SELECT DISTINCT governmentsource.governmentsourceid,
-                government.governmentslugsubstitute AS governmentslug,
-                government.governmentlong,
-                governmentsource.governmentsourcetype,
+        return <<<QUERY
+            SELECT DISTINCT governmentsource.governmentsourcetype,
                 governmentsource.governmentsourcenumber,
                     CASE
                         WHEN (NOT ?) AND (governmentsource.governmentsourcetitle ~* '^[~#]' OR governmentsource.governmentsourcetitle ~~ '[Type %') THEN ''
                         ELSE governmentsource.governmentsourcetitle
                     END AS governmentsourcetitle,
-                extra.shortdate(governmentsource.governmentsourcedate) AS governmentsourcedate,
+                calendar.historicdatetextformat(governmentsource.governmentsourcedate::calendar.historicdate, 'short', ?) AS governmentsourcedate,
                 governmentsource.governmentsourcedate AS governmentsourcedatesort,
-                extra.shortdate(governmentsource.governmentsourceapproveddate) AS governmentsourceapproveddate,
+                calendar.historicdatetextformat(governmentsource.governmentsourceapproveddate::calendar.historicdate, 'short', ?) AS governmentsourceapproveddate,
                 governmentsource.governmentsourceapproveddate AS governmentsourceapproveddatesort,
-                extra.shortdate(governmentsource.governmentsourceeffectivedate) AS governmentsourceeffectivedate,
+                calendar.historicdatetextformat(governmentsource.governmentsourceeffectivedate::calendar.historicdate, 'short', ?) AS governmentsourceeffectivedate,
                 governmentsource.governmentsourceeffectivedate AS governmentsourceeffectivedatesort,
                     CASE
                         WHEN governmentsource.governmentsourceapproveddate <> '' THEN governmentsource.governmentsourceapproveddate
@@ -72,8 +60,24 @@ class GovernmentSourceModel extends BaseModel
                 END ||
                 CASE
                     WHEN governmentsource.sourcecitationpagefrom = '' OR governmentsource.sourcecitationpagefrom = '0' THEN ''
-                    ELSE ' p. ' || governmentsource.sourcecitationpageto
+                    ELSE ' p. ' || governmentsource.sourcecitationpage
                 END) AS sourcecitationlocation,
+                government.governmentlong,
+        QUERY;
+    }
+
+    // extra.ci_model_governmentsource_detail(integer, character varying, boolean, character varying)
+    // extra.ci_model_governmentsource_detail(text, character varying, boolean, character varying)
+
+    public function getDetail(int|string $id): array
+    {
+        if (!is_int($id)) {
+            $id = $this->getSlugId($id);
+        }
+
+        $query = $this->getFields() . <<<QUERY
+                governmentsource.governmentsourceid,
+                government.governmentslugsubstitute AS governmentslug,
                 source.sourceabbreviation,
                 source.sourcetype,
                 source.sourcefullcitation,
@@ -89,7 +93,10 @@ class GovernmentSourceModel extends BaseModel
 
         $query = $this->db->query($query, [
             \App\Controllers\BaseController::isLive(),
-            $id
+            \Config\Services::request()->getLocale(),
+            \Config\Services::request()->getLocale(),
+            \Config\Services::request()->getLocale(),
+            $id,
         ]);
 
         return $this->getObject($query);
@@ -97,81 +104,28 @@ class GovernmentSourceModel extends BaseModel
 
     // extra.ci_model_event_governmentsource(integer, character varying, boolean, character varying)
 
-    // FUNCTION: extra.shortdate
-
     public function getByEvent(int $id): array
     {
-        $query = <<<QUERY
-            SELECT DISTINCT government.governmentslugsubstitute AS governmentslug,
-                government.governmentlong,
-                governmentsource.governmentsourcetype,
-                governmentsource.governmentsourcenumber,
-                    CASE
-                        WHEN (NOT ?) AND (governmentsource.governmentsourcetitle ~* '^[~#]' OR governmentsource.governmentsourcetitle ~~ '[Type %') THEN ''
-                        ELSE governmentsource.governmentsourcetitle
-                    END AS governmentsourcetitle,
-                extra.shortdate(governmentsource.governmentsourcedate) AS governmentsourcedate,
-                governmentsource.governmentsourcedate AS governmentsourcedatesort,
-                extra.shortdate(governmentsource.governmentsourceapproveddate) AS governmentsourceapproveddate,
-                governmentsource.governmentsourceapproveddate AS governmentsourceapproveddatesort,
-                extra.shortdate(governmentsource.governmentsourceeffectivedate) AS governmentsourceeffectivedate,
-                governmentsource.governmentsourceeffectivedate AS governmentsourceeffectivedatesort,
-                    CASE
-                        WHEN governmentsource.governmentsourceapproveddate <> '' THEN governmentsource.governmentsourceapproveddate
-                        WHEN governmentsource.governmentsourcedate <> '' THEN governmentsource.governmentsourcedate
-                        WHEN governmentsource.governmentsourceeffectivedate <> '' THEN governmentsource.governmentsourceeffectivedate
-                        ELSE ''
-                    END || governmentsource.governmentsourcetype || lpad(governmentsource.governmentsourcenumber, 5, '0') AS governmentsourcesort,
-                governmentsource.governmentsourcebody,
-                governmentsource.governmentsourceterm,
-                governmentsource.governmentsourceapproved,
+        $query = $this->getFields() . <<<QUERY
+                government.governmentslugsubstitute AS governmentslug,
                 CASE
                     WHEN governmentsource.hassource THEN governmentsource.governmentsourceslug
                     ELSE NULL
-                END AS governmentsourceslug,
-                trim(CASE
-                    WHEN governmentsource.governmentsourcevolumetype = '' OR governmentsource.governmentsourcevolume = '' THEN ''
-                    ELSE governmentsource.governmentsourcevolumetype
-                END ||
-                CASE
-                    WHEN governmentsource.governmentsourcevolume = '' THEN ''
-                    ELSE ' v. ' || governmentsource.governmentsourcevolume
-                END ||
-                CASE
-                    WHEN governmentsource.governmentsourcevolume <> '' AND governmentsource.governmentsourcepagefrom <> '' AND governmentsource.governmentsourcepagefrom <> '0' THEN ', '
-                    ELSE ''
-                END ||
-                CASE
-                    WHEN governmentsource.governmentsourcepagefrom = '' OR governmentsource.governmentsourcepagefrom = '0' THEN ''
-                    ELSE ' p. ' || governmentsource.governmentsourcepage
-                END) AS governmentsourcelocation,
-                trim(CASE
-                    WHEN governmentsource.sourcecitationvolumetype = '' OR governmentsource.sourcecitationvolume = '' THEN ''
-                    ELSE governmentsource.sourcecitationvolumetype
-                END ||
-                CASE
-                    WHEN governmentsource.sourcecitationvolume = '' THEN ''
-                    ELSE ' v. ' || governmentsource.sourcecitationvolume
-                END ||
-                CASE
-                    WHEN governmentsource.sourcecitationvolume <> '' AND governmentsource.sourcecitationpagefrom <> '' AND governmentsource.sourcecitationpagefrom <> '0' THEN ', '
-                    ELSE ''
-                END ||
-                CASE
-                    WHEN governmentsource.sourcecitationpagefrom = '' OR governmentsource.sourcecitationpagefrom = '0' THEN ''
-                    ELSE ' p. ' || governmentsource.sourcecitationpage
-                END) AS sourcecitationlocation
+                END AS governmentsourceslug
             FROM geohistory.governmentsource
             JOIN geohistory.government
                 ON governmentsource.government = government.governmentid
             JOIN geohistory.governmentsourceevent
                 ON governmentsource.governmentsourceid = governmentsourceevent.governmentsource
                 AND governmentsourceevent.event = ?
-            ORDER BY 12
+            ORDER BY 10
         QUERY;
 
         $query = $this->db->query($query, [
             \App\Controllers\BaseController::isLive(),
+            \Config\Services::request()->getLocale(),
+            \Config\Services::request()->getLocale(),
+            \Config\Services::request()->getLocale(),
             $id,
         ]);
 
@@ -185,63 +139,9 @@ class GovernmentSourceModel extends BaseModel
 
     public function getByGovernment(int $id): array
     {
-        $query = <<<QUERY
-            SELECT DISTINCT array_agg(event.eventslug) AS eventslug,
+        $query = $this->getFields() . <<<QUERY
+                array_agg(event.eventslug) AS eventslug,
                 array_agg(event.eventid) AS eventid,
-                governmentsource.governmentsourcetype,
-                governmentsource.governmentsourcenumber,
-                    CASE
-                        WHEN (NOT ?) AND (governmentsource.governmentsourcetitle ~* '^[~#]' OR governmentsource.governmentsourcetitle ~~ '[Type %') THEN ''
-                        ELSE governmentsource.governmentsourcetitle
-                    END AS governmentsourcetitle,
-                extra.shortdate(governmentsource.governmentsourcedate) AS governmentsourcedate,
-                governmentsource.governmentsourcedate AS governmentsourcedatesort,
-                extra.shortdate(governmentsource.governmentsourceapproveddate) AS governmentsourceapproveddate,
-                governmentsource.governmentsourceapproveddate AS governmentsourceapproveddatesort,
-                extra.shortdate(governmentsource.governmentsourceeffectivedate) AS governmentsourceeffectivedate,
-                governmentsource.governmentsourceeffectivedate AS governmentsourceeffectivedatesort,
-                    CASE
-                        WHEN governmentsource.governmentsourceapproveddate <> '' THEN governmentsource.governmentsourceapproveddate
-                        WHEN governmentsource.governmentsourcedate <> '' THEN governmentsource.governmentsourcedate
-                        WHEN governmentsource.governmentsourceeffectivedate <> '' THEN governmentsource.governmentsourceeffectivedate
-                        ELSE ''
-                    END || governmentsource.governmentsourcetype || lpad(governmentsource.governmentsourcenumber, 5, '0') AS governmentsourcesort,
-                governmentsource.governmentsourcebody,
-                governmentsource.governmentsourceterm,
-                governmentsource.governmentsourceapproved,
-                trim(CASE
-                    WHEN governmentsource.governmentsourcevolumetype = '' OR governmentsource.governmentsourcevolume = '' THEN ''
-                    ELSE governmentsource.governmentsourcevolumetype
-                END ||
-                CASE
-                    WHEN governmentsource.governmentsourcevolume = '' THEN ''
-                    ELSE ' v. ' || governmentsource.governmentsourcevolume
-                END ||
-                CASE
-                    WHEN governmentsource.governmentsourcevolume <> '' AND governmentsource.governmentsourcepagefrom <> '' AND governmentsource.governmentsourcepagefrom <> '0' THEN ', '
-                    ELSE ''
-                END ||
-                CASE
-                    WHEN governmentsource.governmentsourcepagefrom = '' OR governmentsource.governmentsourcepagefrom = '0' THEN ''
-                    ELSE ' p. ' || governmentsource.governmentsourcepage
-                END) AS governmentsourcelocation,
-                trim(CASE
-                    WHEN governmentsource.sourcecitationvolumetype = '' OR governmentsource.sourcecitationvolume = '' THEN ''
-                    ELSE governmentsource.sourcecitationvolumetype
-                END ||
-                CASE
-                    WHEN governmentsource.sourcecitationvolume = '' THEN ''
-                    ELSE ' v. ' || governmentsource.sourcecitationvolume
-                END ||
-                CASE
-                    WHEN governmentsource.sourcecitationvolume <> '' AND governmentsource.sourcecitationpagefrom <> '' AND governmentsource.sourcecitationpagefrom <> '0' THEN ', '
-                    ELSE ''
-                END ||
-                CASE
-                    WHEN governmentsource.sourcecitationpagefrom = '' OR governmentsource.sourcecitationpagefrom = '0' THEN ''
-                    ELSE ' p. ' || governmentsource.sourcecitationpage
-                END) AS sourcecitationlocation,
-                government.governmentlong,
                 '' AS governmentslug
             FROM geohistory.governmentsource
             JOIN geohistory.government
@@ -253,12 +153,15 @@ class GovernmentSourceModel extends BaseModel
                 ON governmentsource.governmentsourceid = governmentsourceevent.governmentsource
             LEFT JOIN geohistory.event
                 ON governmentsourceevent.event = event.eventid
-            GROUP BY 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19
-            ORDER BY 12
+            GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17
+            ORDER BY 10
         QUERY;
 
         $query = $this->db->query($query, [
             \App\Controllers\BaseController::isLive(),
+            \Config\Services::request()->getLocale(),
+            \Config\Services::request()->getLocale(),
+            \Config\Services::request()->getLocale(),
             $id,
         ]);
 

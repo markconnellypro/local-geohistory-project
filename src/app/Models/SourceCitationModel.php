@@ -9,8 +9,6 @@ class SourceCitationModel extends BaseModel
     // extra.ci_model_source_detail(integer, character varying)
     // extra.ci_model_source_detail(text, character varying)
 
-    // FUNCTION: extra.shortdate
-
     public function getDetail(int|string $id): array
     {
         if (!is_int($id)) {
@@ -22,11 +20,11 @@ class SourceCitationModel extends BaseModel
                 source.sourceabbreviation,
                 sourcecitation.sourcecitationdatetype || 
                     CASE WHEN sourcecitation.sourcecitationdatetype = '' THEN '' ELSE ' ' END ||
-                    extra.shortdate(sourcecitation.sourcecitationdate) AS sourcecitationdate,
+                    calendar.historicdatetextformat(sourcecitation.sourcecitationdate, 'short', ?) AS sourcecitationdate,
                 sourcecitation.sourcecitationdate AS sourcecitationdatesort,
                 sourcecitation.sourcecitationdaterangetype || 
                     CASE WHEN sourcecitation.sourcecitationdaterangetype = '' THEN '' ELSE ' ' END ||
-                extra.shortdate(sourcecitation.sourcecitationdaterange) AS sourcecitationdaterange,
+                calendar.historicdatetextformat(sourcecitation.sourcecitationdaterange, 'short', ?) AS sourcecitationdaterange,
                 sourcecitation.sourcecitationdaterange AS sourcecitationdaterangesort,
                 sourcecitation.sourcecitationvolume,
                 sourcecitation.sourcecitationpage,
@@ -44,6 +42,8 @@ class SourceCitationModel extends BaseModel
         QUERY;
 
         $query = $this->db->query($query, [
+            \Config\Services::request()->getLocale(),
+            \Config\Services::request()->getLocale(),
             $id,
         ]);
 
@@ -52,8 +52,6 @@ class SourceCitationModel extends BaseModel
 
     // extra.ci_model_event_source(integer)
 
-    // FUNCTION: extra.shortdate
-
     public function getByEvent(int $id): array
     {
         $query = <<<QUERY
@@ -61,11 +59,11 @@ class SourceCitationModel extends BaseModel
                 source.sourceabbreviation,
                 sourcecitation.sourcecitationdatetype || 
                     CASE WHEN sourcecitation.sourcecitationdatetype = '' THEN '' ELSE ' ' END ||
-                    extra.shortdate(sourcecitation.sourcecitationdate) AS sourcecitationdate,
+                    calendar.historicdatetextformat(sourcecitation.sourcecitationdate, 'short', ?) AS sourcecitationdate,
                 sourcecitation.sourcecitationdate AS sourcecitationdatesort,
                 sourcecitation.sourcecitationdaterangetype || 
                     CASE WHEN sourcecitation.sourcecitationdaterangetype = '' THEN '' ELSE ' ' END ||
-                extra.shortdate(sourcecitation.sourcecitationdaterange) AS sourcecitationdaterange,
+                calendar.historicdatetextformat(sourcecitation.sourcecitationdaterange, 'short', ?) AS sourcecitationdaterange,
                 sourcecitation.sourcecitationdaterange AS sourcecitationdaterangesort,
                 sourcecitation.sourcecitationvolume,
                 sourcecitation.sourcecitationpage,
@@ -81,6 +79,8 @@ class SourceCitationModel extends BaseModel
         QUERY;
 
         $query = $this->db->query($query, [
+            \Config\Services::request()->getLocale(),
+            \Config\Services::request()->getLocale(),
             $id,
         ]);
 
