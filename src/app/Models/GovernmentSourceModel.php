@@ -134,7 +134,6 @@ class GovernmentSourceModel extends BaseModel
 
     // extra.ci_model_government_governmentsource(integer, character varying, boolean)
 
-    // FUNCTION: extra.shortdate
     // VIEW: extra.governmentsubstitutecache
 
     public function getByGovernment(int $id): array
