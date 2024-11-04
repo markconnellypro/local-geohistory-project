@@ -772,7 +772,7 @@ class GovernmentModel extends BaseModel
                 UNION
                 SELECT DISTINCT government.governmentslugsubstitute AS governmentslug,
                 'government' AS governmentslugtype,
-                leadgovernment.governmentlong,
+                government.governmentlong,
                 'Child' AS governmentrelationship,
                     CASE
                         WHEN government.governmentstatus = ANY (ARRAY['alternate', 'language']) THEN 'variant'
