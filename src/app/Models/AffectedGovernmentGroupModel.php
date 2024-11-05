@@ -77,7 +77,7 @@ class AffectedGovernmentGroupModel extends BaseModel
                 COALESCE(affectedtypefrom.affectedtypeshort, '') AS affectedtypefrom,
                 COALESCE(governmentto.governmentslugsubstitute, '') AS governmentto,
                 COALESCE(governmentto.governmentlong, '') AS governmenttolong,
-                COALESCE(affectedtypefrom.affectedtypeshort, '') AS affectedtypeto
+                COALESCE(affectedtypeto.affectedtypeshort, '') AS affectedtypeto
             FROM geohistory.affectedgovernmentgroup
             JOIN geohistory.affectedgovernmentgrouppart
                 ON affectedgovernmentgroup.affectedgovernmentgroupid = affectedgovernmentgrouppart.affectedgovernmentgroup
