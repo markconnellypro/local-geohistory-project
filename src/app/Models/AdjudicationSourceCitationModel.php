@@ -6,17 +6,11 @@ use App\Models\BaseModel;
 
 class AdjudicationSourceCitationModel extends BaseModel
 {
-    // extra.ci_model_reporter_detail(integer, character varying)
-    // extra.ci_model_reporter_detail(text, character varying)
-
-    public function getDetail(int|string $id): array
+    private function getFields()
     {
-        if (!is_int($id)) {
-            $id = $this->getSlugId($id);
-        }
-
-        $query = <<<QUERY
+        return <<<QUERY
             SELECT DISTINCT adjudicationsourcecitation.adjudicationsourcecitationid,
+                adjudicationsourcecitation.adjudicationsourcecitationslug,
                 source.sourceshort,
                 source.sourceabbreviation,
                 adjudicationsourcecitation.adjudicationsourcecitationvolume,
@@ -34,6 +28,19 @@ class AdjudicationSourceCitationModel extends BaseModel
             FROM geohistory.source
             JOIN geohistory.adjudicationsourcecitation
                 ON source.sourceid = adjudicationsourcecitation.source
+        QUERY;
+    }
+
+    // extra.ci_model_reporter_detail(integer, character varying)
+    // extra.ci_model_reporter_detail(text, character varying)
+
+    public function getDetail(int|string $id): array
+    {
+        if (!is_int($id)) {
+            $id = $this->getSlugId($id);
+        }
+
+        $query = $this->getFields() . <<<QUERY
                 AND adjudicationsourcecitation.adjudicationsourcecitationid = ?
         QUERY;
 
@@ -49,18 +56,7 @@ class AdjudicationSourceCitationModel extends BaseModel
 
     public function getByAdjudication(int $id): array
     {
-        $query = <<<QUERY
-            SELECT adjudicationsourcecitation.adjudicationsourcecitationslug,
-                source.sourceshort,
-                adjudicationsourcecitation.adjudicationsourcecitationvolume,
-                adjudicationsourcecitation.adjudicationsourcecitationpage,
-                adjudicationsourcecitation.adjudicationsourcecitationyear,
-                calendar.historicdatetextformat(adjudicationsourcecitation.adjudicationsourcecitationdate::calendar.historicdate, 'short', ?) AS adjudicationsourcecitationdate,
-                adjudicationsourcecitation.adjudicationsourcecitationdate AS adjudicationsourcecitationdatesort,
-                adjudicationsourcecitation.adjudicationsourcecitationtitle
-            FROM geohistory.source
-            JOIN geohistory.adjudicationsourcecitation
-                ON adjudicationsourcecitation.source = source.sourceid
+        $query = $this->getFields() . <<<QUERY
                 AND adjudicationsourcecitation.adjudication = ?
         QUERY;
 
