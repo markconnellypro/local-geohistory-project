@@ -6,7 +6,7 @@ use App\Models\BaseModel;
 
 class AdjudicationSourceCitationModel extends BaseModel
 {
-    private function getFields()
+    private function getFields(): string
     {
         return <<<QUERY
             SELECT DISTINCT adjudicationsourcecitation.adjudicationsourcecitationid,
