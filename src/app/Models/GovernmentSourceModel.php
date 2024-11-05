@@ -76,8 +76,8 @@ class GovernmentSourceModel extends BaseModel
         }
 
         $query = $this->getFields() . <<<QUERY
-                governmentsource.governmentsourceid,
                 government.governmentslugsubstitute AS governmentslug,
+                governmentsource.governmentsourceid,
                 source.sourceabbreviation,
                 source.sourcetype,
                 source.sourcefullcitation,
@@ -139,9 +139,9 @@ class GovernmentSourceModel extends BaseModel
     public function getByGovernment(int $id): array
     {
         $query = $this->getFields() . <<<QUERY
+                '' AS governmentslug,
                 array_agg(event.eventslug) AS eventslug,
-                array_agg(event.eventid) AS eventid,
-                '' AS governmentslug
+                array_agg(event.eventid) AS eventid
             FROM geohistory.governmentsource
             JOIN geohistory.government
                 ON governmentsource.government = government.governmentid
