@@ -26,7 +26,6 @@ class AdjudicationModel extends BaseModel
                 adjudication.adjudicationshort,
                 adjudication.adjudicationnotes,
                 adjudication.adjudicationtitle,
-                extra.tribunalfilingoffice(tribunal.tribunalid) AS tribunalfilingoffice,
         QUERY . $TribunalModel->getLong() . <<<QUERY
                 AS tribunallong,
         QUERY . $TribunalModel->getFilingOffice() . <<<QUERY
