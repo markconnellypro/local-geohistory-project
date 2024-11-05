@@ -6,8 +6,6 @@ use App\Models\BaseModel;
 
 class MetesDescriptionLineModel extends BaseModel
 {
-    // extra.ci_model_metes_row(integer)
-
     public function getByMetesDescription(int $id): array
     {
         $query = <<<QUERY

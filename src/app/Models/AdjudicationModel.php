@@ -50,9 +50,6 @@ class AdjudicationModel extends BaseModel
         QUERY;
     }
 
-    // extra.ci_model_adjudication_detail(character varying, character varying)
-    // extra.ci_model_adjudication_detail(integer, character varying)
-
     public function getDetail(int|string $id): array
     {
         if (!is_int($id)) {
@@ -76,8 +73,6 @@ class AdjudicationModel extends BaseModel
         return $this->getObject($query);
     }
 
-    // extra.ci_model_reporter_adjudication(integer)
-
     public function getByAdjudicationSourceCitation(int $id): array
     {
         $query = $this->getFields() . $this->getTables() . <<<QUERY
@@ -93,8 +88,6 @@ class AdjudicationModel extends BaseModel
 
         return $this->getObject($query);
     }
-
-    // extra.ci_model_event_adjudication(integer)
 
     public function getByEvent(int $id): array
     {
@@ -115,8 +108,6 @@ class AdjudicationModel extends BaseModel
 
         return $this->getObject($query);
     }
-
-    // extra.adjudicationslugid(text)
 
     private function getSlugId(string $id): int
     {

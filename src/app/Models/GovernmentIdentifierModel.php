@@ -6,8 +6,6 @@ use App\Models\BaseModel;
 
 class GovernmentIdentifierModel extends BaseModel
 {
-    // extra.ci_model_governmentidentifier_detail(text, text, text)
-
     public function getDetail(string $type, string $id): array
     {
         $query = <<<QUERY
@@ -33,8 +31,6 @@ class GovernmentIdentifierModel extends BaseModel
 
         return $this->getObject($query);
     }
-
-    // extra.ci_model_government_identifier(integer, character varying, character varying)
 
     // VIEW: extra.governmentsubstitutecache
 
@@ -76,8 +72,6 @@ class GovernmentIdentifierModel extends BaseModel
         return [];
     }
 
-    // extra.ci_model_governmentidentifier_related(integer[], integer[], text)
-
     public function getRelated(string $governments, string $governmentidentifierids): array
     {
         $query = <<<QUERY
@@ -101,8 +95,6 @@ class GovernmentIdentifierModel extends BaseModel
 
         return $this->getObject($query);
     }
-
-    // extra.ci_model_search_governmentidentifier_identifier(character varying, character varying, character varying)
 
     public function getSearchByIdentifier(array $parameters): array
     {

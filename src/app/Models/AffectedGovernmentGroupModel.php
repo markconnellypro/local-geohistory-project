@@ -6,8 +6,6 @@ use App\Models\BaseModel;
 
 class AffectedGovernmentGroupModel extends BaseModel
 {
-    // extra.ci_model_event_affectedgovernmentform(integer, character varying, boolean, character varying)
-
     public function getByEventForm(int $id): array
     {
         $query = <<<QUERY
@@ -36,8 +34,6 @@ class AffectedGovernmentGroupModel extends BaseModel
         return $this->getObject($query);
     }
 
-    // extra.ci_model_event_affectedgovernment(integer)
-
     public function getByEventGeometry(int $id): array
     {
         $query = <<<QUERY
@@ -62,8 +58,6 @@ class AffectedGovernmentGroupModel extends BaseModel
 
         return $this->getArray($query);
     }
-
-    // extra.ci_model_event_affectedgovernment_part(integer, character varying, character varying)
 
     public function getByEventGovernment(int $id): array
     {
@@ -108,8 +102,6 @@ class AffectedGovernmentGroupModel extends BaseModel
         return $this->getProcess($query, $gisQuery);
     }
 
-    // extra.ci_model_government_affectedgovernmentform(integer, character varying, boolean)
-
     // VIEW: extra.governmentsubstitute
 
     public function getByGovernmentForm(int $id): array
@@ -152,9 +144,6 @@ class AffectedGovernmentGroupModel extends BaseModel
 
         return $this->getObject($query);
     }
-
-    // extra.ci_model_government_affectedgovernment(integer, character varying, character varying)
-    // NOT REMOVED
 
     // FUNCTION: extra.governmentsubstitutedcache
     // VIEW: extra.governmentsubstitutecache
@@ -315,8 +304,6 @@ class AffectedGovernmentGroupModel extends BaseModel
 
         return $this->getObject($query);
     }
-
-    // extra.ci_model_area_affectedgovernment(v_governmentshape integer, v_state character varying, v_locale character varying)
 
     // FUNCTION: extra.affectedtypeshort
     // FUNCTION: extra.governmentabbreviation

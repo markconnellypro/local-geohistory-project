@@ -6,9 +6,6 @@ use App\Models\BaseModel;
 
 class LawSectionModel extends BaseModel
 {
-    // extra.ci_model_law_detail(integer, character varying, boolean)
-    // extra.ci_model_law_detail(text, character varying, boolean)
-
     public function getDetail(int|string $id): array
     {
         if (!is_int($id)) {
@@ -43,8 +40,6 @@ class LawSectionModel extends BaseModel
         return $this->getObject($query);
     }
 
-    // extra.ci_model_event_law(integer)
-
     public function getByEvent(int $id): array
     {
         $query = <<<QUERY
@@ -74,8 +69,6 @@ class LawSectionModel extends BaseModel
 
         return $this->getObject($query);
     }
-
-    // extra.ci_model_law_related(integer)
 
     public function getRelated(int $id): array
     {
@@ -143,8 +136,6 @@ class LawSectionModel extends BaseModel
         return $this->getObject($query);
     }
 
-    // extra.ci_model_search_law_dateevent(character varying, text, character varying)
-
     public function getSearchByDateEvent(array $parameters): array
     {
         $date = $parameters[0];
@@ -180,8 +171,6 @@ class LawSectionModel extends BaseModel
 
         return $this->getObject($query);
     }
-
-    // extra_removed.ci_model_search_law_reference(character varying, integer, integer, character varying)
 
     public function getSearchByReference(array $parameters): array
     {
@@ -220,8 +209,6 @@ class LawSectionModel extends BaseModel
 
         return $this->getObject($query);
     }
-
-    // extra.lawsectionslugid(text)
 
     private function getSlugId(string $id): int
     {

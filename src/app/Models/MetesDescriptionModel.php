@@ -6,9 +6,6 @@ use App\Models\BaseModel;
 
 class MetesDescriptionModel extends BaseModel
 {
-    // extra.ci_model_metes_detail(integer, character varying)
-    // extra.ci_model_metes_detail(text, character varying)
-
     public function getDetail(int|string $id): array
     {
         if (!is_int($id)) {
@@ -64,8 +61,6 @@ class MetesDescriptionModel extends BaseModel
         return $this->getObject($query);
     }
 
-    // extra.ci_model_event_metesdescription(integer)
-
     public function getByEvent(int $id): array
     {
         $query = <<<QUERY
@@ -86,8 +81,6 @@ class MetesDescriptionModel extends BaseModel
 
         return $this->getObject($query);
     }
-
-    // extra.ci_model_area_metesdescription(integer)
 
     public function getByGovernmentShape(int $id): array
     {
@@ -115,8 +108,6 @@ class MetesDescriptionModel extends BaseModel
 
         return $this->getObject($query);
     }
-
-    // extra.metesdescriptionslugid(text)
 
     private function getSlugId(string $id): int
     {

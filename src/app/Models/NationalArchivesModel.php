@@ -6,8 +6,6 @@ use App\Models\BaseModel;
 
 class NationalArchivesModel extends BaseModel
 {
-    // extra.ci_model_government_nationalarchives(integer, character varying)
-
     // VIEW: extra.governmentsubstitutecache
 
     public function getByGovernment(int $id): array

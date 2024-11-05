@@ -6,9 +6,6 @@ use App\Models\BaseModel;
 
 class SourceCitationModel extends BaseModel
 {
-    // extra.ci_model_source_detail(integer, character varying)
-    // extra.ci_model_source_detail(text, character varying)
-
     public function getDetail(int|string $id): array
     {
         if (!is_int($id)) {
@@ -49,8 +46,6 @@ class SourceCitationModel extends BaseModel
 
         return $this->getObject($query);
     }
-
-    // extra.ci_model_event_source(integer)
 
     public function getByEvent(int $id): array
     {
@@ -101,8 +96,6 @@ class SourceCitationModel extends BaseModel
     {
         return [];
     }
-
-    // extra.sourcecitationslugid(text)
 
     private function getSlugId(string $id): int
     {

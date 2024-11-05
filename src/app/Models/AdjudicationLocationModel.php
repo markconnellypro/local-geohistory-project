@@ -7,8 +7,6 @@ use App\Models\TribunalModel;
 
 class AdjudicationLocationModel extends BaseModel
 {
-    // extra.ci_model_adjudication_location(integer)
-
     public function getByAdjudication(int $id): array
     {
         $TribunalModel = new TribunalModel();

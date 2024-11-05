@@ -6,8 +6,6 @@ use App\Models\BaseModel;
 
 class EventTypeModel extends BaseModel
 {
-    // extra.ci_model_key_eventtype()
-
     public function getKey(): array
     {
         $query = <<<QUERY
@@ -30,8 +28,6 @@ class EventTypeModel extends BaseModel
         return $this->getObject($query);
     }
 
-    // extra.ci_model_search_form_eventtype(character varying)
-
     public function getSearch(): array
     {
         $query = <<<QUERY
@@ -48,9 +44,6 @@ class EventTypeModel extends BaseModel
 
         return $this->getArray($query);
     }
-
-    // extra.ci_model_statistics_eventtype_list(boolean)
-    // extra.ci_model_statistics_eventtype_list(character varying)
 
     // VIEW: extra.statistics_eventtype
 
@@ -70,8 +63,6 @@ class EventTypeModel extends BaseModel
 
         return $this->getArray($query);
     }
-
-    // extra_removed.ci_model_statistics_eventtype(text)
 
     public function getOneByStatistics(string $eventType): array
     {

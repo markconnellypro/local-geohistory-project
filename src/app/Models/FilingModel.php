@@ -6,8 +6,6 @@ use App\Models\BaseModel;
 
 class FilingModel extends BaseModel
 {
-    // extra.ci_model_adjudication_filing(integer, boolean)
-
     public function getByAdjudication(int $id): array
     {
         $query = <<<QUERY

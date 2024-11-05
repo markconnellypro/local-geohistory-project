@@ -6,9 +6,6 @@ use App\Models\BaseModel;
 
 class GovernmentShapeModel extends BaseModel
 {
-    // extra.ci_model_area_currentgovernment(v_governmentshapeid integer, v_state character varying, v_locale character varying)
-    // extra.ci_model_area_currentgovernment(v_governmentshapeid text, v_state character varying, v_locale character varying)
-
     public function getDetail(int|string $id): array
     {
         if (!is_int($id)) {
@@ -47,8 +44,6 @@ class GovernmentShapeModel extends BaseModel
         return $this->getObject($query);
     }
 
-    // extra.ci_model_area_point(pointy double precision, pointx double precision)
-
     public function getPointId(float $y, float $x): array
     {
         $query = <<<QUERY
@@ -65,8 +60,6 @@ class GovernmentShapeModel extends BaseModel
 
         return $this->getObject($query);
     }
-
-    // extra.ci_model_statistics_mapped_nation_part(character varying, integer, integer, character varying, boolean)
 
     // VIEW: extra.statistics_mapped
 
@@ -125,8 +118,6 @@ class GovernmentShapeModel extends BaseModel
         return $this->getObject($query);
     }
 
-    // extra.ci_model_statistics_mapped_nation_whole(character varying, integer, integer, character varying, boolean)
-
     // VIEW: extra.statistics_mapped
 
     public function getByStatisticsNationWhole(array $parameters): array
@@ -165,8 +156,6 @@ class GovernmentShapeModel extends BaseModel
 
         return $this->getObject($query);
     }
-
-    // extra.ci_model_statistics_mapped_state_part(character varying, integer, integer, character varying, character varying)
 
     // VIEW: extra.statistics_mapped
 
@@ -214,8 +203,6 @@ class GovernmentShapeModel extends BaseModel
         return $this->getObject($query);
     }
 
-    // extra.ci_model_statistics_mapped_state_whole(character varying, integer, integer, character varying, character varying)
-
     // VIEW: extra.statistics_mapped
 
     public function getByStatisticsStateWhole(array $parameters): array
@@ -257,8 +244,6 @@ class GovernmentShapeModel extends BaseModel
         return $this->getObject($query);
     }
 
-    // extra.ci_model_government_current(integer)
-
     public function getCurrentByGovernment(int $id): array
     {
         $query = <<<QUERY
@@ -275,8 +260,6 @@ class GovernmentShapeModel extends BaseModel
 
         return $this->getObject($query);
     }
-
-    // extra.ci_model_government_shape(integer, character varying, character varying)
 
     // FUNCTION: extra.emptytonull
     // FUNCTION: extra.plsstownshipshort
@@ -457,8 +440,6 @@ class GovernmentShapeModel extends BaseModel
         return $this->getObject($query);
     }
 
-    // extra.governmentshapeslugid(text)
-
     private function getSlugId(string $id): int
     {
         $query = <<<QUERY
@@ -481,8 +462,6 @@ class GovernmentShapeModel extends BaseModel
 
         return $id;
     }
-
-    // extra.ci_model_map_tile(v_state character varying, v_z integer, v_x integer, v_y integer)
 
     public function getTile(float $z, float $x, float $y): array
     {

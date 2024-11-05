@@ -6,8 +6,6 @@ use App\Models\BaseModel;
 
 class RecordingModel extends BaseModel
 {
-    // extra.ci_model_event_recording(integer, character varying, character varying)
-
     public function getByEvent(int $id): array
     {
         $query = <<<QUERY

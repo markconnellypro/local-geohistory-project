@@ -6,8 +6,6 @@ use App\Models\BaseModel;
 
 class EventGrantedModel extends BaseModel
 {
-    // extra.ci_model_key_eventgranted()
-
     public function getKey(): array
     {
         $query = <<<QUERY

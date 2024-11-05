@@ -11,8 +11,6 @@ class SourceModel extends BaseModel
         return [];
     }
 
-    // extra.ci_model_search_form_reporter(character varying)
-
     public function getSearch(): array
     {
         $query = <<<QUERY

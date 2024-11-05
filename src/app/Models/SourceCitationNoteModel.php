@@ -6,8 +6,6 @@ use App\Models\BaseModel;
 
 class SourceCitationNoteModel extends BaseModel
 {
-    // extra.ci_model_source_note(integer)
-
     public function getBySourceCitation(int $id): array
     {
         $query = <<<QUERY

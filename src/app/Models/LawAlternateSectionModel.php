@@ -6,9 +6,6 @@ use App\Models\BaseModel;
 
 class LawAlternateSectionModel extends BaseModel
 {
-    // extra.ci_model_lawalternate_detail(integer, character varying, boolean)
-    // extra.ci_model_lawalternate_detail(text, character varying, boolean)
-
     public function getDetail(int|string $id): array
     {
         if (!is_int($id)) {
@@ -44,8 +41,6 @@ class LawAlternateSectionModel extends BaseModel
 
         return $this->getObject($query);
     }
-
-    // extra.ci_model_lawalternate_related(integer)
 
     public function getRelated(int $id): array
     {
@@ -118,8 +113,6 @@ class LawAlternateSectionModel extends BaseModel
 
         return $this->getObject($query);
     }
-
-    // extra.lawalternatesectionslugid(text)
 
     private function getSlugId(string $id): int
     {

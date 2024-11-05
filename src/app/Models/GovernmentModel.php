@@ -6,9 +6,6 @@ use App\Models\BaseModel;
 
 class GovernmentModel extends BaseModel
 {
-    // extra.ci_model_government_detail(integer, character varying, boolean)
-    // extra.ci_model_government_detail(text, character varying, boolean)
-
     // FUNCTION: extra.governmentsubstitutedcache
     // VIEW: extra.governmentchangecountcache
     // VIEW: extra.governmenthasmappedeventcache
@@ -106,9 +103,6 @@ class GovernmentModel extends BaseModel
         return $this->getObject($query);
     }
 
-    // extra.governmentabbreviationid(text)
-    // NOT REMOVED
-
     public function getAbbreviationId(string $id): int
     {
         $query = <<<QUERY
@@ -131,8 +125,6 @@ class GovernmentModel extends BaseModel
 
         return $id;
     }
-
-    // extra.ci_model_governmentidentifier_government(integer[], character varying)
 
     public function getByGovernmentIdentifier(string $ids): array
     {
@@ -169,8 +161,6 @@ class GovernmentModel extends BaseModel
 
         return $this->getArray($query);
     }
-
-    // extra.ci_model_statistics_createddissolved_nation_part(character varying, integer, integer, character varying, boolean)
 
     // VIEW: extra.statistics_createddissolved
 
@@ -251,8 +241,6 @@ class GovernmentModel extends BaseModel
         return $this->getObject($query);
     }
 
-    // extra.ci_model_statistics_createddissolved_nation_whole(character varying, integer, integer, character varying, boolean)
-
     // VIEW: extra.statistics_createddissolved
 
     public function getByStatisticsNationWhole(array $parameters): array
@@ -313,8 +301,6 @@ class GovernmentModel extends BaseModel
 
         return $this->getObject($query);
     }
-
-    // extra.ci_model_statistics_createddissolved_state_part(character varying, integer, integer, character varying, character varying)
 
     // VIEW: extra.statistics_createddissolved
 
@@ -383,8 +369,6 @@ class GovernmentModel extends BaseModel
 
         return $this->getObject($query);
     }
-
-    // extra.ci_model_statistics_createddissolved_state_whole(character varying, integer, integer, character varying, character varying)
 
     // VIEW: extra.statistics_createddissolved
 
@@ -501,8 +485,6 @@ class GovernmentModel extends BaseModel
         return '{' . implode(',', $result) . '}';
     }
 
-    // replace extra.governmentparent(cache), extra.governmentrelation(cache)
-
     public function getIdByGovernmentShortParent(string $government, string $parent): string
     {
         $government = $this->getIdByGovernmentShort($government);
@@ -594,8 +576,6 @@ class GovernmentModel extends BaseModel
         return '{' . implode(',', $result) . '}';
     }
 
-    // extra.ci_model_search_lookup_government(character varying, character varying)
-
     public function getLookupByGovernment(string $government): array
     {
         if (strlen($government) < 3) {
@@ -641,8 +621,6 @@ class GovernmentModel extends BaseModel
 
         return $this->getArray($query);
     }
-
-    // extra.ci_model_search_lookup_governmentparent(text, text)
 
     // VIEW: extra.governmentrelationcache
 
@@ -732,8 +710,6 @@ class GovernmentModel extends BaseModel
     {
         return [];
     }
-
-    // extra.ci_model_government_related(integer, character varying, character varying)
 
     // VIEW: extra.governmentparentcache
     // VIEW: extra.governmentsubstitutecache
@@ -863,8 +839,6 @@ class GovernmentModel extends BaseModel
         return $this->getObject($query);
     }
 
-    // extra.ci_model_search_form_tribunalgovernmentshort(character varying)
-
     // VIEW: governmentrelationcache
 
     public function getSearch(): array
@@ -882,8 +856,6 @@ class GovernmentModel extends BaseModel
 
         return $this->getArray($query);
     }
-
-    // extra.ci_model_search_government_government(text, text, text, integer, text, character varying)
 
     // VIEW: extra.governmentrelationcache
 
@@ -950,11 +922,6 @@ class GovernmentModel extends BaseModel
         return [];
     }
 
-    // extra.ci_model_search_form_detail(character varying)
-    // REMOVED
-    // extra.governmentslug(integer)
-    // NOT REMOVED
-
     public function getSlug(int $id): string
     {
         $query = <<<QUERY
@@ -977,9 +944,6 @@ class GovernmentModel extends BaseModel
 
         return $id;
     }
-
-    // extra.governmentslugid(text)
-    // NOT REMOVED
 
     protected function getSlugId(string $id): int
     {

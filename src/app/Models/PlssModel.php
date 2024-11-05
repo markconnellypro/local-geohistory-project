@@ -6,8 +6,6 @@ use App\Models\BaseModel;
 
 class PlssModel extends BaseModel
 {
-    // extra.ci_model_event_plss(integer)
-
     // FUNCTION: extra.plsstownshiplong
 
     public function getByEvent(int $id): array

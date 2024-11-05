@@ -6,8 +6,6 @@ use App\Models\BaseModel;
 
 class AffectedTypeModel extends BaseModel
 {
-    // extra.ci_model_key_affectedtype()
-
     public function getKey(): array
     {
         $query = <<<QUERY

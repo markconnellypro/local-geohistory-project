@@ -6,8 +6,6 @@ use App\Models\BaseModel;
 
 class ResearchLogModel extends BaseModel
 {
-    // extra.ci_model_government_researchlog(integer, character varying, boolean)
-
     // VIEW: extra.governmentsubstitutecache
 
     public function getByGovernment(int $id): array

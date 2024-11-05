@@ -6,8 +6,6 @@ use App\Models\BaseModel;
 
 class GovernmentIdentifierTypeModel extends BaseModel
 {
-    // extra.ci_model_search_form_governmentidentifiertype(character varying)
-
     public function getSearch(): array
     {
         $query = <<<QUERY

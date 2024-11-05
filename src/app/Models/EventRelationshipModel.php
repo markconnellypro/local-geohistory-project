@@ -6,8 +6,6 @@ use App\Models\BaseModel;
 
 class EventRelationshipModel extends BaseModel
 {
-    // extra.ci_model_key_eventrelationship()
-
     public function getKey(): array
     {
         $query = <<<QUERY

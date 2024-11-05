@@ -6,8 +6,6 @@ use App\Models\BaseModel;
 
 class CurrentGovernmentModel extends BaseModel
 {
-    // extra.ci_model_event_currentgovernment(integer, character varying, character varying)
-
     public function getByEvent(int $id): array
     {
         $query = <<<QUERY

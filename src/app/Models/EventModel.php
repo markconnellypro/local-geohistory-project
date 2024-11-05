@@ -7,9 +7,6 @@ use App\Models\GovernmentModel;
 
 class EventModel extends BaseModel
 {
-    // extra.ci_model_event_detail(integer, character varying)
-    // extra.ci_model_event_detail(text, character varying)
-
     public function getDetail(int|string $id): array
     {
         if (!is_int($id)) {
@@ -95,8 +92,6 @@ class EventModel extends BaseModel
         return $this->getObject($query);
     }
 
-    // extra.ci_model_adjudication_event(integer)
-
     public function getByAdjudication(int $id): array
     {
         $query = <<<QUERY
@@ -128,8 +123,6 @@ class EventModel extends BaseModel
         return $this->getObject($query);
     }
 
-    // extra.ci_model_reporter_event(integer)
-
     public function getByAdjudicationSourceCitation(int $id): array
     {
         $query = <<<QUERY
@@ -159,9 +152,6 @@ class EventModel extends BaseModel
 
         return $this->getObject($query);
     }
-
-    // extra.ci_model_government_event_failure(integer, integer[])
-    // extra.ci_model_government_event_success(integer, integer[])
 
     public function getByGovernmentOther(string $allId, array $omitEvents): array
     {
@@ -193,8 +183,6 @@ class EventModel extends BaseModel
 
         return $this->getObject($query);
     }
-
-    // extra.ci_model_area_event_failure(integer, integer[])
 
     public function getByGovernmentShapeFailure(int $id, array $events): array
     {
@@ -239,8 +227,6 @@ class EventModel extends BaseModel
         return $this->getObject($query);
     }
 
-    // extra.ci_model_governmentsource_event(integer)
-
     public function getByGovernmentSource(int $id): array
     {
         $query = <<<QUERY
@@ -268,8 +254,6 @@ class EventModel extends BaseModel
 
         return $this->getObject($query);
     }
-
-    // extra.ci_model_lawalternate_event(integer)
 
     public function getByLawAlternateSection(int $id): array
     {
@@ -307,8 +291,6 @@ class EventModel extends BaseModel
         return $this->getObject($query);
     }
 
-    // extra.ci_model_law_event(integer)
-
     public function getByLawSection(int $id): array
     {
         $query = <<<QUERY
@@ -343,8 +325,6 @@ class EventModel extends BaseModel
         return $this->getObject($query);
     }
 
-    // extra.ci_model_source_event(integer)
-
     public function getBySourceCitation(int $id): array
     {
         $query = <<<QUERY
@@ -372,8 +352,6 @@ class EventModel extends BaseModel
 
         return $this->getObject($query);
     }
-
-    // extra.ci_model_statistics_eventtype_nation_part(text, integer, integer, character varying, boolean)
 
     // VIEW: extra.statistics_eventtype
 
@@ -443,8 +421,6 @@ class EventModel extends BaseModel
         return $this->getObject($query);
     }
 
-    // extra.ci_model_statistics_eventtype_nation_whole(text, integer, integer, character varying, boolean)
-
     // VIEW: extra.statistics_eventtype
 
     public function getByStatisticsNationWhole(array $parameters): array
@@ -494,8 +470,6 @@ class EventModel extends BaseModel
 
         return $this->getObject($query);
     }
-
-    // extra.ci_model_statistics_eventtype_state_part(text, integer, integer, character varying, character varying)
 
     // VIEW: extra.statistics_eventtype
 
@@ -554,8 +528,6 @@ class EventModel extends BaseModel
         return $this->getObject($query);
     }
 
-    // extra.ci_model_statistics_eventtype_state_whole(text, integer, integer, character varying, character varying)
-
     // VIEW: extra.statistics_eventtype
 
     public function getByStatisticsStateWhole(array $parameters): array
@@ -607,8 +579,6 @@ class EventModel extends BaseModel
 
         return $this->getObject($query);
     }
-
-    // replace extra.eventgovernment(cache)
 
     public function getIdByGovernment(string $government): string
     {
@@ -747,8 +717,6 @@ class EventModel extends BaseModel
         return $this->getIdByGovernment($government);
     }
 
-    // extra.ci_model_search_event_government(text, text, text, text, integer, integer)
-
     public function getSearchByGovernment(array $parameters): array
     {
         $government = $parameters[0];
@@ -810,8 +778,6 @@ class EventModel extends BaseModel
         return $this->getObject($query);
     }
 
-    // extra.eventslugidreplacement(text) - SPLIT INTO TWO
-
     private function getSlugId(string $id): int
     {
         $query = <<<QUERY
@@ -836,8 +802,6 @@ class EventModel extends BaseModel
 
         return $output;
     }
-
-    // extra.eventslugidreplacement(text) - SPLIT INTO TWO
 
     private function getRetiredSlugRedirect(int|string $id): void
     {

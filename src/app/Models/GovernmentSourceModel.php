@@ -66,9 +66,6 @@ class GovernmentSourceModel extends BaseModel
         QUERY;
     }
 
-    // extra.ci_model_governmentsource_detail(integer, character varying, boolean, character varying)
-    // extra.ci_model_governmentsource_detail(text, character varying, boolean, character varying)
-
     public function getDetail(int|string $id): array
     {
         if (!is_int($id)) {
@@ -102,8 +99,6 @@ class GovernmentSourceModel extends BaseModel
         return $this->getObject($query);
     }
 
-    // extra.ci_model_event_governmentsource(integer, character varying, boolean, character varying)
-
     public function getByEvent(int $id): array
     {
         $query = $this->getFields() . <<<QUERY
@@ -131,8 +126,6 @@ class GovernmentSourceModel extends BaseModel
 
         return $this->getObject($query);
     }
-
-    // extra.ci_model_government_governmentsource(integer, character varying, boolean)
 
     // VIEW: extra.governmentsubstitutecache
 
@@ -166,8 +159,6 @@ class GovernmentSourceModel extends BaseModel
 
         return $this->getObject($query);
     }
-
-    // extra.governmentsourceslugid(text)
 
     private function getSlugId(string $id): int
     {

@@ -6,8 +6,6 @@ use App\Models\BaseModel;
 
 class SourceItemPartModel extends BaseModel
 {
-    // extra.ci_model_reporter_url(integer)
-
     public function getByAdjudicationSourceCitation(int $id): array
     {
         $query = <<<QUERY
@@ -40,8 +38,6 @@ class SourceItemPartModel extends BaseModel
 
         return $this->getObject($query);
     }
-
-    // extra.ci_model_governmentsource_url(integer)
 
     // FUNCTION: extra.sourceurlid
 
@@ -82,8 +78,6 @@ class SourceItemPartModel extends BaseModel
 
         return $this->getObject($query);
     }
-
-    // extra.ci_model_lawalternate_url(integer, boolean)
 
     // FUNCTION: extra.sourceurlid
 
@@ -141,8 +135,6 @@ class SourceItemPartModel extends BaseModel
         return $this->getObject($query);
     }
 
-    // extra.ci_model_law_url(integer, boolean)
-
     // FUNCTION: extra.sourceurlid
 
     public function getByLawSection(int $id): array
@@ -196,8 +188,6 @@ class SourceItemPartModel extends BaseModel
 
         return $this->getObject($query);
     }
-
-    // extra.ci_model_source_url(integer)
 
     // FUNCTION: extra.sourceurlid
 

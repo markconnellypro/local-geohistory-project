@@ -6,8 +6,6 @@ use App\Models\BaseModel;
 
 class DocumentationModel extends BaseModel
 {
-    // extra.ci_model_about(character varying)
-
     public function getAboutDetail(string $jurisdiction): array
     {
         $query = <<<QUERY

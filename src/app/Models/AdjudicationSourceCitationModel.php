@@ -31,9 +31,6 @@ class AdjudicationSourceCitationModel extends BaseModel
         QUERY;
     }
 
-    // extra.ci_model_reporter_detail(integer, character varying)
-    // extra.ci_model_reporter_detail(text, character varying)
-
     public function getDetail(int|string $id): array
     {
         if (!is_int($id)) {
@@ -51,8 +48,6 @@ class AdjudicationSourceCitationModel extends BaseModel
 
         return $this->getObject($query);
     }
-
-    // extra.ci_model_adjudication_source(integer)
 
     public function getByAdjudication(int $id): array
     {

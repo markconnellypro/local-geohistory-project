@@ -7,8 +7,6 @@ use stdClass;
 
 class AppModel extends BaseModel
 {
-    // extra.ci_model_lastrefresh()
-
     public function getLastUpdated(): array
     {
         $query = <<<QUERY
