@@ -3,16 +3,16 @@
 namespace App\Models;
 
 use App\Models\BaseModel;
+use App\Models\TribunalModel;
 
 class AdjudicationLocationModel extends BaseModel
 {
     // extra.ci_model_adjudication_location(integer)
 
-    // FUNCTION: extra.tribunallong
-    // FUNCTION: extra.tribunalfilingoffice
-
     public function getByAdjudication(int $id): array
     {
+        $TribunalModel = new TribunalModel();
+
         $query = <<<QUERY
             SELECT adjudicationlocationtype.adjudicationlocationtypelong,
                 adjudicationlocation.adjudicationlocationvolume,
@@ -29,11 +29,13 @@ class AdjudicationLocationModel extends BaseModel
                     ELSE ''::text
                 END AS adjudicationlocationtypearchivetype,
                 CASE
-                    WHEN adjudicationlocationtype.tribunal <> adjudicationtype.tribunal THEN extra.tribunallong(adjudicationlocationtype.tribunal) 
+                    WHEN adjudicationlocationtype.tribunal <> adjudicationtype.tribunal THEN
+        QUERY . $TribunalModel->getLong() . <<<QUERY
                     ELSE ''::text
                 END AS tribunallong,
                 CASE
-                    WHEN adjudicationlocationtype.tribunal <> adjudicationtype.tribunal THEN extra.tribunalfilingoffice(adjudicationlocationtype.tribunal)
+                    WHEN adjudicationlocationtype.tribunal <> adjudicationtype.tribunal THEN
+        QUERY . $TribunalModel->getFilingOffice() . <<<QUERY
                     ELSE ''::text
                 END AS tribunalfilingoffice
             FROM geohistory.adjudicationlocation
@@ -43,6 +45,14 @@ class AdjudicationLocationModel extends BaseModel
                 ON adjudicationlocation.adjudication = adjudication.adjudicationid
             JOIN geohistory.adjudicationtype
                 ON adjudication.adjudicationtype = adjudicationtype.adjudicationtypeid
+            JOIN geohistory.tribunal
+                ON adjudicationlocationtype.tribunal = tribunal.tribunalid
+            JOIN geohistory.tribunaltype
+                ON tribunal.tribunaltype = tribunaltype.tribunaltypeid
+            JOIN geohistory.government
+                ON tribunal.government = government.governmentid
+            JOIN geohistory.government governmentstate
+                ON government.governmentcurrentleadstateid = governmentstate.governmentid
             WHERE adjudicationlocation.adjudication = ?
             ORDER BY adjudicationlocation.adjudicationlocationid
         QUERY;
