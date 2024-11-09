@@ -3,18 +3,14 @@
 namespace App\Controllers;
 
 use App\Models\GovernmentShapeModel;
-use CodeIgniter\HTTP\ResponseInterface;
 
 class Map extends BaseController
 {
-    public function baseStyle(int $maxZoom = 14, ResponseInterface $response = null): void
+    public function baseStyle(int $maxZoom = 14): void
     {
-        if (!$response instanceof \CodeIgniter\HTTP\ResponseInterface) {
-            $response = $this->response;
-        }
-        $response->removeHeader('Cache-Control');
-        $response->setHeader('Cache-Control', 'max-age=86400');
-        $response->setHeader('Content-Type', 'application/json');
+        $this->response->removeHeader('Cache-Control');
+        $this->response->setHeader('Cache-Control', 'max-age=86400');
+        $this->response->setHeader('Content-Type', 'application/json');
         $json = json_decode(file_get_contents(__DIR__ . '/../../html/asset/map/map_style_base.json'), true);
         if (str_contains(getenv('map_tile'), '.json') || str_contains(getenv('map_tile'), '.pmtiles')) {
             $json['sources']['street-tile']['url'] = getenv('map_tile');

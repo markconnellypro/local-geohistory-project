@@ -31,6 +31,7 @@ parameters:
 	reportMaybesInPropertyPhpDocTypes: false
 	treatPhpDocTypesAsCertain: false
 	ignoreErrors:
+		- identifier: missingType.generics
 		- identifier: missingType.iterableValue
 	strictRules:
 		allRules: false
