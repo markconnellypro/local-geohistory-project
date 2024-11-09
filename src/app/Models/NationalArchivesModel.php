@@ -6,8 +6,6 @@ use App\Models\BaseModel;
 
 class NationalArchivesModel extends BaseModel
 {
-    // VIEW: extra.governmentsubstitutecache
-
     public function getByGovernment(int $id): array
     {
         $query = <<<QUERY
@@ -25,9 +23,9 @@ class NationalArchivesModel extends BaseModel
                 ON nationalarchives.source = source.sourceid
             JOIN geohistory.government
                 ON nationalarchives.government = government.governmentid
-            JOIN extra.governmentsubstitutecache
-                ON nationalarchives.government = governmentsubstitutecache.governmentid
-                AND governmentsubstitutecache.governmentsubstitute = ?
+            JOIN geohistory.government governmentsubstitute
+                ON government.governmentslugsubstitute = governmentsubstitute.governmentslugsubstitute
+                AND governmentsubstitute.governmentid = ?
             UNION DISTINCT
             SELECT DISTINCT source.sourceabbreviation,
                 censusmap.censusmapyear::character varying AS nationalarchivesset,
@@ -43,13 +41,13 @@ class NationalArchivesModel extends BaseModel
                 ON source.sourceshort = 'Cns.Mp.'
             JOIN geohistory.government
                 ON censusmap.government = government.governmentid
+            JOIN geohistory.government governmentsubstitute
+                ON government.governmentslugsubstitute = governmentsubstitute.governmentslugsubstitute
+                AND governmentsubstitute.governmentid = ?
             LEFT JOIN geohistory.nationalarchives
                 ON censusmap.government = nationalarchives.government
                 AND source.sourceid = nationalarchives.source
                 AND censusmap.censusmapyear::character varying = nationalarchives.nationalarchivesset
-            JOIN extra.governmentsubstitutecache
-                ON censusmap.government = governmentsubstitutecache.governmentid
-                AND governmentsubstitutecache.governmentsubstitute = ?
             WHERE nationalarchives.nationalarchivesid IS NULL
             ORDER BY 1, 3, 4
         QUERY;
