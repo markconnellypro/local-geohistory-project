@@ -125,13 +125,9 @@ class Area extends BaseController
             echo view('core/map', ['includeBase' => true]);
             $AffectedGovernmentGroupModel = new AffectedGovernmentGroupModel();
             $query = $AffectedGovernmentGroupModel->getByGovernmentShape($id);
-            $events = [];
-            echo view('event/table_affectedgovernment_fixed', ['query' => $query, 'includeDate' => true, 'isComplete' => true]);
-            foreach ($query as $row) {
-                if (!is_null($row->eventid)) {
-                    $events[] = $row->eventid;
-                }
-            }
+            $events = $query['event'];
+            // TO DO: Re-add comparison with current government.
+            echo view('event/table_affectedgovernment', ['affectedGovernment' => $query['affectedGovernment'], 'includeDate' => true, 'isComplete' => true]);
             $MetesDescriptionModel = new MetesDescriptionModel();
             echo view('metes/table', ['query' => $MetesDescriptionModel->getByGovernmentShape($id), 'hasLink' => true, 'title' => 'Metes and Bounds Description']);
             $events = array_unique($events);

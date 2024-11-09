@@ -29,12 +29,12 @@ $isComplete ??= true;
                 foreach ($affectedGovernment['rows'] as $id => $row) { ?>
                 <tr>
                     <?php if ($includeDate) { ?>
-                        <td data-sort="<?= $row->eventorder ?>"><?php echo view('core/link', [
+                        <td data-sort="<?= $row->eventsort ?>"><?php echo view('core/link', [
                             'type' => 'event',
                             'link' => $row->eventslug,
                             'text' => ($row->eventslug  === '' ? 'Missing' : 'View')
                         ]) ?></td>
-                        <td data-sort="<?= $row->eventsort ?>"><?= ($row->eventeffective === '' ? $row->eventyear : $row->eventeffective) ?></td>
+                        <td data-sort="<?= $row->eventsort ?>"><?= $row->eventeffective ?></td>
                     <?php } elseif (\App\Controllers\BaseController::isLive() && $isComplete) { ?>
                         <td>
 

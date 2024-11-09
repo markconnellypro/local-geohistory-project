@@ -305,198 +305,134 @@ class AffectedGovernmentGroupModel extends BaseModel
         return $this->getObject($query);
     }
 
-    // FUNCTION: extra.affectedtypeshort
-    // FUNCTION: extra.governmentabbreviation
-    // FUNCTION: extra.governmentlong
-    // FUNCTION: extra.governmentshort
-    // FUNCTION: extra.governmentslug
-
     public function getByGovernmentShape(int $id): array
     {
         $query = <<<QUERY
-            WITH foundaffectedgovernment AS (
-                SELECT event.eventid,
+            SELECT DISTINCT affectedgovernmentgrouppart.affectedgovernmentgroup AS id,
+                affectedgovernmentlevel.affectedgovernmentlevellong AS affectedgovernmentlevellong,
+                affectedgovernmentlevel.affectedgovernmentleveldisplayorder AS affectedgovernmentleveldisplayorder,
+                affectedgovernmentlevel.affectedgovernmentlevelgroup = 4 AS includelink,
+                COALESCE(governmentfrom.governmentslugsubstitute, '') AS governmentfrom,
+                COALESCE(governmentfrom.governmentlong, '') AS governmentfromlong,
+                COALESCE(affectedtypefrom.affectedtypeshort, '') AS affectedtypefrom,
+                COALESCE(governmentto.governmentslugsubstitute, '') AS governmentto,
+                COALESCE(governmentto.governmentlong, '') AS governmenttolong,
+                COALESCE(affectedtypeto.affectedtypeshort, '') AS affectedtypeto,
+                event.eventid,
                 event.eventslug,
-                extra.governmentslug(affectedgovernment_reconstructed.municipalityfrom) AS municipalityfrom,
-                extra.governmentlong(affectedgovernment_reconstructed.municipalityfrom) AS municipalityfromlong,
-                extra.affectedtypeshort(affectedgovernment_reconstructed.affectedtypemunicipalityfrom) AS affectedtypemunicipalityfrom,
-                extra.governmentslug(affectedgovernment_reconstructed.countyfrom) AS countyfrom,
-                extra.governmentshort(affectedgovernment_reconstructed.countyfrom) AS countyfromshort,
-                extra.affectedtypeshort(affectedgovernment_reconstructed.affectedtypecountyfrom) AS affectedtypecountyfrom,
-                extra.governmentslug(affectedgovernment_reconstructed.statefrom) AS statefrom,
-                extra.governmentabbreviation(affectedgovernment_reconstructed.statefrom) AS statefromabbreviation,
-                extra.affectedtypeshort(affectedgovernment_reconstructed.affectedtypestatefrom) AS affectedtypestatefrom,
-                extra.governmentslug(affectedgovernment_reconstructed.municipalityto) AS municipalityto,
-                extra.governmentlong(affectedgovernment_reconstructed.municipalityto) AS municipalitytolong,
-                extra.affectedtypeshort(affectedgovernment_reconstructed.affectedtypemunicipalityto) AS affectedtypemunicipalityto,
-                extra.governmentslug(affectedgovernment_reconstructed.countyto) AS countyto,
-                extra.governmentshort(affectedgovernment_reconstructed.countyto) AS countytoshort,
-                extra.affectedtypeshort(affectedgovernment_reconstructed.affectedtypecountyto) AS affectedtypecountyto,
-                extra.governmentslug(affectedgovernment_reconstructed.stateto) AS stateto,
-                extra.governmentabbreviation(affectedgovernment_reconstructed.stateto) AS statetoabbreviation,
-                extra.affectedtypeshort(affectedgovernment_reconstructed.affectedtypestateto) AS affectedtypestateto,
-                CASE WHEN affectedgovernment_reconstructed.submunicipalityfrom IS NOT NULL 
-                    OR affectedgovernment_reconstructed.submunicipalityto IS NOT NULL
-                    OR affectedgovernment_reconstructed.subcountyfrom IS NOT NULL
-                    OR affectedgovernment_reconstructed.subcountyto IS NOT NULL THEN TRUE ELSE FALSE END AS textflag,
-                COALESCE(extra.governmentslug(affectedgovernment_reconstructed.submunicipalityfrom), '') AS submunicipalityfrom,
-                COALESCE(extra.governmentlong(affectedgovernment_reconstructed.submunicipalityfrom), '') AS submunicipalityfromlong,
-                COALESCE(extra.affectedtypeshort(affectedgovernment_reconstructed.affectedtypesubmunicipalityfrom), '') AS affectedtypesubmunicipalityfrom,
-                COALESCE(extra.governmentslug(affectedgovernment_reconstructed.submunicipalityto), '') AS submunicipalityto,
-                COALESCE(extra.governmentlong(affectedgovernment_reconstructed.submunicipalityto), '') AS submunicipalitytolong,
-                COALESCE(extra.affectedtypeshort(affectedgovernment_reconstructed.affectedtypesubmunicipalityto), '') AS affectedtypesubmunicipalityto,
-                COALESCE(extra.governmentslug(affectedgovernment_reconstructed.subcountyfrom), '') AS subcountyfrom,
-                COALESCE(extra.governmentshort(affectedgovernment_reconstructed.subcountyfrom), '') AS subcountyfromshort,
-                COALESCE(extra.affectedtypeshort(affectedgovernment_reconstructed.affectedtypesubcountyfrom), '') AS affectedtypesubcountyfrom,
-                COALESCE(extra.governmentslug(affectedgovernment_reconstructed.subcountyto), '') AS subcountyto,
-                COALESCE(extra.governmentshort(affectedgovernment_reconstructed.subcountyto), '') AS subcountytoshort,
-                COALESCE(extra.affectedtypeshort(affectedgovernment_reconstructed.affectedtypesubcountyto), '') AS affectedtypesubcountyto,
-                event.eventyear,
-                event.eventeffectivetext AS eventeffective,
-                event.eventsort,
-                (ROW_NUMBER () OVER (ORDER BY event.eventsort, event.eventid))::integer AS eventorder,
-                (ROW_NUMBER () OVER (ORDER BY event.eventsort DESC, event.eventid DESC))::integer AS eventorderreverse
-                FROM geohistory.event
-                JOIN geohistory.eventgranted
-                ON event.eventgranted = eventgranted.eventgrantedid
-                AND eventgranted.eventgrantedsuccess
-                JOIN extra.affectedgovernment_reconstructed
-                ON affectedgovernment_reconstructed.event = event.eventid
-                JOIN gis.affectedgovernmentgis
-                ON affectedgovernment_reconstructed.affectedgovernmentid = affectedgovernmentgis.affectedgovernment
-                WHERE affectedgovernmentgis.governmentshape = ?
-                GROUP BY 1, event.eventslug, municipalityfrom, municipalityfromlong, affectedtypemunicipalityfrom, countyfrom, countyfromshort, affectedtypecountyfrom, statefrom, statefromabbreviation, affectedtypestatefrom, municipalityto, municipalitytolong, affectedtypemunicipalityto, countyto, countytoshort, affectedtypecountyto, stateto, statetoabbreviation, affectedtypestateto, submunicipalityfrom, submunicipalityfromlong, affectedtypesubmunicipalityfrom, submunicipalityto, submunicipalitytolong, affectedtypesubmunicipalityto, subcountyfrom, subcountyfromshort, affectedtypesubcountyfrom, subcountyto, subcountytoshort, affectedtypesubcountyto, event.eventyear, event.eventeffectivetext, event.eventsort
-            ), currentgovernment AS (
-                -- Taken from GovernmentShapeModel->getDetail
-                SELECT DISTINCT governmentshape.governmentshapeid,
-                    COALESCE(governmentsubmunicipality.governmentslugsubstitute, '') AS governmentsubmunicipality,
-                    COALESCE(governmentsubmunicipality.governmentlong, '') AS governmentsubmunicipalitylong,
-                    governmentmunicipality.governmentslugsubstitute AS governmentmunicipality,
-                    governmentmunicipality.governmentlong AS governmentmunicipalitylong,
-                    governmentcounty.governmentslugsubstitute AS governmentcounty,
-                    governmentcounty.governmentshort AS governmentcountyshort,
-                    governmentstate.governmentslugsubstitute AS governmentstate,
-                    governmentstate.governmentabbreviation AS governmentstateabbreviation,
-                    governmentshape.governmentshapeid AS id,
-                    public.st_asgeojson(governmentshape.governmentshapegeometry) AS geometry
-                FROM gis.governmentshape
-                JOIN geohistory.government governmentmunicipality
-                    ON governmentshape.governmentmunicipality = governmentmunicipality.governmentid
-                JOIN geohistory.government governmentcounty
-                    ON governmentshape.governmentcounty = governmentcounty.governmentid
-                JOIN geohistory.government governmentstate
-                    ON governmentshape.governmentstate = governmentstate.governmentid
-                LEFT JOIN geohistory.government governmentsubmunicipality
-                    ON governmentshape.governmentsubmunicipality = governmentsubmunicipality.governmentid
-                WHERE governmentshape.governmentshapeid = ?
-            )
-            SELECT eventid, eventslug, municipalityfrom, municipalityfromlong, affectedtypemunicipalityfrom, countyfrom, countyfromshort, affectedtypecountyfrom, statefrom, statefromabbreviation, affectedtypestatefrom, municipalityto, municipalitytolong, affectedtypemunicipalityto, countyto, countytoshort, affectedtypecountyto, stateto, statetoabbreviation, affectedtypestateto, textflag, submunicipalityfrom, submunicipalityfromlong, affectedtypesubmunicipalityfrom, submunicipalityto, submunicipalitytolong, affectedtypesubmunicipalityto, subcountyfrom, subcountyfromshort, affectedtypesubcountyfrom, subcountyto, subcountytoshort, affectedtypesubcountyto, eventyear, eventeffective, eventsort, 
-               (eventorder * 2 - 1) AS eventorder
-            FROM foundaffectedgovernment
-            UNION
-            SELECT NULL AS eventid,
-               '' AS eventslug,
-               oldg.municipalityto AS municipalityfrom,
-               oldg.municipalitytolong AS municipalityfromlong,
-               'Missing' AS affectedtypemunicipalityfrom,
-               oldg.countyto AS countyfrom,
-               oldg.countytoshort AS countyfromshort,
-               'Missing' AS affectedtypecountyfrom,
-               oldg.stateto AS statefrom,
-               oldg.statetoabbreviation AS statefromabbreviation,
-               'Missing' AS affectedtypestatefrom,
-               newg.municipalityfrom AS municipalityto,
-               newg.municipalityfromlong AS municipalitytolong,
-               'Missing' AS affectedtypemunicipalityto,
-               newg.countyfrom AS countyto,
-               newg.countyfromshort AS countytoshort,
-               'Missing' AS affectedtypecountyto,
-               newg.statefrom AS stateto,
-               newg.statefromabbreviation AS statetoabbreviation,
-               'Missing' AS affectedtypestateto,
-               oldg.textflag OR newg.textflag AS textflag,
-               oldg.submunicipalityto AS submunicipalityfrom,
-               oldg.submunicipalitytolong AS submunicipalityfromlong,
-               CASE WHEN oldg.submunicipalityto = '' THEN '' ELSE 'Missing' END AS affectedtypesubmunicipalityfrom,
-               newg.submunicipalityfrom AS submunicipalityto,
-               newg.submunicipalityfromlong AS submunicipalitytolong,
-               CASE WHEN newg.submunicipalityfrom = '' THEN '' ELSE 'Missing' END AS affectedtypesubmunicipalityto,
-               oldg.subcountyto AS subcountyfrom,
-               oldg.subcountytoshort AS subcountyfromshort,
-               CASE WHEN oldg.subcountyto = '' THEN '' ELSE 'Missing' END AS affectedtypesubcountyfrom,
-               newg.subcountyfrom AS subcountyto,
-               newg.subcountyfromshort AS subcountytoshort,
-               CASE WHEN newg.subcountyfrom = '' THEN '' ELSE 'Missing' END AS affectedtypesubcountyto,
-               '' AS eventyear,
-               '' AS eventeffective,
-               NULL AS eventsort,
-               (oldg.eventorder * 2) AS eventorder
-            FROM foundaffectedgovernment oldg
-            JOIN foundaffectedgovernment newg
-               ON oldg.eventorder = newg.eventorder - 1
-               AND NOT (
-                 oldg.submunicipalityto = newg.submunicipalityfrom AND
-                 oldg.subcountyto = newg.subcountyfrom AND
-                 oldg.municipalityto = newg.municipalityfrom AND
-                 oldg.countyto = newg.countyfrom AND
-                 (oldg.stateto = newg.statefrom OR oldg.statetoabbreviation ~ ('^' || newg.statefromabbreviation || '[\-][A-Z]$'))
-               )
-            UNION
-            SELECT NULL AS eventid,
-               '' AS eventslug,
-               oldg.municipalityto AS municipalityfrom,
-               oldg.municipalitytolong AS municipalityfromlong,
-               'Missing' AS affectedtypemunicipalityfrom,
-               oldg.countyto AS countyfrom,
-               oldg.countytoshort AS countyfromshort,
-               'Missing' AS affectedtypecountyfrom,
-               oldg.stateto AS statefrom,
-               oldg.statetoabbreviation AS statefromabbreviation,
-               'Missing' AS affectedtypestatefrom,
-               newg.governmentmunicipality AS municipalityto,
-               newg.governmentmunicipalitylong AS municipalitytolong,
-               'Missing' AS affectedtypemunicipalityto,
-               newg.governmentcounty AS countyto,
-               newg.governmentcountyshort AS countytoshort,
-               'Missing' AS affectedtypecountyto,
-               newg.governmentstate AS stateto,
-               newg.governmentstateabbreviation AS statetoabbreviation,
-               'Missing' AS affectedtypestateto,
-               oldg.textflag OR newg.governmentsubmunicipality <> '' AS textflag,
-               oldg.submunicipalityto AS submunicipalityfrom,
-               oldg.submunicipalitytolong AS submunicipalityfromlong,
-               CASE WHEN oldg.submunicipalityto = '' THEN '' ELSE 'Missing' END AS affectedtypesubmunicipalityfrom,
-               newg.governmentsubmunicipality AS submunicipalityto,
-               newg.governmentsubmunicipalitylong AS submunicipalitytolong,
-               CASE WHEN newg.governmentsubmunicipality = '' THEN '' ELSE 'Missing' END AS affectedtypesubmunicipalityto,
-               oldg.subcountyto AS subcountyfrom,
-               oldg.subcountytoshort AS subcountyfromshort,
-               CASE WHEN oldg.subcountyto = '' THEN '' ELSE 'Missing' END AS affectedtypesubcountyfrom,
-               '' AS subcountyto,
-               '' AS subcountytoshort,
-               '' AS affectedtypesubcountyto,
-               '' AS eventyear,
-               '' AS eventeffective,
-               NULL AS eventsort,
-               (oldg.eventorder * 2) AS eventorder
-            FROM foundaffectedgovernment oldg,
-               currentgovernment newg
-            WHERE oldg.eventorderreverse = 1
-               AND NOT (
-                 oldg.submunicipalityto = newg.governmentsubmunicipality AND
-                 oldg.municipalityto = newg.governmentmunicipality AND
-                 oldg.countyto = newg.governmentcounty AND
-                 (oldg.stateto = newg.governmentstate OR oldg.statetoabbreviation ~ ('^' || newg.governmentstateabbreviation || '[\-][A-Z]$'))
-               )
-            ORDER BY 37
+                event.eventdatetext,
+                event.eventsort
+            FROM gis.affectedgovernmentgis
+            JOIN geohistory.affectedgovernmentgroup
+                ON affectedgovernmentgis.affectedgovernment = affectedgovernmentgroup.affectedgovernmentgroupid
+                AND affectedgovernmentgis.governmentshape = ?
+            JOIN geohistory.event
+                ON affectedgovernmentgroup.event = event.eventid
+            JOIN geohistory.affectedgovernmentgrouppart
+                ON affectedgovernmentgroup.affectedgovernmentgroupid = affectedgovernmentgrouppart.affectedgovernmentgroup
+            JOIN geohistory.affectedgovernmentlevel
+                ON affectedgovernmentgrouppart.affectedgovernmentlevel = affectedgovernmentlevel.affectedgovernmentlevelid
+            JOIN geohistory.affectedgovernmentpart
+                ON affectedgovernmentgrouppart.affectedgovernmentpart = affectedgovernmentpart.affectedgovernmentpartid
+            LEFT JOIN geohistory.affectedtype affectedtypefrom
+                ON affectedgovernmentpart.affectedtypefrom = affectedtypefrom.affectedtypeid
+            LEFT JOIN geohistory.affectedtype affectedtypeto
+                ON affectedgovernmentpart.affectedtypeto = affectedtypeto.affectedtypeid
+            LEFT JOIN geohistory.government governmentfrom
+                ON affectedgovernmentpart.governmentfrom = governmentfrom.governmentid
+            LEFT JOIN geohistory.government governmentto
+                ON affectedgovernmentpart.governmentto = governmentto.governmentid
+            ORDER BY 1, 2
         QUERY;
 
         $query = $this->db->query($query, [
             $id,
-            $id,
         ]);
 
-        return $this->getObject($query);
+        $query = $this->getArray($query);
+        $query = $this->getProcess($query);
+        
+        return $this->getEventProcess($query);
+    }
+
+    private function eventSortIncrement(string $input): string
+    {
+        $input = mb_str_split($input);
+        $character = array_pop($input);
+        $character = intval($character) + 1;
+        $input[] = (string) $character;
+        return implode('', $input);
+    }
+
+    private function getEventProcess(array $query): array
+    {
+        $eventSort = [];
+        foreach ($query['event'] as $event) {
+            $event['affectedgovernmentgroupids'] = array_keys($event['affectedgovernmentgroupids']);
+            $eventSort[$event['eventsort']][] = $event;
+        }
+        $query['event'] = $eventSort;
+        $eventIds = [];
+        $eventSort = [];
+        foreach ($query['event'] as $date) {
+            $sortOrder = 0;
+            foreach ($date as $event) {
+                foreach ($event['affectedgovernmentgroupids'] as $affectedGovernment) {
+                    $eventSortOrder = $event['eventsort'] . $sortOrder;
+                    $eventSort[$eventSortOrder] = (object) array_merge([
+                        'eventeffective' => $event['eventdatetext'],
+                        'eventslug' => $event['eventslug'],
+                        'eventsort' => $eventSortOrder,
+                    ], (array) $query['affectedGovernment']['rows'][$affectedGovernment]);
+                }
+                $eventIds[$event['eventid']] = true;
+            }
+            $sortOrder += 2;
+        }
+        $query['affectedGovernment']['rows'] = $eventSort;
+        ksort($query['affectedGovernment']['rows']);
+        $query['event'] = array_keys($eventIds);
+        $emptyRow = [
+            'eventeffective' => '',
+            'eventslug' => '',
+            'eventsort' => '',
+        ];
+        foreach ($query['affectedGovernment']['types']['from'] as $governmentType) {
+            $emptyRow['From ' . $governmentType . ' Affected'] = 'Missing';
+            $emptyRow['From ' . $governmentType . ' Link'] = '';
+            $emptyRow['From ' . $governmentType . ' Long'] = '';
+            $emptyRow['To ' . $governmentType . ' Affected'] = 'Missing';
+            $emptyRow['To ' . $governmentType . ' Link'] = '';
+            $emptyRow['To ' . $governmentType . ' Long'] = '';
+        }
+        ksort($emptyRow);
+        $emptyRow = (object) $emptyRow;
+        $lastRow = null;
+        $isFirstRow = true;
+        foreach ($query['affectedGovernment']['rows'] as $row) {
+            if ($isFirstRow) {
+                $isFirstRow = false;
+            } else {
+                $addRow = false;
+                $newRow = clone $emptyRow;
+                $newRow->eventsort = $this->eventSortIncrement($lastRow->eventsort);
+                foreach ($query['affectedGovernment']['types']['from'] as $governmentType) {
+                    $newRow->{'From ' . $governmentType . ' Link'} = $lastRow->{'To ' . $governmentType . ' Link'} ?? '';
+                    $newRow->{'From ' . $governmentType . ' Long'} = $lastRow->{'To ' . $governmentType . ' Long'} ?? '';
+                    $newRow->{'To ' . $governmentType . ' Link'} = $row->{'From ' . $governmentType . ' Link'} ?? '';
+                    $newRow->{'To ' . $governmentType . ' Long'} = $row->{'From ' . $governmentType . ' Long'} ?? '';
+                    if ($newRow->{'From ' . $governmentType . ' Long'} !== $newRow->{'To ' . $governmentType . ' Long'}) {
+                        $addRow = true;
+                    }
+                }
+                if ($addRow) {
+                    $query['affectedGovernment']['rows'][$newRow->eventsort] = $newRow;
+                }
+            }
+            $lastRow = $row;
+        }
+        ksort($query['affectedGovernment']['rows']);
+        return $query;
     }
 
     public function getProcess(array $query, array $gisQuery = []): array
@@ -504,10 +440,14 @@ class AffectedGovernmentGroupModel extends BaseModel
         $linkTypes = [];
         $rows = [];
         $types = [];
+        $event = [];
 
         foreach ($query as $row) {
             if ($row['governmentfromlong'] !== '') {
                 $types['from'][$row['affectedgovernmentleveldisplayorder']] = $row['affectedgovernmentlevellong'];
+                if (isset($row['eventid'])) {
+                    $types['to'][$row['affectedgovernmentleveldisplayorder']] = $row['affectedgovernmentlevellong'];
+                }
                 if (isset($row['includelink']) && $row['includelink']  === 't') {
                     $linkTypes['from'][$row['affectedgovernmentleveldisplayorder']] = $row['affectedgovernmentlevellong'];
                 }
@@ -517,12 +457,27 @@ class AffectedGovernmentGroupModel extends BaseModel
             }
             if ($row['governmenttolong'] !== '') {
                 $types['to'][$row['affectedgovernmentleveldisplayorder']] = $row['affectedgovernmentlevellong'];
+                if (isset($row['eventid'])) {
+                    $types['from'][$row['affectedgovernmentleveldisplayorder']] = $row['affectedgovernmentlevellong'];
+                }
                 if (isset($row['includelink']) && $row['includelink']  === 't') {
                     $linkTypes['to'][$row['affectedgovernmentleveldisplayorder']] = $row['affectedgovernmentlevellong'];
                 }
                 $rows[$row['id']]['To ' . $row['affectedgovernmentlevellong'] . ' Link'] = $row['governmentto'];
                 $rows[$row['id']]['To ' . $row['affectedgovernmentlevellong'] . ' Long'] = $row['governmenttolong'];
                 $rows[$row['id']]['To ' . $row['affectedgovernmentlevellong'] . ' Affected'] = $row['affectedtypeto'];
+            }
+            if (isset($row['eventid'])) {
+                if (!isset($event[$row['eventid']])) {
+                    $event[$row['eventid']] = [
+                        'eventid' => $row['eventid'],
+                        'eventslug' => $row['eventslug'],
+                        'eventdatetext' => $row['eventdatetext'],
+                        'eventsort' => $row['eventsort'],
+                        'affectedgovernmentgroupids' => [],
+                    ];
+                }
+                $event[$row['eventid']]['affectedgovernmentgroupids'][$row['id']] = true;
             }
         }
 
@@ -577,6 +532,7 @@ class AffectedGovernmentGroupModel extends BaseModel
         sort($jurisdictions);
 
         foreach ($rows as $key => $value) {
+            ksort($value);
             $rows[$key] = (object) $value;
         }
 
@@ -586,6 +542,7 @@ class AffectedGovernmentGroupModel extends BaseModel
                 'rows' => $rows,
                 'types' => $types,
             ],
+            'event' => $event,
             'hasMap' => $hasMap,
             'jurisdictions' => $jurisdictions,
         ];
