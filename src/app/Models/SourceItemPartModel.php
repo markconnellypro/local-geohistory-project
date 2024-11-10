@@ -39,8 +39,6 @@ class SourceItemPartModel extends BaseModel
         return $this->getObject($query);
     }
 
-    // FUNCTION: extra.sourceurlid
-
     public function getByGovernmentSource(int $id): array
     {
         $query = <<<QUERY
@@ -54,8 +52,10 @@ class SourceItemPartModel extends BaseModel
                 END || sourceitempart.sourceitempartsequencecharacterafter::text
             END AS url
             FROM geohistory.governmentsource
+            JOIN geohistory.source
+                ON governmentsource.source = source.sourceid
             JOIN geohistory.sourceitem
-                ON sourceitem.source = ANY (extra.sourceurlid(governmentsource.source))
+                ON sourceitem.source = ANY (ARRAY[source.sourceid, source.sourceurlsubstitute])
             JOIN geohistory.sourceitempart
                 ON sourceitem.sourceitemid = sourceitempart.sourceitem
             WHERE (
@@ -79,8 +79,6 @@ class SourceItemPartModel extends BaseModel
         return $this->getObject($query);
     }
 
-    // FUNCTION: extra.sourceurlid
-
     public function getByLawAlternateSection(int $id): array
     {
         $query = <<<QUERY
@@ -98,8 +96,10 @@ class SourceItemPartModel extends BaseModel
             ON lawalternatesection.lawalternate = lawalternate.lawalternateid
         JOIN geohistory.law
             ON lawalternate.law = law.lawid
+        JOIN geohistory.source
+            ON lawalternate.source = source.sourceid
         JOIN geohistory.sourceitem
-            ON sourceitem.source = ANY (extra.sourceurlid(lawalternate.source))
+            ON sourceitem.source = ANY (ARRAY[source.sourceid, source.sourceurlsubstitute])
         JOIN geohistory.sourceitempart
             ON sourceitem.sourceitemid = sourceitempart.sourceitem
         WHERE (
@@ -135,8 +135,6 @@ class SourceItemPartModel extends BaseModel
         return $this->getObject($query);
     }
 
-    // FUNCTION: extra.sourceurlid
-
     public function getByLawSection(int $id): array
     {
         $query = <<<QUERY
@@ -152,8 +150,10 @@ class SourceItemPartModel extends BaseModel
         FROM geohistory.lawsection
         JOIN geohistory.law
             ON lawsection.law = law.lawid
+        JOIN geohistory.source
+            ON law.source = source.sourceid
         JOIN geohistory.sourceitem
-            ON sourceitem.source = ANY (extra.sourceurlid(law.source))
+            ON sourceitem.source = ANY (ARRAY[source.sourceid, source.sourceurlsubstitute])
         JOIN geohistory.sourceitempart
             ON sourceitem.sourceitemid = sourceitempart.sourceitem
         WHERE (
@@ -189,8 +189,6 @@ class SourceItemPartModel extends BaseModel
         return $this->getObject($query);
     }
 
-    // FUNCTION: extra.sourceurlid
-
     public function getBySourceCitation(int $id): array
     {
         $query = <<<QUERY
@@ -204,8 +202,10 @@ class SourceItemPartModel extends BaseModel
                     END || sourceitempart.sourceitempartsequencecharacterafter::text
                 END AS url
             FROM geohistory.sourcecitation
+            JOIN geohistory.source
+                ON sourcecitation.source = source.sourceid
             JOIN geohistory.sourceitem
-                ON sourceitem.source = ANY (extra.sourceurlid(sourcecitation.source))
+                ON sourceitem.source = ANY (ARRAY[source.sourceid, source.sourceurlsubstitute])
             JOIN geohistory.sourceitempart
                 ON sourceitem.sourceitemid = sourceitempart.sourceitem
             WHERE (
