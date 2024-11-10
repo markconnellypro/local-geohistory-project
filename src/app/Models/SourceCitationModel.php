@@ -17,11 +17,11 @@ class SourceCitationModel extends BaseModel
                 source.sourceabbreviation,
                 sourcecitation.sourcecitationdatetype || 
                     CASE WHEN sourcecitation.sourcecitationdatetype = '' THEN '' ELSE ' ' END ||
-                    calendar.historicdatetextformat(sourcecitation.sourcecitationdate, 'short', ?) AS sourcecitationdate,
+                    calendar.historicdatetextformat(sourcecitation.sourcecitationdate::calendar.historicdate, 'short', ?) AS sourcecitationdate,
                 sourcecitation.sourcecitationdate AS sourcecitationdatesort,
                 sourcecitation.sourcecitationdaterangetype || 
                     CASE WHEN sourcecitation.sourcecitationdaterangetype = '' THEN '' ELSE ' ' END ||
-                calendar.historicdatetextformat(sourcecitation.sourcecitationdaterange, 'short', ?) AS sourcecitationdaterange,
+                calendar.historicdatetextformat(sourcecitation.sourcecitationdaterange::calendar.historicdate, 'short', ?) AS sourcecitationdaterange,
                 sourcecitation.sourcecitationdaterange AS sourcecitationdaterangesort,
                 sourcecitation.sourcecitationvolume,
                 sourcecitation.sourcecitationpage,
