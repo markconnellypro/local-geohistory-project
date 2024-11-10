@@ -127,8 +127,6 @@ class GovernmentSourceModel extends BaseModel
         return $this->getObject($query);
     }
 
-    // VIEW: extra.governmentsubstitutecache
-
     public function getByGovernment(int $id): array
     {
         $query = $this->getFields() . <<<QUERY
@@ -138,9 +136,9 @@ class GovernmentSourceModel extends BaseModel
             FROM geohistory.governmentsource
             JOIN geohistory.government
                 ON governmentsource.government = government.governmentid
-            JOIN extra.governmentsubstitutecache
-                ON governmentsource.government = governmentsubstitutecache.governmentid
-                AND governmentsubstitutecache.governmentsubstitute = ?
+            JOIN geohistory.government governmentsubstitute
+                ON government.governmentslugsubstitute = governmentsubstitute.governmentslugsubstitute
+                AND governmentsubstitute.governmentid = ?
             LEFT JOIN geohistory.governmentsourceevent
                 ON governmentsource.governmentsourceid = governmentsourceevent.governmentsource
             LEFT JOIN geohistory.event
