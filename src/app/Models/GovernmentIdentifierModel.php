@@ -32,8 +32,6 @@ class GovernmentIdentifierModel extends BaseModel
         return $this->getObject($query);
     }
 
-    // VIEW: extra.governmentsubstitutecache
-
     public function getByGovernment(int $id): array
     {
         $query = <<<QUERY
@@ -49,9 +47,9 @@ class GovernmentIdentifierModel extends BaseModel
                 ON governmentidentifier.government = government.governmentid
             JOIN geohistory.governmentidentifiertype
                 ON governmentidentifier.governmentidentifiertype = governmentidentifiertype.governmentidentifiertypeid
-            JOIN extra.governmentsubstitutecache
-                ON governmentidentifier.government = governmentsubstitutecache.governmentid
-                AND governmentsubstitutecache.governmentsubstitute = ?
+            JOIN geohistory.government governmentsubstitute
+                ON government.governmentslugsubstitute = governmentsubstitute.governmentslugsubstitute
+                AND governmentsubstitute.governmentid = ?
         QUERY;
 
         $query = $this->db->query($query, [
