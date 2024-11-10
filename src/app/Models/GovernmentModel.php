@@ -6,10 +6,8 @@ use App\Models\BaseModel;
 
 class GovernmentModel extends BaseModel
 {
-    // FUNCTION: extra.governmentsubstitutedcache
     // VIEW: extra.governmentchangecountcache
     // VIEW: extra.governmenthasmappedeventcache
-    // VIEW: extra.governmentsubstitutecache
 
     public function getDetail(int|string $id): array
     {
@@ -35,7 +33,7 @@ class GovernmentModel extends BaseModel
                     AND governmentchangecountcache.altertotal = 0
                     AND governmentchangecountcache.dissolutionevent IS NULL
                     ) AS textflag,
-                    creationevent.eventslug AS governmentcreationevent,
+                creationevent.eventslug AS governmentcreationevent,
                 governmentchangecountcache.creationtext AS governmentcreationtext,
                     CASE
                         WHEN governmentchangecountcache.creation = 1
@@ -53,17 +51,18 @@ class GovernmentModel extends BaseModel
                     END AS hasmap,
                 government.governmentmapstatus,
                 governmentmapstatus.governmentmapstatustimelapse,
-                governmentsubstitutecache.governmentsubstitutemultiple,
                 CASE
                     WHEN government.governmentslug <> government.governmentslugsubstitute THEN government.governmentslugsubstitute
                     ELSE NULL
                 END AS governmentslugsubstitute, 
-                government.governmentcurrentleadstate
+                government.governmentcurrentleadstate,
+                COUNT(DISTINCT governmentsubstitute.governmentid) > 1 AS governmentsubstitutemultiple
             FROM geohistory.government
             JOIN geohistory.governmentmapstatus
                 ON government.governmentmapstatus = governmentmapstatus.governmentmapstatusid
-            JOIN extra.governmentsubstitutecache
-                ON government.governmentid = governmentsubstitutecache.governmentid
+            JOIN geohistory.government governmentsubstitute
+                ON government.governmentslugsubstitute = governmentsubstitute.governmentslugsubstitute
+                AND governmentsubstitute.governmentstatus NOT IN ('alternate', 'language')
             LEFT JOIN geohistory.governmentform
                 ON government.governmentcurrentform = governmentform.governmentformid
             LEFT JOIN extra.governmentchangecountcache
@@ -81,7 +80,9 @@ class GovernmentModel extends BaseModel
                     JOIN geohistory.government
                         ON governmentshapecache.government = government.governmentid
                         AND government.governmentlevel > 2
-                        AND governmentshapecache.government = ANY (extra.governmentsubstitutedcache(?))
+                    JOIN geohistory.government governmentsubstitute
+                        ON government.governmentslugsubstitute = governmentsubstitute.governmentslugsubstitute
+                        AND governmentsubstitute.governmentid = ?
                     UNION
                     SELECT DISTINCT true AS hasmap
                     FROM extra.governmenthasmappedeventcache
@@ -91,6 +92,7 @@ class GovernmentModel extends BaseModel
             LEFT JOIN geohistory.government creationas
                 ON governmentchangecountcache.creationas[1] = creationas.governmentid
             WHERE government.governmentid = ?
+            GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
         QUERY;
 
         $query = $this->db->query($query, [
@@ -712,7 +714,6 @@ class GovernmentModel extends BaseModel
     }
 
     // VIEW: extra.governmentparentcache
-    // VIEW: extra.governmentsubstitutecache
 
     public function getRelated(int $id): array
     {
@@ -737,9 +738,11 @@ class GovernmentModel extends BaseModel
                 FROM extra.governmentparentcache
                 JOIN geohistory.government
                     ON governmentparentcache.governmentparent = government.governmentid
-                JOIN extra.governmentsubstitutecache
-                    ON governmentparentcache.governmentid = governmentsubstitutecache.governmentid
-                    AND governmentsubstitutecache.governmentsubstitute = ?
+                JOIN geohistory.government governmentparentgovernment
+                    ON governmentparentcache.governmentid = governmentparentgovernment.governmentid
+                JOIN geohistory.government governmentsubstitute
+                    ON governmentparentgovernment.governmentslugsubstitute = governmentsubstitute.governmentslugsubstitute
+                    AND governmentsubstitute.governmentid = ?
                 LEFT JOIN geohistory.governmentmapstatus
                     ON government.governmentmapstatus = governmentmapstatus.governmentmapstatusid
                     AND governmentmapstatus.governmentmapstatusreviewed
@@ -768,9 +771,11 @@ class GovernmentModel extends BaseModel
                 JOIN geohistory.government
                     ON governmentparentcache.governmentid = government.governmentid
                     AND NOT (leadgovernment.governmentlevel < 3 AND (government.governmentlevel - leadgovernment.governmentlevel) > 1)
-                JOIN extra.governmentsubstitutecache
-                    ON governmentparentcache.governmentparent = governmentsubstitutecache.governmentid
-                    AND governmentsubstitutecache.governmentsubstitute = ?
+                JOIN geohistory.government governmentparent
+                    ON governmentparentcache.governmentparent = governmentparent.governmentid
+                JOIN geohistory.government governmentsubstitute
+                    ON governmentparent.governmentslugsubstitute = governmentsubstitute.governmentslugsubstitute
+                    AND governmentsubstitute.governmentid = ?
                 LEFT JOIN geohistory.governmentmapstatus
                     ON government.governmentmapstatus = governmentmapstatus.governmentmapstatusid
                     AND governmentmapstatus.governmentmapstatusreviewed
@@ -791,10 +796,10 @@ class GovernmentModel extends BaseModel
                 'none' AS governmentcolor,
                 government.governmentid = ? AS isgovernmentsubstitute
                 FROM geohistory.government
-                JOIN extra.governmentsubstitutecache
-                    ON government.governmentid = governmentsubstitutecache.governmentid
-                    AND governmentsubstitutecache.governmentsubstitute = ?
-                    AND government.governmentid <> governmentsubstitutecache.governmentsubstitute
+                JOIN geohistory.government governmentsubstitute
+                    ON government.governmentslugsubstitute = governmentsubstitute.governmentslugsubstitute
+                    AND governmentsubstitute.governmentid = ?
+                    AND government.governmentid <> governmentsubstitute.governmentid
                 LEFT JOIN geohistory.event
                     ON government.governmentid = event.government
             ), relationrank AS (
