@@ -353,7 +353,7 @@ class AffectedGovernmentGroupModel extends BaseModel
 
         $query = $this->getArray($query);
         $query = $this->getProcess($query);
-        
+
         return $this->getEventProcess($query);
     }
 
