@@ -381,8 +381,10 @@ class EventModel extends BaseModel
                     ON affectedgovernmentpart.governmentfrom = government.governmentid
                     AND government.governmentstatus::text NOT IN ('placeholder', 'proposed', 'unincorporated')
                     AND government.governmentcurrentleadstate = ANY (?)
+                JOIN geohistory.government governmentsubstitute
+                    ON government.governmentslugsubstitute = governmentsubstitute.governmentslug
                 LEFT JOIN geohistory.governmentidentifier
-                    ON government.governmentid = governmentidentifier.government
+                    ON governmentsubstitute.governmentid = governmentidentifier.government
                     AND governmentidentifier.governmentidentifiertype = 1
                 WHERE affectedgovernmentpart.affectedtypefrom <> 12
                 UNION
@@ -400,8 +402,10 @@ class EventModel extends BaseModel
                     ON affectedgovernmentpart.governmentto = government.governmentid
                     AND government.governmentstatus::text NOT IN ('placeholder', 'proposed', 'unincorporated')
                     AND government.governmentcurrentleadstate = ANY (?)
+                JOIN geohistory.government governmentsubstitute
+                    ON government.governmentslugsubstitute = governmentsubstitute.governmentslug
                 LEFT JOIN geohistory.governmentidentifier
-                    ON government.governmentid = governmentidentifier.government
+                    ON governmentsubstitute.governmentid = governmentidentifier.government
                     AND governmentidentifier.governmentidentifiertype = 1
                 WHERE affectedgovernmentpart.affectedtypeto <> 12
             ), eventdata AS (
@@ -430,8 +434,8 @@ class EventModel extends BaseModel
             array_to_json(array_agg(DISTINCT xvalue.x::text ORDER BY xvalue.x::text)) AS xrow,
             array_to_json(array_agg(
                 CASE
-                    WHEN eventdata.y IS NULL THEN '0'::text
-                    ELSE eventdata.y::text
+                    WHEN eventdata.y IS NULL THEN 0
+                    ELSE eventdata.y
                 END ORDER BY xvalue.x)) AS yrow,
             sum(eventdata.y) AS ysum
             FROM xvalue
@@ -480,8 +484,10 @@ class EventModel extends BaseModel
                     ON affectedgovernmentpart.governmentfrom = government.governmentid
                     AND government.governmentstatus::text NOT IN ('placeholder', 'proposed', 'unincorporated')
                     AND government.governmentcurrentleadstate = ANY (?)
+                JOIN geohistory.government governmentsubstitute
+                    ON government.governmentslugsubstitute = governmentsubstitute.governmentslug
                 LEFT JOIN geohistory.governmentidentifier
-                    ON government.governmentid = governmentidentifier.government
+                    ON governmentsubstitute.governmentid = governmentidentifier.government
                     AND governmentidentifier.governmentidentifiertype = 1
                 WHERE affectedgovernmentpart.affectedtypefrom <> 12
                 UNION
@@ -498,8 +504,10 @@ class EventModel extends BaseModel
                     ON affectedgovernmentpart.governmentto = government.governmentid
                     AND government.governmentstatus::text NOT IN ('placeholder', 'proposed', 'unincorporated')
                     AND government.governmentcurrentleadstate = ANY (?)
+                JOIN geohistory.government governmentsubstitute
+                    ON government.governmentslugsubstitute = governmentsubstitute.governmentslug
                 LEFT JOIN geohistory.governmentidentifier
-                    ON government.governmentid = governmentidentifier.government
+                    ON governmentsubstitute.governmentid = governmentidentifier.government
                     AND governmentidentifier.governmentidentifiertype = 1
                 WHERE affectedgovernmentpart.affectedtypeto <> 12
             ), eventdata AS (
@@ -568,8 +576,10 @@ class EventModel extends BaseModel
                     ON affectedgovernmentpart.governmentfrom = government.governmentid
                     AND government.governmentstatus::text NOT IN ('placeholder', 'proposed', 'unincorporated')
                     AND government.governmentcurrentleadstate = ?
+                JOIN geohistory.government governmentsubstitute
+                    ON government.governmentslugsubstitute = governmentsubstitute.governmentslug
                 LEFT JOIN geohistory.governmentidentifier
-                    ON government.governmentid = governmentidentifier.government
+                    ON governmentsubstitute.governmentid = governmentidentifier.government
                     AND governmentidentifier.governmentidentifiertype = 1
                 WHERE affectedgovernmentpart.affectedtypefrom <> 12
                 UNION
@@ -587,8 +597,10 @@ class EventModel extends BaseModel
                     ON affectedgovernmentpart.governmentto = government.governmentid
                     AND government.governmentstatus::text NOT IN ('placeholder', 'proposed', 'unincorporated')
                     AND government.governmentcurrentleadstate = ?
+                JOIN geohistory.government governmentsubstitute
+                    ON government.governmentslugsubstitute = governmentsubstitute.governmentslug
                 LEFT JOIN geohistory.governmentidentifier
-                    ON government.governmentid = governmentidentifier.government
+                    ON governmentsubstitute.governmentid = governmentidentifier.government
                     AND governmentidentifier.governmentidentifiertype = 1
                 WHERE affectedgovernmentpart.affectedtypeto <> 12
             ), eventdata AS (
@@ -617,8 +629,8 @@ class EventModel extends BaseModel
             array_to_json(array_agg(DISTINCT xvalue.x::text ORDER BY xvalue.x::text)) AS xrow,
             array_to_json(array_agg(
                 CASE
-                    WHEN eventdata.y IS NULL THEN '0'::text
-                    ELSE eventdata.y::text
+                    WHEN eventdata.y IS NULL THEN 0
+                    ELSE eventdata.y
                 END ORDER BY xvalue.x)) AS yrow,
             sum(eventdata.y) AS ysum
             FROM xvalue
@@ -663,8 +675,10 @@ class EventModel extends BaseModel
                     ON affectedgovernmentpart.governmentfrom = government.governmentid
                     AND government.governmentstatus::text NOT IN ('placeholder', 'proposed', 'unincorporated')
                     AND government.governmentcurrentleadstate = ?
+                JOIN geohistory.government governmentsubstitute
+                    ON government.governmentslugsubstitute = governmentsubstitute.governmentslug
                 LEFT JOIN geohistory.governmentidentifier
-                    ON government.governmentid = governmentidentifier.government
+                    ON governmentsubstitute.governmentid = governmentidentifier.government
                     AND governmentidentifier.governmentidentifiertype = 1
                 WHERE affectedgovernmentpart.affectedtypefrom <> 12
                 UNION
@@ -681,8 +695,10 @@ class EventModel extends BaseModel
                     ON affectedgovernmentpart.governmentto = government.governmentid
                     AND government.governmentstatus::text NOT IN ('placeholder', 'proposed', 'unincorporated')
                     AND government.governmentcurrentleadstate = ?
+                JOIN geohistory.government governmentsubstitute
+                    ON government.governmentslugsubstitute = governmentsubstitute.governmentslug
                 LEFT JOIN geohistory.governmentidentifier
-                    ON government.governmentid = governmentidentifier.government
+                    ON governmentsubstitute.governmentid = governmentidentifier.government
                     AND governmentidentifier.governmentidentifiertype = 1
                 WHERE affectedgovernmentpart.affectedtypeto <> 12
             ), eventdata AS (
