@@ -102,8 +102,6 @@ class AffectedGovernmentGroupModel extends BaseModel
         return $this->getProcess($query, $gisQuery);
     }
 
-    // VIEW: extra.governmentsubstitute
-
     public function getByGovernmentForm(int $id): array
     {
         $query = <<<QUERY
@@ -129,11 +127,11 @@ class AffectedGovernmentGroupModel extends BaseModel
                 AND affectedgovernmentpart.governmentformto IS NOT NULL
             JOIN geohistory.government
                 ON affectedgovernmentpart.governmentto = government.governmentid
+            JOIN geohistory.government governmentsubstitute
+                ON government.governmentslugsubstitute = governmentsubstitute.governmentslugsubstitute
+                AND governmentsubstitute.governmentid = ?
             JOIN geohistory.governmentform
                 ON affectedgovernmentpart.governmentformto = governmentform.governmentformid
-            JOIN extra.governmentsubstitute
-                ON affectedgovernmentpart.governmentto = governmentsubstitute.governmentid
-                AND governmentsubstitute.governmentsubstitute = ?
             ORDER BY 1, 4
         QUERY;
 
@@ -144,9 +142,6 @@ class AffectedGovernmentGroupModel extends BaseModel
 
         return $this->getObject($query);
     }
-
-    // FUNCTION: extra.governmentsubstitutedcache
-    // VIEW: extra.governmentsubstitutecache
 
     public function getByGovernmentGovernment(int $id): array
     {
@@ -160,7 +155,7 @@ class AffectedGovernmentGroupModel extends BaseModel
                 END AS affectedtypesame,
                 government.governmentlong,
                 CASE
-                    WHEN affectedgovernment.government = ANY (extra.governmentsubstitutedcache(?)) THEN ''
+                    WHEN government.governmentslugsubstitute = governmentaffected.governmentslugsubstitute THEN ''
                     ELSE government.governmentslugsubstitute
                 END AS governmentslug,
                 affectedtypeother.affectedtypeshort || CASE
@@ -186,9 +181,11 @@ class AffectedGovernmentGroupModel extends BaseModel
                         ON affectedgovernmentgroup.affectedgovernmentgroupid = affectedgovernmentgrouppart.affectedgovernmentgroup
                     JOIN geohistory.affectedgovernmentpart
                         ON affectedgovernmentgrouppart.affectedgovernmentpart = affectedgovernmentpart.affectedgovernmentpartid
-                    JOIN extra.governmentsubstitutecache
-                        ON affectedgovernmentpart.governmentto = governmentsubstitutecache.governmentid
-                        AND governmentsubstitutecache.governmentsubstitute = ?
+                    JOIN geohistory.government
+                        ON affectedgovernmentpart.governmentto = government.governmentid
+                    JOIN geohistory.government governmentsubstitute
+                        ON government.governmentslugsubstitute = governmentsubstitute.governmentslugsubstitute
+                        AND governmentsubstitute.governmentid = ?
                     UNION
                 -- From-To
                     SELECT DISTINCT affectedgovernmentgroup.event,
@@ -203,9 +200,11 @@ class AffectedGovernmentGroupModel extends BaseModel
                         ON affectedgovernmentgroup.affectedgovernmentgroupid = affectedgovernmentgrouppart.affectedgovernmentgroup
                     JOIN geohistory.affectedgovernmentpart
                         ON affectedgovernmentgrouppart.affectedgovernmentpart = affectedgovernmentpart.affectedgovernmentpartid
-                    JOIN extra.governmentsubstitutecache
-                        ON affectedgovernmentpart.governmentfrom = governmentsubstitutecache.governmentid
-                        AND governmentsubstitutecache.governmentsubstitute = ?
+                    JOIN geohistory.government
+                        ON affectedgovernmentpart.governmentfrom = government.governmentid
+                    JOIN geohistory.government governmentsubstitute
+                        ON government.governmentslugsubstitute = governmentsubstitute.governmentslugsubstitute
+                        AND governmentsubstitute.governmentid = ?
                     UNION
                 -- From-To (Different Level)
                     SELECT DISTINCT affectedgovernmentgroup.event,
@@ -220,9 +219,11 @@ class AffectedGovernmentGroupModel extends BaseModel
                         ON affectedgovernmentgroup.affectedgovernmentgroupid = affectedgovernmentgrouppart.affectedgovernmentgroup
                     JOIN geohistory.affectedgovernmentpart
                         ON affectedgovernmentgrouppart.affectedgovernmentpart = affectedgovernmentpart.affectedgovernmentpartid
-                    JOIN extra.governmentsubstitutecache
-                        ON affectedgovernmentpart.governmentfrom = governmentsubstitutecache.governmentid
-                        AND governmentsubstitutecache.governmentsubstitute = ?
+                    JOIN geohistory.government
+                        ON affectedgovernmentpart.governmentfrom = government.governmentid
+                    JOIN geohistory.government governmentsubstitute
+                        ON government.governmentslugsubstitute = governmentsubstitute.governmentslugsubstitute
+                        AND governmentsubstitute.governmentid = ?
                     JOIN geohistory.affectedgovernmentlevel
                         ON affectedgovernmentgrouppart.affectedgovernmentlevel = affectedgovernmentlevel.affectedgovernmentlevelid
                     JOIN geohistory.affectedgovernmentlevel otherlevel
@@ -248,9 +249,11 @@ class AffectedGovernmentGroupModel extends BaseModel
                         ON affectedgovernmentgroup.affectedgovernmentgroupid = affectedgovernmentgrouppart.affectedgovernmentgroup
                     JOIN geohistory.affectedgovernmentpart
                         ON affectedgovernmentgrouppart.affectedgovernmentpart = affectedgovernmentpart.affectedgovernmentpartid
-                    JOIN extra.governmentsubstitutecache
-                        ON affectedgovernmentpart.governmentto = governmentsubstitutecache.governmentid
-                        AND governmentsubstitutecache.governmentsubstitute = ?
+                    JOIN geohistory.government
+                        ON affectedgovernmentpart.governmentto = government.governmentid
+                    JOIN geohistory.government governmentsubstitute
+                        ON government.governmentslugsubstitute = governmentsubstitute.governmentslugsubstitute
+                        AND governmentsubstitute.governmentid = ?
                     JOIN geohistory.affectedgovernmentlevel
                         ON affectedgovernmentgrouppart.affectedgovernmentlevel = affectedgovernmentlevel.affectedgovernmentlevelid
                     JOIN geohistory.affectedgovernmentlevel otherlevel
@@ -295,7 +298,6 @@ class AffectedGovernmentGroupModel extends BaseModel
         QUERY;
 
         $query = $this->db->query($query, [
-            $id,
             $id,
             $id,
             $id,
