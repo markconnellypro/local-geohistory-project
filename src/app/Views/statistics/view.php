@@ -30,8 +30,7 @@
     </section>
     <script>
         var mapPath = [
-            <?php if ($jurisdiction === 'ma' && ($dateRange === '' || substr($dateRange, 0, 4) < '1821')) { ?> '/asset/development/map/statistics/me.geojson',
-            <?php } ?> '/asset/<?= ((\App\Controllers\BaseController::isLive() && ($jurisdiction === '' || !in_array($jurisdiction, \App\Controllers\BaseController::getProductionJurisdictions()))) ? 'development/' : '') ?>map/statistics/<?= ($jurisdiction === '' ? (\App\Controllers\BaseController::isLive() ? 'development' : 'production') : $jurisdiction) ?>.geojson'
+            '/asset/<?= ((\App\Controllers\BaseController::isLive() && ($jurisdiction === '' || !in_array($jurisdiction, \App\Controllers\BaseController::getProductionJurisdictions()))) ? 'development/' : '') ?>map/statistics/<?= ($jurisdiction === '' ? (\App\Controllers\BaseController::isLive() ? 'development' : 'production') : $jurisdiction) ?>.geojson'
         ];
         var partData = <?= $query ?>;
         var lastLayer = "";
