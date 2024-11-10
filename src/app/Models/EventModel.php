@@ -353,8 +353,6 @@ class EventModel extends BaseModel
         return $this->getObject($query);
     }
 
-    // VIEW: extra.statistics_eventtype
-
     public function getByStatisticsNationPart(array $parameters): array
     {
         $for = $parameters[0];
@@ -368,26 +366,60 @@ class EventModel extends BaseModel
         $jurisdiction = '{' . strtoupper($jurisdiction) . '}';
 
         $query = <<<QUERY
-            WITH eventdata AS (
-                SELECT DISTINCT min(governmentidentifier.governmentidentifier) AS series,
-                statistics_eventtype.governmentstate AS actualseries,
-                statistics_eventtype.eventsortyear AS x,
-                statistics_eventtype.eventcount::integer AS y
-                FROM extra.statistics_eventtype
-                JOIN geohistory.eventtype
-                    ON statistics_eventtype.eventtype = eventtype.eventtypeid
-                    AND eventtype.eventtypeshort = ?
+            WITH eventlist AS (
+                SELECT DISTINCT affectedgovernmentgroup.event,
+                    COALESCE(governmentidentifier.governmentidentifier::integer, 0) AS series
+                FROM geohistory.affectedgovernmentpart
+                JOIN geohistory.affectedgovernmentgrouppart
+                    ON affectedgovernmentpart.affectedgovernmentpartid = affectedgovernmentgrouppart.affectedgovernmentpart
+                JOIN geohistory.affectedgovernmentlevel
+                    ON affectedgovernmentgrouppart.affectedgovernmentlevel = affectedgovernmentlevel.affectedgovernmentlevelid
+                    AND affectedgovernmentlevel.affectedgovernmentlevelshort LIKE 'state'
+                JOIN geohistory.affectedgovernmentgroup
+                    ON affectedgovernmentgrouppart.affectedgovernmentgroup = affectedgovernmentgroup.affectedgovernmentgroupid
                 JOIN geohistory.government
-                    ON statistics_eventtype.governmentstate = government.governmentabbreviation
-                JOIN geohistory.governmentidentifier
+                    ON affectedgovernmentpart.governmentfrom = government.governmentid
+                    AND government.governmentstatus::text NOT IN ('placeholder', 'proposed', 'unincorporated')
+                    AND government.governmentcurrentleadstate = ANY (?)
+                LEFT JOIN geohistory.governmentidentifier
                     ON government.governmentid = governmentidentifier.government
                     AND governmentidentifier.governmentidentifiertype = 1
-                WHERE statistics_eventtype.governmenttype = 'state'
-                AND statistics_eventtype.grouptype = ?
-                AND statistics_eventtype.governmentstate = ANY (?)
-                AND statistics_eventtype.eventsortyear >= ?
-                AND statistics_eventtype.eventsortyear <= ?
-                GROUP BY 2, 3, 4
+                WHERE affectedgovernmentpart.affectedtypefrom <> 12
+                UNION
+                SELECT DISTINCT affectedgovernmentgroup.event,
+                    COALESCE(governmentidentifier.governmentidentifier::integer, 0) AS series
+                FROM geohistory.affectedgovernmentpart
+                JOIN geohistory.affectedgovernmentgrouppart
+                    ON affectedgovernmentpart.affectedgovernmentpartid = affectedgovernmentgrouppart.affectedgovernmentpart
+                JOIN geohistory.affectedgovernmentlevel
+                    ON affectedgovernmentgrouppart.affectedgovernmentlevel = affectedgovernmentlevel.affectedgovernmentlevelid
+                    AND affectedgovernmentlevel.affectedgovernmentlevelshort LIKE 'state'
+                JOIN geohistory.affectedgovernmentgroup
+                    ON affectedgovernmentgrouppart.affectedgovernmentgroup = affectedgovernmentgroup.affectedgovernmentgroupid
+                JOIN geohistory.government
+                    ON affectedgovernmentpart.governmentto = government.governmentid
+                    AND government.governmentstatus::text NOT IN ('placeholder', 'proposed', 'unincorporated')
+                    AND government.governmentcurrentleadstate = ANY (?)
+                LEFT JOIN geohistory.governmentidentifier
+                    ON government.governmentid = governmentidentifier.government
+                    AND governmentidentifier.governmentidentifiertype = 1
+                WHERE affectedgovernmentpart.affectedtypeto <> 12
+            ), eventdata AS (
+                SELECT eventlist.series,
+                    event.eventsortyear AS x,
+                    count(DISTINCT event.eventid)::integer AS y
+                FROM geohistory.event
+                JOIN eventlist
+                    ON event.eventid = eventlist.event
+                JOIN geohistory.eventgranted
+                    ON event.eventgranted = eventgranted.eventgrantedid
+                    AND eventgranted.eventgrantedsuccess
+                JOIN geohistory.eventtype
+                    ON event.eventtype = eventtype.eventtypeid
+                    AND eventtype.eventtypeshort = ?
+                WHERE event.eventsortyear >= ?
+                    AND event.eventsortyear <= ?
+                GROUP BY 1, 2
             ), xvalue AS (
                 SELECT DISTINCT eventdata.series,
                 generate_series(min(eventdata.x),max(eventdata.x)) AS x
@@ -398,8 +430,8 @@ class EventModel extends BaseModel
             array_to_json(array_agg(DISTINCT xvalue.x::text ORDER BY xvalue.x::text)) AS xrow,
             array_to_json(array_agg(
                 CASE
-                    WHEN eventdata.y IS NULL THEN 0
-                    ELSE eventdata.y
+                    WHEN eventdata.y IS NULL THEN '0'::text
+                    ELSE eventdata.y::text
                 END ORDER BY xvalue.x)) AS yrow,
             sum(eventdata.y) AS ysum
             FROM xvalue
@@ -411,9 +443,9 @@ class EventModel extends BaseModel
         QUERY;
 
         $query = $this->db->query($query, [
-            $for,
-            $by,
             $jurisdiction,
+            $jurisdiction,
+            $for,
             $from,
             $to,
         ]);
@@ -421,28 +453,70 @@ class EventModel extends BaseModel
         return $this->getObject($query);
     }
 
-    // VIEW: extra.statistics_eventtype
-
     public function getByStatisticsNationWhole(array $parameters): array
     {
         $for = $parameters[0];
         $from = $parameters[1];
         $to = $parameters[2];
         $by = $parameters[3];
+        $jurisdiction = $parameters[4];
+        if ($jurisdiction === '') {
+            $jurisdiction = implode(',', \App\Controllers\BaseController::getJurisdictions());
+        }
+        $jurisdiction = '{' . strtoupper($jurisdiction) . '}';
 
         $query = <<<QUERY
-            WITH eventdata AS (
-                SELECT DISTINCT statistics_eventtype.eventsortyear AS x,
-                statistics_eventtype.eventcount::text AS y
-                FROM extra.statistics_eventtype
+            WITH eventlist AS (
+                SELECT DISTINCT affectedgovernmentgroup.event
+                FROM geohistory.affectedgovernmentpart
+                JOIN geohistory.affectedgovernmentgrouppart
+                    ON affectedgovernmentpart.affectedgovernmentpartid = affectedgovernmentgrouppart.affectedgovernmentpart
+                JOIN geohistory.affectedgovernmentlevel
+                    ON affectedgovernmentgrouppart.affectedgovernmentlevel = affectedgovernmentlevel.affectedgovernmentlevelid
+                    AND affectedgovernmentlevel.affectedgovernmentlevelshort LIKE 'state'
+                JOIN geohistory.affectedgovernmentgroup
+                    ON affectedgovernmentgrouppart.affectedgovernmentgroup = affectedgovernmentgroup.affectedgovernmentgroupid
+                JOIN geohistory.government
+                    ON affectedgovernmentpart.governmentfrom = government.governmentid
+                    AND government.governmentstatus::text NOT IN ('placeholder', 'proposed', 'unincorporated')
+                    AND government.governmentcurrentleadstate = ANY (?)
+                LEFT JOIN geohistory.governmentidentifier
+                    ON government.governmentid = governmentidentifier.government
+                    AND governmentidentifier.governmentidentifiertype = 1
+                WHERE affectedgovernmentpart.affectedtypefrom <> 12
+                UNION
+                SELECT DISTINCT affectedgovernmentgroup.event
+                FROM geohistory.affectedgovernmentpart
+                JOIN geohistory.affectedgovernmentgrouppart
+                    ON affectedgovernmentpart.affectedgovernmentpartid = affectedgovernmentgrouppart.affectedgovernmentpart
+                JOIN geohistory.affectedgovernmentlevel
+                    ON affectedgovernmentgrouppart.affectedgovernmentlevel = affectedgovernmentlevel.affectedgovernmentlevelid
+                    AND affectedgovernmentlevel.affectedgovernmentlevelshort LIKE 'state'
+                JOIN geohistory.affectedgovernmentgroup
+                    ON affectedgovernmentgrouppart.affectedgovernmentgroup = affectedgovernmentgroup.affectedgovernmentgroupid
+                JOIN geohistory.government
+                    ON affectedgovernmentpart.governmentto = government.governmentid
+                    AND government.governmentstatus::text NOT IN ('placeholder', 'proposed', 'unincorporated')
+                    AND government.governmentcurrentleadstate = ANY (?)
+                LEFT JOIN geohistory.governmentidentifier
+                    ON government.governmentid = governmentidentifier.government
+                    AND governmentidentifier.governmentidentifiertype = 1
+                WHERE affectedgovernmentpart.affectedtypeto <> 12
+            ), eventdata AS (
+                SELECT event.eventsortyear AS x,
+                    count(DISTINCT event.eventid)::integer AS y
+                FROM geohistory.event
+                JOIN eventlist
+                    ON event.eventid = eventlist.event
+                JOIN geohistory.eventgranted
+                    ON event.eventgranted = eventgranted.eventgrantedid
+                    AND eventgranted.eventgrantedsuccess
                 JOIN geohistory.eventtype
-                    ON statistics_eventtype.eventtype = eventtype.eventtypeid
+                    ON event.eventtype = eventtype.eventtypeid
                     AND eventtype.eventtypeshort = ?
-                WHERE statistics_eventtype.governmenttype = 'nation'
-                AND statistics_eventtype.grouptype = ?
-                AND statistics_eventtype.governmentstate = ?
-                AND statistics_eventtype.eventsortyear >= ?
-                AND statistics_eventtype.eventsortyear <= ?
+                WHERE event.eventsortyear >= ?
+                    AND event.eventsortyear <= ?
+                GROUP BY 1
             ), xvalue AS (
                 SELECT DISTINCT generate_series(min(eventdata.x),max(eventdata.x)) AS x
                 FROM eventdata
@@ -453,7 +527,7 @@ class EventModel extends BaseModel
             SELECT array_to_json(ARRAY['Whole'] || array_agg(
                 CASE
                     WHEN eventdata.y IS NULL THEN '0'::text
-                    ELSE eventdata.y
+                    ELSE eventdata.y::text
                 END ORDER BY xvalue.x)) AS datarow
             FROM xvalue
             LEFT JOIN eventdata
@@ -461,9 +535,9 @@ class EventModel extends BaseModel
             QUERY;
 
         $query = $this->db->query($query, [
+            $jurisdiction,
+            $jurisdiction,
             $for,
-            $by,
-            ENVIRONMENT,
             $from,
             $to,
         ]);
@@ -471,30 +545,68 @@ class EventModel extends BaseModel
         return $this->getObject($query);
     }
 
-    // VIEW: extra.statistics_eventtype
-
     public function getByStatisticsStatePart(array $parameters): array
     {
         $for = $parameters[0];
         $from = $parameters[1];
         $to = $parameters[2];
-        $by = $parameters[3];
         $jurisdiction = strtoupper($parameters[4]);
 
         $query = <<<QUERY
-            WITH eventdata AS (
-                SELECT DISTINCT statistics_eventtype.governmentcounty AS series,
-                statistics_eventtype.eventsortyear AS x,
-                statistics_eventtype.eventcount::integer AS y
-                FROM extra.statistics_eventtype
+            WITH eventlist AS (
+                SELECT DISTINCT affectedgovernmentgroup.event,
+                    COALESCE(governmentidentifier.governmentidentifier::integer, 0) AS series
+                FROM geohistory.affectedgovernmentpart
+                JOIN geohistory.affectedgovernmentgrouppart
+                    ON affectedgovernmentpart.affectedgovernmentpartid = affectedgovernmentgrouppart.affectedgovernmentpart
+                JOIN geohistory.affectedgovernmentlevel
+                    ON affectedgovernmentgrouppart.affectedgovernmentlevel = affectedgovernmentlevel.affectedgovernmentlevelid
+                    AND affectedgovernmentlevel.affectedgovernmentlevelshort LIKE '%county'
+                JOIN geohistory.affectedgovernmentgroup
+                    ON affectedgovernmentgrouppart.affectedgovernmentgroup = affectedgovernmentgroup.affectedgovernmentgroupid
+                JOIN geohistory.government
+                    ON affectedgovernmentpart.governmentfrom = government.governmentid
+                    AND government.governmentstatus::text NOT IN ('placeholder', 'proposed', 'unincorporated')
+                    AND government.governmentcurrentleadstate = ?
+                LEFT JOIN geohistory.governmentidentifier
+                    ON government.governmentid = governmentidentifier.government
+                    AND governmentidentifier.governmentidentifiertype = 1
+                WHERE affectedgovernmentpart.affectedtypefrom <> 12
+                UNION
+                SELECT DISTINCT affectedgovernmentgroup.event,
+                    COALESCE(governmentidentifier.governmentidentifier::integer, 0) AS series
+                FROM geohistory.affectedgovernmentpart
+                JOIN geohistory.affectedgovernmentgrouppart
+                    ON affectedgovernmentpart.affectedgovernmentpartid = affectedgovernmentgrouppart.affectedgovernmentpart
+                JOIN geohistory.affectedgovernmentlevel
+                    ON affectedgovernmentgrouppart.affectedgovernmentlevel = affectedgovernmentlevel.affectedgovernmentlevelid
+                    AND affectedgovernmentlevel.affectedgovernmentlevelshort LIKE '%county'
+                JOIN geohistory.affectedgovernmentgroup
+                    ON affectedgovernmentgrouppart.affectedgovernmentgroup = affectedgovernmentgroup.affectedgovernmentgroupid
+                JOIN geohistory.government
+                    ON affectedgovernmentpart.governmentto = government.governmentid
+                    AND government.governmentstatus::text NOT IN ('placeholder', 'proposed', 'unincorporated')
+                    AND government.governmentcurrentleadstate = ?
+                LEFT JOIN geohistory.governmentidentifier
+                    ON government.governmentid = governmentidentifier.government
+                    AND governmentidentifier.governmentidentifiertype = 1
+                WHERE affectedgovernmentpart.affectedtypeto <> 12
+            ), eventdata AS (
+                SELECT eventlist.series,
+                    event.eventsortyear AS x,
+                    count(DISTINCT event.eventid)::integer AS y
+                FROM geohistory.event
+                JOIN eventlist
+                    ON event.eventid = eventlist.event
+                JOIN geohistory.eventgranted
+                    ON event.eventgranted = eventgranted.eventgrantedid
+                    AND eventgranted.eventgrantedsuccess
                 JOIN geohistory.eventtype
-                    ON statistics_eventtype.eventtype = eventtype.eventtypeid
+                    ON event.eventtype = eventtype.eventtypeid
                     AND eventtype.eventtypeshort = ?
-                WHERE statistics_eventtype.governmenttype = 'county'
-                AND statistics_eventtype.grouptype = ?
-                AND statistics_eventtype.governmentstate = ?
-                AND statistics_eventtype.eventsortyear >= ?
-                AND statistics_eventtype.eventsortyear <= ?
+                WHERE event.eventsortyear >= ?
+                    AND event.eventsortyear <= ?
+                GROUP BY 1, 2
             ), xvalue AS (
                 SELECT DISTINCT eventdata.series,
                 generate_series(min(eventdata.x),max(eventdata.x)) AS x
@@ -505,8 +617,8 @@ class EventModel extends BaseModel
             array_to_json(array_agg(DISTINCT xvalue.x::text ORDER BY xvalue.x::text)) AS xrow,
             array_to_json(array_agg(
                 CASE
-                    WHEN eventdata.y IS NULL THEN 0
-                    ELSE eventdata.y
+                    WHEN eventdata.y IS NULL THEN '0'::text
+                    ELSE eventdata.y::text
                 END ORDER BY xvalue.x)) AS yrow,
             sum(eventdata.y) AS ysum
             FROM xvalue
@@ -518,17 +630,15 @@ class EventModel extends BaseModel
         QUERY;
 
         $query = $this->db->query($query, [
-            $for,
-            $by,
             $jurisdiction,
+            $jurisdiction,
+            $for,
             $from,
             $to,
         ]);
 
         return $this->getObject($query);
     }
-
-    // VIEW: extra.statistics_eventtype
 
     public function getByStatisticsStateWhole(array $parameters): array
     {
@@ -539,18 +649,57 @@ class EventModel extends BaseModel
         $jurisdiction = strtoupper($parameters[4]);
 
         $query = <<<QUERY
-            WITH eventdata AS (
-                SELECT DISTINCT statistics_eventtype.eventsortyear AS x,
-                statistics_eventtype.eventcount::text AS y
-                FROM extra.statistics_eventtype
+            WITH eventlist AS (
+                SELECT DISTINCT affectedgovernmentgroup.event
+                FROM geohistory.affectedgovernmentpart
+                JOIN geohistory.affectedgovernmentgrouppart
+                    ON affectedgovernmentpart.affectedgovernmentpartid = affectedgovernmentgrouppart.affectedgovernmentpart
+                JOIN geohistory.affectedgovernmentlevel
+                    ON affectedgovernmentgrouppart.affectedgovernmentlevel = affectedgovernmentlevel.affectedgovernmentlevelid
+                    AND affectedgovernmentlevel.affectedgovernmentlevelshort LIKE '%county'
+                JOIN geohistory.affectedgovernmentgroup
+                    ON affectedgovernmentgrouppart.affectedgovernmentgroup = affectedgovernmentgroup.affectedgovernmentgroupid
+                JOIN geohistory.government
+                    ON affectedgovernmentpart.governmentfrom = government.governmentid
+                    AND government.governmentstatus::text NOT IN ('placeholder', 'proposed', 'unincorporated')
+                    AND government.governmentcurrentleadstate = ?
+                LEFT JOIN geohistory.governmentidentifier
+                    ON government.governmentid = governmentidentifier.government
+                    AND governmentidentifier.governmentidentifiertype = 1
+                WHERE affectedgovernmentpart.affectedtypefrom <> 12
+                UNION
+                SELECT DISTINCT affectedgovernmentgroup.event
+                FROM geohistory.affectedgovernmentpart
+                JOIN geohistory.affectedgovernmentgrouppart
+                    ON affectedgovernmentpart.affectedgovernmentpartid = affectedgovernmentgrouppart.affectedgovernmentpart
+                JOIN geohistory.affectedgovernmentlevel
+                    ON affectedgovernmentgrouppart.affectedgovernmentlevel = affectedgovernmentlevel.affectedgovernmentlevelid
+                    AND affectedgovernmentlevel.affectedgovernmentlevelshort LIKE '%county'
+                JOIN geohistory.affectedgovernmentgroup
+                    ON affectedgovernmentgrouppart.affectedgovernmentgroup = affectedgovernmentgroup.affectedgovernmentgroupid
+                JOIN geohistory.government
+                    ON affectedgovernmentpart.governmentto = government.governmentid
+                    AND government.governmentstatus::text NOT IN ('placeholder', 'proposed', 'unincorporated')
+                    AND government.governmentcurrentleadstate = ?
+                LEFT JOIN geohistory.governmentidentifier
+                    ON government.governmentid = governmentidentifier.government
+                    AND governmentidentifier.governmentidentifiertype = 1
+                WHERE affectedgovernmentpart.affectedtypeto <> 12
+            ), eventdata AS (
+                SELECT event.eventsortyear AS x,
+                    count(DISTINCT event.eventid)::integer AS y
+                FROM geohistory.event
+                JOIN eventlist
+                    ON event.eventid = eventlist.event
+                JOIN geohistory.eventgranted
+                    ON event.eventgranted = eventgranted.eventgrantedid
+                    AND eventgranted.eventgrantedsuccess
                 JOIN geohistory.eventtype
-                    ON statistics_eventtype.eventtype = eventtype.eventtypeid
+                    ON event.eventtype = eventtype.eventtypeid
                     AND eventtype.eventtypeshort = ?
-                WHERE statistics_eventtype.governmenttype = 'state'
-                AND statistics_eventtype.grouptype = ?
-                AND statistics_eventtype.governmentstate = ?
-                AND statistics_eventtype.eventsortyear >= ?
-                AND statistics_eventtype.eventsortyear <= ?
+                WHERE event.eventsortyear >= ?
+                    AND event.eventsortyear <= ?
+                GROUP BY 1
             ), xvalue AS (
                 SELECT DISTINCT generate_series(min(eventdata.x),max(eventdata.x)) AS x
                 FROM eventdata
@@ -558,10 +707,10 @@ class EventModel extends BaseModel
             SELECT array_to_json(ARRAY['x'::text] || array_agg(DISTINCT xvalue.x::text ORDER BY xvalue.x::text)) AS datarow
             FROM xvalue
             UNION ALL
-            SELECT array_to_json(ARRAY[?] || array_agg(
+            SELECT array_to_json(ARRAY['Whole'] || array_agg(
                 CASE
                     WHEN eventdata.y IS NULL THEN '0'::text
-                    ELSE eventdata.y
+                    ELSE eventdata.y::text
                 END ORDER BY xvalue.x)) AS datarow
             FROM xvalue
             LEFT JOIN eventdata
@@ -569,12 +718,11 @@ class EventModel extends BaseModel
         QUERY;
 
         $query = $this->db->query($query, [
-            $for,
-            $by,
             $jurisdiction,
+            $jurisdiction,
+            $for,
             $from,
             $to,
-            $jurisdiction,
         ]);
 
         return $this->getObject($query);
