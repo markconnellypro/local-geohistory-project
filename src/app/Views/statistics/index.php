@@ -49,10 +49,10 @@ $jurisdictions ??= [];
         $('input[type=radio][name=for]').change(function() {
             if ($(this).val() == 'eventtype') {
                 $('.option_select').css('display', 'inherit');
-                $('select').attr('required', 'required');
+                $('#_eventtype').attr('required', 'required');
             } else {
                 $('.option_select').css('display', 'none');
-                $('select').removeAttr('required');
+                $('#_eventtype').removeAttr('required');
             }
         });
 
