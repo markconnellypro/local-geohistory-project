@@ -45,16 +45,12 @@ class EventTypeModel extends BaseModel
         return $this->getArray($query);
     }
 
-    // VIEW: extra.statistics_eventtype
-
     public function getManyByStatistics(): array
     {
         $query = <<<QUERY
             SELECT DISTINCT eventtype.eventtypeshort,
                 eventtype.eventtypeid
             FROM geohistory.eventtype
-            JOIN extra.statistics_eventtype
-                ON eventtype.eventtypeid = statistics_eventtype.eventtype
             WHERE eventtype.eventtypeborders NOT IN ('documentation', 'ignore')
             ORDER BY 1, 2
         QUERY;

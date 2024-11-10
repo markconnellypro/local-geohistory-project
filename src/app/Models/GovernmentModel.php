@@ -149,17 +149,21 @@ class GovernmentModel extends BaseModel
 
     public function getByStatisticsJurisdiction(): array
     {
+        $jurisdiction = implode(',', \App\Controllers\BaseController::getJurisdictions());
+        $jurisdiction = '{' . strtoupper($jurisdiction) . '}';
+
         $query = <<<QUERY
             SELECT DISTINCT government.governmentshort,
                 lower(government.governmentabbreviation) AS governmentabbreviation
             FROM geohistory.government
-            JOIN extra.statistics_eventtype
-                ON government.governmentabbreviation = statistics_eventtype.governmentstate
-                AND government.governmentstatus = ''
+            WHERE government.governmentstatus = ''
                 AND government.governmentlevel = 2
+                AND government.governmentabbreviation = ANY (?)
         QUERY;
 
-        $query = $this->db->query($query);
+        $query = $this->db->query($query, [
+            $jurisdiction,
+        ]);
 
         return $this->getArray($query);
     }
