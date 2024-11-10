@@ -27,7 +27,6 @@ class AffectedGovernmentGroupModel extends BaseModel
         QUERY;
 
         $query = $this->db->query($query, [
-            \App\Controllers\BaseController::isLive(),
             $id,
         ]);
 
@@ -136,7 +135,6 @@ class AffectedGovernmentGroupModel extends BaseModel
         QUERY;
 
         $query = $this->db->query($query, [
-            \App\Controllers\BaseController::isLive(),
             $id,
         ]);
 
