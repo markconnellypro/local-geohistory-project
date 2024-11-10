@@ -6,8 +6,6 @@ use App\Models\BaseModel;
 
 class ResearchLogModel extends BaseModel
 {
-    // VIEW: extra.governmentsubstitutecache
-
     public function getByGovernment(int $id): array
     {
         $query = <<<QUERY
@@ -34,9 +32,9 @@ class ResearchLogModel extends BaseModel
                 ON researchlog.researchlogtype = researchlogtype.researchlogtypeid
             JOIN geohistory.government
                 ON researchlog.government = government.governmentid
-            JOIN extra.governmentsubstitutecache
-                ON researchlog.government = governmentsubstitutecache.governmentid
-                AND governmentsubstitutecache.governmentsubstitute = ?
+            JOIN geohistory.government governmentsubstitute
+                ON government.governmentslugsubstitute = governmentsubstitute.governmentslugsubstitute
+                AND governmentsubstitute.governmentid = ?
             WHERE (
                 ?
                 OR (researchlogtype.researchlogtypeisrecord AND NOT researchlog.researchlogismissing)
