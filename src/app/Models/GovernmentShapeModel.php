@@ -263,41 +263,44 @@ class GovernmentShapeModel extends BaseModel
 
     // FUNCTION: extra.emptytonull
     // FUNCTION: extra.plsstownshipshort
-    // VIEW: extra.governmentsubstitutecache
 
     public function getPartByGovernment(int $id): array
     {
         $query = <<<QUERY
             WITH affectedgovernmentsummary AS (
                 SELECT DISTINCT affectedgovernmentgroup.affectedgovernmentgroupid AS affectedgovernmentid,
-                affectedgovernmentgroup.event AS eventid,
-                affectedgovernmentpart.affectedtypefrom AS affectedtypeid,
-                'from' AS fromto,
-                NULL::integer AS governmentto
+                    affectedgovernmentgroup.event AS eventid,
+                    affectedgovernmentpart.affectedtypefrom AS affectedtypeid,
+                    'from' AS fromto,
+                    NULL::integer AS governmentto
                 FROM geohistory.affectedgovernmentgroup
                 JOIN geohistory.affectedgovernmentgrouppart
                     ON affectedgovernmentgroup.affectedgovernmentgroupid = affectedgovernmentgrouppart.affectedgovernmentgroup
                 JOIN geohistory.affectedgovernmentpart
                     ON affectedgovernmentgrouppart.affectedgovernmentpart = affectedgovernmentpart.affectedgovernmentpartid
-                JOIN extra.governmentsubstitutecache
-                    ON affectedgovernmentpart.governmentfrom = governmentsubstitutecache.governmentid
-                    AND governmentsubstitutecache.governmentsubstitute = ?
+                JOIN geohistory.government
+                    ON affectedgovernmentpart.governmentfrom = government.governmentid
+                JOIN geohistory.government governmentsubstitute
+                    ON government.governmentslugsubstitute = governmentsubstitute.governmentslugsubstitute
+                    AND governmentsubstitute.governmentid = ?
                 UNION
-                    SELECT DISTINCT affectedgovernmentgroup.affectedgovernmentgroupid AS affectedgovernmentid,
+                SELECT DISTINCT affectedgovernmentgroup.affectedgovernmentgroupid AS affectedgovernmentid,
                     affectedgovernmentgroup.event AS eventid,
                     affectedgovernmentpart.affectedtypeto AS affectedtypeid,
                     'to' AS fromto,
                     affectedgovernmentpart.governmentto
-                    FROM geohistory.affectedgovernmentgroup
-                    JOIN geohistory.affectedgovernmentgrouppart
-                        ON affectedgovernmentgroup.affectedgovernmentgroupid = affectedgovernmentgrouppart.affectedgovernmentgroup
-                    JOIN geohistory.affectedgovernmentpart
-                        ON affectedgovernmentgrouppart.affectedgovernmentpart = affectedgovernmentpart.affectedgovernmentpartid
-                    JOIN extra.governmentsubstitutecache
-                        ON affectedgovernmentpart.governmentto = governmentsubstitutecache.governmentid
-                        AND governmentsubstitutecache.governmentsubstitute = ?
+                FROM geohistory.affectedgovernmentgroup
+                JOIN geohistory.affectedgovernmentgrouppart
+                    ON affectedgovernmentgroup.affectedgovernmentgroupid = affectedgovernmentgrouppart.affectedgovernmentgroup
+                JOIN geohistory.affectedgovernmentpart
+                    ON affectedgovernmentgrouppart.affectedgovernmentpart = affectedgovernmentpart.affectedgovernmentpartid
+                JOIN geohistory.government
+                    ON affectedgovernmentpart.governmentto = government.governmentid
+                JOIN geohistory.government governmentsubstitute
+                    ON government.governmentslugsubstitute = governmentsubstitute.governmentslugsubstitute
+                    AND governmentsubstitute.governmentid = ?
             ), governmentshapeeventpartparts AS (
-                    SELECT affectedgovernmentgis.governmentshape AS governmentshapeid,
+                SELECT affectedgovernmentgis.governmentshape AS governmentshapeid,
                     event.eventdatetext,
                     event.eventsort,
                     to_char(event.eventsortdate, 'Mon FMDD, YYYY') || CASE
@@ -319,18 +322,18 @@ class GovernmentShapeModel extends BaseModel
                         ELSE 'other'
                     END) AS eventstatus,
                     array_agg(DISTINCT affectedgovernmentsummary.governmentto ORDER BY affectedgovernmentsummary.governmentto) AS governmentto
-                    FROM affectedgovernmentsummary
-                    JOIN geohistory.affectedtype
-                        ON affectedgovernmentsummary.affectedtypeid = affectedtype.affectedtypeid
-                    JOIN gis.affectedgovernmentgis
-                        ON affectedgovernmentsummary.affectedgovernmentid = affectedgovernmentgis.affectedgovernment
-                    JOIN geohistory.event
-                        ON affectedgovernmentsummary.eventid = event.eventid
-                    JOIN geohistory.eventgranted
-                        ON event.eventgranted = eventgranted.eventgrantedid
-                    GROUP BY 1, 2, 3, 4, 5
+                FROM affectedgovernmentsummary
+                JOIN geohistory.affectedtype
+                    ON affectedgovernmentsummary.affectedtypeid = affectedtype.affectedtypeid
+                JOIN gis.affectedgovernmentgis
+                    ON affectedgovernmentsummary.affectedgovernmentid = affectedgovernmentgis.affectedgovernment
+                JOIN geohistory.event
+                    ON affectedgovernmentsummary.eventid = event.eventid
+                JOIN geohistory.eventgranted
+                    ON event.eventgranted = eventgranted.eventgrantedid
+                GROUP BY 1, 2, 3, 4, 5
             ), governmentshapeeventparts AS (
-                    SELECT governmentshapeeventpartparts.governmentshapeid,
+                SELECT governmentshapeeventpartparts.governmentshapeid,
                     governmentshapeeventpartparts.eventdatetext,
                     governmentshapeeventpartparts.eventsort,
                     governmentshapeeventpartparts.eventtextsortdate,
@@ -340,20 +343,20 @@ class GovernmentShapeModel extends BaseModel
                         ELSE governmentshapeeventpartparts.eventstatus[1] 
                     END AS eventstatus,
                     extra.emptytonull(array_to_string(governmentshapeeventpartparts.governmentto, ','))::integer AS governmentto
-                    FROM governmentshapeeventpartparts
+                FROM governmentshapeeventpartparts
             ), lasteventstatus AS (
-                    SELECT governmentshapeeventparts.governmentshapeid,
+                SELECT governmentshapeeventparts.governmentshapeid,
                     (array_agg(governmentshapeeventparts.eventstatus ORDER BY CASE
                         WHEN governmentshapeeventparts.eventstatus IN ('add', 'remove') THEN 0
                         ELSE 1
                     END ASC, governmentshapeeventparts.eventsort DESC))[1] AS eventstatus
-                    FROM governmentshapeeventparts
-                    GROUP BY 1
+                FROM governmentshapeeventparts
+                GROUP BY 1
             ), governmentshapeeventearliest AS (
-                    SELECT min(governmentshapeeventparts.eventsort) AS mineventsort
-                    FROM governmentshapeeventparts
+                SELECT min(governmentshapeeventparts.eventsort) AS mineventsort
+                FROM governmentshapeeventparts
             ), governmentshapeeventjsonparts AS (
-                    SELECT governmentshapeeventparts.governmentshapeid,
+                SELECT governmentshapeeventparts.governmentshapeid,
                     governmentshapeeventparts.eventsort,
                     json_strip_nulls(json_build_object('eventsort', governmentshapeeventparts.eventsort,
                         'eventslug', governmentshapeeventparts.eventslug,
@@ -364,43 +367,43 @@ class GovernmentShapeModel extends BaseModel
                             WHEN governmentshapeeventearliest.mineventsort = governmentshapeeventparts.eventsort OR governmentshapeeventparts.eventstatus = 'name' THEN government.governmentlong
                             ELSE NULL
                         END)) AS eventjson
-                    FROM governmentshapeeventearliest,
-                        governmentshapeeventparts
-                    LEFT JOIN geohistory.government
-                        ON governmentshapeeventparts.governmentto = government.governmentid
+                FROM governmentshapeeventearliest,
+                    governmentshapeeventparts
+                LEFT JOIN geohistory.government
+                    ON governmentshapeeventparts.governmentto = government.governmentid
             ), governmentshapeevent AS (
-                    SELECT governmentshapeeventjsonparts.governmentshapeid,
+                SELECT governmentshapeeventjsonparts.governmentshapeid,
                     lasteventstatus.eventstatus,
                     json_agg(governmentshapeeventjsonparts.eventjson ORDER BY governmentshapeeventjsonparts.eventsort) AS eventjson
-                    FROM governmentshapeeventjsonparts
-                    JOIN lasteventstatus
-                        ON governmentshapeeventjsonparts.governmentshapeid = lasteventstatus.governmentshapeid
-                    GROUP BY 1, 2
+                FROM governmentshapeeventjsonparts
+                JOIN lasteventstatus
+                    ON governmentshapeeventjsonparts.governmentshapeid = lasteventstatus.governmentshapeid
+                GROUP BY 1, 2
             )
             SELECT
-            CASE
-                WHEN governmentshape.governmentshapeslug IS NOT NULL THEN governmentshape.governmentshapeslug
-                ELSE governmentshape.governmentshapeid::text
-            END AS governmentshapeslug,
-            '' AS plsstownship,
-            COALESCE(extra.plsstownshipshort(governmentshape.governmentshapeplsstownship), '') AS plsstownshipshort,
-            COALESCE(governmentsubmunicipality.governmentslugsubstitute, '') AS submunicipality,
-            COALESCE(governmentsubmunicipality.governmentlong, '') AS submunicipalitylong,
-            governmentmunicipality.governmentslugsubstitute AS municipality,
-            governmentmunicipality.governmentlong AS municipalitylong,
-            governmentcounty.governmentslugsubstitute AS county,
-            governmentcounty.governmentshort AS countyshort,
-            st_asgeojson(governmentshape.governmentshapegeometry) AS geometry,
-            CASE
-                WHEN NOT (ARRAY[governmentshape.governmentcounty, governmentshape.governmentmunicipality, governmentshape.governmentshapeplsstownship, governmentshape.governmentschooldistrict, governmentshape.governmentsubmunicipality, governmentshape.governmentward] && ARRAY[?::integer]) AND governmentshapeevent.governmentshapeid IS NOT NULL AND governmentshapeevent.eventstatus = 'proposed' THEN 1
-                WHEN NOT (ARRAY[governmentshape.governmentcounty, governmentshape.governmentmunicipality, governmentshape.governmentshapeplsstownship, governmentshape.governmentschooldistrict, governmentshape.governmentsubmunicipality, governmentshape.governmentward] && ARRAY[?::integer]) THEN 2
-                WHEN (ARRAY[governmentshape.governmentcounty, governmentshape.governmentmunicipality, governmentshape.governmentshapeplsstownship, governmentshape.governmentschooldistrict, governmentshape.governmentsubmunicipality, governmentshape.governmentward] && ARRAY[?::integer]) AND governmentshapeevent.governmentshapeid IS NOT NULL AND governmentshapeevent.eventstatus = 'add' THEN 4
-                ELSE 3
-            END AS disposition,
-            CASE
-                WHEN governmentshapeevent.eventjson IS NULL THEN '[]'::json
-                ELSE governmentshapeevent.eventjson
-            END AS eventjson
+                CASE
+                    WHEN governmentshape.governmentshapeslug IS NOT NULL THEN governmentshape.governmentshapeslug
+                    ELSE governmentshape.governmentshapeid::text
+                END AS governmentshapeslug,
+                '' AS plsstownship,
+                COALESCE(extra.plsstownshipshort(governmentshape.governmentshapeplsstownship), '') AS plsstownshipshort,
+                COALESCE(governmentsubmunicipality.governmentslugsubstitute, '') AS submunicipality,
+                COALESCE(governmentsubmunicipality.governmentlong, '') AS submunicipalitylong,
+                governmentmunicipality.governmentslugsubstitute AS municipality,
+                governmentmunicipality.governmentlong AS municipalitylong,
+                governmentcounty.governmentslugsubstitute AS county,
+                governmentcounty.governmentshort AS countyshort,
+                st_asgeojson(governmentshape.governmentshapegeometry) AS geometry,
+                CASE
+                    WHEN NOT (ARRAY[governmentshape.governmentcounty, governmentshape.governmentmunicipality, governmentshape.governmentshapeplsstownship, governmentshape.governmentschooldistrict, governmentshape.governmentsubmunicipality, governmentshape.governmentward] && ARRAY[?::integer]) AND governmentshapeevent.governmentshapeid IS NOT NULL AND governmentshapeevent.eventstatus = 'proposed' THEN 1
+                    WHEN NOT (ARRAY[governmentshape.governmentcounty, governmentshape.governmentmunicipality, governmentshape.governmentshapeplsstownship, governmentshape.governmentschooldistrict, governmentshape.governmentsubmunicipality, governmentshape.governmentward] && ARRAY[?::integer]) THEN 2
+                    WHEN (ARRAY[governmentshape.governmentcounty, governmentshape.governmentmunicipality, governmentshape.governmentshapeplsstownship, governmentshape.governmentschooldistrict, governmentshape.governmentsubmunicipality, governmentshape.governmentward] && ARRAY[?::integer]) AND governmentshapeevent.governmentshapeid IS NOT NULL AND governmentshapeevent.eventstatus = 'add' THEN 4
+                    ELSE 3
+                END AS disposition,
+                CASE
+                    WHEN governmentshapeevent.eventjson IS NULL THEN '[]'::json
+                    ELSE governmentshapeevent.eventjson
+                END AS eventjson
             FROM gis.governmentshape
             JOIN geohistory.government governmentmunicipality
                 ON governmentshape.governmentmunicipality = governmentmunicipality.governmentid
@@ -409,17 +412,17 @@ class GovernmentShapeModel extends BaseModel
             LEFT JOIN geohistory.government governmentsubmunicipality
                 ON governmentshape.governmentsubmunicipality = governmentsubmunicipality.governmentid
             LEFT JOIN governmentshapeevent
-            ON governmentshape.governmentshapeid = governmentshapeevent.governmentshapeid
+                ON governmentshape.governmentshapeid = governmentshapeevent.governmentshapeid
             WHERE governmentshape.governmentmunicipality = ? OR
-            governmentshape.governmentcounty = ? OR
-            (governmentshape.governmentschooldistrict IS NOT NULL AND governmentshape.governmentschooldistrict = ?) OR
-            (governmentshape.governmentshapeplsstownship IS NOT NULL AND governmentshape.governmentshapeplsstownship = ?) OR
-            (governmentshape.governmentsubmunicipality IS NOT NULL AND governmentshape.governmentsubmunicipality = ?) OR
-            (governmentshape.governmentward IS NOT NULL AND governmentshape.governmentward = ?) OR
-            governmentshape.governmentshapeid IN (
-                SELECT governmentshapeevent.governmentshapeid
-                FROM governmentshapeevent
-            )
+                governmentshape.governmentcounty = ? OR
+                (governmentshape.governmentschooldistrict IS NOT NULL AND governmentshape.governmentschooldistrict = ?) OR
+                (governmentshape.governmentshapeplsstownship IS NOT NULL AND governmentshape.governmentshapeplsstownship = ?) OR
+                (governmentshape.governmentsubmunicipality IS NOT NULL AND governmentshape.governmentsubmunicipality = ?) OR
+                (governmentshape.governmentward IS NOT NULL AND governmentshape.governmentward = ?) OR
+                governmentshape.governmentshapeid IN (
+                    SELECT governmentshapeevent.governmentshapeid
+                    FROM governmentshapeevent
+                )
             ORDER BY 1
         QUERY;
 
