@@ -168,14 +168,11 @@ class GovernmentModel extends BaseModel
         return $this->getArray($query);
     }
 
-    // VIEW: extra.statistics_createddissolved
-
     public function getByStatisticsNationPart(array $parameters): array
     {
         $for = $parameters[0];
         $from = $parameters[1];
         $to = $parameters[2];
-        $by = $parameters[3];
         $jurisdiction = $parameters[4];
         if ($jurisdiction === '') {
             $jurisdiction = implode(',', \App\Controllers\BaseController::getJurisdictions());
@@ -183,162 +180,108 @@ class GovernmentModel extends BaseModel
         $jurisdiction = '{' . strtoupper($jurisdiction) . '}';
 
         $query = <<<QUERY
-            WITH eventdata AS (
-                    SELECT DISTINCT min(governmentidentifier.governmentidentifier) AS series,
-                    statistics_createddissolved.governmentstate AS actualseries,
-                    statistics_createddissolved.eventsortyear AS x,
+            WITH eventlist AS (
+                SELECT DISTINCT affectedgovernmentgroup.event,
+                    affectedtype.affectedtypecreationdissolution,
+                    government.governmentid,
+                    COALESCE(governmentidentifier.governmentidentifier::integer, 0) AS series
+                FROM geohistory.affectedgovernmentpart
+                JOIN geohistory.government
+                    ON affectedgovernmentpart.governmentto = government.governmentid
+                    AND government.governmentstatus NOT IN ('placeholder', 'proposed', 'unincorporated')
+                    AND government.governmentlevel = 4
+                JOIN geohistory.affectedtype
+                    ON affectedgovernmentpart.affectedtypeto = affectedtype.affectedtypeid
+                    AND affectedtype.affectedtypecreationdissolution = 'begin'
+                JOIN geohistory.affectedgovernmentgrouppart
+                    ON affectedgovernmentpart.affectedgovernmentpartid = affectedgovernmentgrouppart.affectedgovernmentpart
+                JOIN geohistory.affectedgovernmentgroup
+                    ON affectedgovernmentgrouppart.affectedgovernmentgroup = affectedgovernmentgroup.affectedgovernmentgroupid
+                JOIN geohistory.affectedgovernmentlevel
+                    ON affectedgovernmentgrouppart.affectedgovernmentlevel = affectedgovernmentlevel.affectedgovernmentlevelid
+                    AND affectedgovernmentlevel.affectedgovernmentlevelshort LIKE '%municipality'
+                JOIN geohistory.affectedgovernmentgrouppart affectedgovernmentgrouppartparent
+                    ON affectedgovernmentgrouppart.affectedgovernmentgroup = affectedgovernmentgrouppartparent.affectedgovernmentgroup
+                JOIN geohistory.affectedgovernmentlevel affectedgovernmentlevelparent
+                    ON affectedgovernmentgrouppartparent.affectedgovernmentlevel = affectedgovernmentlevelparent.affectedgovernmentlevelid
+                    AND affectedgovernmentlevelparent.affectedgovernmentlevelshort LIKE 'state'
+                JOIN geohistory.affectedgovernmentpart affectedgovernmentpartparent
+                    ON affectedgovernmentgrouppartparent.affectedgovernmentpart = affectedgovernmentpartparent.affectedgovernmentpartid
+                JOIN geohistory.government governmentparent
+                    ON affectedgovernmentpartparent.governmentto = governmentparent.governmentid
+                    AND governmentparent.governmentstatus NOT IN ('placeholder', 'proposed', 'unincorporated')
+                    AND governmentparent.governmentcurrentleadstate = ANY (?)
+                JOIN geohistory.government governmentparentsubstitute
+                    ON governmentparent.governmentslugsubstitute = governmentparentsubstitute.governmentslug
+                LEFT JOIN geohistory.governmentidentifier
+                    ON governmentparentsubstitute.governmentid = governmentidentifier.government
+                    AND governmentidentifier.governmentidentifiertype = 1
+                UNION
+                SELECT DISTINCT affectedgovernmentgroup.event,
+                    affectedtype.affectedtypecreationdissolution,
+                    government.governmentid,
+                    COALESCE(governmentidentifier.governmentidentifier::integer, 0) AS series
+                FROM geohistory.affectedgovernmentpart
+                JOIN geohistory.government
+                    ON affectedgovernmentpart.governmentfrom = government.governmentid
+                    AND government.governmentstatus NOT IN ('placeholder', 'proposed', 'unincorporated')
+                    AND government.governmentlevel = 4
+                JOIN geohistory.affectedtype
+                    ON affectedgovernmentpart.affectedtypefrom = affectedtype.affectedtypeid
+                    AND affectedtype.affectedtypecreationdissolution = 'end'
+                JOIN geohistory.affectedgovernmentgrouppart
+                    ON affectedgovernmentpart.affectedgovernmentpartid = affectedgovernmentgrouppart.affectedgovernmentpart
+                JOIN geohistory.affectedgovernmentgroup
+                    ON affectedgovernmentgrouppart.affectedgovernmentgroup = affectedgovernmentgroup.affectedgovernmentgroupid
+                JOIN geohistory.affectedgovernmentlevel
+                    ON affectedgovernmentgrouppart.affectedgovernmentlevel = affectedgovernmentlevel.affectedgovernmentlevelid
+                    AND affectedgovernmentlevel.affectedgovernmentlevelshort LIKE '%municipality'
+                JOIN geohistory.affectedgovernmentgrouppart affectedgovernmentgrouppartparent
+                    ON affectedgovernmentgrouppart.affectedgovernmentgroup = affectedgovernmentgrouppartparent.affectedgovernmentgroup
+                JOIN geohistory.affectedgovernmentlevel affectedgovernmentlevelparent
+                    ON affectedgovernmentgrouppartparent.affectedgovernmentlevel = affectedgovernmentlevelparent.affectedgovernmentlevelid
+                    AND affectedgovernmentlevelparent.affectedgovernmentlevelshort LIKE 'state'
+                JOIN geohistory.affectedgovernmentpart affectedgovernmentpartparent
+                    ON affectedgovernmentgrouppartparent.affectedgovernmentpart = affectedgovernmentpartparent.affectedgovernmentpartid
+                JOIN geohistory.government governmentparent
+                    ON affectedgovernmentpartparent.governmentfrom = governmentparent.governmentid
+                    AND governmentparent.governmentstatus NOT IN ('placeholder', 'proposed', 'unincorporated')
+                    AND governmentparent.governmentcurrentleadstate = ANY (?)
+                JOIN geohistory.government governmentparentsubstitute
+                    ON governmentparent.governmentslugsubstitute = governmentparentsubstitute.governmentslug
+                LEFT JOIN geohistory.governmentidentifier
+                    ON governmentparentsubstitute.governmentid = governmentidentifier.government
+                    AND governmentidentifier.governmentidentifiertype = 1
+            ), eventyear AS (
+                SELECT eventlist.series,
+                    event.eventsortyear AS x,
+                    COALESCE(count(DISTINCT CASE
+                        WHEN eventlist.affectedtypecreationdissolution = 'begin' THEN eventlist.governmentid
+                        ELSE NULL
+                    END), 0)::integer AS begin,
+                    COALESCE(count(DISTINCT CASE
+                        WHEN eventlist.affectedtypecreationdissolution = 'end' THEN eventlist.governmentid
+                        ELSE NULL
+                    END), 0)::integer AS end
+                FROM eventlist
+                JOIN geohistory.event
+                    ON eventlist.event = event.eventid
+                    AND event.eventsortyear >= ?
+                    AND event.eventsortyear <= ?
+                JOIN geohistory.eventgranted
+                    ON event.eventgranted = eventgranted.eventgrantedid
+                    AND eventgranted.eventgrantedsuccess
+                GROUP BY 1, 2
+            ), eventdata AS (
+                SELECT DISTINCT eventyear.series,
+                    eventyear.x,
                     CASE
-                        WHEN ? = 'created' THEN statistics_createddissolved.created::integer
-                        WHEN ? = 'dissolved' THEN statistics_createddissolved.dissolved::integer
-                        WHEN ? = 'net' THEN (statistics_createddissolved.created - statistics_createddissolved.dissolved)::integer
+                        WHEN ? = 'created' THEN eventyear.begin
+                        WHEN ? = 'dissolved' THEN eventyear.end
+                        WHEN ? = 'net' THEN eventyear.begin - eventyear.end
                         ELSE 0::integer
                     END AS y
-                    FROM extra.statistics_createddissolved
-                    JOIN geohistory.government
-                        ON statistics_createddissolved.governmentstate = government.governmentabbreviation
-                    JOIN geohistory.governmentidentifier
-                        ON government.governmentid = governmentidentifier.government
-                        AND governmentidentifier.governmentidentifiertype = 1
-                    WHERE statistics_createddissolved.governmenttype = 'state'
-                    AND statistics_createddissolved.grouptype = ?
-                    AND statistics_createddissolved.governmentstate = ANY (?)
-                    AND statistics_createddissolved.eventsortyear >= ?
-                    AND statistics_createddissolved.eventsortyear <= ?
-                    AND CASE
-                        WHEN ? = 'created' THEN statistics_createddissolved.created > 0
-                        WHEN ? = 'dissolved' THEN statistics_createddissolved.dissolved > 0
-                        ELSE 0 = 0
-                    END
-                    GROUP BY 2, 3, 4
-                ), xvalue AS (
-                    SELECT DISTINCT eventdata.series,
-                    generate_series(min(eventdata.x),max(eventdata.x)) AS x
-                    FROM eventdata
-                    GROUP BY 1
-                )
-            SELECT xvalue.series,
-            array_to_json(array_agg(DISTINCT xvalue.x::text ORDER BY xvalue.x::text)) AS xrow,
-            array_to_json(array_agg(
-                CASE
-                    WHEN eventdata.y IS NULL THEN 0
-                    ELSE eventdata.y
-                END ORDER BY xvalue.x)) AS yrow,
-            sum(eventdata.y) AS ysum
-            FROM xvalue
-            LEFT JOIN eventdata
-                ON xvalue.x = eventdata.x
-                AND xvalue.series = eventdata.series
-            GROUP BY 1
-            ORDER BY 1
-        QUERY;
-
-        $query = $this->db->query($query, [
-            $for,
-            $for,
-            $for,
-            $by,
-            $jurisdiction,
-            $from,
-            $to,
-            $for,
-            $for,
-        ]);
-
-        return $this->getObject($query);
-    }
-
-    // VIEW: extra.statistics_createddissolved
-
-    public function getByStatisticsNationWhole(array $parameters): array
-    {
-        $for = $parameters[0];
-        $from = $parameters[1];
-        $to = $parameters[2];
-        $by = $parameters[3];
-
-        $query = <<<QUERY
-            WITH eventdata AS (
-                SELECT DISTINCT statistics_createddissolved.eventsortyear AS x,
-                (CASE
-                    WHEN ? = 'created' THEN statistics_createddissolved.created::integer
-                    WHEN ? = 'dissolved' THEN statistics_createddissolved.dissolved::integer
-                    WHEN ? = 'net' THEN (statistics_createddissolved.created - statistics_createddissolved.dissolved)::integer
-                    ELSE 0::integer
-                END)::text AS y
-                FROM extra.statistics_createddissolved
-                WHERE statistics_createddissolved.governmenttype = 'nation'
-                AND statistics_createddissolved.grouptype = ?
-                AND statistics_createddissolved.governmentstate = ?
-                AND statistics_createddissolved.eventsortyear >= ?
-                AND statistics_createddissolved.eventsortyear <= ?
-                AND CASE
-                    WHEN ? = 'created' THEN statistics_createddissolved.created > 0
-                    WHEN ? = 'dissolved' THEN statistics_createddissolved.dissolved > 0
-                    ELSE 0 = 0
-                END
-            ), xvalue AS (
-                SELECT DISTINCT generate_series(min(eventdata.x),max(eventdata.x)) AS x
-                FROM eventdata
-            )
-            SELECT array_to_json(ARRAY['x'::text] || array_agg(DISTINCT xvalue.x::text ORDER BY xvalue.x::text)) AS datarow
-            FROM xvalue
-            UNION ALL
-            SELECT array_to_json(ARRAY['Whole'] || array_agg(
-                CASE
-                    WHEN eventdata.y IS NULL THEN '0'::text
-                    ELSE eventdata.y
-                END ORDER BY xvalue.x)) AS datarow
-            FROM xvalue
-            LEFT JOIN eventdata
-                ON xvalue.x = eventdata.x
-        QUERY;
-
-        $query = $this->db->query($query, [
-            $for,
-            $for,
-            $for,
-            $by,
-            ENVIRONMENT,
-            $from,
-            $to,
-            $for,
-            $for,
-        ]);
-
-        return $this->getObject($query);
-    }
-
-    // VIEW: extra.statistics_createddissolved
-
-    public function getByStatisticsStatePart(array $parameters): array
-    {
-        $for = $parameters[0];
-        $from = $parameters[1];
-        $to = $parameters[2];
-        $by = $parameters[3];
-        $jurisdiction = strtoupper($parameters[4]);
-
-        $query = <<<QUERY
-            WITH eventdata AS (
-                SELECT DISTINCT statistics_createddissolved.governmentcounty AS series,
-                statistics_createddissolved.eventsortyear AS x,
-                CASE
-                    WHEN ? = 'created' THEN statistics_createddissolved.created::integer
-                    WHEN ? = 'dissolved' THEN statistics_createddissolved.dissolved::integer
-                    WHEN ? = 'net' THEN (statistics_createddissolved.created - statistics_createddissolved.dissolved)::integer
-                    ELSE 0::integer
-                END AS y
-                FROM extra.statistics_createddissolved
-                WHERE statistics_createddissolved.governmenttype = 'county'
-                AND statistics_createddissolved.grouptype = ?
-                AND statistics_createddissolved.governmentstate = ?
-                AND statistics_createddissolved.eventsortyear >= ?
-                AND statistics_createddissolved.eventsortyear <= ?
-                AND CASE
-                    WHEN ? = 'created' THEN statistics_createddissolved.created > 0
-                    WHEN ? = 'dissolved' THEN statistics_createddissolved.dissolved > 0
-                    ELSE 0 = 0
-                END
+                FROM eventyear
             ), xvalue AS (
                 SELECT DISTINCT eventdata.series,
                 generate_series(min(eventdata.x),max(eventdata.x)) AS x
@@ -362,13 +305,11 @@ class GovernmentModel extends BaseModel
         QUERY;
 
         $query = $this->db->query($query, [
-            $for,
-            $for,
-            $for,
-            $by,
+            $jurisdiction,
             $jurisdiction,
             $from,
             $to,
+            $for,
             $for,
             $for,
         ]);
@@ -376,36 +317,118 @@ class GovernmentModel extends BaseModel
         return $this->getObject($query);
     }
 
-    // VIEW: extra.statistics_createddissolved
-
-    public function getByStatisticsStateWhole(array $parameters): array
+    public function getByStatisticsNationWhole(array $parameters): array
     {
         $for = $parameters[0];
         $from = $parameters[1];
         $to = $parameters[2];
-        $by = $parameters[3];
-        $jurisdiction = strtoupper($parameters[4]);
+        $jurisdiction = $parameters[4];
+        if ($jurisdiction === '') {
+            $jurisdiction = implode(',', \App\Controllers\BaseController::getJurisdictions());
+        }
+        $jurisdiction = '{' . strtoupper($jurisdiction) . '}';
 
         $query = <<<QUERY
-            WITH eventdata AS (
-                SELECT DISTINCT statistics_createddissolved.eventsortyear AS x,
-                (CASE
-                    WHEN ? = 'created' THEN statistics_createddissolved.created::integer
-                    WHEN ? = 'dissolved' THEN statistics_createddissolved.dissolved::integer
-                    WHEN ? = 'net' THEN (statistics_createddissolved.created - statistics_createddissolved.dissolved)::integer
-                    ELSE 0::integer
-                END)::text AS y
-                FROM extra.statistics_createddissolved
-                WHERE statistics_createddissolved.governmenttype = 'state'
-                AND statistics_createddissolved.grouptype = ?
-                AND statistics_createddissolved.governmentstate = ?
-                AND statistics_createddissolved.eventsortyear >= ?
-                AND statistics_createddissolved.eventsortyear <= ?
-                AND CASE
-                    WHEN ? = 'created' THEN statistics_createddissolved.created > 0
-                    WHEN ? = 'dissolved' THEN statistics_createddissolved.dissolved > 0
-                    ELSE 0 = 0
-                END
+            WITH eventlist AS (
+                SELECT DISTINCT affectedgovernmentgroup.event,
+                    affectedtype.affectedtypecreationdissolution,
+                    government.governmentid,
+                    COALESCE(governmentidentifier.governmentidentifier::integer, 0) AS series
+                FROM geohistory.affectedgovernmentpart
+                JOIN geohistory.government
+                    ON affectedgovernmentpart.governmentto = government.governmentid
+                    AND government.governmentstatus NOT IN ('placeholder', 'proposed', 'unincorporated')
+                    AND government.governmentlevel = 4
+                JOIN geohistory.affectedtype
+                    ON affectedgovernmentpart.affectedtypeto = affectedtype.affectedtypeid
+                    AND affectedtype.affectedtypecreationdissolution = 'begin'
+                JOIN geohistory.affectedgovernmentgrouppart
+                    ON affectedgovernmentpart.affectedgovernmentpartid = affectedgovernmentgrouppart.affectedgovernmentpart
+                JOIN geohistory.affectedgovernmentgroup
+                    ON affectedgovernmentgrouppart.affectedgovernmentgroup = affectedgovernmentgroup.affectedgovernmentgroupid
+                JOIN geohistory.affectedgovernmentlevel
+                    ON affectedgovernmentgrouppart.affectedgovernmentlevel = affectedgovernmentlevel.affectedgovernmentlevelid
+                    AND affectedgovernmentlevel.affectedgovernmentlevelshort LIKE '%municipality'
+                JOIN geohistory.affectedgovernmentgrouppart affectedgovernmentgrouppartparent
+                    ON affectedgovernmentgrouppart.affectedgovernmentgroup = affectedgovernmentgrouppartparent.affectedgovernmentgroup
+                JOIN geohistory.affectedgovernmentlevel affectedgovernmentlevelparent
+                    ON affectedgovernmentgrouppartparent.affectedgovernmentlevel = affectedgovernmentlevelparent.affectedgovernmentlevelid
+                    AND affectedgovernmentlevelparent.affectedgovernmentlevelshort LIKE 'state'
+                JOIN geohistory.affectedgovernmentpart affectedgovernmentpartparent
+                    ON affectedgovernmentgrouppartparent.affectedgovernmentpart = affectedgovernmentpartparent.affectedgovernmentpartid
+                JOIN geohistory.government governmentparent
+                    ON affectedgovernmentpartparent.governmentto = governmentparent.governmentid
+                    AND governmentparent.governmentstatus NOT IN ('placeholder', 'proposed', 'unincorporated')
+                    AND governmentparent.governmentcurrentleadstate = ANY (?)
+                JOIN geohistory.government governmentparentsubstitute
+                    ON governmentparent.governmentslugsubstitute = governmentparentsubstitute.governmentslug
+                LEFT JOIN geohistory.governmentidentifier
+                    ON governmentparentsubstitute.governmentid = governmentidentifier.government
+                    AND governmentidentifier.governmentidentifiertype = 1
+                UNION
+                SELECT DISTINCT affectedgovernmentgroup.event,
+                    affectedtype.affectedtypecreationdissolution,
+                    government.governmentid,
+                    COALESCE(governmentidentifier.governmentidentifier::integer, 0) AS series
+                FROM geohistory.affectedgovernmentpart
+                JOIN geohistory.government
+                    ON affectedgovernmentpart.governmentfrom = government.governmentid
+                    AND government.governmentstatus NOT IN ('placeholder', 'proposed', 'unincorporated')
+                    AND government.governmentlevel = 4
+                JOIN geohistory.affectedtype
+                    ON affectedgovernmentpart.affectedtypefrom = affectedtype.affectedtypeid
+                    AND affectedtype.affectedtypecreationdissolution = 'end'
+                JOIN geohistory.affectedgovernmentgrouppart
+                    ON affectedgovernmentpart.affectedgovernmentpartid = affectedgovernmentgrouppart.affectedgovernmentpart
+                JOIN geohistory.affectedgovernmentgroup
+                    ON affectedgovernmentgrouppart.affectedgovernmentgroup = affectedgovernmentgroup.affectedgovernmentgroupid
+                JOIN geohistory.affectedgovernmentlevel
+                    ON affectedgovernmentgrouppart.affectedgovernmentlevel = affectedgovernmentlevel.affectedgovernmentlevelid
+                    AND affectedgovernmentlevel.affectedgovernmentlevelshort LIKE '%municipality'
+                JOIN geohistory.affectedgovernmentgrouppart affectedgovernmentgrouppartparent
+                    ON affectedgovernmentgrouppart.affectedgovernmentgroup = affectedgovernmentgrouppartparent.affectedgovernmentgroup
+                JOIN geohistory.affectedgovernmentlevel affectedgovernmentlevelparent
+                    ON affectedgovernmentgrouppartparent.affectedgovernmentlevel = affectedgovernmentlevelparent.affectedgovernmentlevelid
+                    AND affectedgovernmentlevelparent.affectedgovernmentlevelshort LIKE 'state'
+                JOIN geohistory.affectedgovernmentpart affectedgovernmentpartparent
+                    ON affectedgovernmentgrouppartparent.affectedgovernmentpart = affectedgovernmentpartparent.affectedgovernmentpartid
+                JOIN geohistory.government governmentparent
+                    ON affectedgovernmentpartparent.governmentfrom = governmentparent.governmentid
+                    AND governmentparent.governmentstatus NOT IN ('placeholder', 'proposed', 'unincorporated')
+                    AND governmentparent.governmentcurrentleadstate = ANY (?)
+                JOIN geohistory.government governmentparentsubstitute
+                    ON governmentparent.governmentslugsubstitute = governmentparentsubstitute.governmentslug
+                LEFT JOIN geohistory.governmentidentifier
+                    ON governmentparentsubstitute.governmentid = governmentidentifier.government
+                    AND governmentidentifier.governmentidentifiertype = 1
+            ), eventyear AS (
+                SELECT event.eventsortyear AS x,
+                    COALESCE(count(DISTINCT CASE
+                        WHEN eventlist.affectedtypecreationdissolution = 'begin' THEN eventlist.governmentid
+                        ELSE NULL
+                    END), 0)::integer AS begin,
+                    COALESCE(count(DISTINCT CASE
+                        WHEN eventlist.affectedtypecreationdissolution = 'end' THEN eventlist.governmentid
+                        ELSE NULL
+                    END), 0)::integer AS end
+                FROM eventlist
+                JOIN geohistory.event
+                    ON eventlist.event = event.eventid
+                    AND event.eventsortyear >= ?
+                    AND event.eventsortyear <= ?
+                JOIN geohistory.eventgranted
+                    ON event.eventgranted = eventgranted.eventgrantedid
+                    AND eventgranted.eventgrantedsuccess
+                GROUP BY 1
+            ), eventdata AS (
+                SELECT DISTINCT eventyear.x,
+                    CASE
+                        WHEN ? = 'created' THEN eventyear.begin
+                        WHEN ? = 'dissolved' THEN eventyear.end
+                        WHEN ? = 'net' THEN eventyear.begin - eventyear.end
+                        ELSE 0::integer
+                    END AS y
+                FROM eventyear
             ), xvalue AS (
                 SELECT DISTINCT generate_series(min(eventdata.x),max(eventdata.x)) AS x
                 FROM eventdata
@@ -413,10 +436,10 @@ class GovernmentModel extends BaseModel
             SELECT array_to_json(ARRAY['x'::text] || array_agg(DISTINCT xvalue.x::text ORDER BY xvalue.x::text)) AS datarow
             FROM xvalue
             UNION ALL
-            SELECT array_to_json(ARRAY[?] || array_agg(
+            SELECT array_to_json(ARRAY['Whole'] || array_agg(
                 CASE
                     WHEN eventdata.y IS NULL THEN '0'::text
-                    ELSE eventdata.y
+                    ELSE eventdata.y::text
                 END ORDER BY xvalue.x)) AS datarow
             FROM xvalue
             LEFT JOIN eventdata
@@ -424,16 +447,294 @@ class GovernmentModel extends BaseModel
         QUERY;
 
         $query = $this->db->query($query, [
-            $for,
-            $for,
-            $for,
-            $by,
+            $jurisdiction,
             $jurisdiction,
             $from,
             $to,
             $for,
             $for,
+            $for,
+        ]);
+
+        return $this->getObject($query);
+    }
+
+    public function getByStatisticsStatePart(array $parameters): array
+    {
+        $for = $parameters[0];
+        $from = $parameters[1];
+        $to = $parameters[2];
+        $jurisdiction = strtoupper($parameters[4]);
+
+        $query = <<<QUERY
+            WITH eventlist AS (
+                SELECT DISTINCT affectedgovernmentgroup.event,
+                    affectedtype.affectedtypecreationdissolution,
+                    government.governmentid,
+                    COALESCE(governmentidentifier.governmentidentifier::integer, 0) AS series
+                FROM geohistory.affectedgovernmentpart
+                JOIN geohistory.government
+                    ON affectedgovernmentpart.governmentto = government.governmentid
+                    AND government.governmentstatus NOT IN ('placeholder', 'proposed', 'unincorporated')
+                    AND government.governmentlevel = 4
+                JOIN geohistory.affectedtype
+                    ON affectedgovernmentpart.affectedtypeto = affectedtype.affectedtypeid
+                    AND affectedtype.affectedtypecreationdissolution = 'begin'
+                JOIN geohistory.affectedgovernmentgrouppart
+                    ON affectedgovernmentpart.affectedgovernmentpartid = affectedgovernmentgrouppart.affectedgovernmentpart
+                JOIN geohistory.affectedgovernmentgroup
+                    ON affectedgovernmentgrouppart.affectedgovernmentgroup = affectedgovernmentgroup.affectedgovernmentgroupid
+                JOIN geohistory.affectedgovernmentlevel
+                    ON affectedgovernmentgrouppart.affectedgovernmentlevel = affectedgovernmentlevel.affectedgovernmentlevelid
+                    AND affectedgovernmentlevel.affectedgovernmentlevelshort LIKE '%municipality'
+                JOIN geohistory.affectedgovernmentgrouppart affectedgovernmentgrouppartparent
+                    ON affectedgovernmentgrouppart.affectedgovernmentgroup = affectedgovernmentgrouppartparent.affectedgovernmentgroup
+                JOIN geohistory.affectedgovernmentlevel affectedgovernmentlevelparent
+                    ON affectedgovernmentgrouppartparent.affectedgovernmentlevel = affectedgovernmentlevelparent.affectedgovernmentlevelid
+                    AND affectedgovernmentlevelparent.affectedgovernmentlevelshort LIKE '%county'
+                JOIN geohistory.affectedgovernmentpart affectedgovernmentpartparent
+                    ON affectedgovernmentgrouppartparent.affectedgovernmentpart = affectedgovernmentpartparent.affectedgovernmentpartid
+                JOIN geohistory.government governmentparent
+                    ON affectedgovernmentpartparent.governmentto = governmentparent.governmentid
+                    AND governmentparent.governmentstatus NOT IN ('placeholder', 'proposed', 'unincorporated')
+                    AND governmentparent.governmentcurrentleadstate = ?
+                JOIN geohistory.government governmentparentsubstitute
+                    ON governmentparent.governmentslugsubstitute = governmentparentsubstitute.governmentslug
+                LEFT JOIN geohistory.governmentidentifier
+                    ON governmentparentsubstitute.governmentid = governmentidentifier.government
+                    AND governmentidentifier.governmentidentifiertype = 1
+                UNION
+                SELECT DISTINCT affectedgovernmentgroup.event,
+                    affectedtype.affectedtypecreationdissolution,
+                    government.governmentid,
+                    COALESCE(governmentidentifier.governmentidentifier::integer, 0) AS series
+                FROM geohistory.affectedgovernmentpart
+                JOIN geohistory.government
+                    ON affectedgovernmentpart.governmentfrom = government.governmentid
+                    AND government.governmentstatus NOT IN ('placeholder', 'proposed', 'unincorporated')
+                    AND government.governmentlevel = 4
+                JOIN geohistory.affectedtype
+                    ON affectedgovernmentpart.affectedtypefrom = affectedtype.affectedtypeid
+                    AND affectedtype.affectedtypecreationdissolution = 'end'
+                JOIN geohistory.affectedgovernmentgrouppart
+                    ON affectedgovernmentpart.affectedgovernmentpartid = affectedgovernmentgrouppart.affectedgovernmentpart
+                JOIN geohistory.affectedgovernmentgroup
+                    ON affectedgovernmentgrouppart.affectedgovernmentgroup = affectedgovernmentgroup.affectedgovernmentgroupid
+                JOIN geohistory.affectedgovernmentlevel
+                    ON affectedgovernmentgrouppart.affectedgovernmentlevel = affectedgovernmentlevel.affectedgovernmentlevelid
+                    AND affectedgovernmentlevel.affectedgovernmentlevelshort LIKE '%municipality'
+                JOIN geohistory.affectedgovernmentgrouppart affectedgovernmentgrouppartparent
+                    ON affectedgovernmentgrouppart.affectedgovernmentgroup = affectedgovernmentgrouppartparent.affectedgovernmentgroup
+                JOIN geohistory.affectedgovernmentlevel affectedgovernmentlevelparent
+                    ON affectedgovernmentgrouppartparent.affectedgovernmentlevel = affectedgovernmentlevelparent.affectedgovernmentlevelid
+                    AND affectedgovernmentlevelparent.affectedgovernmentlevelshort LIKE '%county'
+                JOIN geohistory.affectedgovernmentpart affectedgovernmentpartparent
+                    ON affectedgovernmentgrouppartparent.affectedgovernmentpart = affectedgovernmentpartparent.affectedgovernmentpartid
+                JOIN geohistory.government governmentparent
+                    ON affectedgovernmentpartparent.governmentfrom = governmentparent.governmentid
+                    AND governmentparent.governmentstatus NOT IN ('placeholder', 'proposed', 'unincorporated')
+                    AND governmentparent.governmentcurrentleadstate = ?
+                JOIN geohistory.government governmentparentsubstitute
+                    ON governmentparent.governmentslugsubstitute = governmentparentsubstitute.governmentslug
+                LEFT JOIN geohistory.governmentidentifier
+                    ON governmentparentsubstitute.governmentid = governmentidentifier.government
+                    AND governmentidentifier.governmentidentifiertype = 1
+            ), eventyear AS (
+                SELECT eventlist.series,
+                    event.eventsortyear AS x,
+                    COALESCE(count(DISTINCT CASE
+                        WHEN eventlist.affectedtypecreationdissolution = 'begin' THEN eventlist.governmentid
+                        ELSE NULL
+                    END), 0)::integer AS begin,
+                    COALESCE(count(DISTINCT CASE
+                        WHEN eventlist.affectedtypecreationdissolution = 'end' THEN eventlist.governmentid
+                        ELSE NULL
+                    END), 0)::integer AS end
+                FROM eventlist
+                JOIN geohistory.event
+                    ON eventlist.event = event.eventid
+                    AND event.eventsortyear >= ?
+                    AND event.eventsortyear <= ?
+                JOIN geohistory.eventgranted
+                    ON event.eventgranted = eventgranted.eventgrantedid
+                    AND eventgranted.eventgrantedsuccess
+                GROUP BY 1, 2
+            ), eventdata AS (
+                SELECT DISTINCT eventyear.series,
+                    eventyear.x,
+                    CASE
+                        WHEN ? = 'created' THEN eventyear.begin
+                        WHEN ? = 'dissolved' THEN eventyear.end
+                        WHEN ? = 'net' THEN eventyear.begin - eventyear.end
+                        ELSE 0::integer
+                    END AS y
+                FROM eventyear
+            ), xvalue AS (
+                SELECT DISTINCT eventdata.series,
+                generate_series(min(eventdata.x),max(eventdata.x)) AS x
+                FROM eventdata
+                GROUP BY 1
+            )
+            SELECT xvalue.series,
+            array_to_json(array_agg(DISTINCT xvalue.x::text ORDER BY xvalue.x::text)) AS xrow,
+            array_to_json(array_agg(
+                CASE
+                    WHEN eventdata.y IS NULL THEN 0
+                    ELSE eventdata.y
+                END ORDER BY xvalue.x)) AS yrow,
+            sum(eventdata.y) AS ysum
+            FROM xvalue
+            LEFT JOIN eventdata
+                ON xvalue.x = eventdata.x
+                AND xvalue.series = eventdata.series
+            GROUP BY 1
+            ORDER BY 1
+        QUERY;
+
+        $query = $this->db->query($query, [
             $jurisdiction,
+            $jurisdiction,
+            $from,
+            $to,
+            $for,
+            $for,
+            $for,
+        ]);
+
+        return $this->getObject($query);
+    }
+
+    public function getByStatisticsStateWhole(array $parameters): array
+    {
+        $for = $parameters[0];
+        $from = $parameters[1];
+        $to = $parameters[2];
+        $jurisdiction = strtoupper($parameters[4]);
+
+        $query = <<<QUERY
+            WITH eventlist AS (
+                SELECT DISTINCT affectedgovernmentgroup.event,
+                    affectedtype.affectedtypecreationdissolution,
+                    government.governmentid
+                FROM geohistory.affectedgovernmentpart
+                JOIN geohistory.government
+                    ON affectedgovernmentpart.governmentto = government.governmentid
+                    AND government.governmentstatus NOT IN ('placeholder', 'proposed', 'unincorporated')
+                    AND government.governmentlevel = 4
+                JOIN geohistory.affectedtype
+                    ON affectedgovernmentpart.affectedtypeto = affectedtype.affectedtypeid
+                    AND affectedtype.affectedtypecreationdissolution = 'begin'
+                JOIN geohistory.affectedgovernmentgrouppart
+                    ON affectedgovernmentpart.affectedgovernmentpartid = affectedgovernmentgrouppart.affectedgovernmentpart
+                JOIN geohistory.affectedgovernmentgroup
+                    ON affectedgovernmentgrouppart.affectedgovernmentgroup = affectedgovernmentgroup.affectedgovernmentgroupid
+                JOIN geohistory.affectedgovernmentlevel
+                    ON affectedgovernmentgrouppart.affectedgovernmentlevel = affectedgovernmentlevel.affectedgovernmentlevelid
+                    AND affectedgovernmentlevel.affectedgovernmentlevelshort LIKE '%municipality'
+                JOIN geohistory.affectedgovernmentgrouppart affectedgovernmentgrouppartparent
+                    ON affectedgovernmentgrouppart.affectedgovernmentgroup = affectedgovernmentgrouppartparent.affectedgovernmentgroup
+                JOIN geohistory.affectedgovernmentlevel affectedgovernmentlevelparent
+                    ON affectedgovernmentgrouppartparent.affectedgovernmentlevel = affectedgovernmentlevelparent.affectedgovernmentlevelid
+                    AND affectedgovernmentlevelparent.affectedgovernmentlevelshort LIKE '%county'
+                JOIN geohistory.affectedgovernmentpart affectedgovernmentpartparent
+                    ON affectedgovernmentgrouppartparent.affectedgovernmentpart = affectedgovernmentpartparent.affectedgovernmentpartid
+                JOIN geohistory.government governmentparent
+                    ON affectedgovernmentpartparent.governmentto = governmentparent.governmentid
+                    AND governmentparent.governmentstatus NOT IN ('placeholder', 'proposed', 'unincorporated')
+                    AND governmentparent.governmentcurrentleadstate = ?
+                JOIN geohistory.government governmentparentsubstitute
+                    ON governmentparent.governmentslugsubstitute = governmentparentsubstitute.governmentslug
+                LEFT JOIN geohistory.governmentidentifier
+                    ON governmentparentsubstitute.governmentid = governmentidentifier.government
+                    AND governmentidentifier.governmentidentifiertype = 1
+                UNION
+                SELECT DISTINCT affectedgovernmentgroup.event,
+                    affectedtype.affectedtypecreationdissolution,
+                    government.governmentid
+                FROM geohistory.affectedgovernmentpart
+                JOIN geohistory.government
+                    ON affectedgovernmentpart.governmentfrom = government.governmentid
+                    AND government.governmentstatus NOT IN ('placeholder', 'proposed', 'unincorporated')
+                    AND government.governmentlevel = 4
+                JOIN geohistory.affectedtype
+                    ON affectedgovernmentpart.affectedtypefrom = affectedtype.affectedtypeid
+                    AND affectedtype.affectedtypecreationdissolution = 'end'
+                JOIN geohistory.affectedgovernmentgrouppart
+                    ON affectedgovernmentpart.affectedgovernmentpartid = affectedgovernmentgrouppart.affectedgovernmentpart
+                JOIN geohistory.affectedgovernmentgroup
+                    ON affectedgovernmentgrouppart.affectedgovernmentgroup = affectedgovernmentgroup.affectedgovernmentgroupid
+                JOIN geohistory.affectedgovernmentlevel
+                    ON affectedgovernmentgrouppart.affectedgovernmentlevel = affectedgovernmentlevel.affectedgovernmentlevelid
+                    AND affectedgovernmentlevel.affectedgovernmentlevelshort LIKE '%municipality'
+                JOIN geohistory.affectedgovernmentgrouppart affectedgovernmentgrouppartparent
+                    ON affectedgovernmentgrouppart.affectedgovernmentgroup = affectedgovernmentgrouppartparent.affectedgovernmentgroup
+                JOIN geohistory.affectedgovernmentlevel affectedgovernmentlevelparent
+                    ON affectedgovernmentgrouppartparent.affectedgovernmentlevel = affectedgovernmentlevelparent.affectedgovernmentlevelid
+                    AND affectedgovernmentlevelparent.affectedgovernmentlevelshort LIKE '%county'
+                JOIN geohistory.affectedgovernmentpart affectedgovernmentpartparent
+                    ON affectedgovernmentgrouppartparent.affectedgovernmentpart = affectedgovernmentpartparent.affectedgovernmentpartid
+                JOIN geohistory.government governmentparent
+                    ON affectedgovernmentpartparent.governmentfrom = governmentparent.governmentid
+                    AND governmentparent.governmentstatus NOT IN ('placeholder', 'proposed', 'unincorporated')
+                    AND governmentparent.governmentcurrentleadstate = ?
+                JOIN geohistory.government governmentparentsubstitute
+                    ON governmentparent.governmentslugsubstitute = governmentparentsubstitute.governmentslug
+                LEFT JOIN geohistory.governmentidentifier
+                    ON governmentparentsubstitute.governmentid = governmentidentifier.government
+                    AND governmentidentifier.governmentidentifiertype = 1
+            ), eventyear AS (
+                SELECT event.eventsortyear AS x,
+                    COALESCE(count(DISTINCT CASE
+                        WHEN eventlist.affectedtypecreationdissolution = 'begin' THEN eventlist.governmentid
+                        ELSE NULL
+                    END), 0)::integer AS begin,
+                    COALESCE(count(DISTINCT CASE
+                        WHEN eventlist.affectedtypecreationdissolution = 'end' THEN eventlist.governmentid
+                        ELSE NULL
+                    END), 0)::integer AS end
+                FROM eventlist
+                JOIN geohistory.event
+                    ON eventlist.event = event.eventid
+                    AND event.eventsortyear >= ?
+                    AND event.eventsortyear <= ?
+                JOIN geohistory.eventgranted
+                    ON event.eventgranted = eventgranted.eventgrantedid
+                    AND eventgranted.eventgrantedsuccess
+                GROUP BY 1
+            ), eventdata AS (
+                SELECT DISTINCT eventyear.x,
+                    CASE
+                        WHEN ? = 'created' THEN eventyear.begin
+                        WHEN ? = 'dissolved' THEN eventyear.end
+                        WHEN ? = 'net' THEN eventyear.begin - eventyear.end
+                        ELSE 0::integer
+                    END AS y
+                FROM eventyear
+            ), xvalue AS (
+                SELECT DISTINCT generate_series(min(eventdata.x),max(eventdata.x)) AS x
+                FROM eventdata
+            )
+            SELECT array_to_json(ARRAY['x'::text] || array_agg(DISTINCT xvalue.x::text ORDER BY xvalue.x::text)) AS datarow
+            FROM xvalue
+            UNION ALL
+            SELECT array_to_json(ARRAY['Whole'] || array_agg(
+                CASE
+                    WHEN eventdata.y IS NULL THEN '0'::text
+                    ELSE eventdata.y::text
+                END ORDER BY xvalue.x)) AS datarow
+            FROM xvalue
+            LEFT JOIN eventdata
+                ON xvalue.x = eventdata.x
+        QUERY;
+
+        $query = $this->db->query($query, [
+            $jurisdiction,
+            $jurisdiction,
+            $from,
+            $to,
+            $for,
+            $for,
+            $for,
         ]);
 
         return $this->getObject($query);
