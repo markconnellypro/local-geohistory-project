@@ -79,7 +79,6 @@ class GovernmentShapeModel extends BaseModel
     }
 
     // FUNCTION: extra.emptytonull
-    // FUNCTION: extra.plsstownshipshort
 
     public function getPartByGovernment(int $id): array
     {
@@ -203,7 +202,7 @@ class GovernmentShapeModel extends BaseModel
                     ELSE governmentshape.governmentshapeid::text
                 END AS governmentshapeslug,
                 '' AS plsstownship,
-                COALESCE(extra.plsstownshipshort(governmentshape.governmentshapeplsstownship), '') AS plsstownshipshort,
+                COALESCE(governmentplsstownship.governmentlong, '') AS plsstownshipshort,
                 COALESCE(governmentsubmunicipality.governmentslugsubstitute, '') AS submunicipality,
                 COALESCE(governmentsubmunicipality.governmentlong, '') AS submunicipalitylong,
                 governmentmunicipality.governmentslugsubstitute AS municipality,
@@ -228,6 +227,8 @@ class GovernmentShapeModel extends BaseModel
                 ON governmentshape.governmentcounty = governmentcounty.governmentid
             LEFT JOIN geohistory.government governmentsubmunicipality
                 ON governmentshape.governmentsubmunicipality = governmentsubmunicipality.governmentid
+            LEFT JOIN geohistory.government governmentplsstownship
+                ON governmentshape.governmentshapeplsstownship = governmentplsstownship.governmentid
             LEFT JOIN governmentshapeevent
                 ON governmentshape.governmentshapeid = governmentshapeevent.governmentshapeid
             WHERE governmentshape.governmentmunicipality = ? OR

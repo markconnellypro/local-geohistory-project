@@ -6,13 +6,11 @@ use App\Models\BaseModel;
 
 class PlssModel extends BaseModel
 {
-    // FUNCTION: extra.plsstownshiplong
-
     public function getByEvent(int $id): array
     {
         $query = <<<QUERY
             -- Need to add support for second division and special survey
-            SELECT extra.plsstownshiplong(plss.plsstownship) AS plsstownship,
+            SELECT government.governmentlong AS plsstownship,
                 plssfirstdivision.plssfirstdivisionlong ||
                     CASE
                         WHEN plss.plssfirstdivisionnumber = '0' THEN ''
@@ -24,10 +22,12 @@ class PlssModel extends BaseModel
                     END AS plssfirstdivision,
                 replace(plss.plssfirstdivisionpart, '|', ', ') AS plssfirstdivisionpart,
                 plss.plssrelationship
-                FROM geohistory.plss
-                    LEFT JOIN geohistory.plssfirstdivision
-                    ON plss.plssfirstdivision = plssfirstdivision.plssfirstdivisionid
-                WHERE event = ?
+            FROM geohistory.plss
+            JOIN geohistory.government
+                ON plss.plsstownship = government.governmentid
+            LEFT JOIN geohistory.plssfirstdivision
+                ON plss.plssfirstdivision = plssfirstdivision.plssfirstdivisionid
+            WHERE event = ?
         QUERY;
 
         $query = $this->db->query($query, [
