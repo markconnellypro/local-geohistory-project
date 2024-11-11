@@ -1360,17 +1360,15 @@ class GovernmentModel extends BaseModel
         return $this->getObject($query);
     }
 
-    // VIEW: extra.governmentrelationcache
-
     public function getSearch(): array
     {
         $query = <<<QUERY
-            SELECT DISTINCT governmentrelationcache.governmentshort,
-                lpad(governmentrelationcache.governmentid::text, 6, '0') AS governmentid,
-                governmentrelationcache.governmentlevel
-            FROM extra.governmentrelationcache
-            WHERE governmentrelationcache.governmentlevel <= 3
-            ORDER BY governmentrelationcache.governmentlevel, 1
+            SELECT DISTINCT government.governmentshort,
+                lpad(government.governmentid::text, 6, '0') AS governmentid,
+                government.governmentlevel
+            FROM geohistory.government
+            WHERE government.governmentlevel <= 3
+            ORDER BY government.governmentlevel, 1
         QUERY;
 
         $query = $this->db->query($query);
