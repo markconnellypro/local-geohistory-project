@@ -41,7 +41,6 @@ if [ "$CI_ENVIRONMENT" = "production" ]; then
   SELECT geohistory.refresh_view();
   SELECT gis.refresh_view();
   SELECT gis.refresh_sequence();
-  SELECT extra.refresh_view();
   "
   ## Save combined commands
   echo "${tableString}" > /tmp/inpostgis/import.sql

@@ -1233,124 +1233,256 @@ class GovernmentModel extends BaseModel
         return [];
     }
 
-    // VIEW: extra.governmentparentcache
-
     public function getRelated(int $id): array
     {
         $query = <<<QUERY
-            WITH relationpart AS (
-                SELECT DISTINCT government.governmentslugsubstitute AS governmentslug,
-                'government' AS governmentslugtype,
-                government.governmentlong,
-                'Parent' AS governmentrelationship,
-                    CASE
-                        WHEN government.governmentstatus = ANY (ARRAY['alternate', 'language']) THEN 'variant'
-                        WHEN governmentparentcache.governmentid <> ? AND governmentparentcache.governmentparentstatus = ANY (ARRAY['current', 'most recent']) THEN 'former'
-                        ELSE governmentparentcache.governmentparentstatus
-                    END AS governmentparentstatus,
-                    CASE
-                        WHEN governmentmapstatus.governmentmapstatusid IS NOT NULL AND governmentmapstatus.governmentmapstatustimelapse AND NOT governmentmapstatus.governmentmapstatusfurtherresearch THEN 'complete'
-                        WHEN governmentmapstatus.governmentmapstatusid IS NOT NULL AND governmentmapstatus.governmentmapstatustimelapse THEN 'research'
-                        WHEN governmentmapstatus.governmentmapstatusid IS NOT NULL AND governmentmapstatus.governmentmapstatusfurtherresearch THEN 'incomplete'
-                        ELSE 'none'
-                    END AS governmentcolor,
-                governmentparentcache.governmentid = ? AS isgovernmentsubstitute
-                FROM extra.governmentparentcache
-                JOIN geohistory.government
-                    ON governmentparentcache.governmentparent = government.governmentid
-                JOIN geohistory.government governmentparentgovernment
-                    ON governmentparentcache.governmentid = governmentparentgovernment.governmentid
-                JOIN geohistory.government governmentsubstitute
-                    ON governmentparentgovernment.governmentslugsubstitute = governmentsubstitute.governmentslugsubstitute
-                    AND governmentsubstitute.governmentid = ?
-                LEFT JOIN geohistory.governmentmapstatus
-                    ON government.governmentmapstatus = governmentmapstatus.governmentmapstatusid
-                    AND governmentmapstatus.governmentmapstatusreviewed
-                    AND (government.governmentstatus <> ALL (ARRAY['proposed', 'unincorporated']))
-                WHERE governmentparentcache.governmentparentstatus <> 'placeholder' AND governmentparentcache.governmentparent IS NOT NULL
-                UNION
-                SELECT DISTINCT government.governmentslugsubstitute AS governmentslug,
-                'government' AS governmentslugtype,
-                government.governmentlong,
-                'Child' AS governmentrelationship,
-                    CASE
-                        WHEN government.governmentstatus = ANY (ARRAY['alternate', 'language']) THEN 'variant'
-                        WHEN governmentparentcache.governmentparent <> ? AND governmentparentcache.governmentparentstatus = ANY (ARRAY['current', 'most recent']) THEN 'former'
-                        ELSE governmentparentcache.governmentparentstatus
-                    END AS governmentparentstatus,
-                    CASE
-                        WHEN governmentmapstatus.governmentmapstatusid IS NOT NULL AND governmentmapstatus.governmentmapstatustimelapse AND NOT governmentmapstatus.governmentmapstatusfurtherresearch THEN 'complete'
-                        WHEN governmentmapstatus.governmentmapstatusid IS NOT NULL AND governmentmapstatus.governmentmapstatustimelapse THEN 'research'
-                        WHEN governmentmapstatus.governmentmapstatusid IS NOT NULL AND governmentmapstatus.governmentmapstatusfurtherresearch THEN 'incomplete'
-                        ELSE 'none'
-                    END AS governmentcolor,
-                governmentparentcache.governmentparent = ? AS isgovernmentsubstitute
-                FROM extra.governmentparentcache
-                JOIN geohistory.government leadgovernment
-                    ON governmentparentcache.governmentparent = leadgovernment.governmentid
-                JOIN geohistory.government
-                    ON governmentparentcache.governmentid = government.governmentid
-                    AND NOT (leadgovernment.governmentlevel < 3 AND (government.governmentlevel - leadgovernment.governmentlevel) > 1)
-                JOIN geohistory.government governmentparent
-                    ON governmentparentcache.governmentparent = governmentparent.governmentid
-                JOIN geohistory.government governmentsubstitute
-                    ON governmentparent.governmentslugsubstitute = governmentsubstitute.governmentslugsubstitute
-                    AND governmentsubstitute.governmentid = ?
-                LEFT JOIN geohistory.governmentmapstatus
-                    ON government.governmentmapstatus = governmentmapstatus.governmentmapstatusid
-                    AND governmentmapstatus.governmentmapstatusreviewed
-                    AND (government.governmentstatus <> ALL (ARRAY['proposed', 'unincorporated']))
-                WHERE governmentparentcache.governmentparentstatus <> 'placeholder'
-                UNION
-                SELECT DISTINCT event.eventslug AS governmentslug,
-                'event' AS governmentslugtype,
-                government.governmentlong,
-                    CASE
-                        WHEN government.governmentstatus = ANY (ARRAY['alternate', 'language']) THEN 'Variant'
-                        ELSE 'Historic'
-                    END AS governmentrelationship,
-                    CASE
-                        WHEN government.governmentstatus = ANY (ARRAY['alternate', 'language']) THEN 'variant'
-                        ELSE 'former'
-                    END AS governmentparentstatus,
-                'none' AS governmentcolor,
-                government.governmentid = ? AS isgovernmentsubstitute
+            WITH governmentmatch AS (
+                SELECT DISTINCT governmentsubstitute.governmentid,
+                    governmentsubstitute.governmentstatus,
+                    governmentsubstitute.governmentcurrentleadparent,
+                    governmentsubstitute.governmentcurrentleadstateid
                 FROM geohistory.government
                 JOIN geohistory.government governmentsubstitute
                     ON government.governmentslugsubstitute = governmentsubstitute.governmentslugsubstitute
-                    AND governmentsubstitute.governmentid = ?
-                    AND government.governmentid <> governmentsubstitute.governmentid
+                    AND government.governmentid = ?
+            ), governmentrelation AS (
+                SELECT DISTINCT COALESCE(event.eventslug, '') AS governmentslug,
+                    governmentsubstitute.governmentlong,
+                    CASE
+                        WHEN governmentsubstitute.governmentstatus = 'defunct' THEN 'Historic'
+                        ELSE 'Variant'
+                    END AS governmentrelationship,
+                    CASE
+                        WHEN governmentsubstitute.governmentstatus = 'defunct' THEN 'former'
+                        ELSE 'variant'
+                    END AS governmentparentstatus,
+                    'event' AS governmentslugtype
+                FROM governmentmatch
+                JOIN geohistory.government governmentsubstitute
+                    ON governmentmatch.governmentid = governmentsubstitute.governmentid
+                    AND governmentsubstitute.governmentid <> ?
                 LEFT JOIN geohistory.event
-                    ON government.governmentid = event.government
-            ), relationrank AS (
-                SELECT relationpart.governmentslug,
-                    relationpart.governmentslugtype,
-                    relationpart.governmentlong,
-                    relationpart.governmentrelationship,
-                    relationpart.governmentparentstatus,
-                    relationpart.governmentcolor,
-                    row_number() OVER (PARTITION BY relationpart.governmentslug, relationpart.governmentlong, relationpart.governmentrelationship ORDER BY relationpart.isgovernmentsubstitute DESC, (
-                        CASE
-                            WHEN relationpart.governmentparentstatus = 'current' THEN 1
-                            WHEN relationpart.governmentparentstatus = 'most recent' THEN 2
-                            WHEN relationpart.governmentparentstatus = 'former' THEN 3
-                            WHEN relationpart.governmentparentstatus = 'variant' THEN 4
+                    ON governmentsubstitute.governmentid = event.government
+                UNION DISTINCT
+                SELECT DISTINCT governmentsubstitute.governmentslugsubstitute AS governmentslug,
+                    governmentsubstitute.governmentlong,
+                    CASE
+                        WHEN affectedgovernmentlevel.affectedgovernmentlevelgroup > otheraffectedgovernmentlevel.affectedgovernmentlevelgroup THEN 'Parent'
+                        WHEN affectedgovernmentlevel.affectedgovernmentlevelgroup < otheraffectedgovernmentlevel.affectedgovernmentlevelgroup THEN 'Child'
+                        ELSE 'Even'
+                    END AS governmentrelationship,
+                    CASE
+                        WHEN NOT eventgranted.eventgrantedsuccess THEN 'proposed'
+                        WHEN government.governmentid <> governmentsubstitute.governmentid THEN 'variant'
+                        WHEN affectedtype.affectedtypeid = 12 THEN 'reference'
+                        ELSE 'former'
+                    END AS governmentparentstatus,
+                    'government' AS governmentslugtype
+                FROM governmentmatch
+                JOIN geohistory.affectedgovernmentpart
+                    ON governmentmatch.governmentid = affectedgovernmentpart.governmentfrom
+                JOIN geohistory.affectedgovernmentgrouppart
+                    ON affectedgovernmentpart.affectedgovernmentpartid = affectedgovernmentgrouppart.affectedgovernmentpart
+                JOIN geohistory.affectedgovernmentgroup
+                    ON affectedgovernmentgrouppart.affectedgovernmentgroup = affectedgovernmentgroup.affectedgovernmentgroupid
+                JOIN geohistory.event
+                    ON affectedgovernmentgroup.event = event.eventid
+                JOIN geohistory.eventgranted
+                    ON event.eventgranted = eventgranted.eventgrantedid
+                JOIN geohistory.affectedgovernmentlevel
+                    ON affectedgovernmentgrouppart.affectedgovernmentlevel = affectedgovernmentlevel.affectedgovernmentlevelid
+                JOIN geohistory.affectedgovernmentgrouppart otheraffectedgovernmentgrouppart
+                    ON affectedgovernmentgrouppart.affectedgovernmentgroup = otheraffectedgovernmentgrouppart.affectedgovernmentgroup
+                JOIN geohistory.affectedgovernmentlevel otheraffectedgovernmentlevel
+                    ON otheraffectedgovernmentgrouppart.affectedgovernmentlevel = otheraffectedgovernmentlevel.affectedgovernmentlevelid
+                JOIN geohistory.affectedgovernmentpart otheraffectedgovernmentpart
+                    ON otheraffectedgovernmentgrouppart.affectedgovernmentpart = otheraffectedgovernmentpart.affectedgovernmentpartid
+                JOIN geohistory.affectedtype
+                    ON otheraffectedgovernmentpart.affectedtypefrom = affectedtype.affectedtypeid
+                JOIN geohistory.government
+                    ON otheraffectedgovernmentpart.governmentfrom = government.governmentid
+                JOIN geohistory.government governmentsubstitute
+                    ON government.governmentslugsubstitute = governmentsubstitute.governmentslugsubstitute
+                    AND governmentsubstitute.governmentid <> ?
+                    AND governmentsubstitute.governmentstatus <> 'placeholder'
+                UNION DISTINCT
+                SELECT DISTINCT governmentsubstitute.governmentslugsubstitute AS governmentslug,
+                    governmentsubstitute.governmentlong,
+                    CASE
+                        WHEN affectedgovernmentlevel.affectedgovernmentlevelgroup > otheraffectedgovernmentlevel.affectedgovernmentlevelgroup THEN 'Parent'
+                        WHEN affectedgovernmentlevel.affectedgovernmentlevelgroup < otheraffectedgovernmentlevel.affectedgovernmentlevelgroup THEN 'Child'
+                        ELSE 'Even'
+                    END AS governmentrelationship,
+                    CASE
+                        WHEN NOT eventgranted.eventgrantedsuccess THEN 'proposed'
+                        WHEN government.governmentid <> governmentsubstitute.governmentid THEN 'variant'
+                        WHEN affectedtype.affectedtypeid = 12 THEN 'reference'
+                        ELSE 'former'
+                    END AS governmentparentstatus,
+                    'government' AS governmentslugtype
+                FROM governmentmatch
+                JOIN geohistory.affectedgovernmentpart
+                    ON governmentmatch.governmentid = affectedgovernmentpart.governmentto
+                JOIN geohistory.affectedgovernmentgrouppart
+                    ON affectedgovernmentpart.affectedgovernmentpartid = affectedgovernmentgrouppart.affectedgovernmentpart
+                JOIN geohistory.affectedgovernmentgroup
+                    ON affectedgovernmentgrouppart.affectedgovernmentgroup = affectedgovernmentgroup.affectedgovernmentgroupid
+                JOIN geohistory.event
+                    ON affectedgovernmentgroup.event = event.eventid
+                JOIN geohistory.eventgranted
+                    ON event.eventgranted = eventgranted.eventgrantedid
+                JOIN geohistory.affectedgovernmentlevel
+                    ON affectedgovernmentgrouppart.affectedgovernmentlevel = affectedgovernmentlevel.affectedgovernmentlevelid
+                JOIN geohistory.affectedgovernmentgrouppart otheraffectedgovernmentgrouppart
+                    ON affectedgovernmentgrouppart.affectedgovernmentgroup = otheraffectedgovernmentgrouppart.affectedgovernmentgroup
+                JOIN geohistory.affectedgovernmentlevel otheraffectedgovernmentlevel
+                    ON otheraffectedgovernmentgrouppart.affectedgovernmentlevel = otheraffectedgovernmentlevel.affectedgovernmentlevelid
+                JOIN geohistory.affectedgovernmentpart otheraffectedgovernmentpart
+                    ON otheraffectedgovernmentgrouppart.affectedgovernmentpart = otheraffectedgovernmentpart.affectedgovernmentpartid
+                JOIN geohistory.affectedtype
+                    ON otheraffectedgovernmentpart.affectedtypeto = affectedtype.affectedtypeid
+                JOIN geohistory.government
+                    ON otheraffectedgovernmentpart.governmentto = government.governmentid
+                JOIN geohistory.government governmentsubstitute
+                    ON government.governmentslugsubstitute = governmentsubstitute.governmentslugsubstitute
+                    AND governmentsubstitute.governmentid <> ?
+                    AND governmentsubstitute.governmentstatus <> 'placeholder'
+                UNION DISTINCT
+                SELECT DISTINCT governmentsubstitute.governmentslugsubstitute AS governmentslug,
+                    governmentsubstitute.governmentlong,
+                    'Parent' AS governmentrelationship,
+                    CASE
+                        WHEN governmentmatch.governmentstatus IN ('alternate', 'language') OR governmentsubstitute.governmentstatus IN ('alternate', 'language') THEN 'variant'
+                        WHEN governmentmatch.governmentstatus = 'proposed' OR governmentsubstitute.governmentstatus = 'proposed' THEN 'proposed'
+                        WHEN governmentmatch.governmentstatus = 'defunct' OR governmentsubstitute.governmentstatus = 'defunct' THEN 'former'
+                        ELSE 'current'
+                    END AS governmentparentstatus,
+                    'government' AS governmentslugtype
+                FROM governmentmatch
+                JOIN geohistory.government
+                    ON governmentmatch.governmentcurrentleadparent = government.governmentid
+                JOIN geohistory.government governmentsubstitute
+                    ON government.governmentslugsubstitute = governmentsubstitute.governmentslugsubstitute
+                    AND governmentsubstitute.governmentid <> ?
+                UNION DISTINCT
+                SELECT DISTINCT governmentsubstitute.governmentslugsubstitute AS governmentslug,
+                    governmentsubstitute.governmentlong,
+                    'Child' AS governmentrelationship,
+                    CASE
+                        WHEN governmentmatch.governmentstatus IN ('alternate', 'language') OR governmentsubstitute.governmentstatus IN ('alternate', 'language') THEN 'variant'
+                        WHEN governmentmatch.governmentstatus = 'proposed' OR governmentsubstitute.governmentstatus = 'proposed' THEN 'proposed'
+                        WHEN governmentmatch.governmentstatus = 'defunct' OR governmentsubstitute.governmentstatus = 'defunct' THEN 'former'
+                        ELSE 'current'
+                    END AS governmentparentstatus,
+                    'government' AS governmentslugtype
+                FROM governmentmatch
+                JOIN geohistory.government
+                    ON governmentmatch.governmentid = government.governmentcurrentleadparent
+                JOIN geohistory.government governmentsubstitute
+                    ON government.governmentslugsubstitute = governmentsubstitute.governmentslugsubstitute
+                    AND governmentsubstitute.governmentid <> ?
+                UNION DISTINCT
+                SELECT DISTINCT governmentsubstitute.governmentslugsubstitute AS governmentslug,
+                    governmentsubstitute.governmentlong,
+                    'Parent' AS governmentrelationship,
+                    CASE
+                        WHEN governmentmatch.governmentstatus IN ('alternate', 'language') OR governmentsubstitute.governmentstatus IN ('alternate', 'language') THEN 'variant'
+                        WHEN governmentmatch.governmentstatus = 'proposed' OR governmentsubstitute.governmentstatus = 'proposed' THEN 'proposed'
+                        WHEN governmentmatch.governmentstatus = 'defunct' OR governmentsubstitute.governmentstatus = 'defunct' THEN 'former'
+                        ELSE 'current'
+                    END AS governmentparentstatus,
+                    'government' AS governmentslugtype
+                FROM governmentmatch
+                JOIN geohistory.government
+                    ON governmentmatch.governmentcurrentleadstateid = government.governmentid
+                JOIN geohistory.government governmentsubstitute
+                    ON government.governmentslugsubstitute = governmentsubstitute.governmentslugsubstitute
+                    AND governmentsubstitute.governmentid <> ?
+                UNION DISTINCT
+                SELECT DISTINCT governmentsubstitute.governmentslugsubstitute AS governmentslug,
+                    governmentsubstitute.governmentlong,
+                    'Child' AS governmentrelationship,
+                    CASE
+                        WHEN governmentmatch.governmentstatus IN ('alternate', 'language') OR governmentsubstitute.governmentstatus IN ('alternate', 'language') THEN 'variant'
+                        WHEN governmentmatch.governmentstatus = 'proposed' OR governmentsubstitute.governmentstatus = 'proposed' THEN 'proposed'
+                        WHEN governmentmatch.governmentstatus = 'defunct' OR governmentsubstitute.governmentstatus = 'defunct' THEN 'former'
+                        ELSE 'current'
+                    END AS governmentparentstatus,
+                    'government' AS governmentslugtype
+                FROM governmentmatch
+                JOIN geohistory.government
+                    ON governmentmatch.governmentid = government.governmentcurrentleadstateid
+                JOIN geohistory.government governmentsubstitute
+                    ON government.governmentslugsubstitute = governmentsubstitute.governmentslugsubstitute
+                    AND governmentsubstitute.governmentid <> ?
+                UNION DISTINCT
+                SELECT DISTINCT governmentsubstitute.governmentslugsubstitute AS governmentslug,
+                    governmentsubstitute.governmentlong,
+                    'Parent' AS governmentrelationship,
+                    CASE
+                        WHEN governmentmatch.governmentstatus IN ('alternate', 'language') OR governmentsubstitute.governmentstatus IN ('alternate', 'language') THEN 'variant'
+                        WHEN governmentmatch.governmentstatus = 'proposed' OR governmentsubstitute.governmentstatus = 'proposed' THEN 'proposed'
+                        WHEN governmentmatch.governmentstatus = 'defunct' OR governmentsubstitute.governmentstatus = 'defunct' THEN 'former'
+                        ELSE 'current'
+                    END AS governmentparentstatus,
+                    'government' AS governmentslugtype
+                FROM governmentmatch
+                JOIN geohistory.governmentothercurrentparent
+                    ON governmentmatch.governmentid = governmentothercurrentparent.government
+                JOIN geohistory.government
+                    ON governmentothercurrentparent.governmentothercurrentparent = government.governmentid
+                JOIN geohistory.government governmentsubstitute
+                    ON government.governmentslugsubstitute = governmentsubstitute.governmentslugsubstitute
+                    AND governmentsubstitute.governmentid <> ?
+                UNION DISTINCT
+                SELECT DISTINCT governmentsubstitute.governmentslugsubstitute AS governmentslug,
+                    governmentsubstitute.governmentlong,
+                    'Child' AS governmentrelationship,
+                    CASE
+                        WHEN governmentmatch.governmentstatus IN ('alternate', 'language') OR governmentsubstitute.governmentstatus IN ('alternate', 'language') THEN 'variant'
+                        WHEN governmentmatch.governmentstatus = 'proposed' OR governmentsubstitute.governmentstatus = 'proposed' THEN 'proposed'
+                        WHEN governmentmatch.governmentstatus = 'defunct' OR governmentsubstitute.governmentstatus = 'defunct' THEN 'former'
+                        ELSE 'current'
+                    END AS governmentparentstatus,
+                    'government' AS governmentslugtype
+                FROM governmentmatch
+                JOIN geohistory.governmentothercurrentparent
+                    ON governmentmatch.governmentid = governmentothercurrentparent.governmentothercurrentparent
+                JOIN geohistory.government
+                    ON governmentothercurrentparent.government = government.governmentid
+                JOIN geohistory.government governmentsubstitute
+                    ON government.governmentslugsubstitute = governmentsubstitute.governmentslugsubstitute
+                    AND governmentsubstitute.governmentid <> ?
+            ), governmentrelationrank AS (
+                SELECT governmentrelation.governmentslug,
+                    governmentrelation.governmentlong,
+                    governmentrelation.governmentrelationship,
+                    governmentrelation.governmentparentstatus,
+                    ROW_NUMBER () OVER (PARTITION BY governmentrelation.governmentlong
+                        ORDER BY CASE
+                            WHEN governmentrelation.governmentrelationship = 'Historic' THEN 1
+                            WHEN governmentrelation.governmentrelationship = 'Variant' THEN 2
+                            ELSE 3
+                        END, CASE
+                            WHEN governmentrelation.governmentparentstatus = 'current' THEN 1
+                            WHEN governmentrelation.governmentparentstatus = 'former' THEN 2
+                            WHEN governmentrelation.governmentparentstatus = 'variant' THEN 3
+                            WHEN governmentrelation.governmentparentstatus = 'proposed' THEN 4
                             ELSE 5
-                        END)) AS roworder
-                FROM relationpart
+                        END) AS governmentrelationrank
+                FROM governmentrelation
             )
-            SELECT relationrank.governmentslug,
-                relationrank.governmentslugtype,
-                relationrank.governmentlong,
-                relationrank.governmentrelationship,
-                relationrank.governmentparentstatus,
-                relationrank.governmentcolor
-            FROM relationrank
-            WHERE relationrank.roworder = 1
-            ORDER BY 3 DESC, 2, 4, 1
+            SELECT *,
+                'none' AS governmentcolor,
+                'government' AS governmentslugtype
+            FROM governmentrelationrank
+            WHERE governmentrelationrank = 1
+            ORDER BY 2
         QUERY;
 
         $query = $this->db->query($query, [
+            $id,
+            $id,
             $id,
             $id,
             $id,
