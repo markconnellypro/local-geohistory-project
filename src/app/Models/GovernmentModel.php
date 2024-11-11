@@ -1380,61 +1380,137 @@ class GovernmentModel extends BaseModel
         return $this->getArray($query);
     }
 
-    // VIEW: extra.governmentrelationcache
-
     public function getSearchByGovernment(array $parameters): array
     {
-        $government = $parameters[0];
-        $parent = $parameters[1];
+        if ($parameters[3] === 'statewide') {
+            $government = $this->getIdByGovernmentShort($parameters[1]);
+        } else {
+            $government = $this->getIdByGovernmentShort($parameters[0], $parameters[1]);
+        }
         $level = $parameters[2];
-        $type = $parameters[3];
 
         $query = <<<QUERY
-            WITH selectedgovernment AS (
-                SELECT DISTINCT governmentrelationcache.governmentid
-                FROM extra.governmentrelationcache
-                JOIN extra.governmentrelationcache lookupgovernment
-                    ON governmentrelationcache.governmentid = lookupgovernment.governmentid
-                    AND lookupgovernment.governmentid <> lookupgovernment.governmentrelation
-                JOIN geohistory.government governmentparent
-                    ON lookupgovernment.governmentrelation = governmentparent.governmentid
-                    AND (? = ''::text OR governmentparent.governmentshort = ?)
-                WHERE (
-                    governmentrelationcache.governmentshort ILIKE ?
-                    OR (? = 'statewide' AND governmentrelationcache.governmentlevel = 2)
-                )
-            )
-            SELECT DISTINCT government.governmentslugsubstitute AS governmentslug,
-                government.governmentlong
-                FROM selectedgovernment
-                JOIN extra.governmentrelationcache
-                ON selectedgovernment.governmentid = governmentrelationcache.governmentid 
-                AND governmentrelationcache.governmentrelationlevel = ?
-                AND (? = 'government' OR governmentrelationcache.governmentrelationlevel < 4)
-                JOIN geohistory.government
-                ON governmentrelationcache.governmentrelation = government.governmentid
+            SELECT DISTINCT governmentsubstitute.governmentslugsubstitute AS governmentslug,
+                governmentsubstitute.governmentlong
+            FROM geohistory.government
+            JOIN geohistory.government governmentsubstitute
+                ON government.governmentslugsubstitute = governmentsubstitute.governmentslugsubstitute
+                AND government.governmentid = ANY (?) 
+                AND governmentsubstitute.governmentlevel = ?
             UNION DISTINCT
-            SELECT DISTINCT government.governmentslugsubstitute AS governmentslug,
-                government.governmentlong
-                FROM selectedgovernment
-                JOIN extra.governmentrelationcache
-                ON selectedgovernment.governmentid = governmentrelationcache.governmentrelation
-                AND governmentrelationcache.governmentlevel = ?
-                AND (? = 'government' OR governmentrelationcache.governmentlevel < 4)
-                JOIN geohistory.government
-                ON governmentrelationcache.governmentid = government.governmentid
+            SELECT DISTINCT governmentsubstitute.governmentslugsubstitute AS governmentslug,
+                governmentsubstitute.governmentlong
+            FROM geohistory.affectedgovernmentpart
+            JOIN geohistory.affectedgovernmentgrouppart
+                ON affectedgovernmentpart.governmentfrom = ANY (?)
+                AND affectedgovernmentpart.affectedgovernmentpartid = affectedgovernmentgrouppart.affectedgovernmentpart
+            JOIN geohistory.affectedgovernmentgrouppart otheraffectedgovernmentgrouppart
+                ON affectedgovernmentgrouppart.affectedgovernmentgroup = otheraffectedgovernmentgrouppart.affectedgovernmentgroup
+            JOIN geohistory.affectedgovernmentpart otheraffectedgovernmentpart
+                ON otheraffectedgovernmentgrouppart.affectedgovernmentpart = otheraffectedgovernmentpart.affectedgovernmentpartid
+            JOIN geohistory.government
+                ON otheraffectedgovernmentpart.governmentfrom = government.governmentid
+            JOIN geohistory.government governmentsubstitute
+                ON government.governmentslugsubstitute = governmentsubstitute.governmentslugsubstitute
+                AND governmentsubstitute.governmentlevel = ?
+            UNION DISTINCT
+            SELECT DISTINCT governmentsubstitute.governmentslugsubstitute AS governmentslug,
+                governmentsubstitute.governmentlong
+            FROM geohistory.affectedgovernmentpart
+            JOIN geohistory.affectedgovernmentgrouppart
+                ON affectedgovernmentpart.governmentto = ANY (?)
+                AND affectedgovernmentpart.affectedgovernmentpartid = affectedgovernmentgrouppart.affectedgovernmentpart
+            JOIN geohistory.affectedgovernmentgrouppart otheraffectedgovernmentgrouppart
+                ON affectedgovernmentgrouppart.affectedgovernmentgroup = otheraffectedgovernmentgrouppart.affectedgovernmentgroup
+            JOIN geohistory.affectedgovernmentpart otheraffectedgovernmentpart
+                ON otheraffectedgovernmentgrouppart.affectedgovernmentpart = otheraffectedgovernmentpart.affectedgovernmentpartid
+            JOIN geohistory.government
+                ON otheraffectedgovernmentpart.governmentto = government.governmentid
+            JOIN geohistory.government governmentsubstitute
+                ON government.governmentslugsubstitute = governmentsubstitute.governmentslugsubstitute
+                AND governmentsubstitute.governmentlevel = ?
+            UNION DISTINCT
+            SELECT DISTINCT governmentsubstitute.governmentslugsubstitute AS governmentslug,
+                governmentsubstitute.governmentlong
+            FROM geohistory.government lookupgovernment
+            JOIN geohistory.government
+                ON lookupgovernment.governmentid = ANY (?)
+                AND lookupgovernment.governmentcurrentleadparent = government.governmentid
+            JOIN geohistory.government governmentsubstitute
+                ON government.governmentslugsubstitute = governmentsubstitute.governmentslugsubstitute
+                AND governmentsubstitute.governmentlevel = ?
+            UNION DISTINCT
+            SELECT DISTINCT governmentsubstitute.governmentslugsubstitute AS governmentslug,
+                governmentsubstitute.governmentlong
+            FROM geohistory.government lookupgovernment
+            JOIN geohistory.government
+                ON lookupgovernment.governmentid = ANY (?)
+                AND lookupgovernment.governmentid = government.governmentcurrentleadparent
+            JOIN geohistory.government governmentsubstitute
+                ON government.governmentslugsubstitute = governmentsubstitute.governmentslugsubstitute
+                AND governmentsubstitute.governmentlevel = ?
+            UNION DISTINCT
+            SELECT DISTINCT governmentsubstitute.governmentslugsubstitute AS governmentslug,
+                governmentsubstitute.governmentlong
+            FROM geohistory.government lookupgovernment
+            JOIN geohistory.government
+                ON lookupgovernment.governmentid = ANY (?)
+                AND lookupgovernment.governmentcurrentleadstateid = government.governmentid
+            JOIN geohistory.government governmentsubstitute
+                ON government.governmentslugsubstitute = governmentsubstitute.governmentslugsubstitute
+                AND governmentsubstitute.governmentlevel = ?
+            UNION DISTINCT
+            SELECT DISTINCT governmentsubstitute.governmentslugsubstitute AS governmentslug,
+                governmentsubstitute.governmentlong
+            FROM geohistory.government lookupgovernment
+            JOIN geohistory.government
+                ON lookupgovernment.governmentid = ANY (?)
+                AND lookupgovernment.governmentid = government.governmentcurrentleadstateid
+            JOIN geohistory.government governmentsubstitute
+                ON government.governmentslugsubstitute = governmentsubstitute.governmentslugsubstitute
+                AND governmentsubstitute.governmentlevel = ?
+            UNION DISTINCT
+            SELECT DISTINCT governmentsubstitute.governmentslugsubstitute AS governmentslug,
+                governmentsubstitute.governmentlong
+            FROM geohistory.governmentothercurrentparent
+            JOIN geohistory.government
+                ON governmentothercurrentparent.government = ANY (?)
+                AND governmentothercurrentparent.governmentothercurrentparent = government.governmentid
+            JOIN geohistory.government governmentsubstitute
+                ON government.governmentslugsubstitute = governmentsubstitute.governmentslugsubstitute
+                AND governmentsubstitute.governmentlevel = ?
+            UNION DISTINCT
+            SELECT DISTINCT governmentsubstitute.governmentslugsubstitute AS governmentslug,
+                governmentsubstitute.governmentlong
+            FROM geohistory.governmentothercurrentparent
+            JOIN geohistory.government
+                ON governmentothercurrentparent.governmentothercurrentparent = ANY (?)
+                AND governmentothercurrentparent.government = government.governmentid
+            JOIN geohistory.government governmentsubstitute
+                ON government.governmentslugsubstitute = governmentsubstitute.governmentslugsubstitute
+                AND governmentsubstitute.governmentlevel = ?
             ORDER BY 2
         QUERY;
 
         $query = $this->db->query($query, [
-            $parent,
-            $parent,
             $government,
-            $type,
             $level,
-            $type,
+            $government,
             $level,
-            $type
+            $government,
+            $level,
+            $government,
+            $level,
+            $government,
+            $level,
+            $government,
+            $level,
+            $government,
+            $level,
+            $government,
+            $level,
+            $government,
+            $level,
         ]);
 
         return $this->getObject($query);
