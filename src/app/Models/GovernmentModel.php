@@ -101,7 +101,7 @@ class GovernmentModel extends BaseModel
                 GROUP BY affectedgovernmentsummaryevent.governmentid
             ), creation AS (
                 SELECT affectedgovernmentsummaryevent.governmentid,
-                    extra.array_combine(array_agg(affectedgovernmentsummaryevent.originalgovernmentid)) AS originalgovernmentid,
+                    geohistory.array_combine(array_agg(affectedgovernmentsummaryevent.originalgovernmentid)) AS originalgovernmentid,
                     array_agg(DISTINCT affectedgovernmentsummaryevent.eventid ORDER BY affectedgovernmentsummaryevent.eventid) AS eventid,
                     array_agg(DISTINCT affectedgovernmentsummaryevent.eventsortdate) AS eventsortdate,
                     array_agg(DISTINCT affectedgovernmentsummaryevent.eventdatetext) AS eventdatetext,
@@ -113,7 +113,7 @@ class GovernmentModel extends BaseModel
                 GROUP BY affectedgovernmentsummaryevent.governmentid
             ), dissolution AS (
                 SELECT affectedgovernmentsummaryevent.governmentid,
-                    extra.array_combine(array_agg(affectedgovernmentsummaryevent.originalgovernmentid)) AS originalgovernmentid,
+                    geohistory.array_combine(array_agg(affectedgovernmentsummaryevent.originalgovernmentid)) AS originalgovernmentid,
                     array_agg(DISTINCT affectedgovernmentsummaryevent.eventid ORDER BY affectedgovernmentsummaryevent.eventid) AS eventid,
                     array_agg(DISTINCT affectedgovernmentsummaryevent.eventsortdate) AS eventsortdate,
                     array_agg(DISTINCT affectedgovernmentsummaryevent.eventdatetext) AS eventdatetext,
