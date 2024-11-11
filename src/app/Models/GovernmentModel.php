@@ -6,8 +6,6 @@ use App\Models\BaseModel;
 
 class GovernmentModel extends BaseModel
 {
-    // VIEW: extra.governmentchangecountcache
-
     public function getDetail(int|string $id): array
     {
         if (!is_int($id)) {
@@ -15,6 +13,198 @@ class GovernmentModel extends BaseModel
         }
 
         $query = <<<QUERY
+            WITH affectedgovernmentsummary AS (
+                SELECT DISTINCT affectedgovernmentgroup.event AS eventid,
+                    government_1.governmentid,
+                    originalgovernment.governmentid AS originalgovernmentid,
+                    affectedgovernmentpart.affectedtypefrom AS affectedtypeid,
+                    'from'::text AS affectedside
+                FROM geohistory.affectedgovernmentgroup
+                    JOIN geohistory.affectedgovernmentgrouppart ON affectedgovernmentgroup.affectedgovernmentgroupid = affectedgovernmentgrouppart.affectedgovernmentgroup
+                    JOIN geohistory.affectedgovernmentpart ON affectedgovernmentgrouppart.affectedgovernmentpart = affectedgovernmentpart.affectedgovernmentpartid
+                    JOIN geohistory.government originalgovernment ON affectedgovernmentpart.governmentfrom = originalgovernment.governmentid
+                    JOIN geohistory.government government_1 ON originalgovernment.governmentslugsubstitute = government_1.governmentslug AND government_1.governmentid = ?
+                UNION
+                SELECT DISTINCT affectedgovernmentgroup.event AS eventid,
+                    government_1.governmentid,
+                    originalgovernment.governmentid AS originalgovernmentid,
+                    affectedgovernmentpart.affectedtypeto AS affectedtypeid,
+                    'to'::text AS affectedside
+                FROM geohistory.affectedgovernmentgroup
+                    JOIN geohistory.affectedgovernmentgrouppart ON affectedgovernmentgroup.affectedgovernmentgroupid = affectedgovernmentgrouppart.affectedgovernmentgroup
+                    JOIN geohistory.affectedgovernmentpart ON affectedgovernmentgrouppart.affectedgovernmentpart = affectedgovernmentpart.affectedgovernmentpartid
+                    JOIN geohistory.government originalgovernment ON affectedgovernmentpart.governmentto = originalgovernment.governmentid
+                    JOIN geohistory.government government_1 ON originalgovernment.governmentslugsubstitute = government_1.governmentslug AND government_1.governmentid = ?
+            ), affectedgovernmentsummaryeventpart AS (
+                SELECT affectedgovernmentsummary.eventid,
+                    affectedgovernmentsummary.governmentid,
+                    array_agg(DISTINCT affectedgovernmentsummary.originalgovernmentid ORDER BY affectedgovernmentsummary.originalgovernmentid) AS originalgovernmentid,
+                    affectedgovernmentsummary.affectedtypeid,
+                    affectedgovernmentsummary.affectedside,
+                    affectedtype.affectedtypecreationdissolution,
+                    event.eventsortdate,
+                    event.eventdatetext,
+                    initcap((event.eventeffective::calendar.historicdate)."precision") AS eventeffectiveprecision,
+                    eventeffectivetype.eventeffectivetypelong AS eventeffectivetype,
+                    sum(
+                        CASE
+                            WHEN eventrelationship.eventrelationshipid IS NOT NULL THEN 1
+                            ELSE 0
+                        END) AS lawsection
+                FROM affectedgovernmentsummary
+                    JOIN geohistory.event ON affectedgovernmentsummary.eventid = event.eventid
+                    LEFT JOIN geohistory.eventeffectivetype ON event.eventeffectivetypepresumedsource = eventeffectivetype.eventeffectivetypeid
+                    JOIN geohistory.eventgranted ON event.eventgranted = eventgranted.eventgrantedid AND eventgranted.eventgrantedsuccess
+                    JOIN geohistory.affectedtype ON affectedgovernmentsummary.affectedtypeid = affectedtype.affectedtypeid
+                    LEFT JOIN geohistory.lawsectionevent ON event.eventid = lawsectionevent.event
+                    LEFT JOIN geohistory.eventrelationship ON lawsectionevent.eventrelationship = eventrelationship.eventrelationshipid AND eventrelationship.eventrelationshipsufficient
+                GROUP BY affectedgovernmentsummary.eventid, affectedgovernmentsummary.governmentid, affectedgovernmentsummary.affectedtypeid, affectedgovernmentsummary.affectedside, affectedtype.affectedtypecreationdissolution, event.eventsortdate, event.eventdatetext, eventeffectivetype.eventeffectivetypelong, event.eventeffective, event.eventfrom, event.eventto
+            ), creationdissolution AS (
+                SELECT DISTINCT creationaffectedgovernmentsummaryeventpart.governmentid,
+                    creationaffectedgovernmentsummaryeventpart.eventid
+                FROM affectedgovernmentsummaryeventpart creationaffectedgovernmentsummaryeventpart
+                    JOIN affectedgovernmentsummaryeventpart dissolutionaffectedgovernmentsummaryeventpart ON creationaffectedgovernmentsummaryeventpart.governmentid = dissolutionaffectedgovernmentsummaryeventpart.governmentid AND creationaffectedgovernmentsummaryeventpart.eventid = dissolutionaffectedgovernmentsummaryeventpart.eventid AND creationaffectedgovernmentsummaryeventpart.affectedtypecreationdissolution::text = 'begin'::text AND dissolutionaffectedgovernmentsummaryeventpart.affectedtypecreationdissolution::text = 'end'::text
+            ), affectedgovernmentsummaryevent AS (
+                SELECT DISTINCT affectedgovernmentsummaryeventpart.eventid,
+                    affectedgovernmentsummaryeventpart.governmentid,
+                    affectedgovernmentsummaryeventpart.originalgovernmentid,
+                    affectedgovernmentsummaryeventpart.affectedtypeid,
+                    affectedgovernmentsummaryeventpart.affectedside,
+                        CASE
+                            WHEN creationdissolution.eventid IS NOT NULL THEN 'alter'::character varying
+                            ELSE affectedgovernmentsummaryeventpart.affectedtypecreationdissolution
+                        END AS affectedtypecreationdissolution,
+                    affectedgovernmentsummaryeventpart.eventsortdate,
+                    affectedgovernmentsummaryeventpart.eventdatetext,
+                    affectedgovernmentsummaryeventpart.eventeffectiveprecision,
+                    affectedgovernmentsummaryeventpart.eventeffectivetype,
+                    affectedgovernmentsummaryeventpart.lawsection
+                FROM affectedgovernmentsummaryeventpart
+                    LEFT JOIN creationdissolution ON affectedgovernmentsummaryeventpart.eventid = creationdissolution.eventid AND affectedgovernmentsummaryeventpart.governmentid = creationdissolution.governmentid
+            ), alterfrom AS (
+                SELECT affectedgovernmentsummaryevent.governmentid,
+                    COALESCE(array_agg(DISTINCT affectedgovernmentsummaryevent.eventid ORDER BY affectedgovernmentsummaryevent.eventid), ARRAY[]::integer[]) AS eventid
+                FROM affectedgovernmentsummaryevent
+                WHERE affectedgovernmentsummaryevent.affectedside = 'from'::text AND affectedgovernmentsummaryevent.affectedtypecreationdissolution::text = 'alter'::text
+                GROUP BY affectedgovernmentsummaryevent.governmentid
+            ), alterto AS (
+                SELECT affectedgovernmentsummaryevent.governmentid,
+                    COALESCE(array_agg(DISTINCT affectedgovernmentsummaryevent.eventid ORDER BY affectedgovernmentsummaryevent.eventid), ARRAY[]::integer[]) AS eventid
+                FROM affectedgovernmentsummaryevent
+                WHERE affectedgovernmentsummaryevent.affectedside = 'to'::text AND affectedgovernmentsummaryevent.affectedtypecreationdissolution::text = 'alter'::text
+                GROUP BY affectedgovernmentsummaryevent.governmentid
+            ), altertotal AS (
+                SELECT affectedgovernmentsummaryevent.governmentid,
+                    COALESCE(array_agg(DISTINCT affectedgovernmentsummaryevent.eventid ORDER BY affectedgovernmentsummaryevent.eventid), ARRAY[]::integer[]) AS eventid
+                FROM affectedgovernmentsummaryevent
+                WHERE affectedgovernmentsummaryevent.affectedtypecreationdissolution::text = 'alter'::text
+                GROUP BY affectedgovernmentsummaryevent.governmentid
+            ), creation AS (
+                SELECT affectedgovernmentsummaryevent.governmentid,
+                    extra.array_combine(array_agg(affectedgovernmentsummaryevent.originalgovernmentid)) AS originalgovernmentid,
+                    array_agg(DISTINCT affectedgovernmentsummaryevent.eventid ORDER BY affectedgovernmentsummaryevent.eventid) AS eventid,
+                    array_agg(DISTINCT affectedgovernmentsummaryevent.eventsortdate) AS eventsortdate,
+                    array_agg(DISTINCT affectedgovernmentsummaryevent.eventdatetext) AS eventdatetext,
+                    array_agg(DISTINCT affectedgovernmentsummaryevent.eventeffectiveprecision) AS eventeffectiveprecision,
+                    array_agg(DISTINCT affectedgovernmentsummaryevent.eventeffectivetype) AS eventeffectivetype,
+                    sum(affectedgovernmentsummaryevent.lawsection) > 0::numeric AS lawsection
+                FROM affectedgovernmentsummaryevent
+                WHERE affectedgovernmentsummaryevent.affectedtypecreationdissolution::text = 'begin'::text
+                GROUP BY affectedgovernmentsummaryevent.governmentid
+            ), dissolution AS (
+                SELECT affectedgovernmentsummaryevent.governmentid,
+                    extra.array_combine(array_agg(affectedgovernmentsummaryevent.originalgovernmentid)) AS originalgovernmentid,
+                    array_agg(DISTINCT affectedgovernmentsummaryevent.eventid ORDER BY affectedgovernmentsummaryevent.eventid) AS eventid,
+                    array_agg(DISTINCT affectedgovernmentsummaryevent.eventsortdate) AS eventsortdate,
+                    array_agg(DISTINCT affectedgovernmentsummaryevent.eventdatetext) AS eventdatetext,
+                    array_agg(DISTINCT affectedgovernmentsummaryevent.eventeffectiveprecision) AS eventeffectiveprecision,
+                    array_agg(DISTINCT affectedgovernmentsummaryevent.eventeffectivetype) AS eventeffectivetype,
+                    sum(affectedgovernmentsummaryevent.lawsection) > 0::numeric AS lawsection
+                FROM affectedgovernmentsummaryevent
+                WHERE affectedgovernmentsummaryevent.affectedtypecreationdissolution::text = 'end'::text
+                GROUP BY affectedgovernmentsummaryevent.governmentid
+            ), affectedgovernmentform AS (
+                SELECT DISTINCT affectedgovernmentpart.governmentto AS government,
+                    governmentform.governmentformlong,
+                    affectedgovernmentgroup.event,
+                    row_number() OVER (PARTITION BY affectedgovernmentpart.governmentto ORDER BY event.eventsortdate DESC) AS recentness
+                FROM geohistory.affectedgovernmentpart
+                    JOIN geohistory.affectedgovernmentgrouppart ON affectedgovernmentpart.affectedgovernmentpartid = affectedgovernmentgrouppart.affectedgovernmentpart AND affectedgovernmentpart.governmentformto IS NOT NULL AND affectedgovernmentpart.affectedtypeto <> 12
+                    JOIN geohistory.affectedgovernmentgroup ON affectedgovernmentgrouppart.affectedgovernmentgroup = affectedgovernmentgroup.affectedgovernmentgroupid
+                    JOIN geohistory.event ON affectedgovernmentgroup.event = event.eventid
+                    JOIN geohistory.eventgranted ON event.eventgranted = eventgranted.eventgrantedid AND eventgranted.eventgrantedsuccess
+                    JOIN geohistory.governmentform ON affectedgovernmentpart.governmentformto = governmentform.governmentformid
+            ), governmentchangecount AS (
+                SELECT COALESCE(government.governmentcurrentleadstate::text, ''::text) AS governmentstate,
+                    government.governmentlevel,
+                    government.governmenttype,
+                    COALESCE(affectedgovernmentform.governmentformlong, ''::text) AS currentform,
+                    COALESCE(affectedgovernmentform.governmentformlong, ''::text) AS currentformdetailed,
+                        CASE
+                            WHEN government.governmentlevel > 3 THEN governmentparent.governmentname::text
+                            ELSE ''::text
+                        END AS governmentleadparentcounty,
+                    government.governmentid,
+                    government.governmentlong,
+                    COALESCE(array_length(creation.eventid, 1), 0) AS creation,
+                    creation.eventid AS creationevent,
+                        CASE
+                            WHEN array_length(creation.eventid, 1) = 1 THEN creation.eventdatetext[1]
+                            ELSE ''::text
+                        END AS creationtext,
+                        CASE
+                            WHEN array_length(creation.eventid, 1) = 1 THEN COALESCE(creation.eventeffectiveprecision[1], 'None'::text)
+                            ELSE 'None'::text
+                        END AS creationprecision,
+                        CASE
+                            WHEN array_length(creation.eventid, 1) = 1 THEN creation.eventsortdate[1]
+                            ELSE NULL::date
+                        END AS creationsort,
+                        CASE
+                            WHEN array_length(creation.eventid, 1) = 1 THEN COALESCE(creation.eventeffectivetype[1], ''::text)
+                            ELSE ''::text
+                        END AS creationhow,
+                        CASE
+                            WHEN creation.lawsection IS NULL THEN false
+                            ELSE creation.lawsection
+                        END AS creationlawsection,
+                    creation.originalgovernmentid AS creationas,
+                    COALESCE(array_length(alterfrom.eventid, 1), 0) AS alterfrom,
+                    COALESCE(array_length(alterto.eventid, 1), 0) AS alterto,
+                    COALESCE(array_length(altertotal.eventid, 1), 0) AS altertotal,
+                    COALESCE(array_length(dissolution.eventid, 1), 0) AS dissolution,
+                    dissolution.eventid AS dissolutionevent,
+                        CASE
+                            WHEN array_length(dissolution.eventid, 1) = 1 THEN dissolution.eventdatetext[1]
+                            ELSE ''::text
+                        END AS dissolutiontext,
+                        CASE
+                            WHEN array_length(dissolution.eventid, 1) = 1 THEN COALESCE(dissolution.eventeffectiveprecision[1], 'None'::text)
+                            ELSE 'None'::text
+                        END AS dissolutionprecision,
+                        CASE
+                            WHEN array_length(dissolution.eventid, 1) = 1 THEN dissolution.eventsortdate[1]
+                            ELSE NULL::date
+                        END AS dissolutionsort,
+                        CASE
+                            WHEN array_length(dissolution.eventid, 1) = 1 THEN COALESCE(dissolution.eventeffectivetype[1], ''::text)
+                            ELSE ''::text
+                        END AS dissolutionhow,
+                        CASE
+                            WHEN dissolution.lawsection IS NULL THEN false
+                            ELSE dissolution.lawsection
+                        END AS dissolutionlawsection,
+                    dissolution.originalgovernmentid AS dissolutionas
+                FROM geohistory.government
+                    LEFT JOIN geohistory.government governmentparent ON government.governmentcurrentleadparent = governmentparent.governmentid
+                    LEFT JOIN alterfrom ON government.governmentid = alterfrom.governmentid
+                    LEFT JOIN alterto ON government.governmentid = alterto.governmentid
+                    LEFT JOIN altertotal ON government.governmentid = altertotal.governmentid
+                    LEFT JOIN creation ON government.governmentid = creation.governmentid
+                    LEFT JOIN dissolution ON government.governmentid = dissolution.governmentid
+                    LEFT JOIN affectedgovernmentform ON government.governmentid = affectedgovernmentform.government AND affectedgovernmentform.recentness = 1
+                WHERE government.governmentid = ?
+            )
             SELECT government.governmentid,
                 government.governmentlong,
                     CASE
@@ -28,22 +218,23 @@ class GovernmentModel extends BaseModel
                         WHEN government.governmentlevel = 3 THEN 'county'::text
                         ELSE 'municipality or lower'::text
                     END AS governmentlevel,
-                    NOT (governmentchangecountcache.creationevent IS NULL
-                    AND governmentchangecountcache.altertotal = 0
-                    AND governmentchangecountcache.dissolutionevent IS NULL
+                    NOT (
+                        governmentchangecount.creationevent IS NULL
+                        AND governmentchangecount.altertotal = 0
+                        AND governmentchangecount.dissolutionevent IS NULL
                     ) AS textflag,
                 creationevent.eventslug AS governmentcreationevent,
-                governmentchangecountcache.creationtext AS governmentcreationtext,
+                governmentchangecount.creationtext AS governmentcreationtext,
                     CASE
-                        WHEN governmentchangecountcache.creation = 1
-                            AND array_length(governmentchangecountcache.creationas, 1) = 1
-                            AND government.governmentid <> governmentchangecountcache.creationas[1]
+                        WHEN governmentchangecount.creation = 1
+                            AND array_length(governmentchangecount.creationas, 1) = 1
+                            AND government.governmentid <> governmentchangecount.creationas[1]
                             THEN creationas.governmentlong
                         ELSE ''
                     END AS governmentcreationlong,
-                governmentchangecountcache.altertotal AS governmentaltercount,
+                governmentchangecount.altertotal AS governmentaltercount,
                 dissolutionevent.eventslug AS governmentdissolutionevent,
-                governmentchangecountcache.dissolutiontext AS governmentdissolutiontext,
+                governmentchangecount.dissolutiontext AS governmentdissolutiontext,
                     CASE
                         WHEN hasmaptable.hasmap IS NULL THEN false
                         ELSE true
@@ -64,14 +255,14 @@ class GovernmentModel extends BaseModel
                 AND governmentsubstitute.governmentstatus NOT IN ('alternate', 'language')
             LEFT JOIN geohistory.governmentform
                 ON government.governmentcurrentform = governmentform.governmentformid
-            LEFT JOIN extra.governmentchangecountcache
-                ON government.governmentid = governmentchangecountcache.governmentid
+            LEFT JOIN governmentchangecount
+                ON government.governmentid = governmentchangecount.governmentid
             LEFT JOIN geohistory.event creationevent
-                ON governmentchangecountcache.creationevent IS NOT NULL
-                AND governmentchangecountcache.creationevent[1] = creationevent.eventid
+                ON governmentchangecount.creationevent IS NOT NULL
+                AND governmentchangecount.creationevent[1] = creationevent.eventid
             LEFT JOIN geohistory.event dissolutionevent
-                ON governmentchangecountcache.dissolutionevent IS NOT NULL
-                AND governmentchangecountcache.dissolutionevent[1] = dissolutionevent.eventid
+                ON governmentchangecount.dissolutionevent IS NOT NULL
+                AND governmentchangecount.dissolutionevent[1] = dissolutionevent.eventid
             LEFT OUTER JOIN (
                 SELECT DISTINCT true AS hasmap
                 FROM gis.governmentshapecache
@@ -108,12 +299,15 @@ class GovernmentModel extends BaseModel
             ) AS hasmaptable
                 ON 0 = 0
             LEFT JOIN geohistory.government creationas
-                ON governmentchangecountcache.creationas[1] = creationas.governmentid
+                ON governmentchangecount.creationas[1] = creationas.governmentid
             WHERE government.governmentid = ?
             GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
         QUERY;
 
         $query = $this->db->query($query, [
+            $id,
+            $id,
+            $id,
             $id,
             $id,
             $id,
