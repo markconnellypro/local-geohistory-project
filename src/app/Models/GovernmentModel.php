@@ -7,7 +7,6 @@ use App\Models\BaseModel;
 class GovernmentModel extends BaseModel
 {
     // VIEW: extra.governmentchangecountcache
-    // VIEW: extra.governmenthasmappedeventcache
 
     public function getDetail(int|string $id): array
     {
@@ -73,21 +72,40 @@ class GovernmentModel extends BaseModel
             LEFT JOIN geohistory.event dissolutionevent
                 ON governmentchangecountcache.dissolutionevent IS NOT NULL
                 AND governmentchangecountcache.dissolutionevent[1] = dissolutionevent.eventid
-            LEFT OUTER JOIN
-                (
+            LEFT OUTER JOIN (
                 SELECT DISTINCT true AS hasmap
-                    FROM gis.governmentshapecache
-                    JOIN geohistory.government
-                        ON governmentshapecache.government = government.governmentid
-                        AND government.governmentlevel > 2
-                    JOIN geohistory.government governmentsubstitute
-                        ON government.governmentslugsubstitute = governmentsubstitute.governmentslugsubstitute
-                        AND governmentsubstitute.governmentid = ?
-                    UNION
-                    SELECT DISTINCT true AS hasmap
-                    FROM extra.governmenthasmappedeventcache
-                    WHERE governmentsubstitute = ?
-                ) AS hasmaptable
+                FROM gis.governmentshapecache
+                JOIN geohistory.government
+                    ON governmentshapecache.government = government.governmentid
+                    AND government.governmentlevel > 2
+                JOIN geohistory.government governmentsubstitute
+                    ON government.governmentslugsubstitute = governmentsubstitute.governmentslugsubstitute
+                    AND governmentsubstitute.governmentid = ?
+                UNION
+                SELECT DISTINCT true AS hasmap
+                FROM geohistory.affectedgovernmentgrouppart
+                JOIN gis.affectedgovernmentgis
+                    ON affectedgovernmentgrouppart.affectedgovernmentgroup = affectedgovernmentgis.affectedgovernment
+                JOIN geohistory.affectedgovernmentpart
+                    ON affectedgovernmentgrouppart.affectedgovernmentpart = affectedgovernmentpart.affectedgovernmentpartid
+                JOIN geohistory.government
+                    ON affectedgovernmentpart.governmentto = government.governmentid
+                JOIN geohistory.government governmentsubstitute
+                    ON government.governmentslugsubstitute = governmentsubstitute.governmentslugsubstitute
+                WHERE governmentsubstitute.governmentid = ?
+                UNION
+                SELECT DISTINCT true AS hasmap
+                FROM geohistory.affectedgovernmentgrouppart
+                JOIN gis.affectedgovernmentgis
+                    ON affectedgovernmentgrouppart.affectedgovernmentgroup = affectedgovernmentgis.affectedgovernment
+                JOIN geohistory.affectedgovernmentpart
+                    ON affectedgovernmentgrouppart.affectedgovernmentpart = affectedgovernmentpart.affectedgovernmentpartid
+                JOIN geohistory.government
+                    ON affectedgovernmentpart.governmentfrom = government.governmentid
+                JOIN geohistory.government governmentsubstitute
+                    ON government.governmentslugsubstitute = governmentsubstitute.governmentslugsubstitute
+                WHERE governmentsubstitute.governmentid = ?
+            ) AS hasmaptable
                 ON 0 = 0
             LEFT JOIN geohistory.government creationas
                 ON governmentchangecountcache.creationas[1] = creationas.governmentid
@@ -96,6 +114,7 @@ class GovernmentModel extends BaseModel
         QUERY;
 
         $query = $this->db->query($query, [
+            $id,
             $id,
             $id,
             $id,
