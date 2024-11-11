@@ -979,8 +979,12 @@ class GovernmentModel extends BaseModel
         return '{' . implode(',', $result) . '}';
     }
 
-    public function getIdByGovernmentShort(string $government): string
+    public function getIdByGovernmentShort(string $government, string $parent = ''): string
     {
+        if ($parent !== '') {
+            return $this->getIdByGovernmentShortParent($government, $parent);
+        }
+
         $query = <<<QUERY
             SELECT DISTINCT government.governmentid
             FROM geohistory.government lookupgovernment

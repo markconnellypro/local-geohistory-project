@@ -872,12 +872,7 @@ class EventModel extends BaseModel
     public function getIdByGovernmentShort(string $government, string $parent = ''): string
     {
         $GovernmentModel = new GovernmentModel();
-        if ($parent === '') {
-            $government = $GovernmentModel->getIdByGovernmentShort($government);
-        } else {
-            $government = $GovernmentModel->getIdByGovernmentShortParent($government, $parent);
-        }
-
+        $government = $GovernmentModel->getIdByGovernmentShort($government, $parent);
         return $this->getIdByGovernment($government);
     }
 
