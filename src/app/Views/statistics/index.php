@@ -27,16 +27,16 @@ $jurisdictions ??= [];
                 echo view('search/form_eventtype', ['isRequired' => false, 'form' => '']);
 ?>
             </div>
-            <br>
             <label class="forselectize" for="governmentjurisdiction">Jurisdiction</label><br>
             <select name="governmentjurisdiction" class="forselectize" style="width: 300px;">
             </select>
+            <div style="margin-top: -10px;">
+                <label class="forselectize" for="from">Year(s)</label><br>
+                <input id="from" class="selectize-input" name="from" type="number" step="1" style="width: 100px;">
+                <label for="to">&ndash;</label>
+                <input id="to" class="selectize-input" name="to" type="number" step="1" min="0" style="width: 100px;">
+            </div>
             <br>
-            <label class="forselectize" for="from">Year(s)</label><br>
-            <input id="from" class="selectize-input" name="from" type="number" step="1" style="width: 100px;">
-            <label for="to">&ndash;</label>
-            <input id="to" class="selectize-input" name="to" type="number" step="1" min="0" style="width: 100px;">
-            <br><br>
             <button class="submitbutton" type="submit">Search</button>
         </div>
     </fieldset>
