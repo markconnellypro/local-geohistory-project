@@ -948,8 +948,6 @@ class GovernmentModel extends BaseModel
         return $this->getArray($query);
     }
 
-    // VIEW: extra.governmentrelationcache
-
     public function getLookupByGovernmentParent(string $government): array
     {
         $query = <<<QUERY
@@ -1168,7 +1166,7 @@ class GovernmentModel extends BaseModel
         return $this->getObject($query);
     }
 
-    // VIEW: governmentrelationcache
+    // VIEW: extra.governmentrelationcache
 
     public function getSearch(): array
     {
