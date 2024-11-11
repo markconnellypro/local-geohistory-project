@@ -17,15 +17,6 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
--- Name: extra; Type: SCHEMA; Schema: -; Owner: postgres
---
-
-CREATE SCHEMA extra;
-
-
-ALTER SCHEMA extra OWNER TO postgres;
-
---
 -- Name: geohistory; Type: SCHEMA; Schema: -; Owner: postgres
 --
 
@@ -44,25 +35,106 @@ CREATE SCHEMA gis;
 ALTER SCHEMA gis OWNER TO postgres;
 
 --
--- Name: affectedtypeshort(integer); Type: FUNCTION; Schema: extra; Owner: postgres
+-- Name: adjudicationtypegovernmentshort(integer); Type: FUNCTION; Schema: geohistory; Owner: postgres
 --
 
-CREATE FUNCTION extra.affectedtypeshort(integer) RETURNS text
-    LANGUAGE sql STABLE
-    AS $_$
-        SELECT affectedtypeshort
-        FROM geohistory.affectedtype
-        WHERE affectedtypeid = $1;
-    $_$;
+CREATE FUNCTION geohistory.adjudicationtypegovernmentshort(i_id integer) RETURNS text
+    LANGUAGE plpgsql IMMUTABLE
+    AS $$
+    DECLARE o_value text;
+    BEGIN
+        SELECT government.governmentshort
+        INTO o_value
+        FROM geohistory.adjudicationtype
+        JOIN geohistory.tribunal
+            ON adjudicationtype.tribunal = tribunal.tribunalid
+        JOIN geohistory.government
+            ON tribunal.government = government.governmentid
+        WHERE adjudicationtypeid = i_id;
+
+        RETURN COALESCE(o_value, '');
+    END;
+$$;
 
 
-ALTER FUNCTION extra.affectedtypeshort(integer) OWNER TO postgres;
+ALTER FUNCTION geohistory.adjudicationtypegovernmentshort(i_id integer) OWNER TO postgres;
 
 --
--- Name: array_combine(integer[]); Type: FUNCTION; Schema: extra; Owner: postgres
+-- Name: adjudicationtypegovernmentslug(integer); Type: FUNCTION; Schema: geohistory; Owner: postgres
 --
 
-CREATE FUNCTION extra.array_combine(integer[]) RETURNS integer[]
+CREATE FUNCTION geohistory.adjudicationtypegovernmentslug(i_id integer) RETURNS text
+    LANGUAGE plpgsql IMMUTABLE
+    AS $$
+    DECLARE o_value text;
+    BEGIN
+        SELECT government.governmentslug
+        INTO o_value
+        FROM geohistory.adjudicationtype
+        JOIN geohistory.tribunal
+            ON adjudicationtype.tribunal = tribunal.tribunalid
+        JOIN geohistory.government
+            ON tribunal.government = government.governmentid
+        WHERE adjudicationtypeid = i_id;
+
+        RETURN COALESCE(o_value, '');
+    END;
+$$;
+
+
+ALTER FUNCTION geohistory.adjudicationtypegovernmentslug(i_id integer) OWNER TO postgres;
+
+--
+-- Name: adjudicationtypelong(integer); Type: FUNCTION; Schema: geohistory; Owner: postgres
+--
+
+CREATE FUNCTION geohistory.adjudicationtypelong(i_id integer) RETURNS text
+    LANGUAGE plpgsql IMMUTABLE
+    AS $$
+    DECLARE o_value text;
+    BEGIN
+        SELECT adjudicationtypelong
+        INTO o_value
+        FROM geohistory.adjudicationtype
+        WHERE adjudicationtypeid = i_id;
+
+        RETURN COALESCE(o_value, '');
+    END;
+$$;
+
+
+ALTER FUNCTION geohistory.adjudicationtypelong(i_id integer) OWNER TO postgres;
+
+--
+-- Name: adjudicationtypetribunaltypesummary(integer); Type: FUNCTION; Schema: geohistory; Owner: postgres
+--
+
+CREATE FUNCTION geohistory.adjudicationtypetribunaltypesummary(i_id integer) RETURNS text
+    LANGUAGE plpgsql IMMUTABLE
+    AS $$
+    DECLARE o_value text;
+    BEGIN
+        SELECT tribunaltype.tribunaltypesummary
+        INTO o_value
+        FROM geohistory.adjudicationtype
+        JOIN geohistory.tribunal
+            ON adjudicationtype.tribunal = tribunal.tribunalid
+        JOIN geohistory.tribunaltype
+            ON tribunal.tribunaltype = tribunaltype.tribunaltypeid
+        WHERE adjudicationtypeid = i_id;
+
+        RETURN COALESCE(o_value, '');
+    END;
+$$;
+
+
+ALTER FUNCTION geohistory.adjudicationtypetribunaltypesummary(i_id integer) OWNER TO postgres;
+
+--
+-- Name: array_combine(integer[]); Type: FUNCTION; Schema: geohistory; Owner: postgres
+--
+
+CREATE FUNCTION geohistory.array_combine(integer[]) RETURNS integer[]
     LANGUAGE sql STABLE
     AS $_$
 
@@ -75,1560 +147,7 @@ CREATE FUNCTION extra.array_combine(integer[]) RETURNS integer[]
 $_$;
 
 
-ALTER FUNCTION extra.array_combine(integer[]) OWNER TO postgres;
-
---
--- Name: emptytonull(text); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.emptytonull(text) RETURNS text
-    LANGUAGE sql IMMUTABLE
-    AS $_$
-
-        SELECT CASE WHEN $1 = ''
-            THEN NULL::text ELSE $1 END AS emptytonull;
-    
-$_$;
-
-
-ALTER FUNCTION extra.emptytonull(text) OWNER TO postgres;
-
---
--- Name: eventeffectivetype(integer); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.eventeffectivetype(integer) RETURNS text
-    LANGUAGE sql STABLE
-    AS $_$
-
-     SELECT extra.eventeffectivetype(eventeffectivetype.eventeffectivetypegroup, eventeffectivetype.eventeffectivetypequalifier) AS eventeffectivetype
-       FROM geohistory.eventeffectivetype
-      WHERE eventeffectivetypeid = $1;
-    
-$_$;
-
-
-ALTER FUNCTION extra.eventeffectivetype(integer) OWNER TO postgres;
-
---
--- Name: eventeffectivetype(character varying, character varying); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.eventeffectivetype(eventeffectivetypegroup character varying, eventeffectivetypequalifier character varying) RETURNS text
-    LANGUAGE sql IMMUTABLE
-    AS $$
-     SELECT
-        eventeffectivetypegroup ||
-            CASE
-                WHEN eventeffectivetypequalifier <> '' THEN ': ' || eventeffectivetypequalifier
-                ELSE ''
-            END AS eventeffectivetype;
-    $$;
-
-
-ALTER FUNCTION extra.eventeffectivetype(eventeffectivetypegroup character varying, eventeffectivetypequalifier character varying) OWNER TO postgres;
-
---
--- Name: fulldate(text); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.fulldate(text) RETURNS text
-    LANGUAGE plpgsql IMMUTABLE
-    AS $_$
-
-    BEGIN
-        RETURN calendar.historicdatetextformat($1::calendar.historicdate, 'long', 'en');
-    END
-$_$;
-
-
-ALTER FUNCTION extra.fulldate(text) OWNER TO postgres;
-
---
--- Name: governmentabbreviation(integer); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.governmentabbreviation(integer) RETURNS text
-    LANGUAGE sql STABLE
-    AS $_$
-        SELECT governmentabbreviation
-        FROM geohistory.government
-        WHERE governmentid = $1;
-    $_$;
-
-
-ALTER FUNCTION extra.governmentabbreviation(integer) OWNER TO postgres;
-
---
--- Name: governmentabbreviation(integer, character varying); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.governmentabbreviation(integer, character varying) RETURNS text
-    LANGUAGE sql STABLE
-    AS $_$
-
-        SELECT
-            CASE WHEN extra.governmentlevel($1) > 2 AND extra.governmentabbreviation(extra.governmentcurrentleadstateid($1)) <> $2
-                THEN extra.governmentabbreviation(extra.governmentcurrentleadstateid($1)) || '.'
-                ELSE '' END 
-         || governmentabbreviation AS governmentabbreviation
-        FROM geohistory.government
-        WHERE governmentid = $1;
-    
-$_$;
-
-
-ALTER FUNCTION extra.governmentabbreviation(integer, character varying) OWNER TO postgres;
-
---
--- Name: governmentabbreviationid(text); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.governmentabbreviationid(text) RETURNS integer
-    LANGUAGE sql STABLE
-    AS $_$
-        SELECT governmentid
-        FROM geohistory.government
-        WHERE governmentabbreviation = $1;
-    $_$;
-
-
-ALTER FUNCTION extra.governmentabbreviationid(text) OWNER TO postgres;
-
---
--- Name: governmentcurrentleadparent(integer); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.governmentcurrentleadparent(integer) RETURNS integer
-    LANGUAGE sql STABLE
-    AS $_$
-SELECT CASE
-    WHEN parent.governmentsubstitute IS NOT NULL THEN parent.governmentsubstitute
-	ELSE parent.governmentid
-  END AS governmentcurrentleadparent
-   FROM geohistory.government
-   JOIN geohistory.government parent
-     ON government.governmentcurrentleadparent = parent.governmentid
-   WHERE government.governmentid = $1;
-$_$;
-
-
-ALTER FUNCTION extra.governmentcurrentleadparent(integer) OWNER TO postgres;
-
---
--- Name: governmentcurrentleadstateid(integer); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.governmentcurrentleadstateid(integer) RETURNS integer
-    LANGUAGE plpgsql STABLE
-    AS $_$
-        DECLARE gid INTEGER;
-        DECLARE glevel SMALLINT;
-        DECLARE gparent INTEGER;
-        BEGIN
-            gparent := $1;
-            LOOP
-                SELECT
-                    CASE
-                        WHEN governmentsubstitute IS NOT NULL THEN governmentsubstitute
-                        ELSE governmentid
-                    END AS governmentid,
-                governmentlevel,
-                governmentcurrentleadparent
-                INTO gid,
-                glevel, 
-                gparent
-                FROM geohistory.government
-                WHERE governmentid = gparent;
-                EXIT WHEN glevel IS NULL OR glevel < 3;
-            END LOOP;
-            RETURN gid;
-        END;
-    $_$;
-
-
-ALTER FUNCTION extra.governmentcurrentleadstateid(integer) OWNER TO postgres;
-
---
--- Name: governmentformlong(integer); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.governmentformlong(integer) RETURNS text
-    LANGUAGE sql STABLE
-    AS $_$
-
-        SELECT governmentformlong
-        FROM geohistory.governmentform
-        WHERE governmentformid = $1;
-    
-$_$;
-
-
-ALTER FUNCTION extra.governmentformlong(integer) OWNER TO postgres;
-
---
--- Name: governmentformlong(integer, boolean); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.governmentformlong(integer, boolean) RETURNS text
-    LANGUAGE sql STABLE
-    AS $_$
-
- SELECT CASE
-        WHEN $2 THEN governmentform.governmentformlongextended
-        ELSE governmentform.governmentformlong
-    END AS governmentformlong
-   FROM geohistory.governmentform
-  WHERE governmentformid = $1;
- 
-$_$;
-
-
-ALTER FUNCTION extra.governmentformlong(integer, boolean) OWNER TO postgres;
-
---
--- Name: governmentformlongreport(integer); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.governmentformlongreport(integer) RETURNS text
-    LANGUAGE sql STABLE
-    AS $_$
-
-        SELECT governmentformlongreport
-        FROM geohistory.governmentform
-        WHERE governmentformid = $1;
-    
-$_$;
-
-
-ALTER FUNCTION extra.governmentformlongreport(integer) OWNER TO postgres;
-
---
--- Name: governmentindigobook(integer); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.governmentindigobook(integer) RETURNS text
-    LANGUAGE sql STABLE
-    AS $_$
-        SELECT CASE
-            WHEN governmentindigobook = '' AND governmentabbreviation <> '' THEN governmentabbreviation || '.'
-            WHEN governmentindigobook = '' THEN governmentname || '.'
-            ELSE governmentindigobook
-        END AS governmentindigobook
-        FROM geohistory.government
-        WHERE governmentid = $1;
-$_$;
-
-
-ALTER FUNCTION extra.governmentindigobook(integer) OWNER TO postgres;
-
---
--- Name: governmentindigobook(integer, character varying); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.governmentindigobook(integer, character varying) RETURNS text
-    LANGUAGE sql STABLE
-    AS $_$
-
-     SELECT
-            CASE
-                WHEN extra.governmentindigobook($1) <> '' AND governmentlevel > 2 AND extra.governmentabbreviation(extra.governmentcurrentleadstateid(governmentid)) <> upper($2)
-                THEN extra.governmentindigobook(extra.governmentcurrentleadstateid($1))
-                ELSE ''::text
-            END || extra.governmentindigobook($1) AS governmentindigobook
-        FROM geohistory.government
-        WHERE governmentid = $1;
-    
-$_$;
-
-
-ALTER FUNCTION extra.governmentindigobook(integer, character varying) OWNER TO postgres;
-
---
--- Name: governmentlevel(integer); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.governmentlevel(integer) RETURNS smallint
-    LANGUAGE sql STABLE
-    AS $_$
-        SELECT governmentlevel
-        FROM geohistory.government
-        WHERE governmentid = $1;
-    $_$;
-
-
-ALTER FUNCTION extra.governmentlevel(integer) OWNER TO postgres;
-
---
--- Name: governmentlong(integer); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.governmentlong(integer) RETURNS text
-    LANGUAGE sql STABLE
-    AS $_$
-
-        SELECT CASE
-                WHEN governmentname = '' THEN governmentnumber
-                WHEN governmentnumber = '' THEN governmentname
-                ELSE governmentname || ' (' || governmentnumber || ')'
-            END || 
-            CASE WHEN governmentlevel > 1
-            THEN ', ' || CASE WHEN governmentstyle <> ''
-                THEN governmentstyle ELSE governmenttype END || CASE
-                    WHEN governmentconnectingarticle <> '' THEN ' ' || governmentconnectingarticle
-                    WHEN locale IN ('de', 'nl') THEN ''
-                    WHEN locale = 'fr' THEN ' de'
-                    ELSE ' of'
-                END ELSE '' END ||
-            CASE WHEN governmentstatus <> '' OR governmentnotecurrentleadparent OR governmentnotecreation <> '' OR governmentnotedissolution <> ''
-                THEN ' (' || 
-                    CASE WHEN governmentnotecurrentleadparent
-                        THEN extra.governmentname(extra.governmentcurrentleadparent(governmentid)) ELSE '' END ||
-                    CASE WHEN governmentnotecurrentleadparent AND (governmentnotecreation <> '' OR governmentnotedissolution <> '')
-                        THEN ', ' ELSE '' END ||
-                    CASE WHEN governmentnotecreation <> '' AND governmentnotedissolution <> ''
-                        THEN governmentnotecreation || '-' || governmentnotedissolution
-                    WHEN governmentnotecreation <> ''
-                        THEN 'since ' || governmentnotecreation
-                    WHEN governmentnotedissolution <> ''
-                        THEN 'thru ' || governmentnotedissolution ELSE '' END ||
-                    CASE WHEN governmentstatus <> '' AND (governmentnotecurrentleadparent OR governmentnotecreation <> '' OR governmentnotedissolution <> '')
-                        THEN ', ' ELSE '' END || 
-                    governmentstatus || ')' 
-                ELSE '' END AS governmentlong
-            FROM geohistory.government
-        WHERE governmentid = $1;
-    
-$_$;
-
-
-ALTER FUNCTION extra.governmentlong(integer) OWNER TO postgres;
-
---
--- Name: governmentlong(integer, character varying); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.governmentlong(integer, character varying) RETURNS text
-    LANGUAGE sql STABLE
-    AS $_$
-
-        SELECT extra.governmentlong($1) ||
-            CASE WHEN extra.governmentlevel($1) > 2 AND extra.governmentabbreviation(extra.governmentcurrentleadstateid($1)) <> $2
-                THEN ' (' || extra.governmentabbreviation(extra.governmentcurrentleadstateid($1)) || ')'
-                ELSE '' END AS governmentlong;
-    
-$_$;
-
-
-ALTER FUNCTION extra.governmentlong(integer, character varying) OWNER TO postgres;
-
---
--- Name: governmentname(integer); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.governmentname(integer) RETURNS text
-    LANGUAGE sql STABLE
-    AS $_$
-        SELECT governmentname
-        FROM geohistory.government
-        WHERE governmentid = $1;
-    $_$;
-
-
-ALTER FUNCTION extra.governmentname(integer) OWNER TO postgres;
-
---
--- Name: governmentshapeslugid(text); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.governmentshapeslugid(text) RETURNS integer
-    LANGUAGE sql STABLE
-    AS $_$
- SELECT governmentshapeextracache.governmentshapeid
-   FROM extra.governmentshapeextracache
-  WHERE governmentshapeextracache.governmentshapeslug = $1;
-     $_$;
-
-
-ALTER FUNCTION extra.governmentshapeslugid(text) OWNER TO postgres;
-
---
--- Name: governmentshort(integer); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.governmentshort(integer) RETURNS text
-    LANGUAGE sql STABLE
-    AS $_$
-        SELECT CASE
-            WHEN governmentlevel = 2 AND governmenttype = 'District' THEN governmenttype || ' of '
-            ELSE ''
-        END || 
-        CASE
-            WHEN governmentname = '' THEN governmentnumber
-            WHEN governmentnumber = '' THEN governmentname
-            ELSE governmentname || ' (' || governmentnumber || ')'
-        END || 
-        CASE
-            WHEN governmentlevel > 2  THEN ' ' || CASE
-                WHEN governmentstyle <> '' THEN governmentstyle
-                ELSE governmenttype
-            END
-            ELSE ''
-        END AS governmentshort
-            FROM geohistory.government
-        WHERE governmentid = $1;
-    $_$;
-
-
-ALTER FUNCTION extra.governmentshort(integer) OWNER TO postgres;
-
---
--- Name: governmentshort(integer, character varying); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.governmentshort(integer, character varying) RETURNS text
-    LANGUAGE sql STABLE
-    AS $_$
-
-        SELECT extra.governmentshort($1) ||
-            CASE WHEN extra.governmentlevel($1) > 2 AND extra.governmentabbreviation(extra.governmentcurrentleadstateid($1)) <> $2
-                THEN ' (' || extra.governmentabbreviation(extra.governmentcurrentleadstateid($1)) || ')'
-                ELSE '' END AS governmentshort;
-    
-$_$;
-
-
-ALTER FUNCTION extra.governmentshort(integer, character varying) OWNER TO postgres;
-
---
--- Name: governmentslug(integer); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.governmentslug(integer) RETURNS text
-    LANGUAGE sql STABLE
-    AS $_$
-
- SELECT CASE
-     WHEN governmentextracache.governmentsubstituteslug IS NULL THEN governmentextracache.governmentslug
-	 ELSE governmentextracache.governmentsubstituteslug
- END AS governmentslug
-   FROM extra.governmentextracache
-  WHERE governmentextracache.governmentid = $1;
-     
-$_$;
-
-
-ALTER FUNCTION extra.governmentslug(integer) OWNER TO postgres;
-
---
--- Name: governmentslugalternate(integer); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.governmentslugalternate(integer) RETURNS text
-    LANGUAGE sql STABLE
-    AS $_$
-
- SELECT lower(replace(regexp_replace(regexp_replace(
-        CASE
-            WHEN government.governmentlevel < 3 AND government.governmentabbreviation <> '' THEN government.governmentabbreviation
-            ELSE extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentid)) ||
-            CASE
-                WHEN government.governmentarticle <> '' THEN '-' || government.governmentarticle
-                ELSE ''
-            END ||
-            CASE
-                WHEN government.governmentname <> '' THEN '-' || government.governmentname
-                ELSE ''
-            END ||
-            CASE
-                WHEN government.governmentnumber <> '' THEN '-' || government.governmentnumber
-                ELSE ''
-            END ||
-            CASE
-                WHEN government.governmentlevel > 1 THEN '-' ||
-                CASE
-                    WHEN government.governmentstyle <> '' THEN government.governmentstyle
-                    ELSE government.governmenttype
-                END
-                ELSE ''
-            END ||
-            CASE
-                WHEN government.governmentstatus <> '' OR government.governmentnotecurrentleadparent OR government.governmentnotecreation <> '' OR government.governmentnotedissolution <> '' THEN '-' ||
-                CASE
-                    WHEN government.governmentnotecurrentleadparent THEN extra.governmentname(extra.governmentcurrentleadparent(government.governmentid))
-                    ELSE ''
-                END ||
-                CASE
-                    WHEN government.governmentnotecurrentleadparent AND (government.governmentnotecreation <> '' OR government.governmentnotedissolution <> '') THEN '-'
-                    ELSE ''
-                END ||
-                CASE
-                    WHEN government.governmentnotecreation <> '' AND government.governmentnotedissolution <> '' THEN (government.governmentnotecreation || '-') || government.governmentnotedissolution
-                    WHEN government.governmentnotecreation <> '' THEN 'since-' || government.governmentnotecreation
-                    WHEN government.governmentnotedissolution <> '' THEN 'thru-' || government.governmentnotedissolution
-                    ELSE ''
-                END ||
-                CASE
-                    WHEN government.governmentstatus <> '' AND (government.governmentnotecurrentleadparent OR government.governmentnotecreation <> '' OR government.governmentnotedissolution <> '') THEN '-'
-                    ELSE ''
-                END || government.governmentstatus
-                ELSE ''
-            END
-        END, '[\(\)\,\.]', '', 'g'), '[ \/ʻ]', '-', 'g'), '''', '-')) AS governmentslug
-   FROM geohistory.government
-  WHERE government.governmentid = $1;
-     
-$_$;
-
-
-ALTER FUNCTION extra.governmentslugalternate(integer) OWNER TO postgres;
-
---
--- Name: governmentstate(integer); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.governmentstate(integer) RETURNS text[]
-    LANGUAGE sql STABLE
-    AS $_$
-
- SELECT array_agg(DISTINCT governmentrelationcache.governmentrelationstate) AS governmentstates
-   FROM extra.governmentrelationcache
-  WHERE governmentrelationcache.governmentid = $1
-    AND governmentrelationcache.governmentrelationstate <> '';
-    
-$_$;
-
-
-ALTER FUNCTION extra.governmentstate(integer) OWNER TO postgres;
-
---
--- Name: governmentstatelink(integer); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.governmentstatelink(integer) RETURNS text
-    LANGUAGE sql STABLE
-    AS $_$
-
-        SELECT CASE
-            WHEN governmentstatus = 'placeholder' THEN ''
-            ELSE '/en/' || lower(extra.governmentabbreviation(extra.governmentcurrentleadstateid($1)))
-            || '/government/' || $1 || '/'
-        END AS governmentstatelink
-        FROM geohistory.government
-        WHERE governmentid = $1;
-    
-$_$;
-
-
-ALTER FUNCTION extra.governmentstatelink(integer) OWNER TO postgres;
-
---
--- Name: governmentstatelink(integer, character varying, character varying); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.governmentstatelink(v_governmentid integer, v_state character varying, v_locale character varying) RETURNS text
-    LANGUAGE sql STABLE
-    AS $$
-SELECT CASE
-            WHEN governmentstatus = 'placeholder' THEN ''
-            ELSE '/' || v_locale || '/' || CASE
-                WHEN upper(v_state) = ANY (extra.governmentstate(v_governmentid)) THEN v_state
-                ELSE lower(extra.governmentabbreviation(extra.governmentcurrentleadstateid(v_governmentid)))
-            END || '/government/' || extra.governmentslug(v_governmentid) || '/'
-        END AS governmentstatelink
-        FROM geohistory.government
-        WHERE governmentid = v_governmentid;
-$$;
-
-
-ALTER FUNCTION extra.governmentstatelink(v_governmentid integer, v_state character varying, v_locale character varying) OWNER TO postgres;
-
---
--- Name: governmentstatus(integer); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.governmentstatus(integer) RETURNS text
-    LANGUAGE sql STABLE
-    AS $_$
-        SELECT governmentstatus
-        FROM geohistory.government
-        WHERE governmentid = $1;
-    $_$;
-
-
-ALTER FUNCTION extra.governmentstatus(integer) OWNER TO postgres;
-
---
--- Name: governmentsubstitutedcache(integer); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.governmentsubstitutedcache(integer) RETURNS integer[]
-    LANGUAGE sql STABLE
-    AS $_$
-
-    SELECT array_agg(DISTINCT governmentid ORDER BY governmentid)
-    FROM extra.governmentsubstitutecache
-    WHERE governmentsubstitute = $1;
-    
-$_$;
-
-
-ALTER FUNCTION extra.governmentsubstitutedcache(integer) OWNER TO postgres;
-
---
--- Name: governmenttype(integer); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.governmenttype(integer) RETURNS text
-    LANGUAGE sql STABLE
-    AS $_$
-        SELECT governmenttype
-        FROM geohistory.government
-        WHERE governmentid = $1;
-    $_$;
-
-
-ALTER FUNCTION extra.governmenttype(integer) OWNER TO postgres;
-
---
--- Name: lawalternatecitation(integer); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.lawalternatecitation(integer) RETURNS text
-    LANGUAGE sql STABLE
-    AS $_$
-
-     SELECT extra.lawalternatecitation($1, true);
-    
-$_$;
-
-
-ALTER FUNCTION extra.lawalternatecitation(integer) OWNER TO postgres;
-
---
--- Name: lawalternatecitation(integer, boolean); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.lawalternatecitation(integer, boolean) RETURNS text
-    LANGUAGE sql STABLE
-    AS $_$
-
-     SELECT source.sourcelawtype ||
-            CASE
-                WHEN lawalternate.lawalternatepage = 0 AND lawalternate.lawalternatenumberchapter = 0 THEN ' Unknown'
-                ELSE
-                CASE
-                    WHEN law.lawapproved = '' THEN ''
-                    ELSE ' of '
-                END || CASE
-                    WHEN $2 THEN extra.fulldate(law.lawapproved)
-                    ELSE extra.shortdate(law.lawapproved)
-                END || ' (' ||
-                CASE
-                    WHEN lawalternate.lawalternatevolume ~~ '%/%' THEN CASE
-                        WHEN split_part(lawalternate.lawalternatevolume, '/', 3) <> '' THEN split_part(lawalternate.lawalternatevolume, '/', 3) || ', '
-                        ELSE ''
-                    END || split_part(lawalternate.lawalternatevolume, '/', 2) ||
-                    CASE
-                        WHEN split_part(lawalternate.lawalternatevolume, '/', 2) = '1' THEN 'st'
-                        WHEN split_part(lawalternate.lawalternatevolume, '/', 2) = '2' THEN 'nd'
-                        WHEN split_part(lawalternate.lawalternatevolume, '/', 2) = '3' THEN 'rd'
-                        ELSE 'th'
-                    END || ' ' || 
-                    CASE
-                        WHEN source.sourcelawhasspecialsession THEN 'Sp.'
-                        ELSE ''
-                    END || 'Sess., ' ||
-                    CASE
-                        WHEN left(law.lawapproved, 4) <> split_part(lawalternate.lawalternatevolume, '/', 1) THEN split_part(lawalternate.lawalternatevolume, '/', 1) || ' '
-                        ELSE ''
-                    END
-                    ELSE CASE
-                        WHEN lawalternate.lawalternatevolume = left(law.lawapproved, 4) OR lawalternate.lawalternatevolume = '' THEN ''
-                        ELSE lawalternate.lawalternatevolume || ' '
-                    END 
-                END || source.sourceshort || ' ' ||
-                CASE
-                    WHEN lawalternate.lawalternatepage = 0 THEN '___'
-                    ELSE lawalternate.lawalternatepage::text
-                END || ', ' ||
-                CASE
-                    WHEN source.sourcelawisbynumber THEN 'No'
-                    ELSE 'Ch'
-                END || '. ' ||
-                CASE
-                    WHEN lawalternate.lawalternatenumberchapter = 0 THEN '___'
-                    ELSE lawalternate.lawalternatenumberchapter::text
-                END || ')'
-            END AS lawalternatecitation
-       FROM geohistory.lawalternate 
-       JOIN geohistory.source
-         ON lawalternate.source = source.sourceid
-       JOIN geohistory.law
-         ON lawalternate.law = law.lawid
-      WHERE lawalternate.lawalternateid = $1;
-    
-$_$;
-
-
-ALTER FUNCTION extra.lawalternatecitation(integer, boolean) OWNER TO postgres;
-
---
--- Name: lawalternatesectioncitation(integer); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.lawalternatesectioncitation(integer) RETURNS text
-    LANGUAGE sql STABLE
-    AS $_$
-
-     SELECT extra.lawalternatesectioncitation($1, true);
-    
-$_$;
-
-
-ALTER FUNCTION extra.lawalternatesectioncitation(integer) OWNER TO postgres;
-
---
--- Name: lawalternatesectioncitation(integer, boolean); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.lawalternatesectioncitation(integer, boolean) RETURNS text
-    LANGUAGE sql STABLE
-    AS $_$
-
-     SELECT
-        extra.lawalternatecitation(lawalternate.lawalternateid, $2) || ', ' || lawsection.lawsectionsymbol ||
-            CASE
-                WHEN lawsection.lawsectionfrom = '0' THEN '___'
-                WHEN lawsection.lawsectionfrom = lawsection.lawsectionto THEN ' ' || lawsection.lawsectionfrom
-                ELSE '§ ' || lawsection.lawsectionfrom || '-' || lawsection.lawsectionto
-            END AS lawalternatesectioncitation
-       FROM geohistory.lawalternatesection
-       JOIN geohistory.lawalternate
-         ON lawalternatesection.lawalternate = lawalternate.lawalternateid
-       JOIN geohistory.lawsection
-         ON lawalternatesection.lawsection = lawsection.lawsectionid
-      WHERE lawalternatesection.lawalternatesectionid = $1;
-    
-$_$;
-
-
-ALTER FUNCTION extra.lawalternatesectioncitation(integer, boolean) OWNER TO postgres;
-
---
--- Name: lawalternatesectionslug(integer); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.lawalternatesectionslug(integer) RETURNS text
-    LANGUAGE sql STABLE
-    AS $_$
-
- SELECT lower(replace(replace(regexp_replace(regexp_replace(extra.lawalternatesectioncitation($1, false), '[,\.\[\]\(\)\'']', '', 'g'), '([ :\–\—\/]| of )', '-', 'g'), '§', 's'), '¶', 'p')) AS lawalternatesectionslug;
-    
-$_$;
-
-
-ALTER FUNCTION extra.lawalternatesectionslug(integer) OWNER TO postgres;
-
---
--- Name: lawcitation(integer); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.lawcitation(integer) RETURNS text
-    LANGUAGE sql STABLE
-    AS $_$
-
-     SELECT extra.lawcitation($1, true);
-    
-$_$;
-
-
-ALTER FUNCTION extra.lawcitation(integer) OWNER TO postgres;
-
---
--- Name: lawcitation(integer, boolean); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.lawcitation(integer, boolean) RETURNS text
-    LANGUAGE sql STABLE
-    AS $_$
-
-     SELECT source.sourcelawtype ||
-            CASE
-                WHEN law.lawpage = 0 AND law.lawnumberchapter = 0 AND law.lawapproved = '' THEN ' Unknown'
-                ELSE
-                CASE
-                    WHEN law.lawapproved = '' THEN ''
-                    ELSE ' of '
-                END || CASE
-                    WHEN $2 THEN extra.fulldate(law.lawapproved)
-                    ELSE extra.shortdate(law.lawapproved)
-                END || ' (' ||
-                CASE
-                    WHEN law.lawvolume ~~ '%/%' THEN CASE
-                        WHEN split_part(law.lawvolume, '/', 3) <> '' THEN split_part(law.lawvolume, '/', 3) || ', '
-                        ELSE ''
-                    END || split_part(law.lawvolume, '/', 2) ||
-                    CASE
-                        WHEN split_part(law.lawvolume, '/', 2) = '1' THEN 'st'
-                        WHEN split_part(law.lawvolume, '/', 2) = '2' THEN 'nd'
-                        WHEN split_part(law.lawvolume, '/', 2) = '3' THEN 'rd'
-                        ELSE 'th'
-                    END || ' ' || 
-                    CASE
-                        WHEN source.sourcelawhasspecialsession THEN 'Sp.'
-                        ELSE ''
-                    END || 'Sess., ' ||
-                    CASE
-                        WHEN left(law.lawapproved, 4) <> split_part(law.lawvolume, '/', 1) THEN split_part(law.lawvolume, '/', 1) || ' '
-                        ELSE ''
-                    END
-                    ELSE CASE
-                        WHEN law.lawvolume = left(law.lawapproved, 4) OR law.lawvolume = '' THEN ''
-                        ELSE law.lawvolume || ' '
-                    END 
-                END || source.sourceshort || ' ' ||
-                CASE
-                    WHEN law.lawpage = 0 THEN '___'
-                    ELSE law.lawpage::text
-                END || ', ' ||
-                CASE
-                    WHEN source.sourcelawisbynumber THEN 'No'
-                    ELSE 'Ch'
-                END || '. ' ||
-                CASE
-                    WHEN law.lawnumberchapter = 0 THEN '___'
-                    ELSE law.lawnumberchapter::text
-                END ||
-                CASE
-                    WHEN law.lawpublished <> '' THEN ', ' || CASE
-                        WHEN $2 THEN extra.fulldate(law.lawpublished)
-                        ELSE extra.shortdate(law.lawpublished)
-                    END 
-                    ELSE ''
-                END || ')'
-            END AS lawcitation
-       FROM geohistory.law
-       JOIN geohistory.source
-         ON law.source = source.sourceid
-      WHERE law.lawid = $1;
-    
-$_$;
-
-
-ALTER FUNCTION extra.lawcitation(integer, boolean) OWNER TO postgres;
-
---
--- Name: lawsectioncitation(integer); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.lawsectioncitation(integer) RETURNS text
-    LANGUAGE sql STABLE
-    AS $_$
-
-     SELECT extra.lawsectioncitation($1, true);
-    
-$_$;
-
-
-ALTER FUNCTION extra.lawsectioncitation(integer) OWNER TO postgres;
-
---
--- Name: lawsectioncitation(integer, boolean); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.lawsectioncitation(integer, boolean) RETURNS text
-    LANGUAGE sql STABLE
-    AS $_$
-
-     SELECT
-        extra.lawcitation(law.lawid, $2) || ', ' || lawsection.lawsectionsymbol ||
-            CASE
-                WHEN lawsection.lawsectionfrom = '0' THEN '___'
-                WHEN lawsection.lawsectionfrom = lawsection.lawsectionto THEN ' ' || lawsection.lawsectionfrom
-                ELSE '§ ' || lawsection.lawsectionfrom || '–' || lawsection.lawsectionto
-            END AS lawsectioncitation
-       FROM geohistory.lawsection
-       JOIN geohistory.law
-         ON lawsection.law = law.lawid
-      WHERE lawsection.lawsectionid = $1;
-    
-$_$;
-
-
-ALTER FUNCTION extra.lawsectioncitation(integer, boolean) OWNER TO postgres;
-
---
--- Name: lawsectionslug(integer); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.lawsectionslug(integer) RETURNS text
-    LANGUAGE sql STABLE
-    AS $_$
-
- SELECT lower(replace(replace(regexp_replace(regexp_replace(extra.lawsectioncitation($1, false), '[,\.\[\]\(\)\'']', '', 'g'), '([ :\–\—\/]| of )', '-', 'g'), '§', 's'), '¶', 'p')) AS lawsectionslug;
-    
-$_$;
-
-
-ALTER FUNCTION extra.lawsectionslug(integer) OWNER TO postgres;
-
---
--- Name: metesdescriptionlong(integer); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.metesdescriptionlong(integer) RETURNS text
-    LANGUAGE sql STABLE
-    AS $_$
- SELECT event.eventlong || CASE
-    WHEN metesdescription.metesdescriptionname = '' THEN ''
-    ELSE ': ' || metesdescription.metesdescriptionname
-   END AS metesdescriptionlong
-   FROM geohistory.metesdescription
-   JOIN geohistory.event
-     ON metesdescription.event = event.eventid
-  WHERE metesdescription.metesdescriptionid = $1;
-     $_$;
-
-
-ALTER FUNCTION extra.metesdescriptionlong(integer) OWNER TO postgres;
-
---
--- Name: metesdescriptionslug(integer); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.metesdescriptionslug(integer) RETURNS text
-    LANGUAGE sql STABLE
-    AS $_$
-
- SELECT event.eventslug || CASE
-    WHEN metesdescription.metesdescriptionname = '' THEN ''
-    ELSE '-' || lower(regexp_replace(regexp_replace(replace(metesdescription.metesdescriptionname, ', ', ' '), '[ \/'',"]', '-', 'g'), '[\(\)\?\.\[\]]', '', 'g'))
-   END AS metesdescriptionslug
-   FROM geohistory.metesdescription
-   JOIN geohistory.event
-     ON metesdescription.event = event.eventid
-  WHERE metesdescription.metesdescriptionid = $1;
-     
-$_$;
-
-
-ALTER FUNCTION extra.metesdescriptionslug(integer) OWNER TO postgres;
-
---
--- Name: plsstownshiplong(integer); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.plsstownshiplong(integer) RETURNS text
-    LANGUAGE sql STABLE
-    AS $_$
-
-        SELECT plsstownshipfull || ', ' || plssmeridian.plssmeridianlong || ', Township of (survey)'
-        FROM geohistory.plsstownship
-        JOIN geohistory.plssmeridian
-          ON plsstownship.plssmeridian = plssmeridian.plssmeridianid
-        WHERE plsstownshipid = $1;
-    
-$_$;
-
-
-ALTER FUNCTION extra.plsstownshiplong(integer) OWNER TO postgres;
-
---
--- Name: plsstownshipshort(integer); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.plsstownshipshort(integer) RETURNS text
-    LANGUAGE sql STABLE
-    AS $_$
-
-        SELECT plsstownshipfull || ', ' || plssmeridian.plssmeridianlong
-        FROM geohistory.plsstownship
-        JOIN geohistory.plssmeridian
-          ON plsstownship.plssmeridian = plssmeridian.plssmeridianid
-        WHERE plsstownshipid = $1;
-    
-$_$;
-
-
-ALTER FUNCTION extra.plsstownshipshort(integer) OWNER TO postgres;
-
---
--- Name: punctuationhyphen(text); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.punctuationhyphen(text) RETURNS text
-    LANGUAGE sql IMMUTABLE
-    AS $_$
-
-  SELECT regexp_replace(
-     regexp_replace(
-        lower(
-           public.unaccent($1)
-        ), '[^a-z0-9]', '-', 'g'
-     ), '[-]+', '-', 'g'
-  );
-    
-$_$;
-
-
-ALTER FUNCTION extra.punctuationhyphen(text) OWNER TO postgres;
-
---
--- Name: punctuationnone(text); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.punctuationnone(text) RETURNS text
-    LANGUAGE sql IMMUTABLE
-    AS $_$
-
-  SELECT regexp_replace(
-     lower(
-        public.unaccent($1)
-     ), '[^a-z0-9]', '', 'g'
-  );
-    
-$_$;
-
-
-ALTER FUNCTION extra.punctuationnone(text) OWNER TO postgres;
-
---
--- Name: punctuationnonefuzzy(text); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.punctuationnonefuzzy(text) RETURNS text
-    LANGUAGE sql IMMUTABLE
-    AS $_$
-
-  SELECT regexp_replace(
-     lower(
-        public.unaccent($1)
-     ), '[^a-z0-9]', '', 'g'
-  ) || '%';
-    
-$_$;
-
-
-ALTER FUNCTION extra.punctuationnonefuzzy(text) OWNER TO postgres;
-
---
--- Name: rangefix(text, text); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.rangefix(text, text) RETURNS text
-    LANGUAGE plpgsql IMMUTABLE
-    AS $_$
-
-    DECLARE fullrange TEXT;
-    BEGIN
-        $1 := COALESCE($1::text, '');
-        $2 := COALESCE($2::text, '');
-        IF $2 = '' OR $1 = $2 THEN
-            fullrange := $1;
-        ELSEIF $1 = '' THEN
-            fullrange := '–' || $2;
-        ELSEIF $2 = 'missing' THEN
-            fullrange := $1 || ' (' || $2 || ')';
-        ELSE
-            fullrange := $1 || '–' || $2;
-        END IF;
-        RETURN fullrange;
-    END
-$_$;
-
-
-ALTER FUNCTION extra.rangefix(text, text) OWNER TO postgres;
-
---
--- Name: refresh_sequence(); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.refresh_sequence() RETURNS void
-    LANGUAGE plpgsql STABLE
-    AS $_$
-
-    DECLARE
-
-        columncursor refcursor;
-        tableschema text;
-        tablename text;
-        columnname text;
-        columnsequence text;
-        maxidvalue bigint;
-
-    BEGIN
-
-        OPEN columncursor FOR
-        SELECT columns.table_schema::text,
-           columns.table_name::text,
-           columns.column_name::text,
-           split_part(columns.column_default::text, '''', 2) AS column_sequence
-          FROM information_schema.columns
-         WHERE columns.table_schema::text = ANY (ARRAY['geohistory'::text, 'gis'::text])
-           AND columns.column_default ~~ 'nextval(%'
-         ORDER BY 1, 2;
-
-        LOOP
-        
-          FETCH columncursor INTO tableschema, tablename, columnname, columnsequence;
-
-          IF NOT FOUND THEN
-            EXIT;
-          END IF;
-
-          EXECUTE format('SELECT COALESCE(max(%I.%I) + 1, 1) FROM %I.%I',
-            tablename,
-            columnname,
-            tableschema,
-            tablename)
-          INTO maxidvalue;
-
-		  EXECUTE 'SELECT pg_catalog.setval($1, $2, false)'
-		  USING columnsequence,
-		    maxidvalue;
-
-        END LOOP;
-
-    END;
-
-$_$;
-
-
-ALTER FUNCTION extra.refresh_sequence() OWNER TO postgres;
-
---
--- Name: refresh_view_long(); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.refresh_view_long() RETURNS void
-    LANGUAGE plpgsql
-    AS $$
-  
-  BEGIN
-RAISE INFO '%', clock_timestamp();
-    TRUNCATE gis.deleted_affectedgovernmentgis;
-RAISE INFO '%', clock_timestamp();
-    TRUNCATE gis.deleted_metesdescriptiongis;
-RAISE INFO '%', clock_timestamp();
-    UPDATE gis.governmentshape
-     SET governmentshapereference = governmentshapeid
-     WHERE governmentshapereference IS NULL OR (
-       governmentshapereference IS NOT NULL AND governmentshapereference <> governmentshapeid
-     );
-RAISE INFO '%', clock_timestamp();
-    DELETE FROM geohistory.affectedgovernmentgrouppart
-    WHERE affectedgovernmentpart IN (
-      SELECT DISTINCT affectedgovernmentpart.affectedgovernmentpartid
-      FROM geohistory.affectedgovernmentpart
-      WHERE affectedgovernmentpart.governmentfrom IS NULL
-        AND affectedgovernmentpart.affectedtypefrom IS NULL
-        AND affectedgovernmentpart.governmentto IS NULL
-        AND affectedgovernmentpart.affectedtypeto IS NULL
-        AND affectedgovernmentpart.governmentformto IS NULL
-    );
-RAISE INFO '%', clock_timestamp();
-    DELETE FROM geohistory.affectedgovernmentpart
-	WHERE affectedgovernmentpartid IN (
-      SELECT DISTINCT affectedgovernmentpart.affectedgovernmentpartid
-      FROM geohistory.affectedgovernmentpart
-      LEFT JOIN geohistory.affectedgovernmentgrouppart
-      ON affectedgovernmentpart.affectedgovernmentpartid = affectedgovernmentgrouppart.affectedgovernmentpart
-      WHERE affectedgovernmentgrouppart.affectedgovernmentpart IS NULL
-	) AND affectedgovernmentpartid NOT IN (
-      SELECT DISTINCT affectedgovernmentpart.affectedgovernmentpartid
-      FROM geohistory.affectedgovernmentpart
-      WHERE affectedgovernmentpart.governmentfrom IS NULL
-        AND affectedgovernmentpart.affectedtypefrom IS NULL
-        AND affectedgovernmentpart.governmentto IS NULL
-        AND affectedgovernmentpart.affectedtypeto IS NULL
-        AND affectedgovernmentpart.governmentformto IS NULL
-    );
-RAISE INFO '%', clock_timestamp();
-    REFRESH MATERIALIZED VIEW extra.adjudicationgovernmentcache;
-RAISE INFO '%', clock_timestamp();
-    REFRESH MATERIALIZED VIEW extra.adjudicationsearchcache;
-RAISE INFO '%', clock_timestamp();
-    REFRESH MATERIALIZED VIEW extra.adjudicationsourcecitationsourcegovernmentcache;
-RAISE INFO '%', clock_timestamp();
-    REFRESH MATERIALIZED VIEW extra.affectedgovernment_reconstructed;
-RAISE INFO '%', clock_timestamp();
-    REFRESH MATERIALIZED VIEW extra.affectedgovernmentformcache;
-RAISE INFO '%', clock_timestamp();
-    REFRESH MATERIALIZED VIEW extra.areagovernmentcache;
-RAISE INFO '%', clock_timestamp();
-    REFRESH MATERIALIZED VIEW extra.eventgovernmentcache;
-RAISE INFO '%', clock_timestamp();
-    REFRESH MATERIALIZED VIEW extra.giscache;
-RAISE INFO '%', clock_timestamp();
-    REFRESH MATERIALIZED VIEW extra.governmentchangecountcache;
-RAISE INFO '%', clock_timestamp();
-    REFRESH MATERIALIZED VIEW extra.governmentchangecountpartcache;
-RAISE INFO '%', clock_timestamp();
-    REFRESH MATERIALIZED VIEW extra.lastrefresh;
-RAISE INFO '%', clock_timestamp();
-    REFRESH MATERIALIZED VIEW extra.lawsectiongovernmentcache;
-RAISE INFO '%', clock_timestamp();
-    REFRESH MATERIALIZED VIEW extra.sourcecitationgovernmentcache;
-RAISE INFO '%', clock_timestamp();
-    REFRESH MATERIALIZED VIEW extra.statistics_createddissolved;
-RAISE INFO '%', clock_timestamp();
-    REFRESH MATERIALIZED VIEW extra.statistics_eventtype;
-RAISE INFO '%', clock_timestamp();
-    REFRESH MATERIALIZED VIEW extra.statistics_mapped;
-RAISE INFO '%', clock_timestamp();
-  END
-$$;
-
-
-ALTER FUNCTION extra.refresh_view_long() OWNER TO postgres;
-
---
--- Name: refresh_view_quick(); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.refresh_view_quick() RETURNS void
-    LANGUAGE plpgsql
-    AS $$
-BEGIN
-RAISE INFO '%', clock_timestamp();
-    UPDATE geohistory.government
-      SET governmentnotecurrentleadparent = TRUE
-     WHERE NOT governmentnotecurrentleadparent
-       AND governmentid IN (
-      SELECT government.governmentid
-        FROM geohistory.government
-        JOIN (
-         SELECT replace(lower(government.governmentname), ' ', '') AS governmentname,
-           government.governmenttype,
-           extra.governmentcurrentleadstateid(governmentid) AS governmentcurrentleadstateid
-          FROM geohistory.government
-          GROUP BY 1, 2, 3
-          HAVING count(DISTINCT extra.governmentcurrentleadparent(government.governmentid)) > 1
-        ) governmentgroup
-        ON replace(lower(government.governmentname), ' ', '') = governmentgroup.governmentname
-          AND government.governmenttype = governmentgroup.governmenttype
-          AND extra.governmentcurrentleadstateid(governmentid) = governmentgroup.governmentcurrentleadstateid
-          AND NOT government.governmentnotecurrentleadparent
-     );
-RAISE INFO '%', clock_timestamp();  
-    UPDATE geohistory.government
-      SET governmentnotecurrentleadparent = FALSE
-     WHERE governmentnotecurrentleadparent AND governmentid IN (
-      SELECT government.governmentid
-        FROM geohistory.government
-        JOIN (
-         SELECT replace(lower(government.governmentname), ' ', '') AS governmentname,
-           government.governmenttype,
-           extra.governmentcurrentleadstateid(governmentid) AS governmentcurrentleadstateid
-          FROM geohistory.government
-          GROUP BY 1, 2, 3
-          HAVING count(DISTINCT extra.governmentcurrentleadparent(government.governmentid)) = 1
-        ) governmentgroup
-        ON replace(lower(government.governmentname), ' ', '') = governmentgroup.governmentname
-          AND government.governmenttype = governmentgroup.governmenttype
-          AND extra.governmentcurrentleadstateid(governmentid) = governmentgroup.governmentcurrentleadstateid
-          AND NOT government.governmentnotecurrentleadparent
-     );
-RAISE INFO '%', clock_timestamp();
-    REFRESH MATERIALIZED VIEW extra.adjudicationextracache;
-RAISE INFO '%', clock_timestamp();
-    REFRESH MATERIALIZED VIEW extra.adjudicationsourcecitationextracache;
-RAISE INFO '%', clock_timestamp();
-    REFRESH MATERIALIZED VIEW extra.governmentextracache;
-RAISE INFO '%', clock_timestamp();
-    REFRESH MATERIALIZED VIEW extra.governmenthasmappedeventcache;
-RAISE INFO '%', clock_timestamp();
-    REFRESH MATERIALIZED VIEW extra.governmentparentcache;
-RAISE INFO '%', clock_timestamp();
-    REFRESH MATERIALIZED VIEW extra.governmentrelationcache;
-RAISE INFO '%', clock_timestamp();
-    REFRESH MATERIALIZED VIEW extra.governmentshapeextracache;
-RAISE INFO '%', clock_timestamp();
-    REFRESH MATERIALIZED VIEW extra.governmentsourceextracache;
-RAISE INFO '%', clock_timestamp();
-    REFRESH MATERIALIZED VIEW extra.governmentsubstitutecache;
-RAISE INFO '%', clock_timestamp();
-    REFRESH MATERIALIZED VIEW extra.lawalternatesectionextracache;
-RAISE INFO '%', clock_timestamp();
-    REFRESH MATERIALIZED VIEW extra.lawsectionextracache;
-RAISE INFO '%', clock_timestamp();
-    REFRESH MATERIALIZED VIEW extra.metesdescriptionextracache;
-RAISE INFO '%', clock_timestamp();
-    REFRESH MATERIALIZED VIEW extra.recordingextracache;
-RAISE INFO '%', clock_timestamp();
-    REFRESH MATERIALIZED VIEW extra.sourcecitationextracache;
-RAISE INFO '%', clock_timestamp();
-    REFRESH MATERIALIZED VIEW extra.tribunalgovernmentcache;
-RAISE INFO '%', clock_timestamp();
-  END
-$$;
-
-
-ALTER FUNCTION extra.refresh_view_quick() OWNER TO postgres;
-
---
--- Name: shortdate(text); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.shortdate(text) RETURNS text
-    LANGUAGE plpgsql IMMUTABLE
-    AS $_$
-
-    BEGIN
-        RETURN calendar.historicdatetextformat($1::calendar.historicdate, 'short', 'en');
-    END
-$_$;
-
-
-ALTER FUNCTION extra.shortdate(text) OWNER TO postgres;
-
---
--- Name: sourceurlid(integer); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.sourceurlid(integer) RETURNS integer[]
-    LANGUAGE sql STABLE
-    AS $_$
- SELECT ARRAY[source.sourceid, source.sourceurlsubstitute] AS sourceurlid
-   FROM geohistory.source
-  WHERE source.sourceid = $1;
-     $_$;
-
-
-ALTER FUNCTION extra.sourceurlid(integer) OWNER TO postgres;
-
---
--- Name: tribunalfilingoffice(integer); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.tribunalfilingoffice(integer) RETURNS text
-    LANGUAGE sql STABLE
-    AS $_$
-
-     SELECT
-            CASE
-                WHEN tribunal.tribunalalternatefilingoffice::text <> ''::text THEN (((extra.governmentshort(tribunal.government) || ', '::text) || extra.governmentshort(extra.governmentcurrentleadstateid(tribunal.government))) || ' '::text) || tribunal.tribunalalternatefilingoffice::text
-                ELSE (tribunaltype.tribunaltypefilingoffice::text || ' of '::text) ||
-                CASE
-                    WHEN tribunaltype.tribunaltypefilingofficerlevel THEN (extra.governmentshort(tribunal.government) || ', '::text) || extra.governmentshort(extra.governmentcurrentleadstateid(tribunal.government))
-                    ELSE 'the '::text || extra.tribunallong(tribunal.tribunalid)
-                END
-            END AS tribunalfilingoffice
-       FROM geohistory.tribunal,
-        geohistory.tribunaltype
-      WHERE tribunal.tribunaltype = tribunaltype.tribunaltypeid
-      AND tribunalid = $1;
-    
-$_$;
-
-
-ALTER FUNCTION extra.tribunalfilingoffice(integer) OWNER TO postgres;
-
---
--- Name: tribunalgovernmentshort(integer); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.tribunalgovernmentshort(integer) RETURNS text
-    LANGUAGE sql STABLE
-    AS $_$
-
-     SELECT 
-        extra.governmentindigobook(tribunal.government) ||
-            CASE
-                WHEN tribunal.tribunaldistrictcircuit::text <> ''::text THEN tribunal.tribunaldistrictcircuit::text || CASE
-                    WHEN tribunal.tribunaldistrictcircuit::text = '1' THEN 'st'
-                    WHEN tribunal.tribunaldistrictcircuit::text IN ('2', '3') THEN 'd'
-                    WHEN tribunal.tribunaldistrictcircuit::text ~ '^\d+$' THEN 'th'
-                    ELSE ''
-                END || '.'::text
-                ELSE ''::text
-            END AS tribunalgovernmentshort
-       FROM geohistory.tribunaltype
-       JOIN geohistory.tribunal
-         ON tribunal.tribunaltype = tribunaltype.tribunaltypeid
-      WHERE tribunalid = $1;
-    
-$_$;
-
-
-ALTER FUNCTION extra.tribunalgovernmentshort(integer) OWNER TO postgres;
-
---
--- Name: tribunalgovernmentshort(integer, character varying); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.tribunalgovernmentshort(integer, character varying) RETURNS text
-    LANGUAGE sql STABLE
-    AS $_$
-
-     SELECT
-            CASE
-                WHEN extra.governmentlevel(tribunal.government) > 2 AND extra.governmentabbreviation(extra.governmentcurrentleadstateid(tribunal.government)) <> upper($2)
-                THEN extra.governmentindigobook(extra.governmentcurrentleadstateid(tribunal.government))
-                ELSE ''::text
-            END || extra.tribunalgovernmentshort($1) AS tribunalgovernmentshort
-       FROM geohistory.tribunal
-      WHERE tribunal.tribunalid = $1;
-    
-$_$;
-
-
-ALTER FUNCTION extra.tribunalgovernmentshort(integer, character varying) OWNER TO postgres;
-
---
--- Name: tribunalgovernmentshort(integer, character varying, boolean); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.tribunalgovernmentshort(integer, character varying, boolean) RETURNS text
-    LANGUAGE sql STABLE
-    AS $_$
-
-     SELECT
-            CASE
-                WHEN extra.governmentlevel(tribunal.government) > 2 AND extra.governmentabbreviation(extra.governmentcurrentleadstateid(tribunal.government)) <> upper($2)
-                THEN extra.governmentindigobook(extra.governmentcurrentleadstateid(tribunal.government))
-                ELSE ''::text
-            END || CASE
-                WHEN $3 THEN extra.tribunalgovernmentshort($1)
-                ELSE ''
-            END AS tribunalgovernmentshort
-       FROM geohistory.tribunal
-      WHERE tribunal.tribunalid = $1;
-    
-$_$;
-
-
-ALTER FUNCTION extra.tribunalgovernmentshort(integer, character varying, boolean) OWNER TO postgres;
-
---
--- Name: tribunallong(integer); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.tribunallong(integer) RETURNS text
-    LANGUAGE sql STABLE
-    AS $_$
-
-     SELECT (tribunaltype.tribunaltypelong || ' of '::text) ||
-            CASE
-                WHEN tribunaltype.tribunaltypelevel > 2 THEN ((extra.governmentshort(tribunal.government) || ', '::text) || extra.governmentshort(extra.governmentcurrentleadstateid(tribunal.government))) ||
-                CASE
-                    WHEN tribunaltype.tribunaltypedivision::text <> ''::text THEN ' - '::text || tribunaltype.tribunaltypedivision::text
-                    ELSE ''::text
-                END
-                WHEN tribunaltype.tribunaltypelevel = 2 THEN extra.governmentshort(tribunal.government) ||
-                CASE
-                    WHEN tribunal.tribunaldistrictcircuit::text = 'E'::text THEN ' - Eastern District'::text
-                    WHEN tribunal.tribunaldistrictcircuit::text = 'M'::text THEN ' - Middle District'::text
-                    WHEN tribunal.tribunaldistrictcircuit::text = 'W'::text THEN ' - Western District'::text
-                    WHEN tribunal.tribunaldistrictcircuit::text = 'N'::text THEN ' - Northern District'::text
-                    WHEN tribunal.tribunaldistrictcircuit::text = 'S'::text THEN ' - Southern District'::text
-                    WHEN tribunal.tribunaldistrictcircuit::text = 'C'::text THEN ' - Central District'::text
-                    ELSE ''::text
-                END
-                WHEN tribunaltype.tribunaltypelevel = 1 THEN
-                CASE
-                    WHEN tribunal.tribunaldistrictcircuit::text = 'E'::text THEN 'the Eastern District of '::text || extra.governmentshort(tribunal.government)
-                    WHEN tribunal.tribunaldistrictcircuit::text = 'M'::text THEN 'the Middle District of '::text || extra.governmentshort(tribunal.government)
-                    WHEN tribunal.tribunaldistrictcircuit::text = 'W'::text THEN 'the Western District of '::text || extra.governmentshort(tribunal.government)
-                    WHEN tribunal.tribunaldistrictcircuit::text = 'N'::text THEN 'the Northern District of '::text || extra.governmentshort(tribunal.government)
-                    WHEN tribunal.tribunaldistrictcircuit::text = 'S'::text THEN 'the Southern District of '::text || extra.governmentshort(tribunal.government)
-                    WHEN tribunal.tribunaldistrictcircuit::text = 'C'::text THEN 'the Central District of '::text || extra.governmentshort(tribunal.government)
-                    WHEN tribunal.tribunaldistrictcircuit::text = '1'::text THEN 'the First Circuit'::text
-                    WHEN tribunal.tribunaldistrictcircuit::text = '2'::text THEN 'the Second Circuit'::text
-                    WHEN tribunal.tribunaldistrictcircuit::text = '3'::text THEN 'the Third Circuit'::text
-                    WHEN tribunal.tribunaldistrictcircuit::text = '4'::text THEN 'the Fourth Circuit'::text
-                    WHEN tribunal.tribunaldistrictcircuit::text = '5'::text THEN 'the Fifth Circuit'::text
-                    WHEN tribunal.tribunaldistrictcircuit::text = '6'::text THEN 'the Sixth Circuit'::text
-                    WHEN tribunal.tribunaldistrictcircuit::text = '7'::text THEN 'the Seventh Circuit'::text
-                    WHEN tribunal.tribunaldistrictcircuit::text = '8'::text THEN 'the Eighth Circuit'::text
-                    WHEN tribunal.tribunaldistrictcircuit::text = '9'::text THEN 'the Ninth Circuit'::text
-                    WHEN tribunal.tribunaldistrictcircuit::text = '10'::text THEN 'the Tenth Circuit'::text
-                    WHEN tribunal.tribunaldistrictcircuit::text = '11'::text THEN 'the Eleventh Circuit'::text
-                    WHEN extra.governmentlevel(tribunal.government) = 1 OR extra.governmentname(tribunal.government) = 'District of Columbia'::text THEN 'the '::text || extra.governmentshort(tribunal.government)
-                    ELSE extra.governmentshort(tribunal.government)
-                END
-                ELSE ''::text
-            END AS tribunallong
-       FROM geohistory.tribunal,
-        geohistory.tribunaltype
-      WHERE tribunal.tribunaltype = tribunaltype.tribunaltypeid
-      AND tribunalid = $1;
-    
-$_$;
-
-
-ALTER FUNCTION extra.tribunallong(integer) OWNER TO postgres;
-
---
--- Name: tribunalshort(integer); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.tribunalshort(integer) RETURNS text
-    LANGUAGE sql STABLE
-    AS $_$
-
-     SELECT 
-        extra.tribunalgovernmentshort($1) || tribunaltype.tribunaltypeshort AS tribunalshort
-       FROM geohistory.tribunaltype
-       JOIN geohistory.tribunal
-         ON tribunal.tribunaltype = tribunaltype.tribunaltypeid
-      WHERE tribunalid = $1;
-    
-$_$;
-
-
-ALTER FUNCTION extra.tribunalshort(integer) OWNER TO postgres;
-
---
--- Name: tribunalshort(integer, character varying); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.tribunalshort(integer, character varying) RETURNS text
-    LANGUAGE sql STABLE
-    AS $_$
-
-     SELECT
-        extra.tribunalgovernmentshort($1, $2, false) || extra.tribunalshort($1) AS tribunalshort
-       FROM geohistory.tribunal
-      WHERE tribunal.tribunalid = $1;
-    
-$_$;
-
-
-ALTER FUNCTION extra.tribunalshort(integer, character varying) OWNER TO postgres;
-
---
--- Name: tribunalshort(integer, integer, character varying); Type: FUNCTION; Schema: extra; Owner: postgres
---
-
-CREATE FUNCTION extra.tribunalshort(integer, integer, character varying) RETURNS text
-    LANGUAGE sql STABLE
-    AS $_$
-
- SELECT
-        CASE
-            WHEN extra.governmentlevel(tribunal.government) > 2 AND tribunal.government = $2 THEN
-            CASE
-                WHEN tribunal.tribunaldistrictcircuit::text <> ''::text THEN tribunal.tribunaldistrictcircuit::text || CASE
-                    WHEN tribunal.tribunaldistrictcircuit::text = '1' THEN 'st'
-                    WHEN tribunal.tribunaldistrictcircuit::text IN ('2', '3') THEN 'd'
-                    WHEN tribunal.tribunaldistrictcircuit::text ~ '^\d+$' THEN 'th'
-                    ELSE ''
-                END || '.'::text
-                ELSE ''::text
-            END || tribunaltype.tribunaltypeshort::text
-            ELSE extra.tribunalshort($1, $3)
-        END AS tribunalshort
-   FROM geohistory.tribunaltype
-   JOIN geohistory.tribunal
-     ON tribunal.tribunaltype = tribunaltype.tribunaltypeid
-  WHERE tribunal.tribunalid = $1;
-    
-$_$;
-
-
-ALTER FUNCTION extra.tribunalshort(integer, integer, character varying) OWNER TO postgres;
+ALTER FUNCTION geohistory.array_combine(integer[]) OWNER TO postgres;
 
 --
 -- Name: datetonumeric(date); Type: FUNCTION; Schema: geohistory; Owner: postgres
@@ -1642,6 +161,64 @@ $_$;
 
 
 ALTER FUNCTION geohistory.datetonumeric(date) OWNER TO postgres;
+
+--
+-- Name: emptytonull(text); Type: FUNCTION; Schema: geohistory; Owner: postgres
+--
+
+CREATE FUNCTION geohistory.emptytonull(text) RETURNS text
+    LANGUAGE sql IMMUTABLE
+    AS $_$
+
+        SELECT CASE WHEN $1 = ''
+            THEN NULL::text ELSE $1 END AS emptytonull;
+    
+$_$;
+
+
+ALTER FUNCTION geohistory.emptytonull(text) OWNER TO postgres;
+
+--
+-- Name: eventlong(integer); Type: FUNCTION; Schema: geohistory; Owner: postgres
+--
+
+CREATE FUNCTION geohistory.eventlong(i_id integer) RETURNS text
+    LANGUAGE plpgsql IMMUTABLE
+    AS $$
+    DECLARE o_value text;
+    BEGIN
+        SELECT eventlong
+        INTO o_value
+        FROM geohistory.event
+        WHERE eventid = i_id;
+
+        RETURN COALESCE(o_value, '');
+    END;
+$$;
+
+
+ALTER FUNCTION geohistory.eventlong(i_id integer) OWNER TO postgres;
+
+--
+-- Name: eventslug(integer); Type: FUNCTION; Schema: geohistory; Owner: postgres
+--
+
+CREATE FUNCTION geohistory.eventslug(i_id integer) RETURNS text
+    LANGUAGE plpgsql IMMUTABLE
+    AS $$
+    DECLARE o_value text;
+    BEGIN
+        SELECT eventslug
+        INTO o_value
+        FROM geohistory.event
+        WHERE eventid = i_id;
+
+        RETURN COALESCE(o_value, '');
+    END;
+$$;
+
+
+ALTER FUNCTION geohistory.eventslug(i_id integer) OWNER TO postgres;
 
 --
 -- Name: government_insertupdate(); Type: FUNCTION; Schema: geohistory; Owner: postgres
@@ -1668,6 +245,96 @@ $$;
 
 
 ALTER FUNCTION geohistory.government_insertupdate() OWNER TO postgres;
+
+--
+-- Name: governmentcurrentleadstate(integer, integer); Type: FUNCTION; Schema: geohistory; Owner: postgres
+--
+
+CREATE FUNCTION geohistory.governmentcurrentleadstate(i_id integer, i_level integer) RETURNS character varying
+    LANGUAGE plpgsql IMMUTABLE
+    AS $$
+    DECLARE o_abbreviation character varying;
+    DECLARE o_id integer;
+    DECLARE o_state boolean;
+    BEGIN
+        SELECT governmentabbreviation,
+            CASE
+                WHEN governmentsubstitute IS NOT NULL THEN governmentsubstitute
+                ELSE governmentcurrentleadparent
+            END,
+            governmentlevel <= 2 AND governmentsubstitute IS NULL
+        INTO o_abbreviation,
+            o_id,
+            o_state
+        FROM geohistory.government
+        WHERE governmentid = i_id;
+
+        IF o_state THEN
+            RETURN o_abbreviation;
+        ELSIF i_level < 10 THEN
+            RETURN geohistory.governmentcurrentleadstate(o_id, i_level+1);
+        ELSE
+            RETURN ''::character varying;
+        END IF;
+    END;
+$$;
+
+
+ALTER FUNCTION geohistory.governmentcurrentleadstate(i_id integer, i_level integer) OWNER TO postgres;
+
+--
+-- Name: governmentcurrentleadstateid(integer, integer); Type: FUNCTION; Schema: geohistory; Owner: postgres
+--
+
+CREATE FUNCTION geohistory.governmentcurrentleadstateid(i_id integer, i_level integer) RETURNS integer
+    LANGUAGE plpgsql IMMUTABLE
+    AS $$
+    DECLARE o_id integer;
+    DECLARE o_state boolean;
+    BEGIN
+        SELECT CASE
+                WHEN governmentsubstitute IS NOT NULL THEN governmentsubstitute
+                ELSE governmentcurrentleadparent
+            END,
+            governmentlevel <= 2 AND governmentsubstitute IS NULL
+        INTO o_id,
+            o_state
+        FROM geohistory.government
+        WHERE governmentid = i_id;
+
+        IF o_state THEN
+            RETURN i_id;
+        ELSIF i_level < 10 THEN
+            RETURN geohistory.governmentcurrentleadstateid(o_id, i_level+1);
+        ELSE
+            RETURN NULL::integer;
+        END IF;
+    END;
+$$;
+
+
+ALTER FUNCTION geohistory.governmentcurrentleadstateid(i_id integer, i_level integer) OWNER TO postgres;
+
+--
+-- Name: governmentname(integer); Type: FUNCTION; Schema: geohistory; Owner: postgres
+--
+
+CREATE FUNCTION geohistory.governmentname(i_id integer) RETURNS character varying
+    LANGUAGE plpgsql IMMUTABLE
+    AS $$
+    DECLARE o_value text;
+    BEGIN
+        SELECT governmentname
+        INTO o_value
+        FROM geohistory.government
+        WHERE governmentid = i_id;
+
+        RETURN COALESCE(o_value, '');
+    END;
+$$;
+
+
+ALTER FUNCTION geohistory.governmentname(i_id integer) OWNER TO postgres;
 
 --
 -- Name: governmentothercurrentparent_insertupdate(); Type: FUNCTION; Schema: geohistory; Owner: postgres
@@ -1710,6 +377,77 @@ $$;
 
 
 ALTER FUNCTION geohistory.governmentothercurrentparent_insertupdate() OWNER TO postgres;
+
+--
+-- Name: governmentslug(integer); Type: FUNCTION; Schema: geohistory; Owner: postgres
+--
+
+CREATE FUNCTION geohistory.governmentslug(i_id integer) RETURNS character varying
+    LANGUAGE plpgsql IMMUTABLE
+    AS $$
+    DECLARE o_value text;
+    BEGIN
+        SELECT governmentslug
+        INTO o_value
+        FROM geohistory.government
+        WHERE governmentid = i_id;
+
+        RETURN COALESCE(o_value, '');
+    END;
+$$;
+
+
+ALTER FUNCTION geohistory.governmentslug(i_id integer) OWNER TO postgres;
+
+--
+-- Name: governmentslugsubstitute(integer, integer); Type: FUNCTION; Schema: geohistory; Owner: postgres
+--
+
+CREATE FUNCTION geohistory.governmentslugsubstitute(i_id integer, i_level integer) RETURNS text
+    LANGUAGE plpgsql IMMUTABLE
+    AS $$
+    DECLARE o_id integer;
+    DECLARE o_slug text;
+    BEGIN
+        SELECT
+            CASE
+                WHEN governmentsubstitute IS NOT NULL THEN governmentsubstitute
+                ELSE NULL
+            END,
+            CASE
+                WHEN governmentsubstitute IS NOT NULL THEN NULL
+                ELSE governmentslug
+            END
+        INTO o_id,
+            o_slug
+        FROM geohistory.government
+        WHERE governmentid = i_id;
+
+        IF o_slug IS NOT NULL THEN
+            RETURN o_slug;
+        ELSIF i_level < 10 THEN
+            RETURN geohistory.governmentslugsubstitute(o_id, i_level+1);
+        ELSE
+            RETURN NULL::text;
+        END IF;
+    END;
+$$;
+
+
+ALTER FUNCTION geohistory.governmentslugsubstitute(i_id integer, i_level integer) OWNER TO postgres;
+
+--
+-- Name: implode(text[]); Type: FUNCTION; Schema: geohistory; Owner: postgres
+--
+
+CREATE FUNCTION geohistory.implode(text[]) RETURNS text
+    LANGUAGE sql IMMUTABLE
+    AS $_$
+        SELECT array_to_string($1, ' ');
+$_$;
+
+
+ALTER FUNCTION geohistory.implode(text[]) OWNER TO postgres;
 
 --
 -- Name: law_insertupdate(); Type: FUNCTION; Schema: geohistory; Owner: postgres
@@ -1763,6 +501,27 @@ $$;
 ALTER FUNCTION geohistory.lawalternate_update() OWNER TO postgres;
 
 --
+-- Name: lawalternatecitation(integer); Type: FUNCTION; Schema: geohistory; Owner: postgres
+--
+
+CREATE FUNCTION geohistory.lawalternatecitation(i_id integer) RETURNS text
+    LANGUAGE plpgsql IMMUTABLE
+    AS $$
+    DECLARE o_value text;
+    BEGIN
+        SELECT lawalternatecitation
+        INTO o_value
+        FROM geohistory.lawalternate
+        WHERE lawalternateid = i_id;
+
+        RETURN COALESCE(o_value, '');
+    END;
+$$;
+
+
+ALTER FUNCTION geohistory.lawalternatecitation(i_id integer) OWNER TO postgres;
+
+--
 -- Name: lawalternatesection_insertupdate(); Type: FUNCTION; Schema: geohistory; Owner: postgres
 --
 
@@ -1791,6 +550,69 @@ $$;
 
 
 ALTER FUNCTION geohistory.lawalternatesection_insertupdate() OWNER TO postgres;
+
+--
+-- Name: lawalternateslug(integer); Type: FUNCTION; Schema: geohistory; Owner: postgres
+--
+
+CREATE FUNCTION geohistory.lawalternateslug(i_id integer) RETURNS text
+    LANGUAGE plpgsql IMMUTABLE
+    AS $$
+    DECLARE o_value text;
+    BEGIN
+        SELECT lawalternateslug
+        INTO o_value
+        FROM geohistory.lawalternate
+        WHERE lawalternateid = i_id;
+
+        RETURN COALESCE(o_value, '');
+    END;
+$$;
+
+
+ALTER FUNCTION geohistory.lawalternateslug(i_id integer) OWNER TO postgres;
+
+--
+-- Name: lawapproved(integer); Type: FUNCTION; Schema: geohistory; Owner: postgres
+--
+
+CREATE FUNCTION geohistory.lawapproved(i_id integer) RETURNS calendar.historicdatetext
+    LANGUAGE plpgsql IMMUTABLE
+    AS $$
+    DECLARE o_value text;
+    BEGIN
+        SELECT lawapproved::text
+        INTO o_value
+        FROM geohistory.law
+        WHERE lawid = i_id;
+
+        RETURN COALESCE(o_value, '')::calendar.historicdatetext;
+    END;
+$$;
+
+
+ALTER FUNCTION geohistory.lawapproved(i_id integer) OWNER TO postgres;
+
+--
+-- Name: lawcitation(integer); Type: FUNCTION; Schema: geohistory; Owner: postgres
+--
+
+CREATE FUNCTION geohistory.lawcitation(i_id integer) RETURNS text
+    LANGUAGE plpgsql IMMUTABLE
+    AS $$
+    DECLARE o_value text;
+    BEGIN
+        SELECT lawcitation
+        INTO o_value
+        FROM geohistory.law
+        WHERE lawid = i_id;
+
+        RETURN COALESCE(o_value, '');
+    END;
+$$;
+
+
+ALTER FUNCTION geohistory.lawcitation(i_id integer) OWNER TO postgres;
 
 --
 -- Name: lawgroupsection_deleteupdate(); Type: FUNCTION; Schema: geohistory; Owner: postgres
@@ -1889,6 +711,90 @@ $$;
 ALTER FUNCTION geohistory.lawsectionevent_insertupdate() OWNER TO postgres;
 
 --
+-- Name: lawsectionfrom(integer); Type: FUNCTION; Schema: geohistory; Owner: postgres
+--
+
+CREATE FUNCTION geohistory.lawsectionfrom(i_id integer) RETURNS text
+    LANGUAGE plpgsql IMMUTABLE
+    AS $$
+    DECLARE o_value text;
+    BEGIN
+        SELECT lawsectionfrom
+        INTO o_value
+        FROM geohistory.lawsection
+        WHERE lawsectionid = i_id;
+
+        RETURN COALESCE(o_value, '');
+    END;
+$$;
+
+
+ALTER FUNCTION geohistory.lawsectionfrom(i_id integer) OWNER TO postgres;
+
+--
+-- Name: lawsectionsymbol(integer); Type: FUNCTION; Schema: geohistory; Owner: postgres
+--
+
+CREATE FUNCTION geohistory.lawsectionsymbol(i_id integer) RETURNS text
+    LANGUAGE plpgsql IMMUTABLE
+    AS $$
+    DECLARE o_value text;
+    BEGIN
+        SELECT lawsectionsymbol
+        INTO o_value
+        FROM geohistory.lawsection
+        WHERE lawsectionid = i_id;
+
+        RETURN COALESCE(o_value, '');
+    END;
+$$;
+
+
+ALTER FUNCTION geohistory.lawsectionsymbol(i_id integer) OWNER TO postgres;
+
+--
+-- Name: lawsectionto(integer); Type: FUNCTION; Schema: geohistory; Owner: postgres
+--
+
+CREATE FUNCTION geohistory.lawsectionto(i_id integer) RETURNS text
+    LANGUAGE plpgsql IMMUTABLE
+    AS $$
+    DECLARE o_value text;
+    BEGIN
+        SELECT lawsectionto
+        INTO o_value
+        FROM geohistory.lawsection
+        WHERE lawsectionid = i_id;
+
+        RETURN COALESCE(o_value, '');
+    END;
+$$;
+
+
+ALTER FUNCTION geohistory.lawsectionto(i_id integer) OWNER TO postgres;
+
+--
+-- Name: lawslug(integer); Type: FUNCTION; Schema: geohistory; Owner: postgres
+--
+
+CREATE FUNCTION geohistory.lawslug(i_id integer) RETURNS text
+    LANGUAGE plpgsql IMMUTABLE
+    AS $$
+    DECLARE o_value text;
+    BEGIN
+        SELECT lawslug
+        INTO o_value
+        FROM geohistory.law
+        WHERE lawid = i_id;
+
+        RETURN COALESCE(o_value, '');
+    END;
+$$;
+
+
+ALTER FUNCTION geohistory.lawslug(i_id integer) OWNER TO postgres;
+
+--
 -- Name: metesdescriptionline_insertupdate(); Type: FUNCTION; Schema: geohistory; Owner: postgres
 --
 
@@ -1917,6 +823,86 @@ $$;
 ALTER FUNCTION geohistory.metesdescriptionline_insertupdate() OWNER TO postgres;
 
 --
+-- Name: plssmeridianlong(integer); Type: FUNCTION; Schema: geohistory; Owner: postgres
+--
+
+CREATE FUNCTION geohistory.plssmeridianlong(i_id integer) RETURNS text
+    LANGUAGE plpgsql IMMUTABLE
+    AS $$
+    DECLARE o_value text;
+    BEGIN
+        SELECT plssmeridianlong
+        INTO o_value
+        FROM geohistory.plssmeridian
+        WHERE plssmeridianid = i_id;
+
+        RETURN COALESCE(o_value, '');
+    END;
+$$;
+
+
+ALTER FUNCTION geohistory.plssmeridianlong(i_id integer) OWNER TO postgres;
+
+--
+-- Name: plssmeridianshort(integer); Type: FUNCTION; Schema: geohistory; Owner: postgres
+--
+
+CREATE FUNCTION geohistory.plssmeridianshort(i_id integer) RETURNS text
+    LANGUAGE plpgsql IMMUTABLE
+    AS $$
+    DECLARE o_value text;
+    BEGIN
+        SELECT plssmeridianshort
+        INTO o_value
+        FROM geohistory.plssmeridian
+        WHERE plssmeridianid = i_id;
+
+        RETURN COALESCE(o_value, '');
+    END;
+$$;
+
+
+ALTER FUNCTION geohistory.plssmeridianshort(i_id integer) OWNER TO postgres;
+
+--
+-- Name: punctuationnone(text); Type: FUNCTION; Schema: geohistory; Owner: postgres
+--
+
+CREATE FUNCTION geohistory.punctuationnone(text) RETURNS text
+    LANGUAGE sql IMMUTABLE
+    AS $_$
+
+  SELECT regexp_replace(
+     lower(
+        public.unaccent($1)
+     ), '[^a-z0-9]', '', 'g'
+  );
+    
+$_$;
+
+
+ALTER FUNCTION geohistory.punctuationnone(text) OWNER TO postgres;
+
+--
+-- Name: punctuationnonefuzzy(text); Type: FUNCTION; Schema: geohistory; Owner: postgres
+--
+
+CREATE FUNCTION geohistory.punctuationnonefuzzy(text) RETURNS text
+    LANGUAGE sql IMMUTABLE
+    AS $_$
+
+  SELECT regexp_replace(
+     lower(
+        public.unaccent($1)
+     ), '[^a-z0-9]', '', 'g'
+  ) || '%';
+    
+$_$;
+
+
+ALTER FUNCTION geohistory.punctuationnonefuzzy(text) OWNER TO postgres;
+
+--
 -- Name: rangeformat(text, text); Type: FUNCTION; Schema: geohistory; Owner: postgres
 --
 
@@ -1943,6 +929,146 @@ $_$;
 
 
 ALTER FUNCTION geohistory.rangeformat(text, text) OWNER TO postgres;
+
+--
+-- Name: refresh_view(); Type: FUNCTION; Schema: geohistory; Owner: postgres
+--
+
+CREATE FUNCTION geohistory.refresh_view() RETURNS void
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+RAISE INFO '%', clock_timestamp();
+    DELETE FROM geohistory.affectedgovernmentgrouppart
+    WHERE affectedgovernmentpart IN (
+        SELECT DISTINCT affectedgovernmentpart.affectedgovernmentpartid
+        FROM geohistory.affectedgovernmentpart
+        WHERE affectedgovernmentpart.governmentfrom IS NULL
+            AND affectedgovernmentpart.affectedtypefrom IS NULL
+            AND affectedgovernmentpart.governmentto IS NULL
+            AND affectedgovernmentpart.affectedtypeto IS NULL
+            AND affectedgovernmentpart.governmentformto IS NULL
+    );
+RAISE INFO '%', clock_timestamp();
+    DELETE FROM geohistory.affectedgovernmentpart
+	WHERE affectedgovernmentpartid IN (
+        SELECT DISTINCT affectedgovernmentpart.affectedgovernmentpartid
+        FROM geohistory.affectedgovernmentpart
+        LEFT JOIN geohistory.affectedgovernmentgrouppart
+            ON affectedgovernmentpart.affectedgovernmentpartid = affectedgovernmentgrouppart.affectedgovernmentpart
+        WHERE affectedgovernmentgrouppart.affectedgovernmentpart IS NULL
+	) AND affectedgovernmentpartid NOT IN (
+        SELECT DISTINCT affectedgovernmentpart.affectedgovernmentpartid
+        FROM geohistory.affectedgovernmentpart
+        WHERE affectedgovernmentpart.governmentfrom IS NULL
+            AND affectedgovernmentpart.affectedtypefrom IS NULL
+            AND affectedgovernmentpart.governmentto IS NULL
+            AND affectedgovernmentpart.affectedtypeto IS NULL
+            AND affectedgovernmentpart.governmentformto IS NULL
+    );
+RAISE INFO '%', clock_timestamp();
+    UPDATE geohistory.government
+    SET governmentnotecurrentleadparent = TRUE
+    WHERE NOT governmentnotecurrentleadparent
+    AND governmentid IN (
+        SELECT government.governmentid
+        FROM geohistory.government
+        JOIN (
+            SELECT replace(lower(government.governmentname), ' ', '') AS governmentname,
+                government.governmenttype,
+                government.governmentcurrentleadstateid
+            FROM geohistory.government
+		    JOIN geohistory.government governmentparent
+		        ON government.governmentcurrentleadparent = governmentparent.governmentid
+		    JOIN geohistory.government governmentparentlead
+		        ON governmentparent.governmentslugsubstitute = governmentparentlead.governmentslug
+            GROUP BY 1, 2, 3
+            HAVING count(DISTINCT governmentparentlead.governmentid) > 1
+        ) governmentgroup
+        ON replace(lower(government.governmentname), ' ', '') = governmentgroup.governmentname
+            AND government.governmenttype = governmentgroup.governmenttype
+            AND government.governmentcurrentleadstateid = governmentgroup.governmentcurrentleadstateid
+            AND NOT government.governmentnotecurrentleadparent
+     );
+RAISE INFO '%', clock_timestamp();  
+    UPDATE geohistory.government
+    SET governmentnotecurrentleadparent = FALSE
+    WHERE governmentnotecurrentleadparent
+        AND governmentid IN (
+            SELECT government.governmentid
+            FROM geohistory.government
+            JOIN (
+                SELECT replace(lower(government.governmentname), ' ', '') AS governmentname,
+                    government.governmenttype,
+                    government.governmentcurrentleadstateid
+                FROM geohistory.government
+		        JOIN geohistory.government governmentparent
+		            ON government.governmentcurrentleadparent = governmentparent.governmentid
+		        JOIN geohistory.government governmentparentlead
+		            ON governmentparent.governmentslugsubstitute = governmentparentlead.governmentslug
+            GROUP BY 1, 2, 3
+            HAVING count(DISTINCT governmentparentlead.governmentid) > 1
+        ) governmentgroup
+        ON replace(lower(government.governmentname), ' ', '') = governmentgroup.governmentname
+            AND government.governmenttype = governmentgroup.governmenttype
+            AND government.governmentcurrentleadstateid = governmentgroup.governmentcurrentleadstateid
+            AND NOT government.governmentnotecurrentleadparent
+     );
+RAISE INFO '%', clock_timestamp();
+    UPDATE geohistory.government
+    SET governmentname = governmentname || ''
+    WHERE governmentlevel = 1;
+RAISE INFO '%', clock_timestamp();
+    UPDATE geohistory.government
+    SET governmentname = governmentname || ''
+    WHERE governmentlevel = 2;
+RAISE INFO '%', clock_timestamp();
+    UPDATE geohistory.government
+    SET governmentname = governmentname || ''
+    WHERE governmentlevel = 3;
+RAISE INFO '%', clock_timestamp();
+    UPDATE geohistory.government
+    SET governmentname = governmentname || ''
+    WHERE governmentlevel = 4;
+RAISE INFO '%', clock_timestamp();
+    UPDATE geohistory.government
+    SET governmentname = governmentname || ''
+    WHERE governmentlevel = 5;
+RAISE INFO '%', clock_timestamp();
+    UPDATE geohistory.adjudication
+    SET adjudicationname = adjudicationname || '';
+RAISE INFO '%', clock_timestamp();
+    UPDATE geohistory.adjudicationsourcecitation
+    SET adjudicationsourcecitationname = adjudicationsourcecitationname || '';
+RAISE INFO '%', clock_timestamp();
+    UPDATE geohistory.governmentsource
+    SET governmentsourcename = governmentsourcename || '';
+RAISE INFO '%', clock_timestamp();
+    UPDATE geohistory.law
+    SET lawvolume = lawvolume || '';
+RAISE INFO '%', clock_timestamp();
+    UPDATE geohistory.lawalternate
+    SET lawalternatevolume = lawalternatevolume || '';
+RAISE INFO '%', clock_timestamp();
+    UPDATE geohistory.lawalternatesection
+    SET lawalternatesectionpagefrom = lawalternatesectionpagefrom + 0;
+RAISE INFO '%', clock_timestamp();
+    UPDATE geohistory.lawsection
+    SET lawsectionfrom = lawsectionfrom || '';
+RAISE INFO '%', clock_timestamp();
+    UPDATE geohistory.metesdescription
+    SET metesdescriptionname = metesdescriptionname || '';
+RAISE INFO '%', clock_timestamp();
+    UPDATE geohistory.sourcecitation
+    SET sourcecitationname = sourcecitationname || '';
+RAISE INFO '%', clock_timestamp();
+    REFRESH MATERIALIZED VIEW geohistory.lastrefresh;
+RAISE INFO '%', clock_timestamp();
+END
+$$;
+
+
+ALTER FUNCTION geohistory.refresh_view() OWNER TO postgres;
 
 --
 -- Name: source_insert(); Type: FUNCTION; Schema: geohistory; Owner: postgres
@@ -2003,6 +1129,90 @@ $$;
 
 
 ALTER FUNCTION geohistory.source_update() OWNER TO postgres;
+
+--
+-- Name: sourcelawhasspecialsession(integer); Type: FUNCTION; Schema: geohistory; Owner: postgres
+--
+
+CREATE FUNCTION geohistory.sourcelawhasspecialsession(i_id integer) RETURNS boolean
+    LANGUAGE plpgsql IMMUTABLE
+    AS $$
+    DECLARE o_value boolean;
+    BEGIN
+        SELECT sourcelawhasspecialsession
+        INTO o_value
+        FROM geohistory.source
+        WHERE sourceid = i_id;
+
+        RETURN o_value;
+    END;
+$$;
+
+
+ALTER FUNCTION geohistory.sourcelawhasspecialsession(i_id integer) OWNER TO postgres;
+
+--
+-- Name: sourcelawisbynumber(integer); Type: FUNCTION; Schema: geohistory; Owner: postgres
+--
+
+CREATE FUNCTION geohistory.sourcelawisbynumber(i_id integer) RETURNS boolean
+    LANGUAGE plpgsql IMMUTABLE
+    AS $$
+    DECLARE o_value boolean;
+    BEGIN
+        SELECT sourcelawisbynumber
+        INTO o_value
+        FROM geohistory.source
+        WHERE sourceid = i_id;
+
+        RETURN o_value;
+    END;
+$$;
+
+
+ALTER FUNCTION geohistory.sourcelawisbynumber(i_id integer) OWNER TO postgres;
+
+--
+-- Name: sourcelawtype(integer); Type: FUNCTION; Schema: geohistory; Owner: postgres
+--
+
+CREATE FUNCTION geohistory.sourcelawtype(i_id integer) RETURNS text
+    LANGUAGE plpgsql IMMUTABLE
+    AS $$
+    DECLARE o_value text;
+    BEGIN
+        SELECT sourcelawtype
+        INTO o_value
+        FROM geohistory.source
+        WHERE sourceid = i_id;
+
+        RETURN COALESCE(o_value, '');
+    END;
+$$;
+
+
+ALTER FUNCTION geohistory.sourcelawtype(i_id integer) OWNER TO postgres;
+
+--
+-- Name: sourceshort(integer); Type: FUNCTION; Schema: geohistory; Owner: postgres
+--
+
+CREATE FUNCTION geohistory.sourceshort(i_id integer) RETURNS text
+    LANGUAGE plpgsql IMMUTABLE
+    AS $$
+    DECLARE o_value text;
+    BEGIN
+        SELECT sourceshort
+        INTO o_value
+        FROM geohistory.source
+        WHERE sourceid = i_id;
+
+        RETURN COALESCE(o_value, '');
+    END;
+$$;
+
+
+ALTER FUNCTION geohistory.sourceshort(i_id integer) OWNER TO postgres;
 
 --
 -- Name: sourcetype_update(); Type: FUNCTION; Schema: geohistory; Owner: postgres
@@ -2136,33 +1346,124 @@ $$;
 
 ALTER FUNCTION gis.governmentshape_insert() OWNER TO postgres;
 
+--
+-- Name: refresh_sequence(); Type: FUNCTION; Schema: gis; Owner: postgres
+--
+
+CREATE FUNCTION gis.refresh_sequence() RETURNS void
+    LANGUAGE plpgsql STABLE
+    AS $_$
+
+    DECLARE
+
+        columncursor refcursor;
+        tableschema text;
+        tablename text;
+        columnname text;
+        columnsequence text;
+        maxidvalue bigint;
+
+    BEGIN
+
+        OPEN columncursor FOR
+        SELECT columns.table_schema::text,
+           columns.table_name::text,
+           columns.column_name::text,
+           split_part(columns.column_default::text, '''', 2) AS column_sequence
+          FROM information_schema.columns
+         WHERE columns.table_schema::text = ANY (ARRAY['geohistory'::text, 'gis'::text])
+           AND columns.column_default ~~ 'nextval(%'
+         ORDER BY 1, 2;
+
+        LOOP
+        
+          FETCH columncursor INTO tableschema, tablename, columnname, columnsequence;
+
+          IF NOT FOUND THEN
+            EXIT;
+          END IF;
+
+          EXECUTE format('SELECT COALESCE(max(%I.%I) + 1, 1) FROM %I.%I',
+            tablename,
+            columnname,
+            tableschema,
+            tablename)
+          INTO maxidvalue;
+
+		  EXECUTE 'SELECT pg_catalog.setval($1, $2, false)'
+		  USING columnsequence,
+		    maxidvalue;
+
+        END LOOP;
+
+    END;
+
+$_$;
+
+
+ALTER FUNCTION gis.refresh_sequence() OWNER TO postgres;
+
+--
+-- Name: refresh_view(); Type: FUNCTION; Schema: gis; Owner: postgres
+--
+
+CREATE FUNCTION gis.refresh_view() RETURNS void
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+RAISE INFO '%', clock_timestamp();
+    UPDATE gis.governmentshape
+    SET governmentshapetag = governmentshapetag || '';
+RAISE INFO '%', clock_timestamp();
+    TRUNCATE gis.deleted_affectedgovernmentgis;
+RAISE INFO '%', clock_timestamp();
+    TRUNCATE gis.deleted_metesdescriptiongis;
+RAISE INFO '%', clock_timestamp();
+    UPDATE gis.governmentshape
+    SET governmentshapereference = governmentshapeid
+    WHERE governmentshapereference IS NULL OR (
+        governmentshapereference IS NOT NULL
+        AND governmentshapereference <> governmentshapeid
+    );
+RAISE INFO '%', clock_timestamp();
+    REFRESH MATERIALIZED VIEW gis.governmentshapecache;
+RAISE INFO '%', clock_timestamp();
+END
+$$;
+
+
+ALTER FUNCTION gis.refresh_view() OWNER TO postgres;
+
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
 
 --
--- Name: adjudication; Type: TABLE; Schema: geohistory; Owner: postgres
+-- Name: adjudicationlocationtype; Type: TABLE; Schema: geohistory; Owner: postgres
 --
 
-CREATE TABLE geohistory.adjudication (
-    adjudicationid integer NOT NULL,
-    adjudicationtype integer NOT NULL,
-    adjudicationnumber character varying(11) DEFAULT ''::character varying NOT NULL,
-    adjudicationterm character varying(15) DEFAULT ''::character varying NOT NULL,
-    adjudicationlong text DEFAULT ''::text NOT NULL,
-    adjudicationshort text DEFAULT ''::text NOT NULL,
-    adjudicationnotes text DEFAULT ''::text NOT NULL,
-    adjudicationstatus text DEFAULT ''::text NOT NULL
+CREATE TABLE geohistory.adjudicationlocationtype (
+    adjudicationlocationtypeid integer NOT NULL,
+    tribunal integer NOT NULL,
+    adjudicationlocationtypearchivelevel integer,
+    adjudicationlocationtypearchiveseries character varying(10) DEFAULT ''::character varying NOT NULL,
+    adjudicationlocationtypetype character varying(20) DEFAULT 'Docket'::text NOT NULL,
+    adjudicationlocationtypevolumetype character varying(15) DEFAULT 'Volume'::text NOT NULL,
+    adjudicationlocationtypepagetype character varying(10) DEFAULT 'Page'::text NOT NULL,
+    adjudicationlocationtypeabbreviation character varying(45) DEFAULT ''::character varying NOT NULL,
+    adjudicationlocationtypelong character varying(60) DEFAULT ''::character varying NOT NULL,
+    adjudicationlocationtypeshort character varying(25) NOT NULL,
+    CONSTRAINT adjudicationlocationtype_check CHECK (((adjudicationlocationtypeshort)::text <> ''::text))
 );
 
 
-ALTER TABLE geohistory.adjudication OWNER TO postgres;
+ALTER TABLE geohistory.adjudicationlocationtype OWNER TO postgres;
 
 --
--- Name: COLUMN adjudication.adjudicationstatus; Type: COMMENT; Schema: geohistory; Owner: postgres
+-- Name: COLUMN adjudicationlocationtype.adjudicationlocationtypeshort; Type: COMMENT; Schema: geohistory; Owner: postgres
 --
 
-COMMENT ON COLUMN geohistory.adjudication.adjudicationstatus IS 'This field is used for internal tracking purposes, and is not included in open data.';
+COMMENT ON COLUMN geohistory.adjudicationlocationtype.adjudicationlocationtypeshort IS 'Conform with new abbreviations as of 2018-01-31';
 
 
 --
@@ -2204,262 +1505,58 @@ CREATE TABLE geohistory.tribunal (
 ALTER TABLE geohistory.tribunal OWNER TO postgres;
 
 --
--- Name: tribunaltype; Type: TABLE; Schema: geohistory; Owner: postgres
+-- Name: adjudication; Type: TABLE; Schema: geohistory; Owner: postgres
 --
 
-CREATE TABLE geohistory.tribunaltype (
-    tribunaltypeid integer NOT NULL,
-    tribunaltypelevel integer NOT NULL,
-    tribunaltypeshort character varying(20) NOT NULL,
-    tribunaltypelong text NOT NULL,
-    tribunaltypedivision character varying(25) DEFAULT ''::character varying NOT NULL,
-    tribunaltypefilingoffice character varying(50) NOT NULL,
-    tribunaltypefilingofficerlevel boolean DEFAULT false NOT NULL,
-    tribunaldescription text DEFAULT ''::text NOT NULL,
-    tribunaltypesummary character varying(50) DEFAULT ''::character varying NOT NULL,
-    CONSTRAINT tribunaltype_check CHECK ((((tribunaltypefilingoffice)::text <> ''::text) AND (tribunaltypelong <> ''::text) AND ((tribunaltypeshort)::text <> ''::text)))
+CREATE TABLE geohistory.adjudication (
+    adjudicationid integer NOT NULL,
+    adjudicationtype integer NOT NULL,
+    adjudicationnumber character varying(11) DEFAULT ''::character varying NOT NULL,
+    adjudicationterm character varying(15) DEFAULT ''::character varying NOT NULL,
+    adjudicationlong text DEFAULT ''::text NOT NULL,
+    adjudicationshort text DEFAULT ''::text NOT NULL,
+    adjudicationnotes text DEFAULT ''::text NOT NULL,
+    adjudicationstatus text DEFAULT ''::text NOT NULL,
+    adjudicationname text DEFAULT ''::text NOT NULL,
+    adjudicationslug text GENERATED ALWAYS AS (lower(regexp_replace(regexp_replace(((((((((geohistory.adjudicationtypegovernmentslug(adjudicationtype) || '-'::text) || geohistory.adjudicationtypetribunaltypesummary(adjudicationtype)) ||
+CASE
+    WHEN ((adjudicationnumber)::text = ''::text) THEN ''::text
+    ELSE ('-'::text || (adjudicationnumber)::text)
+END) || '-'::text) || geohistory.adjudicationtypelong(adjudicationtype)) ||
+CASE
+    WHEN ((adjudicationterm)::text = ''::text) THEN ''::text
+    ELSE ('-'::text || calendar.historicdatetextformat((((adjudicationterm)::text ||
+    CASE
+        WHEN (length((adjudicationterm)::text) = 4) THEN '-~07-~28'::text
+        WHEN (length((adjudicationterm)::text) = 7) THEN '-~28'::text
+        ELSE ''::text
+    END))::calendar.historicdate, 'short'::text, 'en'::text))
+END) || ' '::text) || adjudicationname), '[ \-]+'::text, '-'::text, 'g'::text), '[\/\,\.\(\)]'::text, ''::text, 'g'::text))) STORED,
+    adjudicationtitle text GENERATED ALWAYS AS (regexp_replace(regexp_replace(((((((geohistory.adjudicationtypegovernmentshort(adjudicationtype) || ' '::text) || geohistory.adjudicationtypetribunaltypesummary(adjudicationtype)) ||
+CASE
+    WHEN ((adjudicationnumber)::text = ''::text) THEN ''::text
+    ELSE (' '::text || (adjudicationnumber)::text)
+END) || ' '::text) || geohistory.adjudicationtypelong(adjudicationtype)) ||
+CASE
+    WHEN ((adjudicationterm)::text = ''::text) THEN ''::text
+    ELSE (' '::text || calendar.historicdatetextformat((((adjudicationterm)::text ||
+    CASE
+        WHEN (length((adjudicationterm)::text) = 4) THEN '-~07-~28'::text
+        WHEN (length((adjudicationterm)::text) = 7) THEN '-~28'::text
+        ELSE ''::text
+    END))::calendar.historicdate, 'short'::text, 'en'::text))
+END), '[ ]+'::text, ' '::text, 'g'::text), '[\/\,\.\(\)]'::text, ''::text, 'g'::text)) STORED
 );
 
 
-ALTER TABLE geohistory.tribunaltype OWNER TO postgres;
+ALTER TABLE geohistory.adjudication OWNER TO postgres;
 
 --
--- Name: adjudicationextra; Type: VIEW; Schema: extra; Owner: postgres
+-- Name: COLUMN adjudication.adjudicationstatus; Type: COMMENT; Schema: geohistory; Owner: postgres
 --
 
-CREATE VIEW extra.adjudicationextra AS
- WITH adjudicationslugs AS (
-         SELECT adjudication.adjudicationid,
-            lower(regexp_replace(regexp_replace(((((((extra.governmentslugalternate(tribunal.government) || '-'::text) || (tribunaltype.tribunaltypesummary)::text) ||
-                CASE
-                    WHEN ((adjudication.adjudicationnumber)::text = ''::text) THEN ''::text
-                    ELSE ('-'::text || (adjudication.adjudicationnumber)::text)
-                END) || '-'::text) || (adjudicationtype.adjudicationtypelong)::text) ||
-                CASE
-                    WHEN ((adjudication.adjudicationterm)::text = ''::text) THEN ''::text
-                    ELSE ('-'::text || extra.shortdate(((adjudication.adjudicationterm)::text ||
-                    CASE
-                        WHEN (length((adjudication.adjudicationterm)::text) = 4) THEN '-~07-~28'::text
-                        WHEN (length((adjudication.adjudicationterm)::text) = 7) THEN '-~28'::text
-                        ELSE ''::text
-                    END)))
-                END), '[ ]'::text, '-'::text, 'g'::text), '[\/\,\.\(\)]'::text, ''::text, 'g'::text)) AS adjudicationpartslug,
-            regexp_replace(regexp_replace(((((((extra.governmentshort(tribunal.government) || ' '::text) || (tribunaltype.tribunaltypesummary)::text) ||
-                CASE
-                    WHEN ((adjudication.adjudicationnumber)::text = ''::text) THEN ''::text
-                    ELSE (' '::text || (adjudication.adjudicationnumber)::text)
-                END) || ' '::text) || (adjudicationtype.adjudicationtypelong)::text) ||
-                CASE
-                    WHEN ((adjudication.adjudicationterm)::text = ''::text) THEN ''::text
-                    ELSE (' '::text || extra.shortdate(((adjudication.adjudicationterm)::text ||
-                    CASE
-                        WHEN (length((adjudication.adjudicationterm)::text) = 4) THEN '-~07-~28'::text
-                        WHEN (length((adjudication.adjudicationterm)::text) = 7) THEN '-~28'::text
-                        ELSE ''::text
-                    END)))
-                END), '[ ]'::text, ' '::text, 'g'::text), '[\/\,\.\(\)]'::text, ''::text, 'g'::text) AS adjudicationtitle
-           FROM (((geohistory.adjudication
-             JOIN geohistory.adjudicationtype ON ((adjudication.adjudicationtype = adjudicationtype.adjudicationtypeid)))
-             JOIN geohistory.tribunal ON ((adjudicationtype.tribunal = tribunal.tribunalid)))
-             JOIN geohistory.tribunaltype ON ((tribunal.tribunaltype = tribunaltype.tribunaltypeid)))
-        ), adjudicationslugcounts AS (
-         SELECT count(*) AS rowct,
-            adjudicationslugs_1.adjudicationpartslug
-           FROM adjudicationslugs adjudicationslugs_1
-          GROUP BY adjudicationslugs_1.adjudicationpartslug
-        )
- SELECT adjudicationslugs.adjudicationid,
-    (adjudicationslugs.adjudicationpartslug ||
-        CASE
-            WHEN (adjudicationslugcounts.rowct > 1) THEN ('-'::text || rank() OVER (PARTITION BY adjudicationslugs.adjudicationpartslug ORDER BY adjudicationslugs.adjudicationid))
-            ELSE ''::text
-        END) AS adjudicationslug,
-    adjudicationslugs.adjudicationtitle
-   FROM (adjudicationslugs
-     JOIN adjudicationslugcounts ON ((adjudicationslugs.adjudicationpartslug = adjudicationslugcounts.adjudicationpartslug)))
-  ORDER BY adjudicationslugs.adjudicationid;
+COMMENT ON COLUMN geohistory.adjudication.adjudicationstatus IS 'This field is used for internal tracking purposes, and is not included in open data.';
 
-
-ALTER VIEW extra.adjudicationextra OWNER TO postgres;
-
---
--- Name: adjudicationextracache; Type: MATERIALIZED VIEW; Schema: extra; Owner: postgres
---
-
-CREATE MATERIALIZED VIEW extra.adjudicationextracache AS
- SELECT adjudicationid,
-    adjudicationslug,
-    adjudicationtitle
-   FROM extra.adjudicationextra
-  WITH NO DATA;
-
-
-ALTER MATERIALIZED VIEW extra.adjudicationextracache OWNER TO postgres;
-
---
--- Name: government; Type: TABLE; Schema: geohistory; Owner: postgres
---
-
-CREATE TABLE geohistory.government (
-    governmentid integer NOT NULL,
-    governmentname character varying(75) NOT NULL,
-    governmenttype character varying(30) NOT NULL,
-    governmentstatus character varying(35) DEFAULT ''::character varying NOT NULL,
-    governmentstatusdefacto boolean DEFAULT false NOT NULL,
-    governmentstyle character varying(20) DEFAULT ''::character varying NOT NULL,
-    governmentlevel smallint NOT NULL,
-    governmentcurrentleadparent integer,
-    governmentabbreviation character varying(10) DEFAULT ''::character varying NOT NULL,
-    government1983stateplaneauthority character varying(100) DEFAULT ''::character varying NOT NULL,
-    governmentlead1983stateplane character varying(2) DEFAULT ''::character varying NOT NULL,
-    governmenthasmultiple1983stateplane boolean,
-    governmentdefaultsrid integer,
-    governmentnotecreation character varying(5) DEFAULT ''::character varying NOT NULL,
-    governmentnotedissolution character varying(5) DEFAULT ''::character varying NOT NULL,
-    governmentnotecurrentleadparent boolean DEFAULT false NOT NULL,
-    governmentcharterstatus integer,
-    governmentbooknote text[],
-    governmentbookcomplete jsonb,
-    governmentmultilevel boolean DEFAULT false NOT NULL,
-    governmentindigobook character varying(20) DEFAULT ''::character varying NOT NULL,
-    governmentsubstitute integer,
-    governmentnumber character varying(3) DEFAULT ''::character varying NOT NULL,
-    governmentmapstatus integer DEFAULT 1 NOT NULL,
-    locale character varying(2) DEFAULT 'en'::character varying NOT NULL,
-    governmentarticle character varying(10) DEFAULT ''::character varying NOT NULL,
-    governmentconnectingarticle character varying(10) DEFAULT ''::character varying NOT NULL,
-    governmentcurrentform integer,
-    CONSTRAINT government_check CHECK (((((governmentstatus)::text = ANY (ARRAY['cadastral'::text, 'defunct'::text, 'nonfunctioning'::text, 'paper'::text, 'placeholder'::text, 'proposed'::text, 'unincorporated'::text, 'unknown'::text, ''::text])) OR (((governmentstatus)::text = ANY (ARRAY['alternate'::text, 'language'::text])) AND (governmentsubstitute IS NOT NULL))) AND (governmentlevel >= 1) AND (governmentlevel <= 5) AND ((governmentlevel = 2) OR ((governmentlevel <> 2) AND ((government1983stateplaneauthority)::text = ''::text))) AND ((governmentlevel = 3) OR ((governmentlevel <> 3) AND ((governmentlead1983stateplane)::text = ''::text))) AND ((governmentlevel = 3) OR ((governmentlevel <> 3) AND (governmenthasmultiple1983stateplane IS NULL))) AND (((governmentname)::text <> ''::text) OR ((governmentnumber)::text <> ''::text)) AND ((governmenttype)::text <> ''::text) AND ((locale)::text <> ''::text) AND (NOT (((governmentstatus)::text = ANY (ARRAY['placeholder'::text, 'proposed'::text, 'unincorporated'::text])) AND (governmentmapstatus <> 0))) AND (((governmentlevel = 1) AND (governmentcurrentleadparent IS NULL)) OR ((governmentlevel > 1) AND (governmentcurrentleadparent IS NOT NULL) AND (governmentid <> governmentcurrentleadparent)))))
-);
-
-
-ALTER TABLE geohistory.government OWNER TO postgres;
-
---
--- Name: COLUMN government.governmentstyle; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.government.governmentstyle IS 'Signifies if the government uses a government type in its formal name that is different than its actual government type.';
-
-
---
--- Name: COLUMN government.governmentlevel; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.government.governmentlevel IS '1 = Nation; 2 = State/Province; 3 = County/Parish; 4 = Township/Municipality; 5 = Unincorporated Ward/Populated Place. Generally = floor((OSM admin_level + 1)/2) or GeoNames administrative division order + 1';
-
-
---
--- Name: COLUMN government.government1983stateplaneauthority; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.government.government1983stateplaneauthority IS 'Last checked January 29, 2017.';
-
-
---
--- Name: COLUMN government.governmentlead1983stateplane; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.government.governmentlead1983stateplane IS 'Last checked January 29, 2017.';
-
-
---
--- Name: COLUMN government.governmenthasmultiple1983stateplane; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.government.governmenthasmultiple1983stateplane IS 'Last checked January 29, 2017.';
-
-
---
--- Name: COLUMN government.governmentcharterstatus; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.government.governmentcharterstatus IS 'This field is used for internal tracking purposes, and is not included in open data.';
-
-
---
--- Name: COLUMN government.governmentbooknote; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.government.governmentbooknote IS 'This field is used for internal tracking purposes, and is not included in open data.';
-
-
---
--- Name: COLUMN government.governmentbookcomplete; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.government.governmentbookcomplete IS 'This field is used for internal tracking purposes, and is not included in open data.';
-
-
---
--- Name: COLUMN government.governmentmapstatus; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.government.governmentmapstatus IS 'The values have been simplified in open data to remove certain information used for internal tracking purposes.';
-
-
---
--- Name: governmentsubstitute; Type: VIEW; Schema: extra; Owner: postgres
---
-
-CREATE VIEW extra.governmentsubstitute AS
- WITH RECURSIVE governmentsubstitutepart(governmentid, governmentsubstitute) AS (
-         SELECT s1.governmentid,
-            s1.governmentsubstitute,
-            1 AS depth
-           FROM geohistory.government s1
-          WHERE (s1.governmentsubstitute IS NOT NULL)
-        UNION
-         SELECT s1.governmentid,
-            s2.governmentsubstitute,
-            (s1.depth + 1) AS depth
-           FROM geohistory.government s2,
-            governmentsubstitutepart s1
-          WHERE ((s2.governmentid = s1.governmentsubstitute) AND (s2.governmentsubstitute IS NOT NULL) AND (s1.depth < 4))
-        ), governmentsubstituterank AS (
-         SELECT governmentsubstitutepart.governmentid,
-            governmentsubstitutepart.governmentsubstitute,
-            (row_number() OVER (PARTITION BY governmentsubstitutepart.governmentid ORDER BY governmentsubstitutepart.depth DESC) = 1) AS isgovernmentlead
-           FROM governmentsubstitutepart
-        ), governmentsubstitutemultiple AS (
-         SELECT DISTINCT governmentsubstituterank.governmentsubstitute
-           FROM (governmentsubstituterank
-             JOIN geohistory.government ON (((governmentsubstituterank.governmentid = government.governmentid) AND ((government.governmentstatus)::text <> ALL (ARRAY[('alternate'::character varying)::text, ('language'::character varying)::text])))))
-        ), governmentsubstitutecombine AS (
-         SELECT governmentsubstituterank.governmentid,
-            governmentsubstituterank.governmentsubstitute
-           FROM governmentsubstituterank
-          WHERE governmentsubstituterank.isgovernmentlead
-        UNION
-         SELECT government.governmentid,
-            government.governmentid AS governmentsubstitute
-           FROM geohistory.government
-          WHERE (government.governmentsubstitute IS NULL)
-        )
- SELECT governmentsubstitutecombine.governmentid,
-    governmentsubstitutecombine.governmentsubstitute,
-    (governmentsubstitutemultiple.governmentsubstitute IS NOT NULL) AS governmentsubstitutemultiple
-   FROM (governmentsubstitutecombine
-     LEFT JOIN governmentsubstitutemultiple ON ((governmentsubstitutecombine.governmentsubstitute = governmentsubstitutemultiple.governmentsubstitute)))
-  ORDER BY governmentsubstitutecombine.governmentid, governmentsubstitutecombine.governmentsubstitute;
-
-
-ALTER VIEW extra.governmentsubstitute OWNER TO postgres;
-
---
--- Name: adjudicationevent; Type: TABLE; Schema: geohistory; Owner: postgres
---
-
-CREATE TABLE geohistory.adjudicationevent (
-    adjudicationeventid integer NOT NULL,
-    adjudication integer NOT NULL,
-    event integer NOT NULL,
-    eventrelationship integer NOT NULL,
-    CONSTRAINT adjudicationevent_check CHECK ((eventrelationship <> ALL (ARRAY[2, 4, 6, 7, 9])))
-);
-
-
-ALTER TABLE geohistory.adjudicationevent OWNER TO postgres;
 
 --
 -- Name: adjudicationlocation; Type: TABLE; Schema: geohistory; Owner: postgres
@@ -2481,39 +1578,12 @@ CREATE TABLE geohistory.adjudicationlocation (
     adjudicationlocationrepositoryextractdate calendar.historicdatetext DEFAULT (''::text)::calendar.historicdatetext NOT NULL,
     adjudicationlocationrepositoryorder smallint,
     adjudicationlocationrepositoryentry character varying(75) DEFAULT ''::text NOT NULL,
-    adjudicationlocationrepositoryseries character varying(50) DEFAULT ''::character varying NOT NULL
+    adjudicationlocationrepositoryseries character varying(50) DEFAULT ''::character varying NOT NULL,
+    adjudicationlocationpage text GENERATED ALWAYS AS (geohistory.rangeformat((adjudicationlocationpagefrom)::text, (adjudicationlocationpageto)::text)) STORED
 );
 
 
 ALTER TABLE geohistory.adjudicationlocation OWNER TO postgres;
-
---
--- Name: adjudicationlocationtype; Type: TABLE; Schema: geohistory; Owner: postgres
---
-
-CREATE TABLE geohistory.adjudicationlocationtype (
-    adjudicationlocationtypeid integer NOT NULL,
-    tribunal integer NOT NULL,
-    adjudicationlocationtypearchivelevel integer,
-    adjudicationlocationtypearchiveseries character varying(10) DEFAULT ''::character varying NOT NULL,
-    adjudicationlocationtypetype character varying(20) DEFAULT 'Docket'::text NOT NULL,
-    adjudicationlocationtypevolumetype character varying(15) DEFAULT 'Volume'::text NOT NULL,
-    adjudicationlocationtypepagetype character varying(10) DEFAULT 'Page'::text NOT NULL,
-    adjudicationlocationtypeabbreviation character varying(45) DEFAULT ''::character varying NOT NULL,
-    adjudicationlocationtypelong character varying(60) DEFAULT ''::character varying NOT NULL,
-    adjudicationlocationtypeshort character varying(25) NOT NULL,
-    CONSTRAINT adjudicationlocationtype_check CHECK (((adjudicationlocationtypeshort)::text <> ''::text))
-);
-
-
-ALTER TABLE geohistory.adjudicationlocationtype OWNER TO postgres;
-
---
--- Name: COLUMN adjudicationlocationtype.adjudicationlocationtypeshort; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.adjudicationlocationtype.adjudicationlocationtypeshort IS 'Conform with new abbreviations as of 2018-01-31';
-
 
 --
 -- Name: affectedgovernmentgroup; Type: TABLE; Schema: geohistory; Owner: postgres
@@ -2542,6 +1612,21 @@ CREATE TABLE geohistory.affectedgovernmentgrouppart (
 ALTER TABLE geohistory.affectedgovernmentgrouppart OWNER TO postgres;
 
 --
+-- Name: affectedgovernmentlevel; Type: TABLE; Schema: geohistory; Owner: postgres
+--
+
+CREATE TABLE geohistory.affectedgovernmentlevel (
+    affectedgovernmentlevelid integer NOT NULL,
+    affectedgovernmentlevelshort character varying(20) NOT NULL,
+    affectedgovernmentlevellong character varying(20) NOT NULL,
+    affectedgovernmentlevelgroup integer NOT NULL,
+    affectedgovernmentleveldisplayorder integer NOT NULL
+);
+
+
+ALTER TABLE geohistory.affectedgovernmentlevel OWNER TO postgres;
+
+--
 -- Name: affectedgovernmentpart; Type: TABLE; Schema: geohistory; Owner: postgres
 --
 
@@ -2559,20 +1644,43 @@ CREATE TABLE geohistory.affectedgovernmentpart (
 ALTER TABLE geohistory.affectedgovernmentpart OWNER TO postgres;
 
 --
--- Name: currentgovernment; Type: TABLE; Schema: geohistory; Owner: postgres
+-- Name: affectedtype; Type: TABLE; Schema: geohistory; Owner: postgres
 --
 
-CREATE TABLE geohistory.currentgovernment (
-    currentgovernmentid integer NOT NULL,
-    governmentsubmunicipality integer,
-    governmentmunicipality integer NOT NULL,
-    governmentcounty integer NOT NULL,
-    governmentstate integer NOT NULL,
-    event integer NOT NULL
+CREATE TABLE geohistory.affectedtype (
+    affectedtypeid integer NOT NULL,
+    affectedtypelong text NOT NULL,
+    affectedtypeshort character varying(20) NOT NULL,
+    affectedtypecreationdissolution character varying(11) DEFAULT ''::character varying NOT NULL,
+    affectedtypefromtoboth character varying(4) NOT NULL,
+    affectedtypeequal boolean DEFAULT false NOT NULL,
+    originalaffectedtypeid integer,
+    CONSTRAINT affectedtype_check CHECK ((((affectedtypefromtoboth)::text <> ''::text) AND (affectedtypelong <> ''::text) AND ((affectedtypeshort)::text <> ''::text)))
 );
 
 
-ALTER TABLE geohistory.currentgovernment OWNER TO postgres;
+ALTER TABLE geohistory.affectedtype OWNER TO postgres;
+
+--
+-- Name: COLUMN affectedtype.affectedtypelong; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.affectedtype.affectedtypelong IS 'Rewrite';
+
+
+--
+-- Name: COLUMN affectedtype.affectedtypefromtoboth; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.affectedtype.affectedtypefromtoboth IS 'Whether the value can appear in the `from` or `to` fields, or if it must appear in both.';
+
+
+--
+-- Name: COLUMN affectedtype.affectedtypeequal; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.affectedtype.affectedtypeequal IS 'Whether the `from` and `to` values must be equal.';
+
 
 --
 -- Name: event; Type: TABLE; Schema: geohistory; Owner: postgres
@@ -2668,6 +1776,564 @@ COMMENT ON COLUMN geohistory.event.eventismappedtype IS 'This field is used for 
 
 
 --
+-- Name: eventgranted; Type: TABLE; Schema: geohistory; Owner: postgres
+--
+
+CREATE TABLE geohistory.eventgranted (
+    eventgrantedid integer NOT NULL,
+    eventgrantedlong text NOT NULL,
+    eventgrantedshort character varying(15) NOT NULL,
+    eventgrantedsuccess boolean DEFAULT true NOT NULL,
+    eventgrantedcertainty boolean DEFAULT false NOT NULL,
+    eventgrantedplaceholder boolean DEFAULT false NOT NULL,
+    eventgrantedpublicview boolean DEFAULT true NOT NULL,
+    CONSTRAINT eventgranted_check CHECK (((eventgrantedlong <> ''::text) AND ((eventgrantedshort)::text <> ''::text)))
+);
+
+
+ALTER TABLE geohistory.eventgranted OWNER TO postgres;
+
+--
+-- Name: COLUMN eventgranted.eventgrantedpublicview; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.eventgranted.eventgrantedpublicview IS 'TRUE items are omitted from open data.';
+
+
+--
+-- Name: eventtype; Type: TABLE; Schema: geohistory; Owner: postgres
+--
+
+CREATE TABLE geohistory.eventtype (
+    eventtypeid integer NOT NULL,
+    eventtypelong text NOT NULL,
+    eventtypeshort character varying(50) NOT NULL,
+    eventtypeborders character varying(15) DEFAULT ''::character varying NOT NULL,
+    eventtypeinclude boolean DEFAULT false NOT NULL,
+    eventtypecreate character varying(1) DEFAULT 'n'::text NOT NULL,
+    eventtypegroup character varying(20),
+    CONSTRAINT eventtype_check CHECK (((eventtypelong <> ''::text) AND ((eventtypeshort)::text <> ''::text)))
+);
+
+
+ALTER TABLE geohistory.eventtype OWNER TO postgres;
+
+--
+-- Name: COLUMN eventtype.eventtypelong; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.eventtype.eventtypelong IS 'Rewrite';
+
+
+--
+-- Name: COLUMN eventtype.eventtypecreate; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.eventtype.eventtypecreate IS 'c = only events affecting counties included; 
+n = no events included;
+s = separate/subordinate events are included for townships and all events included for all other types;
+t = begin/end events are included for townships and all events included for all other types;
+y = all events included';
+
+
+--
+-- Name: COLUMN eventtype.eventtypegroup; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.eventtype.eventtypegroup IS '"Omit" items are omitted from open data, and events with foreign key "Placeholder" are omitted from open data.';
+
+
+--
+-- Name: governmentform; Type: TABLE; Schema: geohistory; Owner: postgres
+--
+
+CREATE TABLE geohistory.governmentform (
+    governmentformid integer NOT NULL,
+    governmentstate integer NOT NULL,
+    governmentformpublication boolean DEFAULT true NOT NULL,
+    recategorize boolean DEFAULT false NOT NULL,
+    governmentformpublicationdate boolean DEFAULT false NOT NULL,
+    governmentformtype text DEFAULT ''::text NOT NULL,
+    governmentformclass text DEFAULT ''::text NOT NULL,
+    governmentformqualifier text DEFAULT ''::text NOT NULL,
+    governmentformqualifierinclude boolean DEFAULT true NOT NULL,
+    governmentformextended text DEFAULT ''::text NOT NULL,
+    governmentformlong text GENERATED ALWAYS AS ((((governmentformtype ||
+CASE
+    WHEN (governmentformclass <> ''::text) THEN (', '::text || governmentformclass)
+    ELSE ''::text
+END) ||
+CASE
+    WHEN (governmentformqualifier <> ''::text) THEN ((' ('::text || governmentformqualifier) || ')'::text)
+    ELSE ''::text
+END) ||
+CASE
+    WHEN (governmentformextended <> ''::text) THEN (': '::text || governmentformextended)
+    ELSE ''::text
+END)) STORED,
+    governmentformlongreport text GENERATED ALWAYS AS (((governmentformtype ||
+CASE
+    WHEN (governmentformclass <> ''::text) THEN (', '::text || governmentformclass)
+    ELSE ''::text
+END) ||
+CASE
+    WHEN (governmentformqualifierinclude AND (governmentformqualifier <> ''::text)) THEN ((' ('::text || governmentformqualifier) || ')'::text)
+    ELSE ''::text
+END)) STORED
+);
+
+
+ALTER TABLE geohistory.governmentform OWNER TO postgres;
+
+--
+-- Name: COLUMN governmentform.governmentformpublication; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.governmentform.governmentformpublication IS 'Whether this record should be included in book publication form. This field is used for internal tracking purposes, and is always shown as the default value in open data.';
+
+
+--
+-- Name: COLUMN governmentform.recategorize; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.governmentform.recategorize IS 'This field is used for internal tracking purposes, and is always shown as the default value in open data.';
+
+
+--
+-- Name: COLUMN governmentform.governmentformpublicationdate; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.governmentform.governmentformpublicationdate IS 'This field is used for internal tracking purposes, and is always shown as the default value in open data.';
+
+
+--
+-- Name: COLUMN governmentform.governmentformextended; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.governmentform.governmentformextended IS 'This field is used for internal tracking purposes, and is not included in open data.';
+
+
+--
+-- Name: government; Type: TABLE; Schema: geohistory; Owner: postgres
+--
+
+CREATE TABLE geohistory.government (
+    governmentid integer NOT NULL,
+    governmentname character varying(75) NOT NULL,
+    governmenttype character varying(30) NOT NULL,
+    governmentstatus character varying(35) DEFAULT ''::character varying NOT NULL,
+    governmentstatusdefacto boolean DEFAULT false NOT NULL,
+    governmentstyle character varying(20) DEFAULT ''::character varying NOT NULL,
+    governmentlevel smallint NOT NULL,
+    governmentcurrentleadparent integer,
+    governmentabbreviation character varying(10) DEFAULT ''::character varying NOT NULL,
+    government1983stateplaneauthority character varying(100) DEFAULT ''::character varying NOT NULL,
+    governmentlead1983stateplane character varying(2) DEFAULT ''::character varying NOT NULL,
+    governmenthasmultiple1983stateplane boolean,
+    governmentdefaultsrid integer,
+    governmentnotecreation character varying(5) DEFAULT ''::character varying NOT NULL,
+    governmentnotedissolution character varying(5) DEFAULT ''::character varying NOT NULL,
+    governmentnotecurrentleadparent boolean DEFAULT false NOT NULL,
+    governmentcharterstatus integer,
+    governmentbooknote text[],
+    governmentbookcomplete jsonb,
+    governmentmultilevel boolean DEFAULT false NOT NULL,
+    governmentindigobook character varying(20) DEFAULT ''::character varying NOT NULL,
+    governmentsubstitute integer,
+    governmentnumber character varying(3) DEFAULT ''::character varying NOT NULL,
+    governmentmapstatus integer DEFAULT 1 NOT NULL,
+    locale character varying(2) DEFAULT 'en'::character varying NOT NULL,
+    governmentarticle character varying(10) DEFAULT ''::character varying NOT NULL,
+    governmentconnectingarticle character varying(10) DEFAULT ''::character varying NOT NULL,
+    governmentcurrentform integer,
+    governmentcurrentleadstate character varying(10) GENERATED ALWAYS AS (geohistory.governmentcurrentleadstate(governmentid, 1)) STORED,
+    governmentcurrentleadstateid integer GENERATED ALWAYS AS (geohistory.governmentcurrentleadstateid(governmentid, 1)) STORED,
+    governmentlong text GENERATED ALWAYS AS ((((
+CASE
+    WHEN ((governmentname)::text = ''::text) THEN (governmentnumber)::text
+    WHEN ((governmentnumber)::text = ''::text) THEN (governmentname)::text
+    ELSE ((((governmentname)::text || ' ('::text) || (governmentnumber)::text) || ')'::text)
+END ||
+CASE
+    WHEN (governmentlevel > 1) THEN ((', '::text || (
+    CASE
+        WHEN ((governmentstyle)::text <> ''::text) THEN governmentstyle
+        ELSE governmenttype
+    END)::text) ||
+    CASE
+        WHEN ((governmentconnectingarticle)::text <> ''::text) THEN (' '::text || (governmentconnectingarticle)::text)
+        WHEN ((locale)::text = ANY (ARRAY[('de'::character varying)::text, ('nl'::character varying)::text])) THEN ''::text
+        WHEN ((locale)::text = 'fr'::text) THEN ' de'::text
+        ELSE ' of'::text
+    END)
+    ELSE ''::text
+END) ||
+CASE
+    WHEN (((governmentstatus)::text <> ''::text) OR governmentnotecurrentleadparent OR ((governmentnotecreation)::text <> ''::text) OR ((governmentnotedissolution)::text <> ''::text)) THEN ((((((' ('::text || (
+    CASE
+        WHEN governmentnotecurrentleadparent THEN geohistory.governmentname(governmentcurrentleadparent)
+        ELSE ''::character varying
+    END)::text) ||
+    CASE
+        WHEN (governmentnotecurrentleadparent AND (((governmentnotecreation)::text <> ''::text) OR ((governmentnotedissolution)::text <> ''::text))) THEN ', '::text
+        ELSE ''::text
+    END) ||
+    CASE
+        WHEN (((governmentnotecreation)::text <> ''::text) AND ((governmentnotedissolution)::text <> ''::text)) THEN (((governmentnotecreation)::text || '-'::text) || (governmentnotedissolution)::text)
+        WHEN ((governmentnotecreation)::text <> ''::text) THEN ('since '::text || (governmentnotecreation)::text)
+        WHEN ((governmentnotedissolution)::text <> ''::text) THEN ('thru '::text || (governmentnotedissolution)::text)
+        ELSE ''::text
+    END) ||
+    CASE
+        WHEN (((governmentstatus)::text <> ''::text) AND (governmentnotecurrentleadparent OR ((governmentnotecreation)::text <> ''::text) OR ((governmentnotedissolution)::text <> ''::text))) THEN ', '::text
+        ELSE ''::text
+    END) || (governmentstatus)::text) || ')'::text)
+    ELSE ''::text
+END) ||
+CASE
+    WHEN (governmentlevel > 2) THEN ((' ('::text || (geohistory.governmentcurrentleadstate(governmentid, 1))::text) || ')'::text)
+    ELSE ''::text
+END)) STORED,
+    governmentsearch text GENERATED ALWAYS AS (geohistory.punctuationnone(((
+CASE
+    WHEN ((governmentlevel = 2) AND ((governmenttype)::text = 'District'::text)) THEN ((governmenttype)::text || ' of '::text)
+    ELSE ''::text
+END ||
+CASE
+    WHEN ((governmentname)::text = ''::text) THEN (governmentnumber)::text
+    WHEN ((governmentnumber)::text = ''::text) THEN (governmentname)::text
+    ELSE ((((governmentname)::text || ' ('::text) || (governmentnumber)::text) || ')'::text)
+END) ||
+CASE
+    WHEN (governmentlevel > 2) THEN ((((' '::text || (
+    CASE
+        WHEN ((governmentstyle)::text <> ''::text) THEN governmentstyle
+        ELSE governmenttype
+    END)::text) || ' ('::text) || (geohistory.governmentcurrentleadstate(governmentid, 1))::text) || ')'::text)
+    ELSE ''::text
+END))) STORED,
+    governmentshort text GENERATED ALWAYS AS (((
+CASE
+    WHEN ((governmentlevel = 2) AND ((governmenttype)::text = 'District'::text)) THEN ((governmenttype)::text || ' of '::text)
+    ELSE ''::text
+END ||
+CASE
+    WHEN ((governmentname)::text = ''::text) THEN (governmentnumber)::text
+    WHEN ((governmentnumber)::text = ''::text) THEN (governmentname)::text
+    ELSE ((((governmentname)::text || ' ('::text) || (governmentnumber)::text) || ')'::text)
+END) ||
+CASE
+    WHEN (governmentlevel > 2) THEN ((((' '::text || (
+    CASE
+        WHEN ((governmentstyle)::text <> ''::text) THEN governmentstyle
+        ELSE governmenttype
+    END)::text) || ' ('::text) || (geohistory.governmentcurrentleadstate(governmentid, 1))::text) || ')'::text)
+    ELSE ''::text
+END)) STORED,
+    governmentslug text GENERATED ALWAYS AS (lower(replace(regexp_replace(regexp_replace(
+CASE
+    WHEN ((governmentstatus)::text = 'placeholder'::text) THEN NULL::text
+    WHEN ((governmentlevel < 3) AND ((governmentabbreviation)::text <> ''::text)) THEN (governmentabbreviation)::text
+    ELSE ((((((geohistory.governmentcurrentleadstate(governmentid, 1))::text ||
+    CASE
+        WHEN ((governmentarticle)::text <> ''::text) THEN ('-'::text || (governmentarticle)::text)
+        ELSE ''::text
+    END) ||
+    CASE
+        WHEN ((governmentname)::text <> ''::text) THEN ('-'::text || (governmentname)::text)
+        ELSE ''::text
+    END) ||
+    CASE
+        WHEN ((governmentnumber)::text <> ''::text) THEN ('-'::text || (governmentnumber)::text)
+        ELSE ''::text
+    END) ||
+    CASE
+        WHEN (governmentlevel > 1) THEN ('-'::text || (
+        CASE
+            WHEN ((governmentstyle)::text <> ''::text) THEN governmentstyle
+            ELSE governmenttype
+        END)::text)
+        ELSE ''::text
+    END) ||
+    CASE
+        WHEN (((governmentstatus)::text <> ''::text) OR governmentnotecurrentleadparent OR ((governmentnotecreation)::text <> ''::text) OR ((governmentnotedissolution)::text <> ''::text)) THEN ((((('-'::text || (
+        CASE
+            WHEN governmentnotecurrentleadparent THEN geohistory.governmentname(governmentcurrentleadparent)
+            ELSE ''::character varying
+        END)::text) ||
+        CASE
+            WHEN (governmentnotecurrentleadparent AND (((governmentnotecreation)::text <> ''::text) OR ((governmentnotedissolution)::text <> ''::text))) THEN '-'::text
+            ELSE ''::text
+        END) ||
+        CASE
+            WHEN (((governmentnotecreation)::text <> ''::text) AND ((governmentnotedissolution)::text <> ''::text)) THEN (((governmentnotecreation)::text || '-'::text) || (governmentnotedissolution)::text)
+            WHEN ((governmentnotecreation)::text <> ''::text) THEN ('since-'::text || (governmentnotecreation)::text)
+            WHEN ((governmentnotedissolution)::text <> ''::text) THEN ('thru-'::text || (governmentnotedissolution)::text)
+            ELSE ''::text
+        END) ||
+        CASE
+            WHEN (((governmentstatus)::text <> ''::text) AND (governmentnotecurrentleadparent OR ((governmentnotecreation)::text <> ''::text) OR ((governmentnotedissolution)::text <> ''::text))) THEN '-'::text
+            ELSE ''::text
+        END) || (governmentstatus)::text)
+        ELSE ''::text
+    END)
+END, '[\(\)\,\.]'::text, ''::text, 'g'::text), '[ \/ʻ]'::text, '-'::text, 'g'::text), ''''::text, '-'::text))) STORED,
+    governmentslugsubstitute text GENERATED ALWAYS AS (geohistory.governmentslugsubstitute(governmentid, 1)) STORED,
+    governmentshortshort text GENERATED ALWAYS AS (((
+CASE
+    WHEN ((governmentlevel = 2) AND ((governmenttype)::text = 'District'::text)) THEN ((governmenttype)::text || ' of '::text)
+    ELSE ''::text
+END ||
+CASE
+    WHEN ((governmentname)::text = ''::text) THEN (governmentnumber)::text
+    WHEN ((governmentnumber)::text = ''::text) THEN (governmentname)::text
+    ELSE ((((governmentname)::text || ' ('::text) || (governmentnumber)::text) || ')'::text)
+END) ||
+CASE
+    WHEN (governmentlevel > 2) THEN (' '::text || (
+    CASE
+        WHEN ((governmentstyle)::text <> ''::text) THEN governmentstyle
+        ELSE governmenttype
+    END)::text)
+    ELSE ''::text
+END)) STORED,
+    CONSTRAINT government_check CHECK (((((governmentstatus)::text = ANY (ARRAY['cadastral'::text, 'defunct'::text, 'nonfunctioning'::text, 'paper'::text, 'placeholder'::text, 'proposed'::text, 'unincorporated'::text, 'unknown'::text, ''::text])) OR (((governmentstatus)::text = ANY (ARRAY['alternate'::text, 'language'::text])) AND (governmentsubstitute IS NOT NULL))) AND (governmentlevel >= 1) AND (governmentlevel <= 5) AND ((governmentlevel = 2) OR ((governmentlevel <> 2) AND ((government1983stateplaneauthority)::text = ''::text))) AND ((governmentlevel = 3) OR ((governmentlevel <> 3) AND ((governmentlead1983stateplane)::text = ''::text))) AND ((governmentlevel = 3) OR ((governmentlevel <> 3) AND (governmenthasmultiple1983stateplane IS NULL))) AND (((governmentname)::text <> ''::text) OR ((governmentnumber)::text <> ''::text)) AND ((governmenttype)::text <> ''::text) AND ((locale)::text <> ''::text) AND (NOT (((governmentstatus)::text = ANY (ARRAY['placeholder'::text, 'proposed'::text, 'unincorporated'::text])) AND (governmentmapstatus <> 0))) AND (((governmentlevel = 1) AND (governmentcurrentleadparent IS NULL)) OR ((governmentlevel > 1) AND (governmentcurrentleadparent IS NOT NULL) AND (governmentid <> governmentcurrentleadparent)))))
+);
+
+
+ALTER TABLE geohistory.government OWNER TO postgres;
+
+--
+-- Name: COLUMN government.governmentstyle; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.government.governmentstyle IS 'Signifies if the government uses a government type in its formal name that is different than its actual government type.';
+
+
+--
+-- Name: COLUMN government.governmentlevel; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.government.governmentlevel IS '1 = Nation; 2 = State/Province; 3 = County/Parish; 4 = Township/Municipality; 5 = Unincorporated Ward/Populated Place. Generally = floor((OSM admin_level + 1)/2) or GeoNames administrative division order + 1';
+
+
+--
+-- Name: COLUMN government.government1983stateplaneauthority; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.government.government1983stateplaneauthority IS 'Last checked January 29, 2017.';
+
+
+--
+-- Name: COLUMN government.governmentlead1983stateplane; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.government.governmentlead1983stateplane IS 'Last checked January 29, 2017.';
+
+
+--
+-- Name: COLUMN government.governmenthasmultiple1983stateplane; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.government.governmenthasmultiple1983stateplane IS 'Last checked January 29, 2017.';
+
+
+--
+-- Name: COLUMN government.governmentcharterstatus; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.government.governmentcharterstatus IS 'This field is used for internal tracking purposes, and is not included in open data.';
+
+
+--
+-- Name: COLUMN government.governmentbooknote; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.government.governmentbooknote IS 'This field is used for internal tracking purposes, and is not included in open data.';
+
+
+--
+-- Name: COLUMN government.governmentbookcomplete; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.government.governmentbookcomplete IS 'This field is used for internal tracking purposes, and is not included in open data.';
+
+
+--
+-- Name: COLUMN government.governmentmapstatus; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.government.governmentmapstatus IS 'The values have been simplified in open data to remove certain information used for internal tracking purposes.';
+
+
+--
+-- Name: governmentmapstatus; Type: TABLE; Schema: geohistory; Owner: postgres
+--
+
+CREATE TABLE geohistory.governmentmapstatus (
+    governmentmapstatusid integer NOT NULL,
+    governmentmapstatusshort character varying(20) NOT NULL,
+    governmentmapstatuslong text NOT NULL,
+    governmentmapstatusreviewed boolean DEFAULT false NOT NULL,
+    governmentmapstatusfurtherresearch boolean DEFAULT false NOT NULL,
+    governmentmapstatustimelapse boolean DEFAULT false NOT NULL,
+    governmentmapstatusomit boolean DEFAULT false NOT NULL,
+    CONSTRAINT governmentmapstatus_check CHECK (((governmentmapstatusshort)::text <> ''::text))
+);
+
+
+ALTER TABLE geohistory.governmentmapstatus OWNER TO postgres;
+
+--
+-- Name: TABLE governmentmapstatus; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON TABLE geohistory.governmentmapstatus IS 'The rows in the table have been simplified in open data to remove certain information used for internal tracking purposes.';
+
+
+--
+-- Name: COLUMN governmentmapstatus.governmentmapstatusfurtherresearch; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.governmentmapstatus.governmentmapstatusfurtherresearch IS 'This field is used for internal tracking purposes, and is always shown as the default value in open data.';
+
+
+--
+-- Name: affectedgovernmentgis; Type: TABLE; Schema: gis; Owner: postgres
+--
+
+CREATE TABLE gis.affectedgovernmentgis (
+    affectedgovernmentgisid integer NOT NULL,
+    affectedgovernment integer NOT NULL,
+    governmentshape integer
+);
+
+
+ALTER TABLE gis.affectedgovernmentgis OWNER TO postgres;
+
+--
+-- Name: governmentshape; Type: TABLE; Schema: gis; Owner: postgres
+--
+
+CREATE TABLE gis.governmentshape (
+    governmentshapeid integer NOT NULL,
+    governmentsubmunicipality integer,
+    governmentmunicipality integer NOT NULL,
+    governmentcounty integer NOT NULL,
+    governmentstate integer NOT NULL,
+    governmentshapenotes text DEFAULT ''::text NOT NULL,
+    governmentshapegeometry public.geometry(Polygon,4326),
+    governmentshapereference integer,
+    governmentshapetag text DEFAULT ''::text NOT NULL,
+    governmentshapeplsstownship integer,
+    governmentward integer,
+    governmentschooldistrict integer,
+    governmentshapeslug text GENERATED ALWAYS AS (ltrim((((geohistory.governmentslug(
+CASE
+    WHEN (governmentsubmunicipality IS NULL) THEN governmentmunicipality
+    ELSE governmentsubmunicipality
+END))::text || '-'::text) || public.st_geohash(public.st_pointonsurface(governmentshapegeometry), 9)), '-'::text)) STORED
+);
+ALTER TABLE ONLY gis.governmentshape ALTER COLUMN governmentshapegeometry SET STORAGE EXTERNAL;
+
+
+ALTER TABLE gis.governmentshape OWNER TO postgres;
+
+--
+-- Name: COLUMN governmentshape.governmentshapereference; Type: COMMENT; Schema: gis; Owner: postgres
+--
+
+COMMENT ON COLUMN gis.governmentshape.governmentshapereference IS 'This column should always match governmentshapeid, and is used for tracking purposes in order to aid in inserting, updating, and deleting records in associative entities when splitting or merging records.';
+
+
+--
+-- Name: COLUMN governmentshape.governmentshapetag; Type: COMMENT; Schema: gis; Owner: postgres
+--
+
+COMMENT ON COLUMN gis.governmentshape.governmentshapetag IS 'This field is used for internal tracking purposes, and is not included in open data.';
+
+
+--
+-- Name: governmentshapecache; Type: MATERIALIZED VIEW; Schema: gis; Owner: postgres
+--
+
+CREATE MATERIALIZED VIEW gis.governmentshapecache AS
+ SELECT governmentshape2.governmentlayer,
+    governmentshape2.government,
+    public.st_buffer(public.st_collect(governmentshape2.governmentshapegeometry), (0)::double precision) AS geometry
+   FROM (( SELECT governmentshape.governmentcounty AS government,
+            'county'::text AS governmentlayer,
+            governmentshape.governmentshapegeometry
+           FROM gis.governmentshape
+        UNION
+         SELECT governmentshape.governmentmunicipality AS government,
+            'municipality'::text AS governmentlayer,
+            governmentshape.governmentshapegeometry
+           FROM gis.governmentshape
+        UNION
+         SELECT governmentshape.governmentschooldistrict AS government,
+            'schooldistrict'::text AS governmentlayer,
+            governmentshape.governmentshapegeometry
+           FROM gis.governmentshape
+          WHERE (governmentshape.governmentschooldistrict IS NOT NULL)
+        UNION
+         SELECT governmentshape.governmentshapeplsstownship AS government,
+            'shapeplsstownship'::text AS governmentlayer,
+            governmentshape.governmentshapegeometry
+           FROM gis.governmentshape
+          WHERE (governmentshape.governmentshapeplsstownship IS NOT NULL)
+        UNION
+         SELECT governmentshape.governmentsubmunicipality AS government,
+            'submunicipality'::text AS governmentlayer,
+            governmentshape.governmentshapegeometry
+           FROM gis.governmentshape
+          WHERE (governmentshape.governmentsubmunicipality IS NOT NULL)
+        UNION
+         SELECT governmentshape.governmentward AS government,
+            'ward'::text AS governmentlayer,
+            governmentshape.governmentshapegeometry
+           FROM gis.governmentshape
+          WHERE (governmentshape.governmentward IS NOT NULL)) governmentshape2
+     JOIN geohistory.government ON (((governmentshape2.government = government.governmentid) AND ((government.governmentstatus)::text <> 'placeholder'::text))))
+  GROUP BY governmentshape2.governmentlayer, governmentshape2.government
+  ORDER BY governmentshape2.governmentlayer, governmentshape2.government
+  WITH NO DATA;
+
+
+ALTER MATERIALIZED VIEW gis.governmentshapecache OWNER TO postgres;
+
+--
+-- Name: adjudicationevent; Type: TABLE; Schema: geohistory; Owner: postgres
+--
+
+CREATE TABLE geohistory.adjudicationevent (
+    adjudicationeventid integer NOT NULL,
+    adjudication integer NOT NULL,
+    event integer NOT NULL,
+    eventrelationship integer NOT NULL,
+    CONSTRAINT adjudicationevent_check CHECK ((eventrelationship <> ALL (ARRAY[2, 4, 6, 7, 9])))
+);
+
+
+ALTER TABLE geohistory.adjudicationevent OWNER TO postgres;
+
+--
+-- Name: currentgovernment; Type: TABLE; Schema: geohistory; Owner: postgres
+--
+
+CREATE TABLE geohistory.currentgovernment (
+    currentgovernmentid integer NOT NULL,
+    governmentsubmunicipality integer,
+    governmentmunicipality integer NOT NULL,
+    governmentcounty integer NOT NULL,
+    governmentstate integer NOT NULL,
+    event integer NOT NULL
+);
+
+
+ALTER TABLE geohistory.currentgovernment OWNER TO postgres;
+
+--
 -- Name: governmentsource; Type: TABLE; Schema: geohistory; Owner: postgres
 --
 
@@ -2695,6 +2361,15 @@ CREATE TABLE geohistory.governmentsource (
     sourcecitationvolume character varying(50) DEFAULT ''::character varying NOT NULL,
     sourcecitationpagefrom character varying(5) DEFAULT ''::character varying NOT NULL,
     sourcecitationpageto character varying(5) DEFAULT ''::character varying NOT NULL,
+    governmentsourcename text DEFAULT ''::text NOT NULL,
+    governmentsourceslug text GENERATED ALWAYS AS (btrim(lower(regexp_replace(((((((((((((geohistory.governmentslug(government))::text || '-'::text) || (governmentsourcebody)::text) || '-'::text) || (governmentsourcetype)::text) || '-'::text) || (governmentsourcenumber)::text) || '-'::text) || (governmentsourceterm)::text) ||
+CASE
+    WHEN ((governmentsourcevolume)::text <> ''::text) THEN ('-v'::text || (governmentsourcevolume)::text)
+    ELSE ''::text
+END) || '-'::text) || geohistory.rangeformat((governmentsourcepagefrom)::text, (((governmentsourcepageto)::text || ' '::text) || governmentsourcename))), '[\s\-\–\.\/''\(\);:,&"#§\?\[\]]+'::text, '-'::text, 'g'::text)), '-'::text)) STORED,
+    hassource boolean GENERATED ALWAYS AS ((source IS NOT NULL)) STORED,
+    governmentsourcepage text GENERATED ALWAYS AS (geohistory.rangeformat((governmentsourcepagefrom)::text, (governmentsourcepageto)::text)) STORED,
+    sourcecitationpage text GENERATED ALWAYS AS (geohistory.rangeformat((sourcecitationpagefrom)::text, (sourcecitationpageto)::text)) STORED,
     CONSTRAINT governmentsource_check CHECK (((governmentsourcetype)::text <> ''::text))
 );
 
@@ -2758,7 +2433,109 @@ CREATE TABLE geohistory.law (
     lawsession character varying(50) DEFAULT ''::character varying NOT NULL,
     lawsessiontype character varying(50) DEFAULT ''::character varying NOT NULL,
     lawpublished calendar.historicdatetext DEFAULT (''::text)::calendar.historicdatetext NOT NULL,
-    lawissue integer
+    lawissue integer,
+    lawcitation text GENERATED ALWAYS AS ((geohistory.sourcelawtype(source) ||
+CASE
+    WHEN ((lawpage = 0) AND (lawnumberchapter = 0) AND ((lawapproved)::text = ''::text)) THEN ' Unknown'::text
+    ELSE ((((((((((((
+    CASE
+        WHEN ((lawapproved)::text = ''::text) THEN ''::text
+        ELSE ' of '::text
+    END || calendar.historicdatetextformat((lawapproved)::calendar.historicdate, 'long'::text, 'en'::text)) || ' ('::text) ||
+    CASE
+        WHEN ((lawvolume)::text ~~ '%/%'::text) THEN ((((((
+        CASE
+            WHEN (split_part((lawvolume)::text, '/'::text, 3) <> ''::text) THEN (split_part((lawvolume)::text, '/'::text, 3) || ', '::text)
+            ELSE ''::text
+        END || split_part((lawvolume)::text, '/'::text, 2)) ||
+        CASE
+            WHEN (split_part((lawvolume)::text, '/'::text, 2) = '1'::text) THEN 'st'::text
+            WHEN (split_part((lawvolume)::text, '/'::text, 2) = '2'::text) THEN 'nd'::text
+            WHEN (split_part((lawvolume)::text, '/'::text, 2) = '3'::text) THEN 'rd'::text
+            ELSE 'th'::text
+        END) || ' '::text) ||
+        CASE
+            WHEN geohistory.sourcelawhasspecialsession(source) THEN 'Sp.'::text
+            ELSE ''::text
+        END) || 'Sess., '::text) ||
+        CASE
+            WHEN ("left"((lawapproved)::text, 4) <> split_part((lawvolume)::text, '/'::text, 1)) THEN (split_part((lawvolume)::text, '/'::text, 1) || ' '::text)
+            ELSE ''::text
+        END)
+        ELSE
+        CASE
+            WHEN (((lawvolume)::text = "left"((lawapproved)::text, 4)) OR ((lawvolume)::text = ''::text)) THEN ''::text
+            ELSE ((lawvolume)::text || ' '::text)
+        END
+    END) || geohistory.sourceshort(source)) || ' '::text) ||
+    CASE
+        WHEN (lawpage = 0) THEN '___'::text
+        ELSE (lawpage)::text
+    END) || ', '::text) ||
+    CASE
+        WHEN geohistory.sourcelawisbynumber(source) THEN 'No'::text
+        ELSE 'Ch'::text
+    END) || '. '::text) ||
+    CASE
+        WHEN (lawnumberchapter = 0) THEN '___'::text
+        ELSE (lawnumberchapter)::text
+    END) ||
+    CASE
+        WHEN ((lawpublished)::text <> ''::text) THEN (', '::text || calendar.historicdatetextformat((lawpublished)::calendar.historicdate, 'long'::text, 'en'::text))
+        ELSE ''::text
+    END) || ')'::text)
+END)) STORED,
+    lawslug text GENERATED ALWAYS AS ((geohistory.sourcelawtype(source) ||
+CASE
+    WHEN ((lawpage = 0) AND (lawnumberchapter = 0) AND ((lawapproved)::text = ''::text)) THEN ' Unknown'::text
+    ELSE ((((((((((((
+    CASE
+        WHEN ((lawapproved)::text = ''::text) THEN ''::text
+        ELSE ' of '::text
+    END || calendar.historicdatetextformat((lawapproved)::calendar.historicdate, 'short'::text, 'en'::text)) || ' ('::text) ||
+    CASE
+        WHEN ((lawvolume)::text ~~ '%/%'::text) THEN ((((((
+        CASE
+            WHEN (split_part((lawvolume)::text, '/'::text, 3) <> ''::text) THEN (split_part((lawvolume)::text, '/'::text, 3) || ', '::text)
+            ELSE ''::text
+        END || split_part((lawvolume)::text, '/'::text, 2)) ||
+        CASE
+            WHEN (split_part((lawvolume)::text, '/'::text, 2) = '1'::text) THEN 'st'::text
+            WHEN (split_part((lawvolume)::text, '/'::text, 2) = '2'::text) THEN 'nd'::text
+            WHEN (split_part((lawvolume)::text, '/'::text, 2) = '3'::text) THEN 'rd'::text
+            ELSE 'th'::text
+        END) || ' '::text) ||
+        CASE
+            WHEN geohistory.sourcelawhasspecialsession(source) THEN 'Sp.'::text
+            ELSE ''::text
+        END) || 'Sess., '::text) ||
+        CASE
+            WHEN ("left"((lawapproved)::text, 4) <> split_part((lawvolume)::text, '/'::text, 1)) THEN (split_part((lawvolume)::text, '/'::text, 1) || ' '::text)
+            ELSE ''::text
+        END)
+        ELSE
+        CASE
+            WHEN (((lawvolume)::text = "left"((lawapproved)::text, 4)) OR ((lawvolume)::text = ''::text)) THEN ''::text
+            ELSE ((lawvolume)::text || ' '::text)
+        END
+    END) || geohistory.sourceshort(source)) || ' '::text) ||
+    CASE
+        WHEN (lawpage = 0) THEN '___'::text
+        ELSE (lawpage)::text
+    END) || ', '::text) ||
+    CASE
+        WHEN geohistory.sourcelawisbynumber(source) THEN 'No'::text
+        ELSE 'Ch'::text
+    END) || '. '::text) ||
+    CASE
+        WHEN (lawnumberchapter = 0) THEN '___'::text
+        ELSE (lawnumberchapter)::text
+    END) ||
+    CASE
+        WHEN ((lawpublished)::text <> ''::text) THEN (', '::text || calendar.historicdatetextformat((lawpublished)::calendar.historicdate, 'short'::text, 'en'::text))
+        ELSE ''::text
+    END) || ')'::text)
+END)) STORED
 );
 
 
@@ -2795,7 +2572,21 @@ CREATE TABLE geohistory.lawsection (
     lawsectionnewto character varying(45) DEFAULT ''::character varying NOT NULL,
     lawsectionnewlaw integer,
     lawsectionsymbol character varying(20) DEFAULT '§'::character varying NOT NULL,
-    lawsectionnewsymbol character varying(20) DEFAULT ''::character varying NOT NULL
+    lawsectionnewsymbol character varying(20) DEFAULT ''::character varying NOT NULL,
+    lawsectioncitation text GENERATED ALWAYS AS ((((geohistory.lawcitation(law) || ', '::text) || (lawsectionsymbol)::text) ||
+CASE
+    WHEN ((lawsectionfrom)::text = '0'::text) THEN '___'::text
+    WHEN ((lawsectionfrom)::text = (lawsectionto)::text) THEN (' '::text || (lawsectionfrom)::text)
+    ELSE ((('§ '::text || (lawsectionfrom)::text) || '–'::text) || (lawsectionto)::text)
+END)) STORED,
+    lawsectionslug text GENERATED ALWAYS AS (lower(replace(replace(regexp_replace(regexp_replace((((geohistory.lawslug(law) || ', '::text) || (lawsectionsymbol)::text) ||
+CASE
+    WHEN ((lawsectionfrom)::text = '0'::text) THEN '___'::text
+    WHEN ((lawsectionfrom)::text = (lawsectionto)::text) THEN (' '::text || (lawsectionfrom)::text)
+    ELSE ((('§ '::text || (lawsectionfrom)::text) || '–'::text) || (lawsectionto)::text)
+END), '[,\.\[\]\(\)\'']'::text, ''::text, 'g'::text), '([ :\–\—\/_]+| of )'::text, '-'::text, 'g'::text), '§'::text, 's'::text), '¶'::text, 'p'::text))) STORED,
+    lawsectionnewsection text GENERATED ALWAYS AS (geohistory.rangeformat((lawsectionnewfrom)::text, (lawsectionnewto)::text)) STORED,
+    lawsectionpage text GENERATED ALWAYS AS (geohistory.rangeformat((lawsectionpagefrom)::text, (lawsectionpageto)::text)) STORED
 );
 
 
@@ -2843,6 +2634,16 @@ CREATE TABLE geohistory.metesdescription (
     metesdescriptionname character varying(500) DEFAULT ''::character varying NOT NULL,
     event integer NOT NULL,
     metesdescriptionacres double precision DEFAULT 0 NOT NULL,
+    metesdescriptionlong text GENERATED ALWAYS AS ((geohistory.eventlong(event) ||
+CASE
+    WHEN ((metesdescriptionname)::text = ''::text) THEN ''::text
+    ELSE (': '::text || (metesdescriptionname)::text)
+END)) STORED,
+    metesdescriptionslug text GENERATED ALWAYS AS ((geohistory.eventslug(event) ||
+CASE
+    WHEN ((metesdescriptionname)::text = ''::text) THEN ''::text
+    ELSE ('-'::text || lower(regexp_replace(regexp_replace(replace((metesdescriptionname)::text, ', '::text, ' '::text), '[ \/'',"]'::text, '-'::text, 'g'::text), '[\(\)\?\.\[\]]'::text, ''::text, 'g'::text)))
+END)) STORED,
     CONSTRAINT metesdescription_check CHECK (((metesdescriptionacres >= (0)::double precision) AND ((metesdescriptionsource)::text <> ''::text) AND ((metesdescriptiontype)::text <> ''::text)))
 );
 
@@ -2864,56 +2665,6 @@ CREATE TABLE geohistory.sourcegovernment (
 ALTER TABLE geohistory.sourcegovernment OWNER TO postgres;
 
 --
--- Name: affectedgovernmentgis; Type: TABLE; Schema: gis; Owner: postgres
---
-
-CREATE TABLE gis.affectedgovernmentgis (
-    affectedgovernmentgisid integer NOT NULL,
-    affectedgovernment integer NOT NULL,
-    governmentshape integer
-);
-
-
-ALTER TABLE gis.affectedgovernmentgis OWNER TO postgres;
-
---
--- Name: governmentshape; Type: TABLE; Schema: gis; Owner: postgres
---
-
-CREATE TABLE gis.governmentshape (
-    governmentshapeid integer NOT NULL,
-    governmentsubmunicipality integer,
-    governmentmunicipality integer NOT NULL,
-    governmentcounty integer NOT NULL,
-    governmentstate integer NOT NULL,
-    governmentshapenotes text DEFAULT ''::text NOT NULL,
-    governmentshapegeometry public.geometry(Polygon,4326),
-    governmentshapereference integer,
-    governmentshapetag text DEFAULT ''::text NOT NULL,
-    governmentshapeplsstownship integer,
-    governmentward integer,
-    governmentschooldistrict integer
-);
-ALTER TABLE ONLY gis.governmentshape ALTER COLUMN governmentshapegeometry SET STORAGE EXTERNAL;
-
-
-ALTER TABLE gis.governmentshape OWNER TO postgres;
-
---
--- Name: COLUMN governmentshape.governmentshapereference; Type: COMMENT; Schema: gis; Owner: postgres
---
-
-COMMENT ON COLUMN gis.governmentshape.governmentshapereference IS 'This column should always match governmentshapeid, and is used for tracking purposes in order to aid in inserting, updating, and deleting records in associative entities when splitting or merging records.';
-
-
---
--- Name: COLUMN governmentshape.governmentshapetag; Type: COMMENT; Schema: gis; Owner: postgres
---
-
-COMMENT ON COLUMN gis.governmentshape.governmentshapetag IS 'This field is used for internal tracking purposes, and is not included in open data.';
-
-
---
 -- Name: metesdescriptiongis; Type: TABLE; Schema: gis; Owner: postgres
 --
 
@@ -2927,1079 +2678,18 @@ CREATE TABLE gis.metesdescriptiongis (
 ALTER TABLE gis.metesdescriptiongis OWNER TO postgres;
 
 --
--- Name: eventgovernment; Type: VIEW; Schema: extra; Owner: postgres
---
-
-CREATE VIEW extra.eventgovernment AS
- WITH eg AS (
-         SELECT DISTINCT currentgovernment.event,
-            currentgovernment.governmentsubmunicipality AS government
-           FROM geohistory.currentgovernment
-          WHERE (currentgovernment.governmentsubmunicipality IS NOT NULL)
-        UNION
-         SELECT DISTINCT currentgovernment.event,
-            currentgovernment.governmentmunicipality AS government
-           FROM geohistory.currentgovernment
-        UNION
-         SELECT DISTINCT currentgovernment.event,
-            currentgovernment.governmentcounty AS government
-           FROM geohistory.currentgovernment
-        UNION
-         SELECT DISTINCT currentgovernment.event,
-            currentgovernment.governmentstate AS government
-           FROM geohistory.currentgovernment
-        UNION
-         SELECT DISTINCT affectedgovernmentgroup.event,
-            affectedgovernmentpart.governmentfrom AS government
-           FROM ((geohistory.affectedgovernmentgroup
-             JOIN geohistory.affectedgovernmentgrouppart ON ((affectedgovernmentgroup.affectedgovernmentgroupid = affectedgovernmentgrouppart.affectedgovernmentgroup)))
-             JOIN geohistory.affectedgovernmentpart ON (((affectedgovernmentgrouppart.affectedgovernmentpart = affectedgovernmentpart.affectedgovernmentpartid) AND (affectedgovernmentpart.governmentfrom IS NOT NULL))))
-        UNION
-         SELECT DISTINCT affectedgovernmentgroup.event,
-            affectedgovernmentpart.governmentto AS government
-           FROM ((geohistory.affectedgovernmentgroup
-             JOIN geohistory.affectedgovernmentgrouppart ON ((affectedgovernmentgroup.affectedgovernmentgroupid = affectedgovernmentgrouppart.affectedgovernmentgroup)))
-             JOIN geohistory.affectedgovernmentpart ON (((affectedgovernmentgrouppart.affectedgovernmentpart = affectedgovernmentpart.affectedgovernmentpartid) AND (affectedgovernmentpart.governmentto IS NOT NULL))))
-        UNION
-         SELECT DISTINCT lawsectionevent.event,
-            sourcegovernment.government
-           FROM geohistory.lawsectionevent,
-            geohistory.lawsection,
-            geohistory.law,
-            geohistory.sourcegovernment
-          WHERE ((lawsectionevent.lawsection = lawsection.lawsectionid) AND (lawsection.law = law.lawid) AND (law.source = sourcegovernment.source) AND (sourcegovernment.sourceorder = 1))
-        UNION
-         SELECT DISTINCT governmentsourceevent.event,
-            governmentsource.government
-           FROM geohistory.governmentsource,
-            geohistory.governmentsourceevent
-          WHERE (governmentsourceevent.governmentsource = governmentsource.governmentsourceid)
-        UNION
-         SELECT DISTINCT adjudicationevent.event,
-            tribunal.government
-           FROM geohistory.adjudicationevent,
-            geohistory.adjudication,
-            geohistory.adjudicationtype,
-            geohistory.tribunal
-          WHERE ((adjudicationevent.adjudication = adjudication.adjudicationid) AND (adjudication.adjudicationtype = adjudicationtype.adjudicationtypeid) AND (adjudicationtype.tribunal = tribunal.tribunalid))
-        UNION
-         SELECT DISTINCT adjudicationevent.event,
-            tribunal.government
-           FROM geohistory.adjudicationevent,
-            geohistory.adjudicationlocation,
-            geohistory.adjudicationlocationtype,
-            geohistory.tribunal
-          WHERE ((adjudicationevent.adjudication = adjudicationlocation.adjudication) AND (adjudicationlocation.adjudicationlocationtype = adjudicationlocationtype.adjudicationlocationtypeid) AND (adjudicationlocationtype.tribunal = tribunal.tribunalid))
-        UNION
-         SELECT DISTINCT affectedgovernmentgroup.event,
-            governmentshape.governmentsubmunicipality AS government
-           FROM geohistory.affectedgovernmentgroup,
-            gis.affectedgovernmentgis,
-            gis.governmentshape
-          WHERE ((affectedgovernmentgroup.affectedgovernmentgroupid = affectedgovernmentgis.affectedgovernment) AND (affectedgovernmentgis.governmentshape = governmentshape.governmentshapeid) AND (governmentshape.governmentsubmunicipality IS NOT NULL))
-        UNION
-         SELECT DISTINCT affectedgovernmentgroup.event,
-            governmentshape.governmentmunicipality AS government
-           FROM geohistory.affectedgovernmentgroup,
-            gis.affectedgovernmentgis,
-            gis.governmentshape
-          WHERE ((affectedgovernmentgroup.affectedgovernmentgroupid = affectedgovernmentgis.affectedgovernment) AND (affectedgovernmentgis.governmentshape = governmentshape.governmentshapeid))
-        UNION
-         SELECT DISTINCT affectedgovernmentgroup.event,
-            governmentshape.governmentcounty AS government
-           FROM geohistory.affectedgovernmentgroup,
-            gis.affectedgovernmentgis,
-            gis.governmentshape
-          WHERE ((affectedgovernmentgroup.affectedgovernmentgroupid = affectedgovernmentgis.affectedgovernment) AND (affectedgovernmentgis.governmentshape = governmentshape.governmentshapeid))
-        UNION
-         SELECT DISTINCT affectedgovernmentgroup.event,
-            governmentshape.governmentstate AS government
-           FROM geohistory.affectedgovernmentgroup,
-            gis.affectedgovernmentgis,
-            gis.governmentshape
-          WHERE ((affectedgovernmentgroup.affectedgovernmentgroupid = affectedgovernmentgis.affectedgovernment) AND (affectedgovernmentgis.governmentshape = governmentshape.governmentshapeid))
-        UNION
-         SELECT DISTINCT metesdescription.event,
-            governmentshape.governmentsubmunicipality AS government
-           FROM geohistory.metesdescription,
-            gis.metesdescriptiongis,
-            gis.governmentshape
-          WHERE ((metesdescription.metesdescriptionid = metesdescriptiongis.metesdescription) AND (metesdescriptiongis.governmentshape = governmentshape.governmentshapeid) AND (governmentshape.governmentsubmunicipality IS NOT NULL))
-        UNION
-         SELECT DISTINCT metesdescription.event,
-            governmentshape.governmentmunicipality AS government
-           FROM geohistory.metesdescription,
-            gis.metesdescriptiongis,
-            gis.governmentshape
-          WHERE ((metesdescription.metesdescriptionid = metesdescriptiongis.metesdescription) AND (metesdescriptiongis.governmentshape = governmentshape.governmentshapeid))
-        UNION
-         SELECT DISTINCT metesdescription.event,
-            governmentshape.governmentcounty AS government
-           FROM geohistory.metesdescription,
-            gis.metesdescriptiongis,
-            gis.governmentshape
-          WHERE ((metesdescription.metesdescriptionid = metesdescriptiongis.metesdescription) AND (metesdescriptiongis.governmentshape = governmentshape.governmentshapeid))
-        UNION
-         SELECT DISTINCT metesdescription.event,
-            governmentshape.governmentstate AS government
-           FROM geohistory.metesdescription,
-            gis.metesdescriptiongis,
-            gis.governmentshape
-          WHERE ((metesdescription.metesdescriptionid = metesdescriptiongis.metesdescription) AND (metesdescriptiongis.governmentshape = governmentshape.governmentshapeid))
-        UNION
-         SELECT DISTINCT event_1.eventid AS event,
-            event_1.government
-           FROM geohistory.event event_1
-          WHERE (event_1.government IS NOT NULL)
-        )
- SELECT DISTINCT event.eventid,
-    governmentsubstitute.governmentsubstitute AS government
-   FROM (((geohistory.event
-     LEFT JOIN eg ON ((eg.event = event.eventid)))
-     LEFT JOIN geohistory.government ON ((eg.government = government.governmentid)))
-     LEFT JOIN extra.governmentsubstitute ON ((government.governmentid = governmentsubstitute.governmentid)))
-  WHERE ((government.governmentlevel IS NULL) OR (government.governmentlevel <> 1))
-  ORDER BY event.eventid, governmentsubstitute.governmentsubstitute;
-
-
-ALTER VIEW extra.eventgovernment OWNER TO postgres;
-
---
--- Name: affectedgovernmentlevel; Type: TABLE; Schema: geohistory; Owner: postgres
---
-
-CREATE TABLE geohistory.affectedgovernmentlevel (
-    affectedgovernmentlevelid integer NOT NULL,
-    affectedgovernmentlevelshort character varying(20) NOT NULL,
-    affectedgovernmentlevellong character varying(20) NOT NULL,
-    affectedgovernmentlevelgroup integer NOT NULL,
-    affectedgovernmentleveldisplayorder integer NOT NULL
-);
-
-
-ALTER TABLE geohistory.affectedgovernmentlevel OWNER TO postgres;
-
---
--- Name: eventgranted; Type: TABLE; Schema: geohistory; Owner: postgres
---
-
-CREATE TABLE geohistory.eventgranted (
-    eventgrantedid integer NOT NULL,
-    eventgrantedlong text NOT NULL,
-    eventgrantedshort character varying(15) NOT NULL,
-    eventgrantedsuccess boolean DEFAULT true NOT NULL,
-    eventgrantedcertainty boolean DEFAULT false NOT NULL,
-    eventgrantedplaceholder boolean DEFAULT false NOT NULL,
-    eventgrantedpublicview boolean DEFAULT true NOT NULL,
-    CONSTRAINT eventgranted_check CHECK (((eventgrantedlong <> ''::text) AND ((eventgrantedshort)::text <> ''::text)))
-);
-
-
-ALTER TABLE geohistory.eventgranted OWNER TO postgres;
-
---
--- Name: COLUMN eventgranted.eventgrantedpublicview; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.eventgranted.eventgrantedpublicview IS 'TRUE items are omitted from open data.';
-
-
---
--- Name: governmentothercurrentparent; Type: TABLE; Schema: geohistory; Owner: postgres
---
-
-CREATE TABLE geohistory.governmentothercurrentparent (
-    governmentothercurrentparentid integer NOT NULL,
-    government integer NOT NULL,
-    governmentothercurrentparent integer NOT NULL
-);
-
-
-ALTER TABLE geohistory.governmentothercurrentparent OWNER TO postgres;
-
---
--- Name: governmentparent; Type: VIEW; Schema: extra; Owner: postgres
---
-
-CREATE VIEW extra.governmentparent AS
- SELECT government.governmentid,
-    government.governmentcurrentleadparent AS governmentparent,
-        CASE
-            WHEN (((government.governmentstatus)::text = ''::text) AND (extra.governmentstatus(government.governmentcurrentleadparent) = ''::text)) THEN 'current'::text
-            WHEN ((government.governmentstatus)::text = 'proposed'::text) THEN 'proposed'::text
-            WHEN ((government.governmentstatus)::text = 'unincorporated'::text) THEN 'unincorporated'::text
-            WHEN ((government.governmentstatus)::text = 'placeholder'::text) THEN 'placeholder'::text
-            ELSE 'most recent'::text
-        END AS governmentparentstatus
-   FROM geohistory.government
-UNION
- SELECT governmentothercurrentparent.government AS governmentid,
-    governmentothercurrentparent.governmentothercurrentparent AS governmentparent,
-        CASE
-            WHEN ((extra.governmentstatus(governmentothercurrentparent.government) = ''::text) AND (extra.governmentstatus(governmentothercurrentparent.governmentothercurrentparent) = ''::text)) THEN 'current'::text
-            WHEN (extra.governmentstatus(governmentothercurrentparent.government) = 'proposed'::text) THEN 'proposed'::text
-            WHEN (extra.governmentstatus(governmentothercurrentparent.government) = 'unincorporated'::text) THEN 'unincorporated'::text
-            ELSE 'most recent'::text
-        END AS governmentparentstatus
-   FROM geohistory.governmentothercurrentparent
-UNION (
-         SELECT totalgovernment.governmentid,
-            totalgovernment.governmentparent,
-                CASE
-                    WHEN (max((totalgovernment.eventgrantedsuccess)::integer) = 1) THEN 'former'::text
-                    ELSE 'proposed'::text
-                END AS governmentparentstatus
-           FROM ( SELECT DISTINCT affectedgovernmentpart.governmentfrom AS governmentid,
-                    parentpart.governmentfrom AS governmentparent,
-                    eventgranted.eventgrantedsuccess
-                   FROM ((((((((geohistory.affectedgovernmentgroup
-                     JOIN geohistory.event ON ((affectedgovernmentgroup.event = event.eventid)))
-                     JOIN geohistory.eventgranted ON ((event.eventgranted = eventgranted.eventgrantedid)))
-                     JOIN geohistory.affectedgovernmentgrouppart ON ((affectedgovernmentgroup.affectedgovernmentgroupid = affectedgovernmentgrouppart.affectedgovernmentgroup)))
-                     JOIN geohistory.affectedgovernmentlevel ON ((affectedgovernmentgrouppart.affectedgovernmentlevel = affectedgovernmentlevel.affectedgovernmentlevelid)))
-                     JOIN geohistory.affectedgovernmentgrouppart parentgrouppart ON ((affectedgovernmentgroup.affectedgovernmentgroupid = parentgrouppart.affectedgovernmentgroup)))
-                     JOIN geohistory.affectedgovernmentlevel parentlevel ON (((parentgrouppart.affectedgovernmentlevel = parentlevel.affectedgovernmentlevelid) AND (parentlevel.affectedgovernmentlevelgroup < affectedgovernmentlevel.affectedgovernmentlevelgroup) AND (parentlevel.affectedgovernmentlevelgroup < 4))))
-                     JOIN geohistory.affectedgovernmentpart ON (((affectedgovernmentgrouppart.affectedgovernmentpart = affectedgovernmentpart.affectedgovernmentpartid) AND (affectedgovernmentpart.governmentfrom IS NOT NULL))))
-                     JOIN geohistory.affectedgovernmentpart parentpart ON (((parentgrouppart.affectedgovernmentpart = parentpart.affectedgovernmentpartid) AND (parentpart.governmentfrom IS NOT NULL))))
-                UNION
-                 SELECT DISTINCT affectedgovernmentpart.governmentto AS governmentid,
-                    parentpart.governmentto AS governmentparent,
-                    eventgranted.eventgrantedsuccess
-                   FROM ((((((((geohistory.affectedgovernmentgroup
-                     JOIN geohistory.event ON ((affectedgovernmentgroup.event = event.eventid)))
-                     JOIN geohistory.eventgranted ON ((event.eventgranted = eventgranted.eventgrantedid)))
-                     JOIN geohistory.affectedgovernmentgrouppart ON ((affectedgovernmentgroup.affectedgovernmentgroupid = affectedgovernmentgrouppart.affectedgovernmentgroup)))
-                     JOIN geohistory.affectedgovernmentlevel ON ((affectedgovernmentgrouppart.affectedgovernmentlevel = affectedgovernmentlevel.affectedgovernmentlevelid)))
-                     JOIN geohistory.affectedgovernmentgrouppart parentgrouppart ON ((affectedgovernmentgroup.affectedgovernmentgroupid = parentgrouppart.affectedgovernmentgroup)))
-                     JOIN geohistory.affectedgovernmentlevel parentlevel ON (((parentgrouppart.affectedgovernmentlevel = parentlevel.affectedgovernmentlevelid) AND (parentlevel.affectedgovernmentlevelgroup < affectedgovernmentlevel.affectedgovernmentlevelgroup) AND (parentlevel.affectedgovernmentlevelgroup < 4))))
-                     JOIN geohistory.affectedgovernmentpart ON (((affectedgovernmentgrouppart.affectedgovernmentpart = affectedgovernmentpart.affectedgovernmentpartid) AND (affectedgovernmentpart.governmentto IS NOT NULL))))
-                     JOIN geohistory.affectedgovernmentpart parentpart ON (((parentgrouppart.affectedgovernmentpart = parentpart.affectedgovernmentpartid) AND (parentpart.governmentto IS NOT NULL))))
-                UNION
-                 SELECT currentgovernment.governmentsubmunicipality AS governmentid,
-                    currentgovernment.governmentcounty AS governmentparent,
-                    eventgranted.eventgrantedsuccess
-                   FROM ((geohistory.currentgovernment
-                     JOIN geohistory.event ON ((currentgovernment.event = event.eventid)))
-                     JOIN geohistory.eventgranted ON ((event.eventgranted = eventgranted.eventgrantedid)))
-                  WHERE (currentgovernment.governmentsubmunicipality IS NOT NULL)
-                UNION
-                 SELECT currentgovernment.governmentmunicipality AS governmentid,
-                    currentgovernment.governmentcounty AS governmentparent,
-                    eventgranted.eventgrantedsuccess
-                   FROM ((geohistory.currentgovernment
-                     JOIN geohistory.event ON ((currentgovernment.event = event.eventid)))
-                     JOIN geohistory.eventgranted ON ((event.eventgranted = eventgranted.eventgrantedid)))
-                UNION
-                 SELECT currentgovernment.governmentcounty AS governmentid,
-                    currentgovernment.governmentstate AS governmentparent,
-                    eventgranted.eventgrantedsuccess
-                   FROM ((geohistory.currentgovernment
-                     JOIN geohistory.event ON ((currentgovernment.event = event.eventid)))
-                     JOIN geohistory.eventgranted ON ((event.eventgranted = eventgranted.eventgrantedid)))) totalgovernment
-          WHERE (NOT (totalgovernment.governmentid IN ( SELECT government.governmentid
-                   FROM geohistory.government
-                  WHERE ((government.governmentstatus)::text = 'placeholder'::text))))
-          GROUP BY totalgovernment.governmentid, totalgovernment.governmentparent
-        EXCEPT (
-                 SELECT government.governmentid,
-                    government.governmentcurrentleadparent AS governmentparent,
-                    'former'::text AS governmentparentstatus
-                   FROM geohistory.government
-                UNION
-                 SELECT governmentothercurrentparent.government AS governmentid,
-                    governmentothercurrentparent.governmentothercurrentparent AS governmentparent,
-                    'former'::text AS governmentparentstatus
-                   FROM geohistory.governmentothercurrentparent
-                UNION
-                 SELECT government.governmentid,
-                    government.governmentcurrentleadparent AS governmentparent,
-                    'proposed'::text AS governmentparentstatus
-                   FROM geohistory.government
-                UNION
-                 SELECT governmentothercurrentparent.government AS governmentid,
-                    governmentothercurrentparent.governmentothercurrentparent AS governmentparent,
-                    'proposed'::text AS governmentparentstatus
-                   FROM geohistory.governmentothercurrentparent
-        )
-)
-  ORDER BY 1, 2, 3;
-
-
-ALTER VIEW extra.governmentparent OWNER TO postgres;
-
---
--- Name: governmentrelation; Type: VIEW; Schema: extra; Owner: postgres
---
-
-CREATE VIEW extra.governmentrelation AS
- WITH RECURSIVE governmentparentpart(governmentparent, governmentid) AS (
-         SELECT s1.governmentparent,
-            s1.governmentid
-           FROM extra.governmentparent s1
-        UNION
-         SELECT s2.governmentparent,
-            s1.governmentid
-           FROM extra.governmentparent s2,
-            governmentparentpart s1
-          WHERE (s2.governmentid = s1.governmentparent)
-        ), governmentsubstitute AS (
-         SELECT governmentsubstitute.governmentid,
-            governmentsubstitute.governmentsubstitute,
-            governmentsubstitute.governmentsubstitutemultiple
-           FROM extra.governmentsubstitute
-          WHERE (governmentsubstitute.governmentid <> governmentsubstitute.governmentsubstitute)
-        )
- SELECT DISTINCT governmentparentpart.governmentid,
-    extra.governmentlevel(governmentparentpart.governmentid) AS governmentlevel,
-    extra.governmentshort(governmentparentpart.governmentid) AS governmentshort,
-    extra.governmentlong(governmentparentpart.governmentid) AS governmentlong,
-    extra.governmentlevel(governmentparentpart.governmentparent) AS governmentrelationlevel,
-    governmentparentpart.governmentparent AS governmentrelation,
-        CASE
-            WHEN (extra.governmentlevel(governmentparentpart.governmentparent) = 2) THEN extra.governmentabbreviation(governmentparentpart.governmentparent)
-            ELSE ''::text
-        END AS governmentrelationstate
-   FROM governmentparentpart
-  WHERE (governmentparentpart.governmentparent IS NOT NULL)
-UNION
- SELECT DISTINCT government.governmentid,
-    government.governmentlevel,
-    extra.governmentshort(government.governmentid) AS governmentshort,
-    extra.governmentlong(government.governmentid) AS governmentlong,
-    government.governmentlevel AS governmentrelationlevel,
-    government.governmentid AS governmentrelation,
-        CASE
-            WHEN (government.governmentlevel = 2) THEN government.governmentabbreviation
-            ELSE ''::character varying
-        END AS governmentrelationstate
-   FROM geohistory.government
-UNION
- SELECT DISTINCT governmentparentpart.governmentid,
-    extra.governmentlevel(governmentparentpart.governmentid) AS governmentlevel,
-    extra.governmentshort(governmentparentpart.governmentid) AS governmentshort,
-    extra.governmentlong(governmentparentpart.governmentid) AS governmentlong,
-    extra.governmentlevel(governmentparentpart.governmentparent) AS governmentrelationlevel,
-    governmentsubstitute.governmentsubstitute AS governmentrelation,
-        CASE
-            WHEN (extra.governmentlevel(governmentparentpart.governmentparent) = 2) THEN extra.governmentabbreviation(governmentsubstitute.governmentsubstitute)
-            ELSE ''::text
-        END AS governmentrelationstate
-   FROM (governmentparentpart
-     JOIN governmentsubstitute ON (((governmentparentpart.governmentparent = governmentsubstitute.governmentid) AND (governmentparentpart.governmentparent IS NOT NULL) AND (governmentsubstitute.governmentsubstitute IS NOT NULL))))
-UNION
- SELECT DISTINCT government.governmentid,
-    government.governmentlevel,
-    extra.governmentshort(government.governmentid) AS governmentshort,
-    extra.governmentlong(government.governmentid) AS governmentlong,
-    government.governmentlevel AS governmentrelationlevel,
-    government.governmentsubstitute AS governmentrelation,
-        CASE
-            WHEN (government.governmentlevel = 2) THEN (extra.governmentabbreviation(government.governmentsubstitute))::character varying
-            ELSE ''::character varying
-        END AS governmentrelationstate
-   FROM geohistory.government
-  WHERE (government.governmentsubstitute IS NOT NULL)
-UNION
- SELECT government.governmentid,
-    government.governmentlevel,
-    extra.governmentshort(government.governmentid) AS governmentshort,
-    extra.governmentlong(government.governmentid) AS governmentlong,
-    2 AS governmentrelationlevel,
-    NULL::integer AS governmentrelation,
-    NULL::text AS governmentrelationstate
-   FROM geohistory.government
-  WHERE (government.governmentlevel = 1)
-  ORDER BY 1, 5, 6;
-
-
-ALTER VIEW extra.governmentrelation OWNER TO postgres;
-
---
--- Name: adjudicationgovernment; Type: VIEW; Schema: extra; Owner: postgres
---
-
-CREATE VIEW extra.adjudicationgovernment AS
- SELECT DISTINCT adjudication.adjudicationid,
-    ag2.governmentrelationstate
-   FROM (geohistory.adjudication
-     LEFT JOIN (( SELECT DISTINCT adjudication_1.adjudicationid AS adjudication,
-            tribunal.government
-           FROM geohistory.adjudication adjudication_1,
-            geohistory.adjudicationtype,
-            geohistory.tribunal
-          WHERE ((adjudication_1.adjudicationtype = adjudicationtype.adjudicationtypeid) AND (adjudicationtype.tribunal = tribunal.tribunalid))
-        UNION
-         SELECT DISTINCT adjudicationlocation.adjudication,
-            tribunal.government
-           FROM geohistory.adjudicationlocation,
-            geohistory.adjudicationlocationtype,
-            geohistory.tribunal
-          WHERE ((adjudicationlocation.adjudicationlocationtype = adjudicationlocationtype.adjudicationlocationtypeid) AND (adjudicationlocationtype.tribunal = tribunal.tribunalid))
-        UNION
-         SELECT DISTINCT adjudicationevent.adjudication,
-            eventgovernment.government
-           FROM geohistory.adjudicationevent,
-            extra.eventgovernment
-          WHERE (adjudicationevent.event = eventgovernment.eventid)) ag
-     JOIN extra.governmentrelation ON (((ag.government = governmentrelation.governmentid) AND (governmentrelation.governmentrelationstate IS NOT NULL) AND (governmentrelation.governmentrelationstate <> ''::text)))) ag2 ON (((ag2.government IS NOT NULL) AND (extra.governmentlevel(ag2.government) <> 1) AND (ag2.adjudication = adjudication.adjudicationid))))
-  ORDER BY ag2.governmentrelationstate, adjudication.adjudicationid;
-
-
-ALTER VIEW extra.adjudicationgovernment OWNER TO postgres;
-
---
--- Name: adjudicationgovernmentcache; Type: MATERIALIZED VIEW; Schema: extra; Owner: postgres
---
-
-CREATE MATERIALIZED VIEW extra.adjudicationgovernmentcache AS
- SELECT adjudicationid,
-    governmentrelationstate
-   FROM extra.adjudicationgovernment
-  WITH NO DATA;
-
-
-ALTER MATERIALIZED VIEW extra.adjudicationgovernmentcache OWNER TO postgres;
-
---
--- Name: tribunalgovernment; Type: VIEW; Schema: extra; Owner: postgres
---
-
-CREATE VIEW extra.tribunalgovernment AS
- SELECT DISTINCT tribunal.tribunalid,
-    extra.governmentabbreviation(extra.governmentcurrentleadstateid(tribunal.government)) AS governmentrelationstate,
-    extra.tribunalshort(tribunal.tribunalid) AS tribunalshort,
-    extra.tribunalshort(tribunal.tribunalid, '--'::character varying) AS tribunalshortstate,
-    extra.tribunallong(tribunal.tribunalid) AS tribunallong,
-    extra.tribunalfilingoffice(tribunal.tribunalid) AS tribunalfilingoffice,
-    count(DISTINCT adjudicationtype.adjudicationtypeid) AS adjudicationtypecount,
-    count(DISTINCT adjudicationlocationtype.adjudicationlocationtypeid) AS adjudicationlocationtypecount
-   FROM ((geohistory.tribunal
-     LEFT JOIN geohistory.adjudicationtype ON ((tribunal.tribunalid = adjudicationtype.tribunal)))
-     LEFT JOIN geohistory.adjudicationlocationtype ON ((tribunal.tribunalid = adjudicationlocationtype.tribunal)))
-  GROUP BY tribunal.tribunalid, (extra.governmentabbreviation(extra.governmentcurrentleadstateid(tribunal.government))), (extra.tribunalshort(tribunal.tribunalid)), (extra.tribunalshort(tribunal.tribunalid, '--'::character varying)), (extra.tribunallong(tribunal.tribunalid)), (extra.tribunalfilingoffice(tribunal.tribunalid))
-  ORDER BY tribunal.tribunalid;
-
-
-ALTER VIEW extra.tribunalgovernment OWNER TO postgres;
-
---
--- Name: tribunalgovernmentcache; Type: MATERIALIZED VIEW; Schema: extra; Owner: postgres
---
-
-CREATE MATERIALIZED VIEW extra.tribunalgovernmentcache AS
- SELECT tribunalid,
-    governmentrelationstate,
-    tribunalshort,
-    tribunalshortstate,
-    tribunallong,
-    tribunalfilingoffice,
-    adjudicationtypecount,
-    adjudicationlocationtypecount
-   FROM extra.tribunalgovernment
-  WITH NO DATA;
-
-
-ALTER MATERIALIZED VIEW extra.tribunalgovernmentcache OWNER TO postgres;
-
---
--- Name: adjudicationsearch; Type: VIEW; Schema: extra; Owner: postgres
---
-
-CREATE VIEW extra.adjudicationsearch AS
- SELECT DISTINCT (lpad((adjudication.adjudicationid)::text, 6, '0'::text) || lpad((COALESCE(adjudicationlocation.adjudicationlocationid, 0))::text, 6, '0'::text)) AS adjudicationlocationid,
-    lpad((adjudication.adjudicationid)::text, 6, '0'::text) AS adjudicationid,
-    adjudication.adjudicationnumber,
-    adjudication.adjudicationterm,
-    btrim(((((adjudication.adjudicationlong || ' '::text) || adjudication.adjudicationshort) || ' '::text) || adjudication.adjudicationnotes)) AS adjudicationsummary,
-        CASE
-            WHEN ((adjudicationgovernmentcache.governmentrelationstate = a.governmentrelationstate) OR (adjudicationgovernmentcache.governmentrelationstate IS NULL)) THEN a.tribunalshort
-            ELSE a.tribunalshortstate
-        END AS adjudicationtribunal,
-    adjudicationtype.adjudicationtypeshort,
-    adjudicationtype.adjudicationtypeabbreviation,
-    lpad((adjudicationtype.adjudicationtypeid)::text, 6, '0'::text) AS adjudicationtypeid,
-    lpad(COALESCE((adjudicationlocationtype.adjudicationlocationtypeid)::text, ''::text), 6, '0'::text) AS adjudicationlocationtypeid,
-    COALESCE((adjudicationlocation.adjudicationlocationvolume)::text, ''::text) AS adjudicationlocationvolume,
-    COALESCE((adjudicationlocation.adjudicationlocationpagefrom)::text, ''::text) AS adjudicationlocationpagefrom,
-    COALESCE((adjudicationlocation.adjudicationlocationpageto)::text, ''::text) AS adjudicationlocationpageto,
-        CASE
-            WHEN ((adjudicationgovernmentcache.governmentrelationstate = b.governmentrelationstate) OR (adjudicationgovernmentcache.governmentrelationstate IS NULL)) THEN b.tribunalshort
-            ELSE COALESCE(b.tribunalshortstate, ''::text)
-        END AS adjudicationlocationtribunal,
-    COALESCE((adjudicationlocationtype.adjudicationlocationtypeshort)::text, ''::text) AS adjudicationlocationtypeshort,
-    COALESCE((adjudicationlocationtype.adjudicationlocationtypeabbreviation)::text, ''::text) AS adjudicationlocationtypeabbreviation,
-        CASE
-            WHEN (adjudicationgovernmentcache.governmentrelationstate IS NULL) THEN upper("left"(a.tribunalshortstate, 2))
-            ELSE adjudicationgovernmentcache.governmentrelationstate
-        END AS governmentrelationstate,
-    adjudication.adjudicationlong,
-    adjudication.adjudicationshort,
-    adjudication.adjudicationnotes,
-    adjudication.adjudicationstatus,
-    adjudicationtype.tribunal AS adjudicationtribunalid,
-    adjudicationlocationtype.tribunal AS adjudicationlocationtribunalid
-   FROM ((((geohistory.adjudication
-     LEFT JOIN extra.adjudicationgovernmentcache ON ((adjudication.adjudicationid = adjudicationgovernmentcache.adjudicationid)))
-     JOIN geohistory.adjudicationtype ON ((adjudication.adjudicationtype = adjudicationtype.adjudicationtypeid)))
-     JOIN extra.tribunalgovernmentcache a ON ((adjudicationtype.tribunal = a.tribunalid)))
-     LEFT JOIN ((geohistory.adjudicationlocation
-     JOIN geohistory.adjudicationlocationtype ON ((adjudicationlocation.adjudicationlocationtype = adjudicationlocationtype.adjudicationlocationtypeid)))
-     JOIN extra.tribunalgovernmentcache b ON ((adjudicationlocationtype.tribunal = b.tribunalid))) ON ((adjudication.adjudicationid = adjudicationlocation.adjudication)))
-  ORDER BY
-        CASE
-            WHEN (adjudicationgovernmentcache.governmentrelationstate IS NULL) THEN upper("left"(a.tribunalshortstate, 2))
-            ELSE adjudicationgovernmentcache.governmentrelationstate
-        END,
-        CASE
-            WHEN ((adjudicationgovernmentcache.governmentrelationstate = a.governmentrelationstate) OR (adjudicationgovernmentcache.governmentrelationstate IS NULL)) THEN a.tribunalshort
-            ELSE a.tribunalshortstate
-        END, adjudicationtype.adjudicationtypeshort, adjudication.adjudicationterm, adjudication.adjudicationnumber,
-        CASE
-            WHEN ((adjudicationgovernmentcache.governmentrelationstate = b.governmentrelationstate) OR (adjudicationgovernmentcache.governmentrelationstate IS NULL)) THEN b.tribunalshort
-            ELSE COALESCE(b.tribunalshortstate, ''::text)
-        END, COALESCE((adjudicationlocationtype.adjudicationlocationtypeshort)::text, ''::text), COALESCE((adjudicationlocation.adjudicationlocationvolume)::text, ''::text), COALESCE((adjudicationlocation.adjudicationlocationpagefrom)::text, ''::text);
-
-
-ALTER VIEW extra.adjudicationsearch OWNER TO postgres;
-
---
--- Name: adjudicationsearchcache; Type: MATERIALIZED VIEW; Schema: extra; Owner: postgres
---
-
-CREATE MATERIALIZED VIEW extra.adjudicationsearchcache AS
- SELECT adjudicationlocationid,
-    adjudicationid,
-    adjudicationnumber,
-    adjudicationterm,
-    adjudicationsummary,
-    adjudicationtribunal,
-    adjudicationtypeshort,
-    adjudicationtypeabbreviation,
-    adjudicationtypeid,
-    adjudicationlocationtypeid,
-    adjudicationlocationvolume,
-    adjudicationlocationpagefrom,
-    adjudicationlocationpageto,
-    adjudicationlocationtribunal,
-    adjudicationlocationtypeshort,
-    adjudicationlocationtypeabbreviation,
-    governmentrelationstate,
-    adjudicationlong,
-    adjudicationshort,
-    adjudicationnotes,
-    adjudicationstatus,
-    adjudicationtribunalid,
-    adjudicationlocationtribunalid
-   FROM extra.adjudicationsearch
-  WITH NO DATA;
-
-
-ALTER MATERIALIZED VIEW extra.adjudicationsearchcache OWNER TO postgres;
-
---
--- Name: adjudicationsourcecitation; Type: TABLE; Schema: geohistory; Owner: postgres
---
-
-CREATE TABLE geohistory.adjudicationsourcecitation (
-    adjudicationsourcecitationid integer NOT NULL,
-    source integer NOT NULL,
-    adjudicationsourcecitationvolume smallint,
-    adjudicationsourcecitationpagefrom smallint,
-    adjudicationsourcecitationpageto smallint,
-    adjudicationsourcecitationyear character varying(4) DEFAULT ''::character varying NOT NULL,
-    adjudicationsourcecitationdate calendar.historicdatetext DEFAULT (''::text)::calendar.historicdatetext NOT NULL,
-    adjudicationsourcecitationtitle text DEFAULT ''::text NOT NULL,
-    adjudicationsourcecitationauthor character varying(45) DEFAULT ''::character varying NOT NULL,
-    adjudicationsourcecitationjudge character varying(45) DEFAULT ''::character varying NOT NULL,
-    adjudicationsourcecitationdissentjudge character varying(45) DEFAULT ''::character varying NOT NULL,
-    adjudicationsourcecitationurl text DEFAULT ''::text NOT NULL,
-    adjudication integer NOT NULL
-);
-
-
-ALTER TABLE geohistory.adjudicationsourcecitation OWNER TO postgres;
-
---
--- Name: source; Type: TABLE; Schema: geohistory; Owner: postgres
---
-
-CREATE TABLE geohistory.source (
-    sourceid integer NOT NULL,
-    sourcetype character varying(25) NOT NULL,
-    sourceshort character varying(50) DEFAULT ''::character varying NOT NULL,
-    sourceshortpart character varying(50) DEFAULT ''::character varying NOT NULL,
-    sourcebookshort character varying(20) DEFAULT ''::character varying NOT NULL,
-    sourceurlsubstitute integer NOT NULL,
-    sourcelawtype character varying(50) DEFAULT ''::character varying NOT NULL,
-    sourceperson text DEFAULT ''::text NOT NULL,
-    sourcesectiontitle text DEFAULT ''::text NOT NULL,
-    sourcetitle text DEFAULT ''::text NOT NULL,
-    sourceidentifier text DEFAULT ''::text NOT NULL,
-    sourcepublisherlocation text DEFAULT ''::text NOT NULL,
-    sourcepublisher text DEFAULT ''::text NOT NULL,
-    sourcepublisheryear character varying(20) DEFAULT ''::text NOT NULL,
-    sourcelawisbynumber boolean DEFAULT false NOT NULL,
-    sourcelawhasspecialsession boolean DEFAULT false NOT NULL,
-    sourceabbreviationverified boolean DEFAULT false NOT NULL,
-    sourcetemporarynote text DEFAULT ''::text NOT NULL
-);
-
-
-ALTER TABLE geohistory.source OWNER TO postgres;
-
---
--- Name: COLUMN source.sourcetemporarynote; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.source.sourcetemporarynote IS 'This field is used for internal tracking purposes, and is not included in open data.';
-
-
---
--- Name: adjudicationsourcecitationextra; Type: VIEW; Schema: extra; Owner: postgres
---
-
-CREATE VIEW extra.adjudicationsourcecitationextra AS
- WITH adjudicationsourcecitationslugs AS (
-         SELECT adjudicationsourcecitation.adjudicationsourcecitationid,
-            lower(replace(replace(replace((((
-                CASE
-                    WHEN (adjudicationsourcecitation.adjudicationsourcecitationvolume = 0) THEN ''::text
-                    ELSE (adjudicationsourcecitation.adjudicationsourcecitationvolume || '-'::text)
-                END || (source.sourceshort)::text) ||
-                CASE
-                    WHEN (adjudicationsourcecitation.adjudicationsourcecitationpagefrom = 0) THEN ''::text
-                    ELSE ('-'::text || adjudicationsourcecitation.adjudicationsourcecitationpagefrom)
-                END) ||
-                CASE
-                    WHEN (((adjudicationsourcecitation.adjudicationsourcecitationdate)::text = ''::text) OR ("left"((adjudicationsourcecitation.adjudicationsourcecitationdate)::text, 4) = '0000'::text)) THEN
-                    CASE
-                        WHEN ((adjudicationsourcecitation.adjudicationsourcecitationyear)::text = ''::text) THEN ''::text
-                        ELSE ('-'::text || (adjudicationsourcecitation.adjudicationsourcecitationyear)::text)
-                    END
-                    ELSE ('-'::text || "left"((adjudicationsourcecitation.adjudicationsourcecitationdate)::text, 4))
-                END), '.'::text, ''::text), '& '::text, ''::text), ' '::text, '-'::text)) AS adjudicationsourcecitationpartslug
-           FROM (geohistory.adjudicationsourcecitation
-             JOIN geohistory.source ON ((adjudicationsourcecitation.source = source.sourceid)))
-        ), adjudicationsourcecitationslugcounts AS (
-         SELECT count(*) AS rowct,
-            adjudicationsourcecitationslugs_1.adjudicationsourcecitationpartslug
-           FROM adjudicationsourcecitationslugs adjudicationsourcecitationslugs_1
-          GROUP BY adjudicationsourcecitationslugs_1.adjudicationsourcecitationpartslug
-        )
- SELECT adjudicationsourcecitationslugs.adjudicationsourcecitationid,
-    (adjudicationsourcecitationslugs.adjudicationsourcecitationpartslug ||
-        CASE
-            WHEN (adjudicationsourcecitationslugcounts.rowct > 1) THEN ('-'::text || rank() OVER (PARTITION BY adjudicationsourcecitationslugcounts.adjudicationsourcecitationpartslug ORDER BY adjudicationsourcecitationslugs.adjudicationsourcecitationid))
-            ELSE ''::text
-        END) AS adjudicationsourcecitationslug
-   FROM (adjudicationsourcecitationslugs
-     JOIN adjudicationsourcecitationslugcounts ON ((adjudicationsourcecitationslugs.adjudicationsourcecitationpartslug = adjudicationsourcecitationslugcounts.adjudicationsourcecitationpartslug)))
-  ORDER BY adjudicationsourcecitationslugs.adjudicationsourcecitationid;
-
-
-ALTER VIEW extra.adjudicationsourcecitationextra OWNER TO postgres;
-
---
--- Name: adjudicationsourcecitationextracache; Type: MATERIALIZED VIEW; Schema: extra; Owner: postgres
---
-
-CREATE MATERIALIZED VIEW extra.adjudicationsourcecitationextracache AS
- SELECT adjudicationsourcecitationid,
-    adjudicationsourcecitationslug
-   FROM extra.adjudicationsourcecitationextra
-  ORDER BY adjudicationsourcecitationid
-  WITH NO DATA;
-
-
-ALTER MATERIALIZED VIEW extra.adjudicationsourcecitationextracache OWNER TO postgres;
-
---
--- Name: adjudicationsourcecitationsourcegovernment; Type: VIEW; Schema: extra; Owner: postgres
---
-
-CREATE VIEW extra.adjudicationsourcecitationsourcegovernment AS
- SELECT DISTINCT source.sourceshort,
-    adjudicationgovernment.governmentrelationstate
-   FROM ((geohistory.source
-     JOIN geohistory.adjudicationsourcecitation ON ((source.sourceid = adjudicationsourcecitation.source)))
-     LEFT JOIN extra.adjudicationgovernment ON ((adjudicationsourcecitation.adjudication = adjudicationgovernment.adjudicationid)))
-  WHERE ((source.sourcetype)::text = 'court reporters'::text)
-  ORDER BY adjudicationgovernment.governmentrelationstate, source.sourceshort;
-
-
-ALTER VIEW extra.adjudicationsourcecitationsourcegovernment OWNER TO postgres;
-
---
--- Name: adjudicationsourcecitationsourcegovernmentcache; Type: MATERIALIZED VIEW; Schema: extra; Owner: postgres
---
-
-CREATE MATERIALIZED VIEW extra.adjudicationsourcecitationsourcegovernmentcache AS
- SELECT sourceshort,
-    governmentrelationstate
-   FROM extra.adjudicationsourcecitationsourcegovernment
-  WITH NO DATA;
-
-
-ALTER MATERIALIZED VIEW extra.adjudicationsourcecitationsourcegovernmentcache OWNER TO postgres;
-
---
--- Name: affectedgovernment_reconstructed; Type: MATERIALIZED VIEW; Schema: extra; Owner: postgres
---
-
-CREATE MATERIALIZED VIEW extra.affectedgovernment_reconstructed AS
- SELECT DISTINCT affectedgovernmentgroup.affectedgovernmentgroupid AS affectedgovernmentid,
-    affectedgovernmentgroup.event,
-    municipalitypart.governmentfrom AS municipalityfrom,
-    municipalitypart.affectedtypefrom AS affectedtypemunicipalityfrom,
-    municipalitypart.governmentto AS municipalityto,
-    municipalitypart.affectedtypeto AS affectedtypemunicipalityto,
-    municipalitypart.governmentformto AS governmentformmunicipalityto,
-    submunicipalitypart.governmentfrom AS submunicipalityfrom,
-    submunicipalitypart.affectedtypefrom AS affectedtypesubmunicipalityfrom,
-    submunicipalitypart.governmentto AS submunicipalityto,
-    submunicipalitypart.affectedtypeto AS affectedtypesubmunicipalityto,
-    submunicipalitypart.governmentformto AS governmentformsubmunicipalityto,
-    countypart.governmentfrom AS countyfrom,
-    countypart.affectedtypefrom AS affectedtypecountyfrom,
-    countypart.governmentto AS countyto,
-    countypart.affectedtypeto AS affectedtypecountyto,
-    countypart.governmentformto AS governmentformcountyto,
-    subcountypart.governmentfrom AS subcountyfrom,
-    subcountypart.affectedtypefrom AS affectedtypesubcountyfrom,
-    subcountypart.governmentto AS subcountyto,
-    subcountypart.affectedtypeto AS affectedtypesubcountyto,
-    subcountypart.governmentformto AS governmentformsubcountyto,
-    statepart.governmentfrom AS statefrom,
-    statepart.affectedtypefrom AS affectedtypestatefrom,
-    statepart.governmentto AS stateto,
-    statepart.affectedtypeto AS affectedtypestateto,
-    statepart.governmentformto AS governmentformstateto
-   FROM (((((((((((((((geohistory.affectedgovernmentgroup
-     LEFT JOIN geohistory.affectedgovernmentlevel municipalitylevel ON (((municipalitylevel.affectedgovernmentlevelshort)::text = 'municipality'::text)))
-     LEFT JOIN geohistory.affectedgovernmentgrouppart municipalitygrouppart ON (((affectedgovernmentgroup.affectedgovernmentgroupid = municipalitygrouppart.affectedgovernmentgroup) AND (municipalitygrouppart.affectedgovernmentlevel = municipalitylevel.affectedgovernmentlevelid))))
-     LEFT JOIN geohistory.affectedgovernmentpart municipalitypart ON ((municipalitygrouppart.affectedgovernmentpart = municipalitypart.affectedgovernmentpartid)))
-     LEFT JOIN geohistory.affectedgovernmentlevel submunicipalitylevel ON (((submunicipalitylevel.affectedgovernmentlevelshort)::text = 'submunicipality'::text)))
-     LEFT JOIN geohistory.affectedgovernmentgrouppart submunicipalitygrouppart ON (((affectedgovernmentgroup.affectedgovernmentgroupid = submunicipalitygrouppart.affectedgovernmentgroup) AND (submunicipalitygrouppart.affectedgovernmentlevel = submunicipalitylevel.affectedgovernmentlevelid))))
-     LEFT JOIN geohistory.affectedgovernmentpart submunicipalitypart ON ((submunicipalitygrouppart.affectedgovernmentpart = submunicipalitypart.affectedgovernmentpartid)))
-     LEFT JOIN geohistory.affectedgovernmentlevel countylevel ON (((countylevel.affectedgovernmentlevelshort)::text = 'county'::text)))
-     LEFT JOIN geohistory.affectedgovernmentgrouppart countygrouppart ON (((affectedgovernmentgroup.affectedgovernmentgroupid = countygrouppart.affectedgovernmentgroup) AND (countygrouppart.affectedgovernmentlevel = countylevel.affectedgovernmentlevelid))))
-     LEFT JOIN geohistory.affectedgovernmentpart countypart ON ((countygrouppart.affectedgovernmentpart = countypart.affectedgovernmentpartid)))
-     LEFT JOIN geohistory.affectedgovernmentlevel subcountylevel ON (((subcountylevel.affectedgovernmentlevelshort)::text = 'subcounty'::text)))
-     LEFT JOIN geohistory.affectedgovernmentgrouppart subcountygrouppart ON (((affectedgovernmentgroup.affectedgovernmentgroupid = subcountygrouppart.affectedgovernmentgroup) AND (subcountygrouppart.affectedgovernmentlevel = subcountylevel.affectedgovernmentlevelid))))
-     LEFT JOIN geohistory.affectedgovernmentpart subcountypart ON ((subcountygrouppart.affectedgovernmentpart = subcountypart.affectedgovernmentpartid)))
-     LEFT JOIN geohistory.affectedgovernmentlevel statelevel ON (((statelevel.affectedgovernmentlevelshort)::text = 'state'::text)))
-     LEFT JOIN geohistory.affectedgovernmentgrouppart stategrouppart ON (((affectedgovernmentgroup.affectedgovernmentgroupid = stategrouppart.affectedgovernmentgroup) AND (stategrouppart.affectedgovernmentlevel = statelevel.affectedgovernmentlevelid))))
-     LEFT JOIN geohistory.affectedgovernmentpart statepart ON ((stategrouppart.affectedgovernmentpart = statepart.affectedgovernmentpartid)))
-  ORDER BY affectedgovernmentgroup.affectedgovernmentgroupid
-  WITH NO DATA;
-
-
-ALTER MATERIALIZED VIEW extra.affectedgovernment_reconstructed OWNER TO postgres;
-
---
--- Name: affectedgovernmentform; Type: VIEW; Schema: extra; Owner: postgres
---
-
-CREATE VIEW extra.affectedgovernmentform AS
- WITH governmentforms AS (
-         SELECT DISTINCT affectedgovernmentpart.governmentto AS government,
-            affectedgovernmentpart.governmentformto AS governmentform,
-            affectedgovernmentgroup.event
-           FROM ((geohistory.affectedgovernmentpart
-             JOIN geohistory.affectedgovernmentgrouppart ON (((affectedgovernmentpart.affectedgovernmentpartid = affectedgovernmentgrouppart.affectedgovernmentpart) AND (affectedgovernmentpart.governmentformto IS NOT NULL) AND (affectedgovernmentpart.affectedtypeto <> 12))))
-             JOIN geohistory.affectedgovernmentgroup ON ((affectedgovernmentgrouppart.affectedgovernmentgroup = affectedgovernmentgroup.affectedgovernmentgroupid)))
-        )
- SELECT extra.governmentabbreviation(extra.governmentcurrentleadstateid(governmentforms.government)) AS "State",
-    governmentforms.government AS "ID",
-    extra.governmentlong(governmentforms.government) AS "Name",
-    extra.governmenttype(governmentforms.government) AS "Government Type",
-    extra.governmentformlongreport(governmentforms.governmentform) AS "Form",
-    extra.governmentformlong(governmentforms.governmentform, true) AS "Form Detailed",
-    governmentforms.governmentform AS "Form ID",
-    event.eventsortdate AS "Date",
-    governmentforms.event AS "Event",
-    (extra.governmenttype(governmentforms.government) = split_part(replace(extra.governmentformlong(governmentforms.governmentform), ' '::text, ','::text), ','::text, 1)) AS "Type-Form Match",
-    row_number() OVER (PARTITION BY governmentforms.government ORDER BY event.eventsortdate DESC) AS "Recentness"
-   FROM ((governmentforms
-     JOIN geohistory.event ON ((governmentforms.event = event.eventid)))
-     JOIN geohistory.eventgranted ON (((event.eventgranted = eventgranted.eventgrantedid) AND eventgranted.eventgrantedsuccess)))
-  WHERE ((extra.governmentstatus(governmentforms.government) <> ALL (ARRAY['placeholder'::text, 'proposed'::text, 'unincorporated'::text])) AND (extra.governmenttype(governmentforms.government) <> 'Ward'::text))
-  ORDER BY (extra.governmentabbreviation(extra.governmentcurrentleadstateid(governmentforms.government))), governmentforms.government, event.eventsortdate;
-
-
-ALTER VIEW extra.affectedgovernmentform OWNER TO postgres;
-
---
--- Name: affectedgovernmentformcache; Type: MATERIALIZED VIEW; Schema: extra; Owner: postgres
---
-
-CREATE MATERIALIZED VIEW extra.affectedgovernmentformcache AS
- SELECT "State",
-    "ID",
-    "Name",
-    "Government Type",
-    "Form",
-    "Form Detailed",
-    "Form ID",
-    "Date",
-    "Event",
-    "Type-Form Match",
-    "Recentness"
-   FROM extra.affectedgovernmentform
-  WITH NO DATA;
-
-
-ALTER MATERIALIZED VIEW extra.affectedgovernmentformcache OWNER TO postgres;
-
---
--- Name: areagovernment; Type: VIEW; Schema: extra; Owner: postgres
---
-
-CREATE VIEW extra.areagovernment AS
- SELECT DISTINCT governmentshape.governmentshapeid,
-    ag2.governmentrelationstate
-   FROM (gis.governmentshape
-     LEFT JOIN (( SELECT DISTINCT governmentshape_1.governmentsubmunicipality AS government,
-            governmentshape_1.governmentshapeid
-           FROM gis.governmentshape governmentshape_1
-          WHERE (governmentshape_1.governmentsubmunicipality IS NOT NULL)
-        UNION
-         SELECT DISTINCT governmentshape_1.governmentmunicipality AS government,
-            governmentshape_1.governmentshapeid
-           FROM gis.governmentshape governmentshape_1
-        UNION
-         SELECT DISTINCT governmentshape_1.governmentcounty AS government,
-            governmentshape_1.governmentshapeid
-           FROM gis.governmentshape governmentshape_1
-        UNION
-         SELECT DISTINCT governmentshape_1.governmentstate AS government,
-            governmentshape_1.governmentshapeid
-           FROM gis.governmentshape governmentshape_1
-        UNION
-         SELECT DISTINCT affectedgovernmentpart.governmentfrom AS government,
-            affectedgovernmentgis.governmentshape AS governmentshapeid
-           FROM ((geohistory.affectedgovernmentgrouppart
-             JOIN gis.affectedgovernmentgis ON ((affectedgovernmentgrouppart.affectedgovernmentgroup = affectedgovernmentgis.affectedgovernment)))
-             JOIN geohistory.affectedgovernmentpart ON ((affectedgovernmentgrouppart.affectedgovernmentpart = affectedgovernmentpart.affectedgovernmentpartid)))
-          WHERE (affectedgovernmentpart.governmentfrom IS NOT NULL)
-        UNION
-         SELECT DISTINCT affectedgovernmentpart.governmentto AS government,
-            affectedgovernmentgis.governmentshape AS governmentshapeid
-           FROM ((geohistory.affectedgovernmentgrouppart
-             JOIN gis.affectedgovernmentgis ON ((affectedgovernmentgrouppart.affectedgovernmentgroup = affectedgovernmentgis.affectedgovernment)))
-             JOIN geohistory.affectedgovernmentpart ON ((affectedgovernmentgrouppart.affectedgovernmentpart = affectedgovernmentpart.affectedgovernmentpartid)))
-          WHERE (affectedgovernmentpart.governmentto IS NOT NULL)) ag
-     JOIN extra.governmentrelation ON (((ag.government = governmentrelation.governmentid) AND (governmentrelation.governmentrelationstate IS NOT NULL) AND (governmentrelation.governmentrelationstate <> ''::text)))) ag2 ON (((ag2.government IS NOT NULL) AND (extra.governmentlevel(ag2.government) <> 1) AND (governmentshape.governmentshapeid = ag2.governmentshapeid))))
-  ORDER BY ag2.governmentrelationstate, governmentshape.governmentshapeid;
-
-
-ALTER VIEW extra.areagovernment OWNER TO postgres;
-
---
--- Name: areagovernmentcache; Type: MATERIALIZED VIEW; Schema: extra; Owner: postgres
---
-
-CREATE MATERIALIZED VIEW extra.areagovernmentcache AS
- SELECT governmentshapeid,
-    governmentrelationstate
-   FROM extra.areagovernment
-  WITH NO DATA;
-
-
-ALTER MATERIALIZED VIEW extra.areagovernmentcache OWNER TO postgres;
-
---
--- Name: eventgovernmentcache; Type: MATERIALIZED VIEW; Schema: extra; Owner: postgres
---
-
-CREATE MATERIALIZED VIEW extra.eventgovernmentcache AS
- SELECT eventid,
-    government
-   FROM extra.eventgovernment
-  WITH NO DATA;
-
-
-ALTER MATERIALIZED VIEW extra.eventgovernmentcache OWNER TO postgres;
-
---
--- Name: giscache; Type: MATERIALIZED VIEW; Schema: extra; Owner: postgres
---
-
-CREATE MATERIALIZED VIEW extra.giscache AS
- SELECT governmentshape2.government,
-    public.st_buffer(public.st_collect(governmentshape2.governmentshapegeometry), (0)::double precision) AS geometry
-   FROM (( SELECT governmentshape.governmentcounty AS government,
-            governmentshape.governmentshapegeometry
-           FROM gis.governmentshape
-        UNION
-         SELECT governmentshape.governmentmunicipality AS government,
-            governmentshape.governmentshapegeometry
-           FROM gis.governmentshape
-        UNION
-         SELECT governmentshape.governmentschooldistrict AS government,
-            governmentshape.governmentshapegeometry
-           FROM gis.governmentshape
-          WHERE (governmentshape.governmentschooldistrict IS NOT NULL)
-        UNION
-         SELECT governmentshape.governmentshapeplsstownship AS government,
-            governmentshape.governmentshapegeometry
-           FROM gis.governmentshape
-          WHERE (governmentshape.governmentshapeplsstownship IS NOT NULL)
-        UNION
-         SELECT governmentshape.governmentsubmunicipality AS government,
-            governmentshape.governmentshapegeometry
-           FROM gis.governmentshape
-          WHERE (governmentshape.governmentsubmunicipality IS NOT NULL)
-        UNION
-         SELECT governmentshape.governmentward AS government,
-            governmentshape.governmentshapegeometry
-           FROM gis.governmentshape
-          WHERE (governmentshape.governmentward IS NOT NULL)) governmentshape2
-     JOIN geohistory.government ON (((governmentshape2.government = government.governmentid) AND ((government.governmentstatus)::text <> 'placeholder'::text))))
-  GROUP BY governmentshape2.government
-  ORDER BY governmentshape2.government
-  WITH NO DATA;
-
-
-ALTER MATERIALIZED VIEW extra.giscache OWNER TO postgres;
-
---
--- Name: giscountycache; Type: VIEW; Schema: extra; Owner: postgres
---
-
-CREATE VIEW extra.giscountycache AS
- SELECT government,
-    geometry
-   FROM extra.giscache
-  WHERE (government IN ( SELECT DISTINCT governmentshape.governmentcounty
-           FROM gis.governmentshape))
-  ORDER BY government;
-
-
-ALTER VIEW extra.giscountycache OWNER TO postgres;
-
---
--- Name: gismunicipalitycache; Type: VIEW; Schema: extra; Owner: postgres
---
-
-CREATE VIEW extra.gismunicipalitycache AS
- SELECT government,
-    geometry
-   FROM extra.giscache
-  WHERE (government IN ( SELECT DISTINCT governmentshape.governmentmunicipality
-           FROM gis.governmentshape))
-  ORDER BY government;
-
-
-ALTER VIEW extra.gismunicipalitycache OWNER TO postgres;
-
---
--- Name: gisplsstownshipcache; Type: VIEW; Schema: extra; Owner: postgres
---
-
-CREATE VIEW extra.gisplsstownshipcache AS
- SELECT government,
-    geometry
-   FROM extra.giscache
-  WHERE (government IN ( SELECT DISTINCT governmentshape.governmentshapeplsstownship
-           FROM gis.governmentshape))
-  ORDER BY government;
-
-
-ALTER VIEW extra.gisplsstownshipcache OWNER TO postgres;
-
---
--- Name: gisschooldistrictcache; Type: VIEW; Schema: extra; Owner: postgres
---
-
-CREATE VIEW extra.gisschooldistrictcache AS
- SELECT government,
-    geometry
-   FROM extra.giscache
-  WHERE (government IN ( SELECT DISTINCT governmentshape.governmentschooldistrict
-           FROM gis.governmentshape))
-  ORDER BY government;
-
-
-ALTER VIEW extra.gisschooldistrictcache OWNER TO postgres;
-
---
--- Name: gissubmunicipalitycache; Type: VIEW; Schema: extra; Owner: postgres
---
-
-CREATE VIEW extra.gissubmunicipalitycache AS
- SELECT government,
-    geometry
-   FROM extra.giscache
-  WHERE (government IN ( SELECT DISTINCT governmentshape.governmentsubmunicipality
-           FROM gis.governmentshape))
-  ORDER BY government;
-
-
-ALTER VIEW extra.gissubmunicipalitycache OWNER TO postgres;
-
---
--- Name: giswardcache; Type: VIEW; Schema: extra; Owner: postgres
---
-
-CREATE VIEW extra.giswardcache AS
- SELECT government,
-    geometry
-   FROM extra.giscache
-  WHERE (government IN ( SELECT DISTINCT governmentshape.governmentward
-           FROM gis.governmentshape))
-  ORDER BY government;
-
-
-ALTER VIEW extra.giswardcache OWNER TO postgres;
-
---
--- Name: affectedtype; Type: TABLE; Schema: geohistory; Owner: postgres
---
-
-CREATE TABLE geohistory.affectedtype (
-    affectedtypeid integer NOT NULL,
-    affectedtypelong text NOT NULL,
-    affectedtypeshort character varying(20) NOT NULL,
-    affectedtypecreationdissolution character varying(11) DEFAULT ''::character varying NOT NULL,
-    affectedtypefromtoboth character varying(4) NOT NULL,
-    affectedtypeequal boolean DEFAULT false NOT NULL,
-    originalaffectedtypeid integer,
-    CONSTRAINT affectedtype_check CHECK ((((affectedtypefromtoboth)::text <> ''::text) AND (affectedtypelong <> ''::text) AND ((affectedtypeshort)::text <> ''::text)))
-);
-
-
-ALTER TABLE geohistory.affectedtype OWNER TO postgres;
-
---
--- Name: COLUMN affectedtype.affectedtypelong; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.affectedtype.affectedtypelong IS 'Rewrite';
-
-
---
--- Name: COLUMN affectedtype.affectedtypefromtoboth; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.affectedtype.affectedtypefromtoboth IS 'Whether the value can appear in the `from` or `to` fields, or if it must appear in both.';
-
-
---
--- Name: COLUMN affectedtype.affectedtypeequal; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.affectedtype.affectedtypeequal IS 'Whether the `from` and `to` values must be equal.';
-
-
---
 -- Name: eventeffectivetype; Type: TABLE; Schema: geohistory; Owner: postgres
 --
 
 CREATE TABLE geohistory.eventeffectivetype (
     eventeffectivetypeid integer NOT NULL,
     eventeffectivetypegroup character varying(100) DEFAULT ''::character varying NOT NULL,
-    eventeffectivetypequalifier character varying(100) DEFAULT ''::character varying NOT NULL
+    eventeffectivetypequalifier character varying(100) DEFAULT ''::character varying NOT NULL,
+    eventeffectivetypelong text GENERATED ALWAYS AS (((eventeffectivetypegroup)::text ||
+CASE
+    WHEN ((eventeffectivetypequalifier)::text <> ''::text) THEN (': '::text || (eventeffectivetypequalifier)::text)
+    ELSE ''::text
+END)) STORED
 );
 
 
@@ -4024,868 +2714,141 @@ CREATE TABLE geohistory.eventrelationship (
 ALTER TABLE geohistory.eventrelationship OWNER TO postgres;
 
 --
--- Name: governmentchangecount; Type: VIEW; Schema: extra; Owner: postgres
+-- Name: governmentothercurrentparent; Type: TABLE; Schema: geohistory; Owner: postgres
 --
 
-CREATE VIEW extra.governmentchangecount AS
- WITH affectedgovernmentsummary AS (
-         SELECT DISTINCT affectedgovernmentgroup.event AS eventid,
-            affectedgovernmentpart.governmentfrom AS governmentid,
-            affectedgovernmentpart.affectedtypefrom AS affectedtypeid,
-            'from'::text AS affectedside
-           FROM ((geohistory.affectedgovernmentgroup
-             JOIN geohistory.affectedgovernmentgrouppart ON ((affectedgovernmentgroup.affectedgovernmentgroupid = affectedgovernmentgrouppart.affectedgovernmentgroup)))
-             JOIN geohistory.affectedgovernmentpart ON (((affectedgovernmentgrouppart.affectedgovernmentpart = affectedgovernmentpart.affectedgovernmentpartid) AND (affectedgovernmentpart.governmentfrom IS NOT NULL))))
-        UNION
-         SELECT DISTINCT affectedgovernmentgroup.event AS eventid,
-            affectedgovernmentpart.governmentto AS governmentid,
-            affectedgovernmentpart.affectedtypeto AS affectedtypeid,
-            'to'::text AS affectedside
-           FROM ((geohistory.affectedgovernmentgroup
-             JOIN geohistory.affectedgovernmentgrouppart ON ((affectedgovernmentgroup.affectedgovernmentgroupid = affectedgovernmentgrouppart.affectedgovernmentgroup)))
-             JOIN geohistory.affectedgovernmentpart ON (((affectedgovernmentgrouppart.affectedgovernmentpart = affectedgovernmentpart.affectedgovernmentpartid) AND (affectedgovernmentpart.governmentto IS NOT NULL))))
-        ), affectedgovernmentsummaryeventpart AS (
-         SELECT affectedgovernmentsummary.eventid,
-            governmentsubstitute.governmentsubstitute AS governmentid,
-            array_agg(DISTINCT governmentsubstitute.governmentid ORDER BY governmentsubstitute.governmentid) AS originalgovernmentid,
-            affectedgovernmentsummary.affectedtypeid,
-            affectedgovernmentsummary.affectedside,
-            affectedtype.affectedtypecreationdissolution,
-            event.eventsortdate,
-            event.eventdatetext,
-            initcap(((event.eventeffective)::calendar.historicdate)."precision") AS eventeffectiveprecision,
-            extra.eventeffectivetype(eventeffectivetype.eventeffectivetypegroup, eventeffectivetype.eventeffectivetypequalifier) AS eventeffectivetype,
-            sum(
-                CASE
-                    WHEN (eventrelationship.eventrelationshipid IS NOT NULL) THEN 1
-                    ELSE 0
-                END) AS lawsection
-           FROM (((((((affectedgovernmentsummary
-             JOIN geohistory.event ON ((affectedgovernmentsummary.eventid = event.eventid)))
-             JOIN extra.governmentsubstitute ON ((affectedgovernmentsummary.governmentid = governmentsubstitute.governmentid)))
-             LEFT JOIN geohistory.eventeffectivetype ON ((event.eventeffectivetypepresumedsource = eventeffectivetype.eventeffectivetypeid)))
-             JOIN geohistory.eventgranted ON (((event.eventgranted = eventgranted.eventgrantedid) AND eventgranted.eventgrantedsuccess)))
-             JOIN geohistory.affectedtype ON ((affectedgovernmentsummary.affectedtypeid = affectedtype.affectedtypeid)))
-             LEFT JOIN geohistory.lawsectionevent ON ((event.eventid = lawsectionevent.event)))
-             LEFT JOIN geohistory.eventrelationship ON (((lawsectionevent.eventrelationship = eventrelationship.eventrelationshipid) AND eventrelationship.eventrelationshipsufficient)))
-          GROUP BY affectedgovernmentsummary.eventid, governmentsubstitute.governmentsubstitute, affectedgovernmentsummary.affectedtypeid, affectedgovernmentsummary.affectedside, affectedtype.affectedtypecreationdissolution, event.eventsortdate, event.eventdatetext, (extra.eventeffectivetype(eventeffectivetype.eventeffectivetypegroup, eventeffectivetype.eventeffectivetypequalifier)), event.eventeffective, event.eventfrom, event.eventto
-        ), creationdissolution AS (
-         SELECT DISTINCT creationaffectedgovernmentsummaryeventpart.governmentid,
-            creationaffectedgovernmentsummaryeventpart.eventid
-           FROM (affectedgovernmentsummaryeventpart creationaffectedgovernmentsummaryeventpart
-             JOIN affectedgovernmentsummaryeventpart dissolutionaffectedgovernmentsummaryeventpart ON (((creationaffectedgovernmentsummaryeventpart.governmentid = dissolutionaffectedgovernmentsummaryeventpart.governmentid) AND (creationaffectedgovernmentsummaryeventpart.eventid = dissolutionaffectedgovernmentsummaryeventpart.eventid) AND ((creationaffectedgovernmentsummaryeventpart.affectedtypecreationdissolution)::text = 'begin'::text) AND ((dissolutionaffectedgovernmentsummaryeventpart.affectedtypecreationdissolution)::text = 'end'::text))))
-        ), affectedgovernmentsummaryevent AS (
-         SELECT DISTINCT affectedgovernmentsummaryeventpart.eventid,
-            affectedgovernmentsummaryeventpart.governmentid,
-            affectedgovernmentsummaryeventpart.originalgovernmentid,
-            affectedgovernmentsummaryeventpart.affectedtypeid,
-            affectedgovernmentsummaryeventpart.affectedside,
-                CASE
-                    WHEN (creationdissolution.eventid IS NOT NULL) THEN 'alter'::character varying
-                    ELSE affectedgovernmentsummaryeventpart.affectedtypecreationdissolution
-                END AS affectedtypecreationdissolution,
-            affectedgovernmentsummaryeventpart.eventsortdate,
-            affectedgovernmentsummaryeventpart.eventdatetext,
-            affectedgovernmentsummaryeventpart.eventeffectiveprecision,
-            affectedgovernmentsummaryeventpart.eventeffectivetype,
-            affectedgovernmentsummaryeventpart.lawsection
-           FROM (affectedgovernmentsummaryeventpart
-             LEFT JOIN creationdissolution ON (((affectedgovernmentsummaryeventpart.eventid = creationdissolution.eventid) AND (affectedgovernmentsummaryeventpart.governmentid = creationdissolution.governmentid))))
-        ), alterfrom AS (
-         SELECT affectedgovernmentsummaryevent.governmentid,
-            COALESCE(array_agg(DISTINCT affectedgovernmentsummaryevent.eventid ORDER BY affectedgovernmentsummaryevent.eventid), ARRAY[]::integer[]) AS eventid
-           FROM affectedgovernmentsummaryevent
-          WHERE ((affectedgovernmentsummaryevent.affectedside = 'from'::text) AND ((affectedgovernmentsummaryevent.affectedtypecreationdissolution)::text = 'alter'::text))
-          GROUP BY affectedgovernmentsummaryevent.governmentid
-        ), alterto AS (
-         SELECT affectedgovernmentsummaryevent.governmentid,
-            COALESCE(array_agg(DISTINCT affectedgovernmentsummaryevent.eventid ORDER BY affectedgovernmentsummaryevent.eventid), ARRAY[]::integer[]) AS eventid
-           FROM affectedgovernmentsummaryevent
-          WHERE ((affectedgovernmentsummaryevent.affectedside = 'to'::text) AND ((affectedgovernmentsummaryevent.affectedtypecreationdissolution)::text = 'alter'::text))
-          GROUP BY affectedgovernmentsummaryevent.governmentid
-        ), altertotal AS (
-         SELECT affectedgovernmentsummaryevent.governmentid,
-            COALESCE(array_agg(DISTINCT affectedgovernmentsummaryevent.eventid ORDER BY affectedgovernmentsummaryevent.eventid), ARRAY[]::integer[]) AS eventid
-           FROM affectedgovernmentsummaryevent
-          WHERE ((affectedgovernmentsummaryevent.affectedtypecreationdissolution)::text = 'alter'::text)
-          GROUP BY affectedgovernmentsummaryevent.governmentid
-        ), creation AS (
-         SELECT affectedgovernmentsummaryevent.governmentid,
-            extra.array_combine(array_agg(affectedgovernmentsummaryevent.originalgovernmentid)) AS originalgovernmentid,
-            array_agg(DISTINCT affectedgovernmentsummaryevent.eventid ORDER BY affectedgovernmentsummaryevent.eventid) AS eventid,
-            array_agg(DISTINCT affectedgovernmentsummaryevent.eventsortdate) AS eventsortdate,
-            array_agg(DISTINCT affectedgovernmentsummaryevent.eventdatetext) AS eventdatetext,
-            array_agg(DISTINCT affectedgovernmentsummaryevent.eventeffectiveprecision) AS eventeffectiveprecision,
-            array_agg(DISTINCT affectedgovernmentsummaryevent.eventeffectivetype) AS eventeffectivetype,
-            (sum(affectedgovernmentsummaryevent.lawsection) > (0)::numeric) AS lawsection
-           FROM affectedgovernmentsummaryevent
-          WHERE ((affectedgovernmentsummaryevent.affectedtypecreationdissolution)::text = 'begin'::text)
-          GROUP BY affectedgovernmentsummaryevent.governmentid
-        ), dissolution AS (
-         SELECT affectedgovernmentsummaryevent.governmentid,
-            extra.array_combine(array_agg(affectedgovernmentsummaryevent.originalgovernmentid)) AS originalgovernmentid,
-            array_agg(DISTINCT affectedgovernmentsummaryevent.eventid ORDER BY affectedgovernmentsummaryevent.eventid) AS eventid,
-            array_agg(DISTINCT affectedgovernmentsummaryevent.eventsortdate) AS eventsortdate,
-            array_agg(DISTINCT affectedgovernmentsummaryevent.eventdatetext) AS eventdatetext,
-            array_agg(DISTINCT affectedgovernmentsummaryevent.eventeffectiveprecision) AS eventeffectiveprecision,
-            array_agg(DISTINCT affectedgovernmentsummaryevent.eventeffectivetype) AS eventeffectivetype,
-            (sum(affectedgovernmentsummaryevent.lawsection) > (0)::numeric) AS lawsection
-           FROM affectedgovernmentsummaryevent
-          WHERE ((affectedgovernmentsummaryevent.affectedtypecreationdissolution)::text = 'end'::text)
-          GROUP BY affectedgovernmentsummaryevent.governmentid
-        )
- SELECT COALESCE(extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentid)), ''::text) AS governmentstate,
-    government.governmentlevel,
-    government.governmenttype,
-    COALESCE(affectedgovernmentform."Form", ''::text) AS currentform,
-    COALESCE(affectedgovernmentform."Form Detailed", ''::text) AS currentformdetailed,
-        CASE
-            WHEN (government.governmentlevel > 3) THEN extra.governmentname(government.governmentcurrentleadparent)
-            ELSE ''::text
-        END AS governmentleadparentcounty,
-    government.governmentid,
-    extra.governmentlong(government.governmentid) AS governmentlong,
-    COALESCE(array_length(creation.eventid, 1), 0) AS creation,
-    creation.eventid AS creationevent,
-        CASE
-            WHEN (array_length(creation.eventid, 1) = 1) THEN creation.eventdatetext[1]
-            ELSE ''::text
-        END AS creationtext,
-        CASE
-            WHEN (array_length(creation.eventid, 1) = 1) THEN COALESCE(creation.eventeffectiveprecision[1], 'None'::text)
-            ELSE 'None'::text
-        END AS creationprecision,
-        CASE
-            WHEN (array_length(creation.eventid, 1) = 1) THEN creation.eventsortdate[1]
-            ELSE NULL::date
-        END AS creationsort,
-        CASE
-            WHEN (array_length(creation.eventid, 1) = 1) THEN COALESCE(creation.eventeffectivetype[1], ''::text)
-            ELSE ''::text
-        END AS creationhow,
-        CASE
-            WHEN (creation.lawsection IS NULL) THEN false
-            ELSE creation.lawsection
-        END AS creationlawsection,
-    creation.originalgovernmentid AS creationas,
-    COALESCE(array_length(alterfrom.eventid, 1), 0) AS alterfrom,
-    COALESCE(array_length(alterto.eventid, 1), 0) AS alterto,
-    COALESCE(array_length(altertotal.eventid, 1), 0) AS altertotal,
-    COALESCE(array_length(dissolution.eventid, 1), 0) AS dissolution,
-    dissolution.eventid AS dissolutionevent,
-        CASE
-            WHEN (array_length(dissolution.eventid, 1) = 1) THEN dissolution.eventdatetext[1]
-            ELSE ''::text
-        END AS dissolutiontext,
-        CASE
-            WHEN (array_length(dissolution.eventid, 1) = 1) THEN COALESCE(dissolution.eventeffectiveprecision[1], 'None'::text)
-            ELSE 'None'::text
-        END AS dissolutionprecision,
-        CASE
-            WHEN (array_length(dissolution.eventid, 1) = 1) THEN dissolution.eventsortdate[1]
-            ELSE NULL::date
-        END AS dissolutionsort,
-        CASE
-            WHEN (array_length(dissolution.eventid, 1) = 1) THEN COALESCE(dissolution.eventeffectivetype[1], ''::text)
-            ELSE ''::text
-        END AS dissolutionhow,
-        CASE
-            WHEN (dissolution.lawsection IS NULL) THEN false
-            ELSE dissolution.lawsection
-        END AS dissolutionlawsection,
-    dissolution.originalgovernmentid AS dissolutionas
-   FROM ((((((geohistory.government
-     LEFT JOIN alterfrom ON ((government.governmentid = alterfrom.governmentid)))
-     LEFT JOIN alterto ON ((government.governmentid = alterto.governmentid)))
-     LEFT JOIN altertotal ON ((government.governmentid = altertotal.governmentid)))
-     LEFT JOIN creation ON ((government.governmentid = creation.governmentid)))
-     LEFT JOIN dissolution ON ((government.governmentid = dissolution.governmentid)))
-     LEFT JOIN extra.affectedgovernmentform ON (((government.governmentid = affectedgovernmentform."ID") AND (affectedgovernmentform."Recentness" = 1))))
-  WHERE (government.governmentsubstitute IS NULL)
-  ORDER BY (extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentid))), government.governmentlevel, government.governmenttype,
-        CASE
-            WHEN (government.governmentlevel > 3) THEN extra.governmentname(government.governmentcurrentleadparent)
-            ELSE NULL::text
-        END, (extra.governmentlong(government.governmentid)), government.governmentid;
-
-
-ALTER VIEW extra.governmentchangecount OWNER TO postgres;
-
---
--- Name: governmentchangecountcache; Type: MATERIALIZED VIEW; Schema: extra; Owner: postgres
---
-
-CREATE MATERIALIZED VIEW extra.governmentchangecountcache AS
- SELECT governmentstate,
-    governmentlevel,
-    governmenttype,
-    currentform,
-    currentformdetailed,
-    governmentleadparentcounty,
-    governmentid,
-    governmentlong,
-    creation,
-    creationevent,
-    creationtext,
-    creationprecision,
-    creationsort,
-    creationhow,
-    creationlawsection,
-    creationas,
-    alterfrom,
-    alterto,
-    altertotal,
-    dissolution,
-    dissolutionevent,
-    dissolutiontext,
-    dissolutionprecision,
-    dissolutionsort,
-    dissolutionhow,
-    dissolutionlawsection,
-    dissolutionas
-   FROM extra.governmentchangecount
-  WITH NO DATA;
-
-
-ALTER MATERIALIZED VIEW extra.governmentchangecountcache OWNER TO postgres;
-
---
--- Name: governmentchangecountpart; Type: VIEW; Schema: extra; Owner: postgres
---
-
-CREATE VIEW extra.governmentchangecountpart AS
- WITH affectedgovernmentsummary AS (
-         SELECT DISTINCT affectedgovernmentgroup.event AS eventid,
-            affectedgovernmentpart.governmentfrom AS governmentid,
-            affectedgovernmentpart.affectedtypefrom AS affectedtypeid,
-            'from'::text AS affectedside
-           FROM ((geohistory.affectedgovernmentgroup
-             JOIN geohistory.affectedgovernmentgrouppart ON ((affectedgovernmentgroup.affectedgovernmentgroupid = affectedgovernmentgrouppart.affectedgovernmentgroup)))
-             JOIN geohistory.affectedgovernmentpart ON (((affectedgovernmentgrouppart.affectedgovernmentpart = affectedgovernmentpart.affectedgovernmentpartid) AND (affectedgovernmentpart.governmentfrom IS NOT NULL))))
-        UNION
-         SELECT DISTINCT affectedgovernmentgroup.event AS eventid,
-            affectedgovernmentpart.governmentto AS governmentid,
-            affectedgovernmentpart.affectedtypeto AS affectedtypeid,
-            'to'::text AS affectedside
-           FROM ((geohistory.affectedgovernmentgroup
-             JOIN geohistory.affectedgovernmentgrouppart ON ((affectedgovernmentgroup.affectedgovernmentgroupid = affectedgovernmentgrouppart.affectedgovernmentgroup)))
-             JOIN geohistory.affectedgovernmentpart ON (((affectedgovernmentgrouppart.affectedgovernmentpart = affectedgovernmentpart.affectedgovernmentpartid) AND (affectedgovernmentpart.governmentto IS NOT NULL))))
-        ), affectedgovernmentsummaryevent AS (
-         SELECT affectedgovernmentsummary.eventid,
-            affectedgovernmentsummary.governmentid,
-            affectedgovernmentsummary.affectedtypeid,
-            affectedgovernmentsummary.affectedside,
-            affectedtype.affectedtypecreationdissolution,
-            event.eventsortdate,
-            event.eventdatetext,
-            initcap(((event.eventeffective)::calendar.historicdate)."precision") AS eventeffectiveprecision,
-            extra.eventeffectivetype(eventeffectivetype.eventeffectivetypegroup, eventeffectivetype.eventeffectivetypequalifier) AS eventeffectivetype,
-            sum(
-                CASE
-                    WHEN (eventrelationship.eventrelationshipid IS NOT NULL) THEN 1
-                    ELSE 0
-                END) AS lawsection
-           FROM ((((((affectedgovernmentsummary
-             JOIN geohistory.event ON ((affectedgovernmentsummary.eventid = event.eventid)))
-             LEFT JOIN geohistory.eventeffectivetype ON ((event.eventeffectivetypepresumedsource = eventeffectivetype.eventeffectivetypeid)))
-             JOIN geohistory.eventgranted ON (((event.eventgranted = eventgranted.eventgrantedid) AND eventgranted.eventgrantedsuccess)))
-             JOIN geohistory.affectedtype ON ((affectedgovernmentsummary.affectedtypeid = affectedtype.affectedtypeid)))
-             LEFT JOIN geohistory.lawsectionevent ON ((event.eventid = lawsectionevent.event)))
-             LEFT JOIN geohistory.eventrelationship ON (((lawsectionevent.eventrelationship = eventrelationship.eventrelationshipid) AND eventrelationship.eventrelationshipsufficient)))
-          GROUP BY affectedgovernmentsummary.eventid, affectedgovernmentsummary.governmentid, affectedgovernmentsummary.affectedtypeid, affectedgovernmentsummary.affectedside, affectedtype.affectedtypecreationdissolution, event.eventsortdate, event.eventdatetext, (extra.eventeffectivetype(eventeffectivetype.eventeffectivetypegroup, eventeffectivetype.eventeffectivetypequalifier)), event.eventeffective, event.eventfrom, event.eventto
-        ), alterfrom AS (
-         SELECT affectedgovernmentsummaryevent.governmentid,
-            COALESCE(array_agg(DISTINCT affectedgovernmentsummaryevent.eventid ORDER BY affectedgovernmentsummaryevent.eventid), ARRAY[]::integer[]) AS eventid
-           FROM affectedgovernmentsummaryevent
-          WHERE ((affectedgovernmentsummaryevent.affectedside = 'from'::text) AND ((affectedgovernmentsummaryevent.affectedtypecreationdissolution)::text = 'alter'::text))
-          GROUP BY affectedgovernmentsummaryevent.governmentid
-        ), alterto AS (
-         SELECT affectedgovernmentsummaryevent.governmentid,
-            COALESCE(array_agg(DISTINCT affectedgovernmentsummaryevent.eventid ORDER BY affectedgovernmentsummaryevent.eventid), ARRAY[]::integer[]) AS eventid
-           FROM affectedgovernmentsummaryevent
-          WHERE ((affectedgovernmentsummaryevent.affectedside = 'to'::text) AND ((affectedgovernmentsummaryevent.affectedtypecreationdissolution)::text = 'alter'::text))
-          GROUP BY affectedgovernmentsummaryevent.governmentid
-        ), altertotal AS (
-         SELECT affectedgovernmentsummaryevent.governmentid,
-            COALESCE(array_agg(DISTINCT affectedgovernmentsummaryevent.eventid ORDER BY affectedgovernmentsummaryevent.eventid), ARRAY[]::integer[]) AS eventid
-           FROM affectedgovernmentsummaryevent
-          WHERE ((affectedgovernmentsummaryevent.affectedtypecreationdissolution)::text = 'alter'::text)
-          GROUP BY affectedgovernmentsummaryevent.governmentid
-        ), creation AS (
-         SELECT affectedgovernmentsummaryevent.governmentid,
-            array_agg(DISTINCT affectedgovernmentsummaryevent.eventid ORDER BY affectedgovernmentsummaryevent.eventid) AS eventid,
-            array_agg(DISTINCT affectedgovernmentsummaryevent.eventsortdate) AS eventsortdate,
-            array_agg(DISTINCT affectedgovernmentsummaryevent.eventdatetext) AS eventdatetext,
-            array_agg(DISTINCT affectedgovernmentsummaryevent.eventeffectiveprecision) AS eventeffectiveprecision,
-            array_agg(DISTINCT affectedgovernmentsummaryevent.eventeffectivetype) AS eventeffectivetype,
-            (sum(affectedgovernmentsummaryevent.lawsection) > (0)::numeric) AS lawsection
-           FROM affectedgovernmentsummaryevent
-          WHERE ((affectedgovernmentsummaryevent.affectedtypecreationdissolution)::text = 'begin'::text)
-          GROUP BY affectedgovernmentsummaryevent.governmentid
-        ), dissolution AS (
-         SELECT affectedgovernmentsummaryevent.governmentid,
-            array_agg(DISTINCT affectedgovernmentsummaryevent.eventid ORDER BY affectedgovernmentsummaryevent.eventid) AS eventid,
-            array_agg(DISTINCT affectedgovernmentsummaryevent.eventsortdate) AS eventsortdate,
-            array_agg(DISTINCT affectedgovernmentsummaryevent.eventdatetext) AS eventdatetext,
-            array_agg(DISTINCT affectedgovernmentsummaryevent.eventeffectiveprecision) AS eventeffectiveprecision,
-            array_agg(DISTINCT affectedgovernmentsummaryevent.eventeffectivetype) AS eventeffectivetype,
-            (sum(affectedgovernmentsummaryevent.lawsection) > (0)::numeric) AS lawsection
-           FROM affectedgovernmentsummaryevent
-          WHERE ((affectedgovernmentsummaryevent.affectedtypecreationdissolution)::text = 'end'::text)
-          GROUP BY affectedgovernmentsummaryevent.governmentid
-        )
- SELECT COALESCE(extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentid)), ''::text) AS governmentstate,
-    government.governmentlevel,
-    government.governmenttype,
-    COALESCE(affectedgovernmentform."Form", ''::text) AS currentform,
-    COALESCE(affectedgovernmentform."Form Detailed", ''::text) AS currentformdetailed,
-        CASE
-            WHEN (government.governmentlevel > 3) THEN extra.governmentname(government.governmentcurrentleadparent)
-            ELSE ''::text
-        END AS governmentleadparentcounty,
-    government.governmentid,
-    extra.governmentlong(government.governmentid) AS governmentlong,
-    COALESCE(array_length(creation.eventid, 1), 0) AS creation,
-    creation.eventid AS creationevent,
-        CASE
-            WHEN (array_length(creation.eventid, 1) = 1) THEN creation.eventdatetext[1]
-            ELSE ''::text
-        END AS creationtext,
-        CASE
-            WHEN (array_length(creation.eventid, 1) = 1) THEN COALESCE(creation.eventeffectiveprecision[1], 'None'::text)
-            ELSE 'None'::text
-        END AS creationprecision,
-        CASE
-            WHEN (array_length(creation.eventid, 1) = 1) THEN creation.eventsortdate[1]
-            ELSE NULL::date
-        END AS creationsort,
-        CASE
-            WHEN (array_length(creation.eventid, 1) = 1) THEN COALESCE(creation.eventeffectivetype[1], ''::text)
-            ELSE ''::text
-        END AS creationhow,
-        CASE
-            WHEN (creation.lawsection IS NULL) THEN false
-            ELSE creation.lawsection
-        END AS creationlawsection,
-    COALESCE(array_length(alterfrom.eventid, 1), 0) AS alterfrom,
-    COALESCE(array_length(alterto.eventid, 1), 0) AS alterto,
-    COALESCE(array_length(altertotal.eventid, 1), 0) AS altertotal,
-    COALESCE(array_length(dissolution.eventid, 1), 0) AS dissolution,
-    dissolution.eventid AS dissolutionevent,
-        CASE
-            WHEN (array_length(dissolution.eventid, 1) = 1) THEN dissolution.eventdatetext[1]
-            ELSE ''::text
-        END AS dissolutiontext,
-        CASE
-            WHEN (array_length(dissolution.eventid, 1) = 1) THEN COALESCE(dissolution.eventeffectiveprecision[1], 'None'::text)
-            ELSE 'None'::text
-        END AS dissolutionprecision,
-        CASE
-            WHEN (array_length(dissolution.eventid, 1) = 1) THEN dissolution.eventsortdate[1]
-            ELSE NULL::date
-        END AS dissolutionsort,
-        CASE
-            WHEN (array_length(dissolution.eventid, 1) = 1) THEN COALESCE(dissolution.eventeffectivetype[1], ''::text)
-            ELSE ''::text
-        END AS dissolutionhow,
-        CASE
-            WHEN (dissolution.lawsection IS NULL) THEN false
-            ELSE dissolution.lawsection
-        END AS dissolutionlawsection,
-    governmentsubstitute.governmentsubstitute AS governmentsubstituteid,
-    extra.governmentlong(governmentsubstitute.governmentsubstitute) AS governmentsubstitutelong
-   FROM (((((((geohistory.government
-     LEFT JOIN alterfrom ON ((government.governmentid = alterfrom.governmentid)))
-     LEFT JOIN alterto ON ((government.governmentid = alterto.governmentid)))
-     LEFT JOIN altertotal ON ((government.governmentid = altertotal.governmentid)))
-     LEFT JOIN creation ON ((government.governmentid = creation.governmentid)))
-     LEFT JOIN dissolution ON ((government.governmentid = dissolution.governmentid)))
-     LEFT JOIN extra.affectedgovernmentform ON (((government.governmentid = affectedgovernmentform."ID") AND (affectedgovernmentform."Recentness" = 1))))
-     LEFT JOIN extra.governmentsubstitute ON (((government.governmentid = governmentsubstitute.governmentid) AND ((government.governmentstatus)::text <> ALL (ARRAY[('alternate'::character varying)::text, ('language'::character varying)::text, ('placeholder'::character varying)::text])))))
-  ORDER BY (extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentid))), government.governmentlevel, government.governmenttype,
-        CASE
-            WHEN (government.governmentlevel > 3) THEN extra.governmentname(government.governmentcurrentleadparent)
-            ELSE NULL::text
-        END, (extra.governmentlong(government.governmentid)), government.governmentid;
-
-
-ALTER VIEW extra.governmentchangecountpart OWNER TO postgres;
-
---
--- Name: governmentchangecountpartcache; Type: MATERIALIZED VIEW; Schema: extra; Owner: postgres
---
-
-CREATE MATERIALIZED VIEW extra.governmentchangecountpartcache AS
- SELECT governmentstate,
-    governmentlevel,
-    governmenttype,
-    currentform,
-    currentformdetailed,
-    governmentleadparentcounty,
-    governmentid,
-    governmentlong,
-    creation,
-    creationevent,
-    creationtext,
-    creationprecision,
-    creationsort,
-    creationhow,
-    creationlawsection,
-    alterfrom,
-    alterto,
-    altertotal,
-    dissolution,
-    dissolutionevent,
-    dissolutiontext,
-    dissolutionprecision,
-    dissolutionsort,
-    dissolutionhow,
-    dissolutionlawsection,
-    governmentsubstituteid,
-    governmentsubstitutelong
-   FROM extra.governmentchangecountpart
-  WITH NO DATA;
-
-
-ALTER MATERIALIZED VIEW extra.governmentchangecountpartcache OWNER TO postgres;
-
---
--- Name: governmentextra; Type: VIEW; Schema: extra; Owner: postgres
---
-
-CREATE VIEW extra.governmentextra AS
- SELECT government.governmentid,
-    extra.governmentslugalternate(government.governmentid) AS governmentslug,
-    extra.governmentlong(government.governmentid, '--'::character varying) AS governmentlong,
-    extra.governmentshort(government.governmentid) AS governmentshort,
-    ((government.governmentstatus)::text = 'placeholder'::text) AS governmentisplaceholder,
-    extra.governmentslugalternate(governmentsubstitute.governmentsubstitute) AS governmentsubstituteslug
-   FROM (geohistory.government
-     LEFT JOIN extra.governmentsubstitute ON (((government.governmentid = governmentsubstitute.governmentid) AND (governmentsubstitute.governmentid <> governmentsubstitute.governmentsubstitute))))
-  ORDER BY government.governmentid;
-
-
-ALTER VIEW extra.governmentextra OWNER TO postgres;
-
---
--- Name: governmentextracache; Type: MATERIALIZED VIEW; Schema: extra; Owner: postgres
---
-
-CREATE MATERIALIZED VIEW extra.governmentextracache AS
- SELECT governmentid,
-    governmentslug,
-    governmentlong,
-    governmentshort,
-    governmentisplaceholder,
-    governmentsubstituteslug
-   FROM extra.governmentextra
-  ORDER BY governmentid
-  WITH NO DATA;
-
-
-ALTER MATERIALIZED VIEW extra.governmentextracache OWNER TO postgres;
-
---
--- Name: governmenthasmappedevent; Type: VIEW; Schema: extra; Owner: postgres
---
-
-CREATE VIEW extra.governmenthasmappedevent AS
- SELECT DISTINCT governmentsubstitute.governmentsubstitute
-   FROM (((geohistory.affectedgovernmentgrouppart
-     JOIN gis.affectedgovernmentgis ON ((affectedgovernmentgrouppart.affectedgovernmentgroup = affectedgovernmentgis.affectedgovernment)))
-     JOIN geohistory.affectedgovernmentpart ON ((affectedgovernmentgrouppart.affectedgovernmentpart = affectedgovernmentpart.affectedgovernmentpartid)))
-     JOIN extra.governmentsubstitute ON ((affectedgovernmentpart.governmentfrom = governmentsubstitute.governmentid)))
-UNION
- SELECT DISTINCT governmentsubstitute.governmentsubstitute
-   FROM (((geohistory.affectedgovernmentgrouppart
-     JOIN gis.affectedgovernmentgis ON ((affectedgovernmentgrouppart.affectedgovernmentgroup = affectedgovernmentgis.affectedgovernment)))
-     JOIN geohistory.affectedgovernmentpart ON ((affectedgovernmentgrouppart.affectedgovernmentpart = affectedgovernmentpart.affectedgovernmentpartid)))
-     JOIN extra.governmentsubstitute ON ((affectedgovernmentpart.governmentto = governmentsubstitute.governmentid)));
-
-
-ALTER VIEW extra.governmenthasmappedevent OWNER TO postgres;
-
---
--- Name: governmenthasmappedeventcache; Type: MATERIALIZED VIEW; Schema: extra; Owner: postgres
---
-
-CREATE MATERIALIZED VIEW extra.governmenthasmappedeventcache AS
- SELECT governmentsubstitute
-   FROM extra.governmenthasmappedevent
-  WITH NO DATA;
-
-
-ALTER MATERIALIZED VIEW extra.governmenthasmappedeventcache OWNER TO postgres;
-
---
--- Name: governmentparentcache; Type: MATERIALIZED VIEW; Schema: extra; Owner: postgres
---
-
-CREATE MATERIALIZED VIEW extra.governmentparentcache AS
- SELECT governmentid,
-    governmentparent,
-    governmentparentstatus
-   FROM extra.governmentparent
-  WITH NO DATA;
-
-
-ALTER MATERIALIZED VIEW extra.governmentparentcache OWNER TO postgres;
-
---
--- Name: governmentrelationcache; Type: MATERIALIZED VIEW; Schema: extra; Owner: postgres
---
-
-CREATE MATERIALIZED VIEW extra.governmentrelationcache AS
- SELECT governmentid,
-    governmentlevel,
-    governmentshort,
-    governmentlong,
-    governmentrelationlevel,
-    governmentrelation,
-    governmentrelationstate
-   FROM extra.governmentrelation
-  WITH NO DATA;
-
-
-ALTER MATERIALIZED VIEW extra.governmentrelationcache OWNER TO postgres;
-
---
--- Name: governmentshape_history; Type: VIEW; Schema: extra; Owner: postgres
---
-
-CREATE VIEW extra.governmentshape_history AS
- WITH affectedgovernmentorder AS (
-         SELECT affectedgovernmentgis.governmentshape AS governmentshapeid,
-            affectedgovernment_reconstructed.affectedgovernmentid,
-            row_number() OVER (PARTITION BY affectedgovernmentgis.governmentshape ORDER BY event.eventsort) AS shapeorder,
-            event.eventsort,
-            affectedgovernment_reconstructed.submunicipalityto,
-            affectedgovernment_reconstructed.municipalityto,
-            affectedgovernment_reconstructed.subcountyto,
-            affectedgovernment_reconstructed.countyto,
-            affectedgovernment_reconstructed.stateto,
-            governmentshape.governmentsubmunicipality,
-            governmentshape.governmentmunicipality,
-            governmentshape.governmentcounty,
-            governmentshape.governmentstate
-           FROM ((((gis.affectedgovernmentgis
-             JOIN gis.governmentshape ON ((affectedgovernmentgis.governmentshape = governmentshape.governmentshapeid)))
-             JOIN extra.affectedgovernment_reconstructed ON ((affectedgovernmentgis.affectedgovernment = affectedgovernment_reconstructed.affectedgovernmentid)))
-             JOIN geohistory.event ON ((affectedgovernment_reconstructed.event = event.eventid)))
-             JOIN geohistory.eventgranted ON (((event.eventgranted = eventgranted.eventgrantedid) AND eventgranted.eventgrantedsuccess)))
-        )
- SELECT currentorder.governmentshapeid,
-    currentorder.eventsort AS startdate,
-        CASE
-            WHEN (nextorder.eventsort IS NULL) THEN (to_char((CURRENT_DATE)::timestamp with time zone, 'J'::text))::numeric
-            ELSE nextorder.eventsort
-        END AS enddate,
-    currentorder.submunicipalityto,
-    currentorder.municipalityto,
-    currentorder.subcountyto,
-    currentorder.countyto,
-    currentorder.stateto,
-    currentorder.governmentsubmunicipality,
-    currentorder.governmentmunicipality,
-    currentorder.governmentcounty,
-    currentorder.governmentstate
-   FROM (affectedgovernmentorder currentorder
-     LEFT JOIN affectedgovernmentorder nextorder ON (((currentorder.governmentshapeid = nextorder.governmentshapeid) AND (currentorder.shapeorder = (nextorder.shapeorder - 1)))))
-UNION
- SELECT affectedgovernmentorder.governmentshapeid,
-    (0)::numeric AS startdate,
-    affectedgovernmentorder.eventsort AS enddate,
-    affectedgovernment_reconstructed.submunicipalityfrom AS submunicipalityto,
-    affectedgovernment_reconstructed.municipalityfrom AS municipalityto,
-    affectedgovernment_reconstructed.subcountyfrom AS subcountyto,
-    affectedgovernment_reconstructed.countyfrom AS countyto,
-    affectedgovernment_reconstructed.statefrom AS stateto,
-    affectedgovernmentorder.governmentsubmunicipality,
-    affectedgovernmentorder.governmentmunicipality,
-    affectedgovernmentorder.governmentcounty,
-    affectedgovernmentorder.governmentstate
-   FROM (affectedgovernmentorder
-     LEFT JOIN extra.affectedgovernment_reconstructed ON ((affectedgovernmentorder.affectedgovernmentid = affectedgovernment_reconstructed.affectedgovernmentid)))
-  WHERE (affectedgovernmentorder.shapeorder = 1)
-  ORDER BY 1, 2;
-
-
-ALTER VIEW extra.governmentshape_history OWNER TO postgres;
-
---
--- Name: governmentshapeextra; Type: VIEW; Schema: extra; Owner: postgres
---
-
-CREATE VIEW extra.governmentshapeextra AS
- WITH areaslugs AS (
-         SELECT governmentshape.governmentshapeid,
-            extra.governmentslugalternate(
-                CASE
-                    WHEN (governmentshape.governmentsubmunicipality IS NULL) THEN governmentshape.governmentmunicipality
-                    ELSE governmentshape.governmentsubmunicipality
-                END) AS areaslugpart
-           FROM gis.governmentshape
-        ), areaslugscounts AS (
-         SELECT count(*) AS rowct,
-            replace(areaslugs_1.areaslugpart, '.'::text, ''::text) AS areaslugpart
-           FROM areaslugs areaslugs_1
-          GROUP BY areaslugs_1.areaslugpart
-        )
- SELECT areaslugs.governmentshapeid,
-    (areaslugs.areaslugpart ||
-        CASE
-            WHEN (areaslugscounts.rowct > 1) THEN ('-'::text || rank() OVER (PARTITION BY areaslugs.areaslugpart ORDER BY areaslugs.governmentshapeid))
-            ELSE ''::text
-        END) AS governmentshapeslug
-   FROM (areaslugs
-     JOIN areaslugscounts ON ((areaslugs.areaslugpart = areaslugscounts.areaslugpart)))
-  ORDER BY areaslugs.governmentshapeid;
-
-
-ALTER VIEW extra.governmentshapeextra OWNER TO postgres;
-
---
--- Name: governmentshapeextracache; Type: MATERIALIZED VIEW; Schema: extra; Owner: postgres
---
-
-CREATE MATERIALIZED VIEW extra.governmentshapeextracache AS
- SELECT governmentshapeid,
-    governmentshapeslug
-   FROM extra.governmentshapeextra
-  ORDER BY governmentshapeid
-  WITH NO DATA;
-
-
-ALTER MATERIALIZED VIEW extra.governmentshapeextracache OWNER TO postgres;
-
---
--- Name: governmentsourceextra; Type: VIEW; Schema: extra; Owner: postgres
---
-
-CREATE VIEW extra.governmentsourceextra AS
- WITH governmentsourceslugs AS (
-         SELECT governmentsource.governmentsourceid,
-            btrim(lower(regexp_replace((((((((((((governmentextra.governmentslug || '-'::text) || (governmentsource.governmentsourcebody)::text) || '-'::text) || (governmentsource.governmentsourcetype)::text) || '-'::text) || (governmentsource.governmentsourcenumber)::text) || '-'::text) || (governmentsource.governmentsourceterm)::text) ||
-                CASE
-                    WHEN ((governmentsource.governmentsourcevolume)::text <> ''::text) THEN ('-v'::text || (governmentsource.governmentsourcevolume)::text)
-                    ELSE ''::text
-                END) || '-'::text) || extra.rangefix((governmentsource.governmentsourcepagefrom)::text, (governmentsource.governmentsourcepageto)::text)), '[\s\-\.\/''\(\);:,&"#§\?\[\]]+'::text, '-'::text, 'g'::text)), '-'::text) AS governmentsourcepartslug,
-            (governmentsource.source IS NOT NULL) AS hassource
-           FROM (geohistory.governmentsource
-             JOIN extra.governmentextra ON ((governmentsource.government = governmentextra.governmentid)))
-        ), governmentsourceslugcounts AS (
-         SELECT count(*) AS rowct,
-            governmentsourceslugs_1.governmentsourcepartslug
-           FROM governmentsourceslugs governmentsourceslugs_1
-          GROUP BY governmentsourceslugs_1.governmentsourcepartslug
-        )
- SELECT governmentsourceslugs.governmentsourceid,
-    (governmentsourceslugs.governmentsourcepartslug ||
-        CASE
-            WHEN (governmentsourceslugcounts.rowct > 1) THEN ('-'::text || rank() OVER (PARTITION BY governmentsourceslugcounts.governmentsourcepartslug ORDER BY governmentsourceslugs.governmentsourceid))
-            ELSE ''::text
-        END) AS governmentsourceslug,
-    governmentsourceslugs.hassource
-   FROM (governmentsourceslugs
-     JOIN governmentsourceslugcounts ON ((governmentsourceslugs.governmentsourcepartslug = governmentsourceslugcounts.governmentsourcepartslug)))
-  ORDER BY governmentsourceslugs.governmentsourceid;
-
-
-ALTER VIEW extra.governmentsourceextra OWNER TO postgres;
-
---
--- Name: governmentsourceextracache; Type: MATERIALIZED VIEW; Schema: extra; Owner: postgres
---
-
-CREATE MATERIALIZED VIEW extra.governmentsourceextracache AS
- SELECT governmentsourceid,
-    governmentsourceslug,
-    hassource
-   FROM extra.governmentsourceextra
-  WITH NO DATA;
-
-
-ALTER MATERIALIZED VIEW extra.governmentsourceextracache OWNER TO postgres;
-
---
--- Name: governmentsubstitutecache; Type: MATERIALIZED VIEW; Schema: extra; Owner: postgres
---
-
-CREATE MATERIALIZED VIEW extra.governmentsubstitutecache AS
- SELECT governmentid,
-    governmentsubstitute,
-    governmentsubstitutemultiple
-   FROM extra.governmentsubstitute
-  WITH NO DATA;
-
-
-ALTER MATERIALIZED VIEW extra.governmentsubstitutecache OWNER TO postgres;
-
---
--- Name: lastrefresh; Type: MATERIALIZED VIEW; Schema: extra; Owner: postgres
---
-
-CREATE MATERIALIZED VIEW extra.lastrefresh AS
- SELECT ('now'::text)::date AS lastrefreshdate
-  WITH NO DATA;
-
-
-ALTER MATERIALIZED VIEW extra.lastrefresh OWNER TO postgres;
-
---
--- Name: lawalternatesection; Type: TABLE; Schema: geohistory; Owner: postgres
---
-
-CREATE TABLE geohistory.lawalternatesection (
-    lawalternatesectionid integer NOT NULL,
-    lawalternate integer NOT NULL,
-    lawsection integer NOT NULL,
-    lawalternatesectionpagefrom smallint,
-    lawalternatesectionpageto smallint
+CREATE TABLE geohistory.governmentothercurrentparent (
+    governmentothercurrentparentid integer NOT NULL,
+    government integer NOT NULL,
+    governmentothercurrentparent integer NOT NULL
 );
 
 
-ALTER TABLE geohistory.lawalternatesection OWNER TO postgres;
+ALTER TABLE geohistory.governmentothercurrentparent OWNER TO postgres;
 
 --
--- Name: lawalternatesectionextra; Type: VIEW; Schema: extra; Owner: postgres
+-- Name: metesdescriptionline; Type: TABLE; Schema: geohistory; Owner: postgres
 --
 
-CREATE VIEW extra.lawalternatesectionextra AS
- SELECT lawalternatesectionid AS lawsectionid,
-    extra.lawalternatesectioncitation(lawalternatesectionid) AS lawsectioncitation,
-    (extra.lawalternatesectionslug(lawalternatesectionid) || '-alternate'::text) AS lawsectionslug
-   FROM geohistory.lawalternatesection
-  ORDER BY lawalternatesectionid;
+CREATE TABLE geohistory.metesdescriptionline (
+    metesdescriptionlineid integer NOT NULL,
+    metesdescription integer NOT NULL,
+    metesdescriptionline smallint NOT NULL,
+    thencepoint text DEFAULT ''::text NOT NULL,
+    northsouth character varying(1) DEFAULT ''::character varying NOT NULL,
+    degree double precision,
+    eastwest character varying(1) DEFAULT ''::character varying NOT NULL,
+    foot double precision,
+    topoint text DEFAULT ''::text NOT NULL,
+    curveleftright character varying(5) DEFAULT ''::character varying NOT NULL,
+    curveradiusfoot double precision,
+    curvetangent smallint DEFAULT (0)::smallint NOT NULL,
+    manualxchange double precision,
+    manualychange double precision,
+    metesdescriptionlinenotes text DEFAULT ''::text NOT NULL,
+    curveinternalangle double precision,
+    CONSTRAINT metesdescriptionline_curvetangent_check CHECK (((curvetangent = 0) OR (curvetangent = 1) OR (curvetangent = '-1'::integer))),
+    CONSTRAINT metesdescriptionline_degree_check CHECK ((degree <> (0)::double precision)),
+    CONSTRAINT metesdescriptionline_eastwest_check CHECK (((eastwest)::text = ANY (ARRAY[('E'::character varying)::text, ('W'::character varying)::text, (''::character varying)::text]))),
+    CONSTRAINT metesdescriptionline_manualxchange_check CHECK ((manualxchange <> (0)::double precision)),
+    CONSTRAINT metesdescriptionline_northsouth_check CHECK (((northsouth)::text = ANY (ARRAY[('N'::character varying)::text, ('S'::character varying)::text, (''::character varying)::text])))
+);
 
 
-ALTER VIEW extra.lawalternatesectionextra OWNER TO postgres;
-
---
--- Name: lawalternatesectionextracache; Type: MATERIALIZED VIEW; Schema: extra; Owner: postgres
---
-
-CREATE MATERIALIZED VIEW extra.lawalternatesectionextracache AS
- SELECT lawsectionid,
-    lawsectioncitation,
-    lawsectionslug
-   FROM extra.lawalternatesectionextra
-  ORDER BY lawsectionid
-  WITH NO DATA;
-
-
-ALTER MATERIALIZED VIEW extra.lawalternatesectionextracache OWNER TO postgres;
-
---
--- Name: lawsectionextra; Type: VIEW; Schema: extra; Owner: postgres
---
-
-CREATE VIEW extra.lawsectionextra AS
- WITH lawsections AS (
-         SELECT lawsection.lawsectionid,
-            extra.lawsectioncitation(lawsection.lawsectionid) AS lawsectioncitation,
-            extra.lawsectionslug(lawsection.lawsectionid) AS lawsectionslug,
-            row_number() OVER (PARTITION BY (extra.lawsectionslug(lawsection.lawsectionid)) ORDER BY lawsection.lawsectionid) AS row_number
-           FROM geohistory.lawsection
-        )
- SELECT lawsectionid,
-    lawsectioncitation,
-    (lawsectionslug ||
-        CASE
-            WHEN (row_number > 1) THEN ('-pt'::text || row_number)
-            ELSE ''::text
-        END) AS lawsectionslug
-   FROM lawsections
-  ORDER BY lawsectionid;
-
-
-ALTER VIEW extra.lawsectionextra OWNER TO postgres;
+ALTER TABLE geohistory.metesdescriptionline OWNER TO postgres;
 
 --
--- Name: lawsectionextracache; Type: MATERIALIZED VIEW; Schema: extra; Owner: postgres
+-- Name: source; Type: TABLE; Schema: geohistory; Owner: postgres
 --
 
-CREATE MATERIALIZED VIEW extra.lawsectionextracache AS
- SELECT lawsectionid,
-    lawsectioncitation,
-    lawsectionslug
-   FROM extra.lawsectionextra
-  ORDER BY lawsectionid
-  WITH NO DATA;
+CREATE TABLE geohistory.source (
+    sourceid integer NOT NULL,
+    sourcetype character varying(25) NOT NULL,
+    sourceshort character varying(50) DEFAULT ''::character varying NOT NULL,
+    sourceshortpart character varying(50) DEFAULT ''::character varying NOT NULL,
+    sourcebookshort character varying(20) DEFAULT ''::character varying NOT NULL,
+    sourceurlsubstitute integer NOT NULL,
+    sourcelawtype character varying(50) DEFAULT ''::character varying NOT NULL,
+    sourceperson text DEFAULT ''::text NOT NULL,
+    sourcesectiontitle text DEFAULT ''::text NOT NULL,
+    sourcetitle text DEFAULT ''::text NOT NULL,
+    sourceidentifier text DEFAULT ''::text NOT NULL,
+    sourcepublisherlocation text DEFAULT ''::text NOT NULL,
+    sourcepublisher text DEFAULT ''::text NOT NULL,
+    sourcepublisheryear character varying(20) DEFAULT ''::text NOT NULL,
+    sourcelawisbynumber boolean DEFAULT false NOT NULL,
+    sourcelawhasspecialsession boolean DEFAULT false NOT NULL,
+    sourceabbreviationverified boolean DEFAULT false NOT NULL,
+    sourcetemporarynote text DEFAULT ''::text NOT NULL,
+    sourceabbreviation text GENERATED ALWAYS AS (((sourceshort)::text ||
+CASE
+    WHEN ((sourceshortpart)::text <> ''::text) THEN (' '::text || (sourceshortpart)::text)
+    ELSE ''::text
+END)) STORED,
+    sourcefullcitation text GENERATED ALWAYS AS (geohistory.implode(ARRAY[
+CASE
+    WHEN (sourceperson = ''::text) THEN NULL::text
+    ELSE (sourceperson ||
+    CASE
+        WHEN ("right"(sourceperson, 1) = '.'::text) THEN ''::text
+        ELSE '.'::text
+    END)
+END,
+CASE
+    WHEN (sourcesectiontitle = ''::text) THEN NULL::text
+    ELSE (('&quot;'::text || sourcesectiontitle) || '.&quot;'::text)
+END,
+CASE
+    WHEN (sourcetitle = ''::text) THEN NULL::text
+    ELSE (('<span style="font-style: italic;">'::text || sourcetitle) || '</span>.'::text)
+END,
+CASE
+    WHEN (sourceidentifier = ''::text) THEN NULL::text
+    ELSE (sourceidentifier || '.'::text)
+END,
+CASE
+    WHEN ((sourcepublisherlocation = ''::text) AND (sourcepublisher <> ''::text)) THEN '?:'::text
+    WHEN (sourcepublisherlocation = ''::text) THEN NULL::text
+    ELSE (((
+    CASE
+        WHEN ((sourcetype)::text = 'newspapers'::text) THEN '('::text
+        ELSE ''::text
+    END || sourcepublisherlocation) ||
+    CASE
+        WHEN ((sourcetype)::text = 'newspapers'::text) THEN ')'::text
+        ELSE ''::text
+    END) ||
+    CASE
+        WHEN (sourcepublisher <> ''::text) THEN ':'::text
+        WHEN ((sourcepublisheryear)::text <> ''::text) THEN ','::text
+        WHEN (("right"(sourcepublisherlocation, 1) = '.'::text) AND ((sourcetype)::text <> 'newspapers'::text)) THEN ''::text
+        ELSE '.'::text
+    END)
+END,
+CASE
+    WHEN (sourcepublisher = ''::text) THEN NULL::text
+    ELSE (sourcepublisher ||
+    CASE
+        WHEN ((sourcepublisheryear)::text <> ''::text) THEN ','::text
+        WHEN ("right"(sourcepublisher, 1) = '.'::text) THEN ''::text
+        ELSE '.'::text
+    END)
+END,
+CASE
+    WHEN ((sourcepublisheryear)::text = ''::text) THEN NULL::text
+    ELSE ((sourcepublisheryear)::text || '.'::text)
+END])) STORED
+);
 
 
-ALTER MATERIALIZED VIEW extra.lawsectionextracache OWNER TO postgres;
+ALTER TABLE geohistory.source OWNER TO postgres;
 
 --
--- Name: lawsectiongovernment; Type: VIEW; Schema: extra; Owner: postgres
+-- Name: COLUMN source.sourcetemporarynote; Type: COMMENT; Schema: geohistory; Owner: postgres
 --
 
-CREATE VIEW extra.lawsectiongovernment AS
- SELECT DISTINCT lawsection.lawsectionid,
-    ag2.governmentrelationstate,
-    extra.lawsectioncitation(lawsection.lawsectionid) AS lawsectioncitation
-   FROM (geohistory.lawsection
-     LEFT JOIN (( SELECT DISTINCT lawsection_1.lawsectionid AS lawsection,
-            sourcegovernment.government
-           FROM ((geohistory.sourcegovernment
-             JOIN geohistory.law ON ((sourcegovernment.source = law.source)))
-             JOIN geohistory.lawsection lawsection_1 ON ((law.lawid = lawsection_1.law)))
-          WHERE (sourcegovernment.sourceorder = 1)
-        UNION
-         SELECT DISTINCT lawsectionevent.lawsection,
-            eventgovernment.government
-           FROM (geohistory.lawsectionevent
-             JOIN extra.eventgovernment ON (((lawsectionevent.event = eventgovernment.eventid) AND (NOT (eventgovernment.eventid IN ( SELECT event.eventid
-                   FROM (geohistory.event
-                     JOIN geohistory.eventgranted ON (((event.eventgranted = eventgranted.eventgrantedid) AND eventgranted.eventgrantedplaceholder)))))))))) ag
-     JOIN extra.governmentrelation ON (((ag.government = governmentrelation.governmentid) AND (governmentrelation.governmentrelationstate IS NOT NULL) AND (governmentrelation.governmentrelationstate <> ''::text)))) ag2 ON (((ag2.government IS NOT NULL) AND (extra.governmentlevel(ag2.government) <> 1) AND (ag2.lawsection = lawsection.lawsectionid))))
-  ORDER BY ag2.governmentrelationstate, lawsection.lawsectionid;
+COMMENT ON COLUMN geohistory.source.sourcetemporarynote IS 'This field is used for internal tracking purposes, and is not included in open data.';
 
-
-ALTER VIEW extra.lawsectiongovernment OWNER TO postgres;
-
---
--- Name: lawsectiongovernmentcache; Type: MATERIALIZED VIEW; Schema: extra; Owner: postgres
---
-
-CREATE MATERIALIZED VIEW extra.lawsectiongovernmentcache AS
- SELECT lawsectionid,
-    governmentrelationstate,
-    lawsectioncitation
-   FROM extra.lawsectiongovernment
-  WITH NO DATA;
-
-
-ALTER MATERIALIZED VIEW extra.lawsectiongovernmentcache OWNER TO postgres;
-
---
--- Name: metesdescriptionextra; Type: VIEW; Schema: extra; Owner: postgres
---
-
-CREATE VIEW extra.metesdescriptionextra AS
- SELECT metesdescriptionid,
-    extra.metesdescriptionlong(metesdescriptionid) AS metesdescriptionlong,
-    extra.metesdescriptionslug(metesdescriptionid) AS metesdescriptionslug
-   FROM geohistory.metesdescription
-  ORDER BY metesdescriptionid;
-
-
-ALTER VIEW extra.metesdescriptionextra OWNER TO postgres;
-
---
--- Name: metesdescriptionextracache; Type: MATERIALIZED VIEW; Schema: extra; Owner: postgres
---
-
-CREATE MATERIALIZED VIEW extra.metesdescriptionextracache AS
- SELECT metesdescriptionid,
-    metesdescriptionlong,
-    metesdescriptionslug
-   FROM extra.metesdescriptionextra
-  ORDER BY metesdescriptionid
-  WITH NO DATA;
-
-
-ALTER MATERIALIZED VIEW extra.metesdescriptionextracache OWNER TO postgres;
 
 --
 -- Name: recording; Type: TABLE; Schema: geohistory; Owner: postgres
@@ -4916,7 +2879,8 @@ CREATE TABLE geohistory.recording (
     recordingnumbertext character varying(25) DEFAULT ''::character varying NOT NULL,
     recordingvolumeofficerinitials character varying(10) DEFAULT ''::character varying NOT NULL,
     recordingrepositoryseries character varying(50) DEFAULT ''::character varying NOT NULL,
-    recordingrepositorycontainer character varying(50) DEFAULT ''::character varying NOT NULL
+    recordingrepositorycontainer character varying(50) DEFAULT ''::character varying NOT NULL,
+    recordingrepositoryitemrange text GENERATED ALWAYS AS (geohistory.rangeformat((recordingrepositoryitemfrom)::text, (recordingrepositoryitemto)::text)) STORED
 );
 
 
@@ -5002,1164 +2966,6 @@ CREATE TABLE geohistory.recordingtype (
 ALTER TABLE geohistory.recordingtype OWNER TO postgres;
 
 --
--- Name: recordingextra; Type: VIEW; Schema: extra; Owner: postgres
---
-
-CREATE VIEW extra.recordingextra AS
- SELECT recording.recordingid,
-    lower(regexp_replace(regexp_replace(regexp_replace(replace(((((
-        CASE
-            WHEN (recording.recordingtype IS NOT NULL) THEN ((((((((((recordingtype.recordingtypelong)::text || '-'::text) || (recordingtype.recordingtypetype)::text) || '-'::text) || (recording.recordingvolume)::text) || '-'::text) || (recording.recordingvolumeofficerinitials)::text) || '-'::text) || COALESCE((recording.recordingpage)::text, ''::text)) || (recording.recordingpagetext)::text)
-            WHEN (recording.recordingnumbertype IS NOT NULL) THEN ((((((recordingnumbertype.recordingtypelong)::text || '-'::text) || (recordingnumbertype.recordingtypetype)::text) || '-'::text) || COALESCE((recording.recordingnumber)::text, ''::text)) || (recording.recordingnumbertext)::text)
-            ELSE ''::text
-        END || '-of-'::text) || "left"((recording.recordingdate)::text, 4)) || '-'::text) || recording.recordingid), ', '::text, ' '::text), '[ \/'',"]'::text, '-'::text, 'g'::text), '[\-]+'::text, '-'::text, 'g'::text), '[\(\)\?\.\[\]]'::text, ''::text, 'g'::text)) AS recordingslug
-   FROM ((((geohistory.recording
-     LEFT JOIN geohistory.recordingoffice ON ((recording.recordingoffice = recordingoffice.recordingofficeid)))
-     LEFT JOIN geohistory.recordingofficetype ON ((recordingoffice.recordingofficetype = recordingofficetype.recordingofficetypeid)))
-     LEFT JOIN geohistory.recordingtype ON ((recording.recordingtype = recordingtype.recordingtypeid)))
-     LEFT JOIN geohistory.recordingtype recordingnumbertype ON ((recording.recordingnumbertype = recordingnumbertype.recordingtypeid)))
-  ORDER BY recording.recordingid;
-
-
-ALTER VIEW extra.recordingextra OWNER TO postgres;
-
---
--- Name: recordingextracache; Type: MATERIALIZED VIEW; Schema: extra; Owner: postgres
---
-
-CREATE MATERIALIZED VIEW extra.recordingextracache AS
- SELECT recordingid,
-    recordingslug
-   FROM extra.recordingextra
-  WITH NO DATA;
-
-
-ALTER MATERIALIZED VIEW extra.recordingextracache OWNER TO postgres;
-
---
--- Name: sourcecitation; Type: TABLE; Schema: geohistory; Owner: postgres
---
-
-CREATE TABLE geohistory.sourcecitation (
-    sourcecitationid integer NOT NULL,
-    source integer,
-    sourcecitationdate calendar.historicdatetext DEFAULT (''::text)::calendar.historicdatetext NOT NULL,
-    sourcecitationdatetype character varying(50) DEFAULT ''::character varying NOT NULL,
-    sourcecitationdaterange calendar.historicdatetext DEFAULT (''::text)::calendar.historicdatetext NOT NULL,
-    sourcecitationdaterangetype character varying(50) DEFAULT ''::character varying NOT NULL,
-    sourcecitationvolume character varying(20) DEFAULT ''::character varying NOT NULL,
-    sourcecitationpagefrom character varying(7) DEFAULT ''::character varying NOT NULL,
-    sourcecitationpageto character varying(7) DEFAULT ''::character varying NOT NULL,
-    sourcecitationurl text DEFAULT ''::text NOT NULL,
-    sourcecitationtypetitle text DEFAULT ''::text NOT NULL,
-    sourcecitationperson text DEFAULT ''::text NOT NULL,
-    sourcecitationgovernmentreferences text DEFAULT ''::text NOT NULL,
-    sourcecitationarchiveslotfilm character varying(25) DEFAULT ''::character varying NOT NULL,
-    sourcecitationarchivecarton character varying(15) DEFAULT ''::character varying NOT NULL,
-    sourcecitationstatus character varying(1) DEFAULT ''::character varying NOT NULL,
-    sourcecitationissue character varying(20) DEFAULT ''::character varying NOT NULL
-);
-
-
-ALTER TABLE geohistory.sourcecitation OWNER TO postgres;
-
---
--- Name: COLUMN sourcecitation.sourcecitationstatus; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.sourcecitation.sourcecitationstatus IS 'This field is used for internal tracking purposes, and is not included in open data.';
-
-
---
--- Name: sourcecitationextra; Type: VIEW; Schema: extra; Owner: postgres
---
-
-CREATE VIEW extra.sourcecitationextra AS
- WITH sourcecitationslugs AS (
-         SELECT sourcecitation.sourcecitationid,
-            lower(regexp_replace(regexp_replace(btrim((((((source.sourceshort)::text || ' '::text) || btrim(btrim(((btrim(((split_part(sourcecitation.sourcecitationtypetitle, ' '::text, 1) || ' '::text) || split_part(sourcecitation.sourcecitationtypetitle, ' '::text, 2))) || ' '::text) || btrim(((split_part(regexp_replace(sourcecitation.sourcecitationgovernmentreferences, '[;]+'::text, ' '::text, 'g'::text), ' '::text, 1) || ' '::text) || split_part(regexp_replace(sourcecitation.sourcecitationgovernmentreferences, '[;]+'::text, ' '::text, 'g'::text), ' '::text, 2))))))) || ' '::text) || (sourcecitation.sourcecitationpagefrom)::text)), '[ –—]'::text, '-'::text, 'g'::text), '[\.\/''\(\);:,&"#§\?\[\]]'::text, ''::text, 'g'::text)) AS sourcecitationpartslug
-           FROM (geohistory.sourcecitation
-             JOIN geohistory.source ON ((sourcecitation.source = source.sourceid)))
-        ), sourcecitationslugcounts AS (
-         SELECT count(*) AS rowct,
-            sourcecitationslugs_1.sourcecitationpartslug
-           FROM sourcecitationslugs sourcecitationslugs_1
-          GROUP BY sourcecitationslugs_1.sourcecitationpartslug
-        )
- SELECT sourcecitationslugs.sourcecitationid,
-    (sourcecitationslugs.sourcecitationpartslug ||
-        CASE
-            WHEN (sourcecitationslugcounts.rowct > 1) THEN ('-'::text || rank() OVER (PARTITION BY sourcecitationslugcounts.sourcecitationpartslug ORDER BY sourcecitationslugs.sourcecitationid))
-            ELSE ''::text
-        END) AS sourcecitationslug
-   FROM (sourcecitationslugs
-     JOIN sourcecitationslugcounts ON ((sourcecitationslugs.sourcecitationpartslug = sourcecitationslugcounts.sourcecitationpartslug)))
-  ORDER BY sourcecitationslugs.sourcecitationid;
-
-
-ALTER VIEW extra.sourcecitationextra OWNER TO postgres;
-
---
--- Name: sourcecitationextracache; Type: MATERIALIZED VIEW; Schema: extra; Owner: postgres
---
-
-CREATE MATERIALIZED VIEW extra.sourcecitationextracache AS
- SELECT sourcecitationid,
-    sourcecitationslug
-   FROM extra.sourcecitationextra
-  ORDER BY sourcecitationid
-  WITH NO DATA;
-
-
-ALTER MATERIALIZED VIEW extra.sourcecitationextracache OWNER TO postgres;
-
---
--- Name: sourcecitationevent; Type: TABLE; Schema: geohistory; Owner: postgres
---
-
-CREATE TABLE geohistory.sourcecitationevent (
-    sourcecitationeventid integer NOT NULL,
-    sourcecitation integer NOT NULL,
-    event integer NOT NULL,
-    sourcecitationeventinclude boolean
-);
-
-
-ALTER TABLE geohistory.sourcecitationevent OWNER TO postgres;
-
---
--- Name: sourcecitationgovernment; Type: VIEW; Schema: extra; Owner: postgres
---
-
-CREATE VIEW extra.sourcecitationgovernment AS
- SELECT DISTINCT sourcecitation.sourcecitationid,
-    ag2.governmentrelationstate
-   FROM (geohistory.sourcecitation
-     LEFT JOIN (( SELECT DISTINCT sourcecitation_1.sourcecitationid AS sourcecitation,
-            sourcegovernment.government
-           FROM geohistory.sourcegovernment,
-            geohistory.sourcecitation sourcecitation_1
-          WHERE ((sourcegovernment.source = sourcecitation_1.source) AND (sourcegovernment.sourceorder = 1))
-        UNION
-         SELECT DISTINCT sourcecitationevent.sourcecitation,
-            eventgovernment.government
-           FROM geohistory.sourcecitationevent,
-            extra.eventgovernment
-          WHERE (sourcecitationevent.event = eventgovernment.eventid)) ag
-     JOIN extra.governmentrelation ON (((ag.government = governmentrelation.governmentid) AND (governmentrelation.governmentrelationstate IS NOT NULL) AND (governmentrelation.governmentrelationstate <> ''::text)))) ag2 ON (((ag2.government IS NOT NULL) AND (extra.governmentlevel(ag2.government) <> 1) AND (ag2.sourcecitation = sourcecitation.sourcecitationid))))
-  ORDER BY ag2.governmentrelationstate, sourcecitation.sourcecitationid;
-
-
-ALTER VIEW extra.sourcecitationgovernment OWNER TO postgres;
-
---
--- Name: sourcecitationgovernmentcache; Type: MATERIALIZED VIEW; Schema: extra; Owner: postgres
---
-
-CREATE MATERIALIZED VIEW extra.sourcecitationgovernmentcache AS
- SELECT sourcecitationid,
-    governmentrelationstate
-   FROM extra.sourcecitationgovernment
-  WITH NO DATA;
-
-
-ALTER MATERIALIZED VIEW extra.sourcecitationgovernmentcache OWNER TO postgres;
-
---
--- Name: sourceextra; Type: VIEW; Schema: extra; Owner: postgres
---
-
-CREATE VIEW extra.sourceextra AS
- SELECT sourceid,
-    ((sourceshort)::text ||
-        CASE
-            WHEN ((sourceshortpart)::text <> ''::text) THEN (' '::text || (sourceshortpart)::text)
-            ELSE ''::text
-        END) AS sourceabbreviation,
-    array_to_string(ARRAY[
-        CASE
-            WHEN (sourceperson = ''::text) THEN NULL::text
-            ELSE (sourceperson ||
-            CASE
-                WHEN ("right"(sourceperson, 1) = '.'::text) THEN ''::text
-                ELSE '.'::text
-            END)
-        END,
-        CASE
-            WHEN (sourcesectiontitle = ''::text) THEN NULL::text
-            ELSE (('&quot;'::text || sourcesectiontitle) || '.&quot;'::text)
-        END,
-        CASE
-            WHEN (sourcetitle = ''::text) THEN NULL::text
-            ELSE (('<span style="font-style: italic;">'::text || sourcetitle) || '</span>.'::text)
-        END,
-        CASE
-            WHEN (sourceidentifier = ''::text) THEN NULL::text
-            ELSE (sourceidentifier || '.'::text)
-        END,
-        CASE
-            WHEN ((sourcepublisherlocation = ''::text) AND (sourcepublisher <> ''::text)) THEN '?:'::text
-            WHEN (sourcepublisherlocation = ''::text) THEN NULL::text
-            ELSE (((
-            CASE
-                WHEN ((sourcetype)::text = 'newspapers'::text) THEN '('::text
-                ELSE ''::text
-            END || sourcepublisherlocation) ||
-            CASE
-                WHEN ((sourcetype)::text = 'newspapers'::text) THEN ')'::text
-                ELSE ''::text
-            END) ||
-            CASE
-                WHEN (sourcepublisher <> ''::text) THEN ':'::text
-                WHEN ((sourcepublisheryear)::text <> ''::text) THEN ','::text
-                WHEN (("right"(sourcepublisherlocation, 1) = '.'::text) AND ((sourcetype)::text <> 'newspapers'::text)) THEN ''::text
-                ELSE '.'::text
-            END)
-        END,
-        CASE
-            WHEN (sourcepublisher = ''::text) THEN NULL::text
-            ELSE (sourcepublisher ||
-            CASE
-                WHEN ((sourcepublisheryear)::text <> ''::text) THEN ','::text
-                WHEN ("right"(sourcepublisher, 1) = '.'::text) THEN ''::text
-                ELSE '.'::text
-            END)
-        END,
-        CASE
-            WHEN ((sourcepublisheryear)::text = ''::text) THEN NULL::text
-            ELSE ((sourcepublisheryear)::text || '.'::text)
-        END], ' '::text) AS sourcefullcitation
-   FROM geohistory.source
-  ORDER BY sourceid;
-
-
-ALTER VIEW extra.sourceextra OWNER TO postgres;
-
---
--- Name: governmentidentifier; Type: TABLE; Schema: geohistory; Owner: postgres
---
-
-CREATE TABLE geohistory.governmentidentifier (
-    governmentidentifierid integer NOT NULL,
-    government integer,
-    governmentidentifiertype integer NOT NULL,
-    governmentidentifierprefix character varying(20) DEFAULT ''::character varying NOT NULL,
-    governmentidentifier character varying(20) DEFAULT ''::character varying NOT NULL,
-    governmentidentifiernote text DEFAULT ''::text NOT NULL,
-    governmentidentifiermatchtype character varying(30) DEFAULT ''::character varying NOT NULL,
-    governmentidentifiermatchdate date,
-    governmentidentifierlead boolean GENERATED ALWAYS AS ((((governmentidentifiermatchtype)::text ~~ 'current%'::text) OR ((governmentidentifiermatchtype)::text = 'full'::text) OR ((governmentidentifiermatchtype)::text ~~ '%lead'::text))) STORED,
-    governmentidentifierstatus text GENERATED ALWAYS AS (
-CASE
-    WHEN (((governmentidentifiermatchtype)::text ~~ 'current%'::text) OR ((governmentidentifiermatchtype)::text = 'full'::text) OR ((governmentidentifiermatchtype)::text ~~ '%lead'::text)) THEN 'Lead'::text
-    WHEN ((governmentidentifiermatchtype)::text = ANY (ARRAY[('historic-successor'::character varying)::text, ('reference'::character varying)::text])) THEN 'Reference'::text
-    WHEN ((governmentidentifiermatchtype)::text ~~ 'historic%'::text) THEN 'Historic'::text
-    WHEN ((governmentidentifiermatchtype)::text = ''::text) THEN ''::text
-    ELSE 'Other'::text
-END) STORED
-);
-
-
-ALTER TABLE geohistory.governmentidentifier OWNER TO postgres;
-
---
--- Name: COLUMN governmentidentifier.governmentidentifiermatchtype; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.governmentidentifier.governmentidentifiermatchtype IS 'current-alternate: Current government with correct spelling shown as USGS alternate.
-current-obsolete: Current government with obsolete USGS spelling.
-current-spelling: Current government with USGS spelling mismatch.
-current-status: Current government with USGS historic flag.
-delete: Should be merged into another feature ID.
-full: Spelling and status match.
-historic-alternate: Historic government with correct spelling shown as USGS alternate.
-historic-county: Temporary historic government created after county division.
-historic-error: Government-identifier link created in error.
-historic-match: Secondary records with spelling match.
-historic-missing: Successor current government does not list as USGS alternate (name change).
-historic-obsolete: Historic government with USGS spelling match.
-historic-spelling: Historic government with USGS alternate spelling mismatch.
-historic-status: Historic government missing USGS historic flag.
-historic-successor: Successor current government does not list as USGS alternate (merger-consolidation).
-
-Entries other than current-* or full can also be combined with -lead flag.';
-
-
---
--- Name: statistics_createddissolved; Type: MATERIALIZED VIEW; Schema: extra; Owner: postgres
---
-
-CREATE MATERIALIZED VIEW extra.statistics_createddissolved AS
- WITH countyevents AS (
-         SELECT DISTINCT affectedgovernment_reconstructed.event,
-            affectedtype.affectedtypecreationdissolution,
-            affectedgovernment_reconstructed.municipalityto AS governmentid,
-                CASE
-                    WHEN (governmentidentifier.governmentidentifier IS NULL) THEN 0
-                    ELSE (governmentidentifier.governmentidentifier)::integer
-                END AS governmentcounty,
-            extra.governmentabbreviation(
-                CASE
-                    WHEN (stategovernment.governmentsubstitute IS NOT NULL) THEN stategovernment.governmentsubstitute
-                    ELSE affectedgovernment_reconstructed.stateto
-                END) AS governmentstate
-           FROM (((((extra.affectedgovernment_reconstructed
-             JOIN geohistory.government stategovernment ON (((affectedgovernment_reconstructed.stateto = stategovernment.governmentid) AND ((stategovernment.governmentstatus)::text <> ALL (ARRAY[('placeholder'::character varying)::text, ('proposed'::character varying)::text, ('unincorporated'::character varying)::text])))))
-             JOIN geohistory.government countygovernment ON (((affectedgovernment_reconstructed.countyto = countygovernment.governmentid) AND ((countygovernment.governmentstatus)::text <> ALL (ARRAY[('placeholder'::character varying)::text, ('proposed'::character varying)::text, ('unincorporated'::character varying)::text])))))
-             JOIN geohistory.government municipalgovernment ON (((affectedgovernment_reconstructed.municipalityto = municipalgovernment.governmentid) AND ((municipalgovernment.governmentstatus)::text <> ALL (ARRAY[('placeholder'::character varying)::text, ('proposed'::character varying)::text, ('unincorporated'::character varying)::text])) AND (municipalgovernment.governmentlevel = 4))))
-             JOIN geohistory.affectedtype ON (((affectedgovernment_reconstructed.affectedtypemunicipalityto = affectedtype.affectedtypeid) AND ((affectedtype.affectedtypecreationdissolution)::text = 'begin'::text))))
-             LEFT JOIN geohistory.governmentidentifier ON (((countygovernment.governmentid = governmentidentifier.government) AND (governmentidentifier.governmentidentifiertype = 1))))
-        UNION
-         SELECT DISTINCT affectedgovernment_reconstructed.event,
-            affectedtype.affectedtypecreationdissolution,
-            affectedgovernment_reconstructed.municipalityto AS governmentid,
-                CASE
-                    WHEN (governmentidentifier.governmentidentifier IS NULL) THEN 0
-                    ELSE (governmentidentifier.governmentidentifier)::integer
-                END AS governmentcounty,
-            extra.governmentabbreviation(
-                CASE
-                    WHEN (stategovernment.governmentsubstitute IS NOT NULL) THEN stategovernment.governmentsubstitute
-                    ELSE affectedgovernment_reconstructed.stateto
-                END) AS governmentstate
-           FROM (((((extra.affectedgovernment_reconstructed
-             JOIN geohistory.government stategovernment ON (((affectedgovernment_reconstructed.stateto = stategovernment.governmentid) AND ((stategovernment.governmentstatus)::text <> ALL (ARRAY[('placeholder'::character varying)::text, ('proposed'::character varying)::text, ('unincorporated'::character varying)::text])))))
-             JOIN geohistory.government countygovernment ON (((affectedgovernment_reconstructed.subcountyto = countygovernment.governmentid) AND ((countygovernment.governmentstatus)::text <> ALL (ARRAY[('placeholder'::character varying)::text, ('proposed'::character varying)::text, ('unincorporated'::character varying)::text])))))
-             JOIN geohistory.government municipalgovernment ON (((affectedgovernment_reconstructed.municipalityto = municipalgovernment.governmentid) AND ((municipalgovernment.governmentstatus)::text <> ALL (ARRAY[('placeholder'::character varying)::text, ('proposed'::character varying)::text, ('unincorporated'::character varying)::text])) AND (municipalgovernment.governmentlevel = 4))))
-             JOIN geohistory.affectedtype ON (((affectedgovernment_reconstructed.affectedtypemunicipalityto = affectedtype.affectedtypeid) AND ((affectedtype.affectedtypecreationdissolution)::text = 'begin'::text))))
-             LEFT JOIN geohistory.governmentidentifier ON (((countygovernment.governmentid = governmentidentifier.government) AND (governmentidentifier.governmentidentifiertype = 1))))
-        UNION
-         SELECT DISTINCT affectedgovernment_reconstructed.event,
-            affectedtype.affectedtypecreationdissolution,
-            affectedgovernment_reconstructed.submunicipalityto AS governmentid,
-                CASE
-                    WHEN (governmentidentifier.governmentidentifier IS NULL) THEN 0
-                    ELSE (governmentidentifier.governmentidentifier)::integer
-                END AS governmentcounty,
-            extra.governmentabbreviation(
-                CASE
-                    WHEN (stategovernment.governmentsubstitute IS NOT NULL) THEN stategovernment.governmentsubstitute
-                    ELSE affectedgovernment_reconstructed.stateto
-                END) AS governmentstate
-           FROM (((((extra.affectedgovernment_reconstructed
-             JOIN geohistory.government stategovernment ON (((affectedgovernment_reconstructed.stateto = stategovernment.governmentid) AND ((stategovernment.governmentstatus)::text <> ALL (ARRAY[('placeholder'::character varying)::text, ('proposed'::character varying)::text, ('unincorporated'::character varying)::text])))))
-             JOIN geohistory.government countygovernment ON (((affectedgovernment_reconstructed.countyto = countygovernment.governmentid) AND ((countygovernment.governmentstatus)::text <> ALL (ARRAY[('placeholder'::character varying)::text, ('proposed'::character varying)::text, ('unincorporated'::character varying)::text])))))
-             JOIN geohistory.government municipalgovernment ON (((affectedgovernment_reconstructed.submunicipalityto = municipalgovernment.governmentid) AND ((municipalgovernment.governmentstatus)::text <> ALL (ARRAY[('placeholder'::character varying)::text, ('proposed'::character varying)::text, ('unincorporated'::character varying)::text])) AND (municipalgovernment.governmentlevel = 4))))
-             JOIN geohistory.affectedtype ON (((affectedgovernment_reconstructed.affectedtypesubmunicipalityto = affectedtype.affectedtypeid) AND ((affectedtype.affectedtypecreationdissolution)::text = 'begin'::text))))
-             LEFT JOIN geohistory.governmentidentifier ON (((countygovernment.governmentid = governmentidentifier.government) AND (governmentidentifier.governmentidentifiertype = 1))))
-        UNION
-         SELECT DISTINCT affectedgovernment_reconstructed.event,
-            affectedtype.affectedtypecreationdissolution,
-            affectedgovernment_reconstructed.submunicipalityto AS governmentid,
-                CASE
-                    WHEN (governmentidentifier.governmentidentifier IS NULL) THEN 0
-                    ELSE (governmentidentifier.governmentidentifier)::integer
-                END AS governmentcounty,
-            extra.governmentabbreviation(
-                CASE
-                    WHEN (stategovernment.governmentsubstitute IS NOT NULL) THEN stategovernment.governmentsubstitute
-                    ELSE affectedgovernment_reconstructed.stateto
-                END) AS governmentstate
-           FROM (((((extra.affectedgovernment_reconstructed
-             JOIN geohistory.government stategovernment ON (((affectedgovernment_reconstructed.stateto = stategovernment.governmentid) AND ((stategovernment.governmentstatus)::text <> ALL (ARRAY[('placeholder'::character varying)::text, ('proposed'::character varying)::text, ('unincorporated'::character varying)::text])))))
-             JOIN geohistory.government countygovernment ON (((affectedgovernment_reconstructed.subcountyto = countygovernment.governmentid) AND ((countygovernment.governmentstatus)::text <> ALL (ARRAY[('placeholder'::character varying)::text, ('proposed'::character varying)::text, ('unincorporated'::character varying)::text])))))
-             JOIN geohistory.government municipalgovernment ON (((affectedgovernment_reconstructed.submunicipalityto = municipalgovernment.governmentid) AND ((municipalgovernment.governmentstatus)::text <> ALL (ARRAY[('placeholder'::character varying)::text, ('proposed'::character varying)::text, ('unincorporated'::character varying)::text])) AND (municipalgovernment.governmentlevel = 4))))
-             JOIN geohistory.affectedtype ON (((affectedgovernment_reconstructed.affectedtypesubmunicipalityto = affectedtype.affectedtypeid) AND ((affectedtype.affectedtypecreationdissolution)::text = 'begin'::text))))
-             LEFT JOIN geohistory.governmentidentifier ON (((countygovernment.governmentid = governmentidentifier.government) AND (governmentidentifier.governmentidentifiertype = 1))))
-        UNION
-         SELECT DISTINCT affectedgovernment_reconstructed.event,
-            affectedtype.affectedtypecreationdissolution,
-            affectedgovernment_reconstructed.municipalityfrom AS governmentid,
-                CASE
-                    WHEN (governmentidentifier.governmentidentifier IS NULL) THEN 0
-                    ELSE (governmentidentifier.governmentidentifier)::integer
-                END AS governmentcounty,
-            extra.governmentabbreviation(
-                CASE
-                    WHEN (stategovernment.governmentsubstitute IS NOT NULL) THEN stategovernment.governmentsubstitute
-                    ELSE affectedgovernment_reconstructed.statefrom
-                END) AS governmentstate
-           FROM (((((extra.affectedgovernment_reconstructed
-             JOIN geohistory.government stategovernment ON (((affectedgovernment_reconstructed.statefrom = stategovernment.governmentid) AND ((stategovernment.governmentstatus)::text <> ALL (ARRAY[('placeholder'::character varying)::text, ('proposed'::character varying)::text, ('unincorporated'::character varying)::text])))))
-             JOIN geohistory.government countygovernment ON (((affectedgovernment_reconstructed.countyfrom = countygovernment.governmentid) AND ((countygovernment.governmentstatus)::text <> ALL (ARRAY[('placeholder'::character varying)::text, ('proposed'::character varying)::text, ('unincorporated'::character varying)::text])))))
-             JOIN geohistory.government municipalgovernment ON (((affectedgovernment_reconstructed.municipalityfrom = municipalgovernment.governmentid) AND ((municipalgovernment.governmentstatus)::text <> ALL (ARRAY[('placeholder'::character varying)::text, ('proposed'::character varying)::text, ('unincorporated'::character varying)::text])) AND (municipalgovernment.governmentlevel = 4))))
-             JOIN geohistory.affectedtype ON (((affectedgovernment_reconstructed.affectedtypemunicipalityfrom = affectedtype.affectedtypeid) AND ((affectedtype.affectedtypecreationdissolution)::text = 'end'::text))))
-             LEFT JOIN geohistory.governmentidentifier ON (((countygovernment.governmentid = governmentidentifier.government) AND (governmentidentifier.governmentidentifiertype = 1))))
-        UNION
-         SELECT DISTINCT affectedgovernment_reconstructed.event,
-            affectedtype.affectedtypecreationdissolution,
-            affectedgovernment_reconstructed.municipalityfrom AS governmentid,
-                CASE
-                    WHEN (governmentidentifier.governmentidentifier IS NULL) THEN 0
-                    ELSE (governmentidentifier.governmentidentifier)::integer
-                END AS governmentcounty,
-            extra.governmentabbreviation(
-                CASE
-                    WHEN (stategovernment.governmentsubstitute IS NOT NULL) THEN stategovernment.governmentsubstitute
-                    ELSE affectedgovernment_reconstructed.statefrom
-                END) AS governmentstate
-           FROM (((((extra.affectedgovernment_reconstructed
-             JOIN geohistory.government stategovernment ON (((affectedgovernment_reconstructed.statefrom = stategovernment.governmentid) AND ((stategovernment.governmentstatus)::text <> ALL (ARRAY[('placeholder'::character varying)::text, ('proposed'::character varying)::text, ('unincorporated'::character varying)::text])))))
-             JOIN geohistory.government countygovernment ON (((affectedgovernment_reconstructed.subcountyfrom = countygovernment.governmentid) AND ((countygovernment.governmentstatus)::text <> ALL (ARRAY[('placeholder'::character varying)::text, ('proposed'::character varying)::text, ('unincorporated'::character varying)::text])))))
-             JOIN geohistory.government municipalgovernment ON (((affectedgovernment_reconstructed.municipalityfrom = municipalgovernment.governmentid) AND ((municipalgovernment.governmentstatus)::text <> ALL (ARRAY[('placeholder'::character varying)::text, ('proposed'::character varying)::text, ('unincorporated'::character varying)::text])) AND (municipalgovernment.governmentlevel = 4))))
-             JOIN geohistory.affectedtype ON (((affectedgovernment_reconstructed.affectedtypemunicipalityfrom = affectedtype.affectedtypeid) AND ((affectedtype.affectedtypecreationdissolution)::text = 'end'::text))))
-             LEFT JOIN geohistory.governmentidentifier ON (((countygovernment.governmentid = governmentidentifier.government) AND (governmentidentifier.governmentidentifiertype = 1))))
-        UNION
-         SELECT DISTINCT affectedgovernment_reconstructed.event,
-            affectedtype.affectedtypecreationdissolution,
-            affectedgovernment_reconstructed.submunicipalityfrom AS governmentid,
-                CASE
-                    WHEN (governmentidentifier.governmentidentifier IS NULL) THEN 0
-                    ELSE (governmentidentifier.governmentidentifier)::integer
-                END AS governmentcounty,
-            extra.governmentabbreviation(
-                CASE
-                    WHEN (stategovernment.governmentsubstitute IS NOT NULL) THEN stategovernment.governmentsubstitute
-                    ELSE affectedgovernment_reconstructed.statefrom
-                END) AS governmentstate
-           FROM (((((extra.affectedgovernment_reconstructed
-             JOIN geohistory.government stategovernment ON (((affectedgovernment_reconstructed.statefrom = stategovernment.governmentid) AND ((stategovernment.governmentstatus)::text <> ALL (ARRAY[('placeholder'::character varying)::text, ('proposed'::character varying)::text, ('unincorporated'::character varying)::text])))))
-             JOIN geohistory.government countygovernment ON (((affectedgovernment_reconstructed.countyfrom = countygovernment.governmentid) AND ((countygovernment.governmentstatus)::text <> ALL (ARRAY[('placeholder'::character varying)::text, ('proposed'::character varying)::text, ('unincorporated'::character varying)::text])))))
-             JOIN geohistory.government municipalgovernment ON (((affectedgovernment_reconstructed.submunicipalityfrom = municipalgovernment.governmentid) AND ((municipalgovernment.governmentstatus)::text <> ALL (ARRAY[('placeholder'::character varying)::text, ('proposed'::character varying)::text, ('unincorporated'::character varying)::text])) AND (municipalgovernment.governmentlevel = 4))))
-             JOIN geohistory.affectedtype ON (((affectedgovernment_reconstructed.affectedtypesubmunicipalityfrom = affectedtype.affectedtypeid) AND ((affectedtype.affectedtypecreationdissolution)::text = 'end'::text))))
-             LEFT JOIN geohistory.governmentidentifier ON (((countygovernment.governmentid = governmentidentifier.government) AND (governmentidentifier.governmentidentifiertype = 1))))
-        UNION
-         SELECT DISTINCT affectedgovernment_reconstructed.event,
-            affectedtype.affectedtypecreationdissolution,
-            affectedgovernment_reconstructed.submunicipalityfrom AS governmentid,
-                CASE
-                    WHEN (governmentidentifier.governmentidentifier IS NULL) THEN 0
-                    ELSE (governmentidentifier.governmentidentifier)::integer
-                END AS governmentcounty,
-            extra.governmentabbreviation(
-                CASE
-                    WHEN (stategovernment.governmentsubstitute IS NOT NULL) THEN stategovernment.governmentsubstitute
-                    ELSE affectedgovernment_reconstructed.statefrom
-                END) AS governmentstate
-           FROM (((((extra.affectedgovernment_reconstructed
-             JOIN geohistory.government stategovernment ON (((affectedgovernment_reconstructed.statefrom = stategovernment.governmentid) AND ((stategovernment.governmentstatus)::text <> ALL (ARRAY[('placeholder'::character varying)::text, ('proposed'::character varying)::text, ('unincorporated'::character varying)::text])))))
-             JOIN geohistory.government countygovernment ON (((affectedgovernment_reconstructed.subcountyfrom = countygovernment.governmentid) AND ((countygovernment.governmentstatus)::text <> ALL (ARRAY[('placeholder'::character varying)::text, ('proposed'::character varying)::text, ('unincorporated'::character varying)::text])))))
-             JOIN geohistory.government municipalgovernment ON (((affectedgovernment_reconstructed.submunicipalityfrom = municipalgovernment.governmentid) AND ((municipalgovernment.governmentstatus)::text <> ALL (ARRAY[('placeholder'::character varying)::text, ('proposed'::character varying)::text, ('unincorporated'::character varying)::text])) AND (municipalgovernment.governmentlevel = 4))))
-             JOIN geohistory.affectedtype ON (((affectedgovernment_reconstructed.affectedtypesubmunicipalityfrom = affectedtype.affectedtypeid) AND ((affectedtype.affectedtypecreationdissolution)::text = 'end'::text))))
-             LEFT JOIN geohistory.governmentidentifier ON (((countygovernment.governmentid = governmentidentifier.government) AND (governmentidentifier.governmentidentifiertype = 1))))
-        ), stateevents AS (
-         SELECT DISTINCT affectedgovernment_reconstructed.event,
-            affectedtype.affectedtypecreationdissolution,
-            affectedgovernment_reconstructed.municipalityto AS governmentid,
-            extra.governmentabbreviation(
-                CASE
-                    WHEN (government.governmentsubstitute IS NOT NULL) THEN government.governmentsubstitute
-                    ELSE affectedgovernment_reconstructed.stateto
-                END) AS governmentstate
-           FROM (((extra.affectedgovernment_reconstructed
-             JOIN geohistory.government ON (((affectedgovernment_reconstructed.stateto = government.governmentid) AND ((government.governmentstatus)::text <> ALL (ARRAY[('placeholder'::character varying)::text, ('proposed'::character varying)::text, ('unincorporated'::character varying)::text])))))
-             JOIN geohistory.government municipalgovernment ON (((affectedgovernment_reconstructed.municipalityto = municipalgovernment.governmentid) AND ((municipalgovernment.governmentstatus)::text <> ALL (ARRAY[('placeholder'::character varying)::text, ('proposed'::character varying)::text, ('unincorporated'::character varying)::text])) AND (municipalgovernment.governmentlevel = 4))))
-             JOIN geohistory.affectedtype ON (((affectedgovernment_reconstructed.affectedtypemunicipalityto = affectedtype.affectedtypeid) AND ((affectedtype.affectedtypecreationdissolution)::text = 'begin'::text))))
-        UNION
-         SELECT DISTINCT affectedgovernment_reconstructed.event,
-            affectedtype.affectedtypecreationdissolution,
-            affectedgovernment_reconstructed.submunicipalityto AS governmentid,
-            extra.governmentabbreviation(
-                CASE
-                    WHEN (government.governmentsubstitute IS NOT NULL) THEN government.governmentsubstitute
-                    ELSE affectedgovernment_reconstructed.stateto
-                END) AS governmentstate
-           FROM (((extra.affectedgovernment_reconstructed
-             JOIN geohistory.government ON (((affectedgovernment_reconstructed.stateto = government.governmentid) AND ((government.governmentstatus)::text <> ALL (ARRAY[('placeholder'::character varying)::text, ('proposed'::character varying)::text, ('unincorporated'::character varying)::text])))))
-             JOIN geohistory.government municipalgovernment ON (((affectedgovernment_reconstructed.submunicipalityto = municipalgovernment.governmentid) AND ((municipalgovernment.governmentstatus)::text <> ALL (ARRAY[('placeholder'::character varying)::text, ('proposed'::character varying)::text, ('unincorporated'::character varying)::text])) AND (municipalgovernment.governmentlevel = 4))))
-             JOIN geohistory.affectedtype ON (((affectedgovernment_reconstructed.affectedtypesubmunicipalityto = affectedtype.affectedtypeid) AND ((affectedtype.affectedtypecreationdissolution)::text = 'begin'::text))))
-        UNION
-         SELECT DISTINCT affectedgovernment_reconstructed.event,
-            affectedtype.affectedtypecreationdissolution,
-            affectedgovernment_reconstructed.municipalityfrom AS governmentid,
-            extra.governmentabbreviation(
-                CASE
-                    WHEN (government.governmentsubstitute IS NOT NULL) THEN government.governmentsubstitute
-                    ELSE affectedgovernment_reconstructed.statefrom
-                END) AS governmentstate
-           FROM (((extra.affectedgovernment_reconstructed
-             JOIN geohistory.government ON (((affectedgovernment_reconstructed.statefrom = government.governmentid) AND ((government.governmentstatus)::text <> ALL (ARRAY[('placeholder'::character varying)::text, ('proposed'::character varying)::text, ('unincorporated'::character varying)::text])))))
-             JOIN geohistory.government municipalgovernment ON (((affectedgovernment_reconstructed.municipalityfrom = municipalgovernment.governmentid) AND ((municipalgovernment.governmentstatus)::text <> ALL (ARRAY[('placeholder'::character varying)::text, ('proposed'::character varying)::text, ('unincorporated'::character varying)::text])) AND (municipalgovernment.governmentlevel = 4))))
-             JOIN geohistory.affectedtype ON (((affectedgovernment_reconstructed.affectedtypemunicipalityfrom = affectedtype.affectedtypeid) AND ((affectedtype.affectedtypecreationdissolution)::text = 'end'::text))))
-        UNION
-         SELECT DISTINCT affectedgovernment_reconstructed.event,
-            affectedtype.affectedtypecreationdissolution,
-            affectedgovernment_reconstructed.submunicipalityfrom AS governmentid,
-            extra.governmentabbreviation(
-                CASE
-                    WHEN (government.governmentsubstitute IS NOT NULL) THEN government.governmentsubstitute
-                    ELSE affectedgovernment_reconstructed.statefrom
-                END) AS governmentstate
-           FROM (((extra.affectedgovernment_reconstructed
-             JOIN geohistory.government ON (((affectedgovernment_reconstructed.statefrom = government.governmentid) AND ((government.governmentstatus)::text <> ALL (ARRAY[('placeholder'::character varying)::text, ('proposed'::character varying)::text, ('unincorporated'::character varying)::text])))))
-             JOIN geohistory.government municipalgovernment ON (((affectedgovernment_reconstructed.submunicipalityfrom = municipalgovernment.governmentid) AND ((municipalgovernment.governmentstatus)::text <> ALL (ARRAY[('placeholder'::character varying)::text, ('proposed'::character varying)::text, ('unincorporated'::character varying)::text])) AND (municipalgovernment.governmentlevel = 4))))
-             JOIN geohistory.affectedtype ON (((affectedgovernment_reconstructed.affectedtypesubmunicipalityfrom = affectedtype.affectedtypeid) AND ((affectedtype.affectedtypecreationdissolution)::text = 'end'::text))))
-        ), eventstates AS (
-         SELECT DISTINCT stateevents.event,
-            stateevents.affectedtypecreationdissolution,
-            stateevents.governmentid,
-            array_agg(DISTINCT stateevents.governmentstate) AS governmentstates
-           FROM stateevents
-          GROUP BY stateevents.event, stateevents.affectedtypecreationdissolution, stateevents.governmentid
-        ), summary AS (
-         SELECT 'historic'::text AS grouptype,
-            'county'::text AS governmenttype,
-            countyevents.governmentstate,
-            countyevents.governmentcounty,
-            event.eventsortyear,
-            countyevents.affectedtypecreationdissolution,
-            (count(DISTINCT countyevents.governmentid))::integer AS governmentcount
-           FROM ((geohistory.event
-             JOIN countyevents ON ((event.eventid = countyevents.event)))
-             JOIN geohistory.eventgranted ON (((event.eventgranted = eventgranted.eventgrantedid) AND eventgranted.eventgrantedsuccess)))
-          GROUP BY 'historic'::text, 'county'::text, countyevents.governmentstate, countyevents.governmentcounty, event.eventsortyear, countyevents.affectedtypecreationdissolution
-        UNION
-         SELECT 'historic'::text AS grouptype,
-            'state'::text AS governmenttype,
-            stateevents.governmentstate,
-            NULL::integer AS governmentcounty,
-            event.eventsortyear,
-            stateevents.affectedtypecreationdissolution,
-            count(DISTINCT stateevents.governmentid) AS governmentcount
-           FROM ((geohistory.event
-             JOIN stateevents ON ((event.eventid = stateevents.event)))
-             JOIN geohistory.eventgranted ON (((event.eventgranted = eventgranted.eventgrantedid) AND eventgranted.eventgrantedsuccess)))
-          GROUP BY 'historic'::text, 'state'::text, stateevents.governmentstate, NULL::integer, event.eventsortyear, stateevents.affectedtypecreationdissolution
-        UNION
-         SELECT 'historic'::text AS grouptype,
-            'nation'::text AS governmenttype,
-            'production'::text AS governmentstate,
-            NULL::integer AS governmentcounty,
-            event.eventsortyear,
-            eventstates.affectedtypecreationdissolution,
-            count(DISTINCT eventstates.governmentid) AS governmentcount
-           FROM ((geohistory.event
-             JOIN eventstates ON (((event.eventid = eventstates.event) AND (eventstates.governmentstates && ARRAY['NJ'::text, 'PA'::text]))))
-             JOIN geohistory.eventgranted ON (((event.eventgranted = eventgranted.eventgrantedid) AND eventgranted.eventgrantedsuccess)))
-          GROUP BY 'historic'::text, 'nation'::text, 'production'::text, NULL::integer, event.eventsortyear, eventstates.affectedtypecreationdissolution
-        UNION
-         SELECT 'historic'::text AS grouptype,
-            'nation'::text AS governmenttype,
-            'development'::text AS governmentstate,
-            NULL::integer AS governmentcounty,
-            event.eventsortyear,
-            eventstates.affectedtypecreationdissolution,
-            count(DISTINCT eventstates.governmentid) AS governmentcount
-           FROM ((geohistory.event
-             JOIN eventstates ON (((event.eventid = eventstates.event) AND (eventstates.governmentstates && ARRAY['DE'::text, 'ME'::text, 'MA'::text, 'MD'::text, 'MI'::text, 'MN'::text, 'NJ'::text, 'NY'::text, 'OH'::text, 'PA'::text]))))
-             JOIN geohistory.eventgranted ON (((event.eventgranted = eventgranted.eventgrantedid) AND eventgranted.eventgrantedsuccess)))
-          GROUP BY 'historic'::text, 'nation'::text, 'development'::text, NULL::integer, event.eventsortyear, eventstates.affectedtypecreationdissolution
-        )
- SELECT DISTINCT summary.grouptype,
-    summary.governmenttype,
-    summary.governmentstate,
-    summary.governmentcounty,
-    summary.eventsortyear,
-        CASE
-            WHEN (creation.governmentcount IS NULL) THEN (0)::bigint
-            ELSE creation.governmentcount
-        END AS created,
-        CASE
-            WHEN (dissolution.governmentcount IS NULL) THEN (0)::bigint
-            ELSE dissolution.governmentcount
-        END AS dissolved
-   FROM ((summary
-     LEFT JOIN summary creation ON (((summary.grouptype = creation.grouptype) AND (summary.governmenttype = creation.governmenttype) AND (summary.governmentstate = creation.governmentstate) AND (((summary.governmentcounty IS NULL) AND (creation.governmentcounty IS NULL)) OR (summary.governmentcounty = creation.governmentcounty)) AND (summary.eventsortyear = creation.eventsortyear) AND ((creation.affectedtypecreationdissolution)::text = 'begin'::text))))
-     LEFT JOIN summary dissolution ON (((summary.grouptype = dissolution.grouptype) AND (summary.governmenttype = dissolution.governmenttype) AND (summary.governmentstate = dissolution.governmentstate) AND (((summary.governmentcounty IS NULL) AND (dissolution.governmentcounty IS NULL)) OR (summary.governmentcounty = dissolution.governmentcounty)) AND (summary.eventsortyear = dissolution.eventsortyear) AND ((dissolution.affectedtypecreationdissolution)::text = 'end'::text))))
-  ORDER BY summary.grouptype, summary.governmenttype, summary.governmentstate, summary.governmentcounty, summary.eventsortyear
-  WITH NO DATA;
-
-
-ALTER MATERIALIZED VIEW extra.statistics_createddissolved OWNER TO postgres;
-
---
--- Name: statistics_eventtype; Type: MATERIALIZED VIEW; Schema: extra; Owner: postgres
---
-
-CREATE MATERIALIZED VIEW extra.statistics_eventtype AS
- WITH countyevents AS (
-         SELECT DISTINCT affectedgovernment_reconstructed.event,
-                CASE
-                    WHEN (governmentidentifier.governmentidentifier IS NULL) THEN 0
-                    ELSE (governmentidentifier.governmentidentifier)::integer
-                END AS governmentcounty,
-            extra.governmentabbreviation(
-                CASE
-                    WHEN (stategovernment.governmentsubstitute IS NOT NULL) THEN stategovernment.governmentsubstitute
-                    ELSE affectedgovernment_reconstructed.statefrom
-                END) AS governmentstate
-           FROM (((extra.affectedgovernment_reconstructed
-             JOIN geohistory.government stategovernment ON (((affectedgovernment_reconstructed.statefrom = stategovernment.governmentid) AND ((stategovernment.governmentstatus)::text <> ALL (ARRAY[('placeholder'::character varying)::text, ('proposed'::character varying)::text, ('unincorporated'::character varying)::text])))))
-             JOIN geohistory.government countygovernment ON (((affectedgovernment_reconstructed.countyfrom = countygovernment.governmentid) AND ((countygovernment.governmentstatus)::text <> ALL (ARRAY[('placeholder'::character varying)::text, ('proposed'::character varying)::text, ('unincorporated'::character varying)::text])))))
-             LEFT JOIN geohistory.governmentidentifier ON (((countygovernment.governmentid = governmentidentifier.government) AND (governmentidentifier.governmentidentifiertype = 1))))
-          WHERE (affectedgovernment_reconstructed.affectedtypecountyfrom <> 12)
-        UNION
-         SELECT DISTINCT affectedgovernment_reconstructed.event,
-                CASE
-                    WHEN (governmentidentifier.governmentidentifier IS NULL) THEN 0
-                    ELSE (governmentidentifier.governmentidentifier)::integer
-                END AS governmentcounty,
-            extra.governmentabbreviation(
-                CASE
-                    WHEN (stategovernment.governmentsubstitute IS NOT NULL) THEN stategovernment.governmentsubstitute
-                    ELSE affectedgovernment_reconstructed.stateto
-                END) AS governmentstate
-           FROM (((extra.affectedgovernment_reconstructed
-             JOIN geohistory.government stategovernment ON (((affectedgovernment_reconstructed.stateto = stategovernment.governmentid) AND ((stategovernment.governmentstatus)::text <> ALL (ARRAY[('placeholder'::character varying)::text, ('proposed'::character varying)::text, ('unincorporated'::character varying)::text])))))
-             JOIN geohistory.government countygovernment ON (((affectedgovernment_reconstructed.countyto = countygovernment.governmentid) AND ((countygovernment.governmentstatus)::text <> ALL (ARRAY[('placeholder'::character varying)::text, ('proposed'::character varying)::text, ('unincorporated'::character varying)::text])))))
-             LEFT JOIN geohistory.governmentidentifier ON (((countygovernment.governmentid = governmentidentifier.government) AND (governmentidentifier.governmentidentifiertype = 1))))
-          WHERE (affectedgovernment_reconstructed.affectedtypecountyto <> 12)
-        UNION
-         SELECT DISTINCT affectedgovernment_reconstructed.event,
-                CASE
-                    WHEN (governmentidentifier.governmentidentifier IS NULL) THEN 0
-                    ELSE (governmentidentifier.governmentidentifier)::integer
-                END AS governmentcounty,
-            extra.governmentabbreviation(
-                CASE
-                    WHEN (stategovernment.governmentsubstitute IS NOT NULL) THEN stategovernment.governmentsubstitute
-                    ELSE affectedgovernment_reconstructed.statefrom
-                END) AS governmentstate
-           FROM (((extra.affectedgovernment_reconstructed
-             JOIN geohistory.government stategovernment ON (((affectedgovernment_reconstructed.statefrom = stategovernment.governmentid) AND ((stategovernment.governmentstatus)::text <> ALL (ARRAY[('placeholder'::character varying)::text, ('proposed'::character varying)::text, ('unincorporated'::character varying)::text])))))
-             JOIN geohistory.government countygovernment ON (((affectedgovernment_reconstructed.subcountyfrom = countygovernment.governmentid) AND ((countygovernment.governmentstatus)::text <> ALL (ARRAY[('placeholder'::character varying)::text, ('proposed'::character varying)::text, ('unincorporated'::character varying)::text])))))
-             LEFT JOIN geohistory.governmentidentifier ON (((countygovernment.governmentid = governmentidentifier.government) AND (governmentidentifier.governmentidentifiertype = 1))))
-          WHERE (affectedgovernment_reconstructed.affectedtypesubcountyfrom <> 12)
-        UNION
-         SELECT DISTINCT affectedgovernment_reconstructed.event,
-                CASE
-                    WHEN (governmentidentifier.governmentidentifier IS NULL) THEN 0
-                    ELSE (governmentidentifier.governmentidentifier)::integer
-                END AS governmentcounty,
-            extra.governmentabbreviation(
-                CASE
-                    WHEN (stategovernment.governmentsubstitute IS NOT NULL) THEN stategovernment.governmentsubstitute
-                    ELSE affectedgovernment_reconstructed.stateto
-                END) AS governmentstate
-           FROM (((extra.affectedgovernment_reconstructed
-             JOIN geohistory.government stategovernment ON (((affectedgovernment_reconstructed.stateto = stategovernment.governmentid) AND ((stategovernment.governmentstatus)::text <> ALL (ARRAY[('placeholder'::character varying)::text, ('proposed'::character varying)::text, ('unincorporated'::character varying)::text])))))
-             JOIN geohistory.government countygovernment ON (((affectedgovernment_reconstructed.subcountyto = countygovernment.governmentid) AND ((countygovernment.governmentstatus)::text <> ALL (ARRAY[('placeholder'::character varying)::text, ('proposed'::character varying)::text, ('unincorporated'::character varying)::text])))))
-             LEFT JOIN geohistory.governmentidentifier ON (((countygovernment.governmentid = governmentidentifier.government) AND (governmentidentifier.governmentidentifiertype = 1))))
-          WHERE (affectedgovernment_reconstructed.affectedtypesubcountyto <> 12)
-        ), stateevents AS (
-         SELECT DISTINCT affectedgovernment_reconstructed.event,
-            extra.governmentabbreviation(
-                CASE
-                    WHEN (government.governmentsubstitute IS NOT NULL) THEN government.governmentsubstitute
-                    ELSE affectedgovernment_reconstructed.statefrom
-                END) AS governmentstate
-           FROM (extra.affectedgovernment_reconstructed
-             JOIN geohistory.government ON (((affectedgovernment_reconstructed.statefrom = government.governmentid) AND ((government.governmentstatus)::text <> ALL (ARRAY[('placeholder'::character varying)::text, ('proposed'::character varying)::text, ('unincorporated'::character varying)::text])))))
-          WHERE (affectedgovernment_reconstructed.affectedtypestatefrom <> 12)
-        UNION
-         SELECT DISTINCT affectedgovernment_reconstructed.event,
-            extra.governmentabbreviation(
-                CASE
-                    WHEN (government.governmentsubstitute IS NOT NULL) THEN government.governmentsubstitute
-                    ELSE affectedgovernment_reconstructed.stateto
-                END) AS governmentstate
-           FROM (extra.affectedgovernment_reconstructed
-             JOIN geohistory.government ON (((affectedgovernment_reconstructed.stateto = government.governmentid) AND ((government.governmentstatus)::text <> ALL (ARRAY[('placeholder'::character varying)::text, ('proposed'::character varying)::text, ('unincorporated'::character varying)::text])))))
-          WHERE (affectedgovernment_reconstructed.affectedtypestateto <> 12)
-        ), eventstates AS (
-         SELECT DISTINCT stateevents.event,
-            array_agg(DISTINCT stateevents.governmentstate) AS governmentstates
-           FROM stateevents
-          GROUP BY stateevents.event
-        )
- SELECT 'historic'::text AS grouptype,
-    'county'::text AS governmenttype,
-    countyevents.governmentstate,
-    countyevents.governmentcounty,
-    event.eventtype,
-    event.eventsortyear,
-    (count(DISTINCT event.eventid))::integer AS eventcount,
-    array_agg(DISTINCT event.eventid ORDER BY event.eventid) AS eventlist
-   FROM ((geohistory.event
-     JOIN countyevents ON ((event.eventid = countyevents.event)))
-     JOIN geohistory.eventgranted ON (((event.eventgranted = eventgranted.eventgrantedid) AND eventgranted.eventgrantedsuccess)))
-  GROUP BY 'county'::text, countyevents.governmentstate, countyevents.governmentcounty, event.eventtype, event.eventsortyear
-UNION
- SELECT 'historic'::text AS grouptype,
-    'state'::text AS governmenttype,
-    stateevents.governmentstate,
-    NULL::integer AS governmentcounty,
-    event.eventtype,
-    event.eventsortyear,
-    count(DISTINCT event.eventid) AS eventcount,
-    array_agg(DISTINCT event.eventid ORDER BY event.eventid) AS eventlist
-   FROM ((geohistory.event
-     JOIN stateevents ON ((event.eventid = stateevents.event)))
-     JOIN geohistory.eventgranted ON (((event.eventgranted = eventgranted.eventgrantedid) AND eventgranted.eventgrantedsuccess)))
-  GROUP BY 'state'::text, stateevents.governmentstate, NULL::integer, event.eventtype, event.eventsortyear
-UNION
- SELECT 'historic'::text AS grouptype,
-    'nation'::text AS governmenttype,
-    'production'::text AS governmentstate,
-    NULL::integer AS governmentcounty,
-    event.eventtype,
-    event.eventsortyear,
-    count(DISTINCT event.eventid) AS eventcount,
-    array_agg(DISTINCT event.eventid ORDER BY event.eventid) AS eventlist
-   FROM ((geohistory.event
-     JOIN eventstates ON (((event.eventid = eventstates.event) AND (eventstates.governmentstates && ARRAY['NJ'::text, 'PA'::text]))))
-     JOIN geohistory.eventgranted ON (((event.eventgranted = eventgranted.eventgrantedid) AND eventgranted.eventgrantedsuccess)))
-  GROUP BY 'state'::text, 'production'::text, NULL::integer, event.eventtype, event.eventsortyear
-UNION
- SELECT 'historic'::text AS grouptype,
-    'nation'::text AS governmenttype,
-    'development'::text AS governmentstate,
-    NULL::integer AS governmentcounty,
-    event.eventtype,
-    event.eventsortyear,
-    count(DISTINCT event.eventid) AS eventcount,
-    array_agg(DISTINCT event.eventid ORDER BY event.eventid) AS eventlist
-   FROM ((geohistory.event
-     JOIN eventstates ON (((event.eventid = eventstates.event) AND (eventstates.governmentstates && ARRAY['DE'::text, 'ME'::text, 'MA'::text, 'MD'::text, 'MI'::text, 'MN'::text, 'NJ'::text, 'NY'::text, 'OH'::text, 'PA'::text]))))
-     JOIN geohistory.eventgranted ON (((event.eventgranted = eventgranted.eventgrantedid) AND eventgranted.eventgrantedsuccess)))
-  GROUP BY 'state'::text, 'development'::text, NULL::integer, event.eventtype, event.eventsortyear
-  ORDER BY 1, 2, 3, 4, 5
-  WITH NO DATA;
-
-
-ALTER MATERIALIZED VIEW extra.statistics_eventtype OWNER TO postgres;
-
---
--- Name: governmentmapstatus; Type: TABLE; Schema: geohistory; Owner: postgres
---
-
-CREATE TABLE geohistory.governmentmapstatus (
-    governmentmapstatusid integer NOT NULL,
-    governmentmapstatusshort character varying(20) NOT NULL,
-    governmentmapstatuslong text NOT NULL,
-    governmentmapstatusreviewed boolean DEFAULT false NOT NULL,
-    governmentmapstatusfurtherresearch boolean DEFAULT false NOT NULL,
-    governmentmapstatustimelapse boolean DEFAULT false NOT NULL,
-    governmentmapstatusomit boolean DEFAULT false NOT NULL,
-    CONSTRAINT governmentmapstatus_check CHECK (((governmentmapstatusshort)::text <> ''::text))
-);
-
-
-ALTER TABLE geohistory.governmentmapstatus OWNER TO postgres;
-
---
--- Name: TABLE governmentmapstatus; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON TABLE geohistory.governmentmapstatus IS 'The rows in the table have been simplified in open data to remove certain information used for internal tracking purposes.';
-
-
---
--- Name: COLUMN governmentmapstatus.governmentmapstatusfurtherresearch; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.governmentmapstatus.governmentmapstatusfurtherresearch IS 'This field is used for internal tracking purposes, and is always shown as the default value in open data.';
-
-
---
--- Name: statistics_mapped; Type: MATERIALIZED VIEW; Schema: extra; Owner: postgres
---
-
-CREATE MATERIALIZED VIEW extra.statistics_mapped AS
- SELECT 'incorporated'::text AS grouptype,
-    'county'::text AS governmenttype,
-    extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentcurrentleadparent)) AS governmentstate,
-        CASE
-            WHEN (governmentidentifier.governmentidentifier IS NULL) THEN 0
-            ELSE (governmentidentifier.governmentidentifier)::integer
-        END AS governmentcounty,
-    round((((sum(
-        CASE
-            WHEN governmentmapstatus.governmentmapstatustimelapse THEN 1
-            ELSE 0
-        END))::numeric / (COALESCE(count(*), (1)::bigint))::numeric) * (100)::numeric), 2) AS percentmapped
-   FROM ((geohistory.government
-     JOIN geohistory.governmentmapstatus ON ((government.governmentmapstatus = governmentmapstatus.governmentmapstatusid)))
-     LEFT JOIN geohistory.governmentidentifier ON (((government.governmentcurrentleadparent = governmentidentifier.government) AND (governmentidentifier.governmentidentifiertype = 1))))
-  WHERE ((government.governmentsubstitute IS NULL) AND (government.governmentlevel = 4) AND ((government.governmenttype)::text <> ALL (ARRAY['Hundred'::text, 'Independent School District'::text, 'Place'::text, 'School District'::text, 'Township'::text, 'Ward'::text])) AND ((government.governmentstatus)::text = ANY (ARRAY[('defunct'::character varying)::text, 'nonfunctioning'::text, 'paper'::text, 'unknown'::text, (''::character varying)::text])))
-  GROUP BY 'incorporated'::text, 'county'::text, (extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentcurrentleadparent))), government.governmentcurrentleadparent, governmentidentifier.governmentidentifier
-UNION
- SELECT 'total'::text AS grouptype,
-    'county'::text AS governmenttype,
-    extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentcurrentleadparent)) AS governmentstate,
-        CASE
-            WHEN (governmentidentifier.governmentidentifier IS NULL) THEN 0
-            ELSE (governmentidentifier.governmentidentifier)::integer
-        END AS governmentcounty,
-    round((((sum(
-        CASE
-            WHEN governmentmapstatus.governmentmapstatustimelapse THEN 1
-            ELSE 0
-        END))::numeric / (COALESCE(count(*), (1)::bigint))::numeric) * (100)::numeric), 2) AS percentmapped
-   FROM ((geohistory.government
-     JOIN geohistory.governmentmapstatus ON ((government.governmentmapstatus = governmentmapstatus.governmentmapstatusid)))
-     LEFT JOIN geohistory.governmentidentifier ON (((government.governmentcurrentleadparent = governmentidentifier.government) AND (governmentidentifier.governmentidentifiertype = 1))))
-  WHERE ((government.governmentsubstitute IS NULL) AND (government.governmentlevel = 4) AND ((government.governmenttype)::text <> ALL (ARRAY['Independent School District'::text, 'Place'::text, 'School District'::text, 'Ward'::text])) AND ((government.governmentstatus)::text = ANY (ARRAY[('defunct'::character varying)::text, 'nonfunctioning'::text, 'paper'::text, 'unknown'::text, (''::character varying)::text])))
-  GROUP BY 'total'::text, 'county'::text, (extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentcurrentleadparent))), government.governmentcurrentleadparent, governmentidentifier.governmentidentifier
-UNION
- SELECT 'incorporated'::text AS grouptype,
-    'state'::text AS governmenttype,
-    extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentcurrentleadparent)) AS governmentstate,
-    0 AS governmentcounty,
-    round((((sum(
-        CASE
-            WHEN governmentmapstatus.governmentmapstatustimelapse THEN 1
-            ELSE 0
-        END))::numeric / (COALESCE(count(*), (1)::bigint))::numeric) * (100)::numeric), 2) AS percentmapped
-   FROM (geohistory.government
-     JOIN geohistory.governmentmapstatus ON ((government.governmentmapstatus = governmentmapstatus.governmentmapstatusid)))
-  WHERE ((government.governmentsubstitute IS NULL) AND (government.governmentlevel = 4) AND ((government.governmenttype)::text <> ALL (ARRAY['Hundred'::text, 'Independent School District'::text, 'Place'::text, 'School District'::text, 'Township'::text, 'Ward'::text])) AND ((government.governmentstatus)::text = ANY (ARRAY[('defunct'::character varying)::text, 'nonfunctioning'::text, 'paper'::text, 'unknown'::text, (''::character varying)::text])))
-  GROUP BY 'incorporated'::text, 'state'::text, (extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentcurrentleadparent))), 0::integer
-UNION
- SELECT 'total'::text AS grouptype,
-    'state'::text AS governmenttype,
-    extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentcurrentleadparent)) AS governmentstate,
-    0 AS governmentcounty,
-    round((((sum(
-        CASE
-            WHEN governmentmapstatus.governmentmapstatustimelapse THEN 1
-            ELSE 0
-        END))::numeric / (COALESCE(count(*), (1)::bigint))::numeric) * (100)::numeric), 2) AS percentmapped
-   FROM (geohistory.government
-     JOIN geohistory.governmentmapstatus ON ((government.governmentmapstatus = governmentmapstatus.governmentmapstatusid)))
-  WHERE ((government.governmentsubstitute IS NULL) AND (government.governmentlevel = 4) AND ((government.governmenttype)::text <> ALL (ARRAY['Independent School District'::text, 'Place'::text, 'School District'::text, 'Ward'::text])) AND ((government.governmentstatus)::text = ANY (ARRAY[('defunct'::character varying)::text, 'nonfunctioning'::text, 'paper'::text, 'unknown'::text, (''::character varying)::text])))
-  GROUP BY 'total'::text, 'state'::text, (extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentcurrentleadparent))), 0::integer
-UNION
- SELECT 'incorporated'::text AS grouptype,
-    'nation'::text AS governmenttype,
-    'development'::text AS governmentstate,
-    0 AS governmentcounty,
-    round((((sum(
-        CASE
-            WHEN governmentmapstatus.governmentmapstatustimelapse THEN 1
-            ELSE 0
-        END))::numeric / (COALESCE(count(*), (1)::bigint))::numeric) * (100)::numeric), 2) AS percentmapped
-   FROM (geohistory.government
-     JOIN geohistory.governmentmapstatus ON ((government.governmentmapstatus = governmentmapstatus.governmentmapstatusid)))
-  WHERE ((government.governmentsubstitute IS NULL) AND (government.governmentlevel = 4) AND ((government.governmenttype)::text <> ALL (ARRAY['Hundred'::text, 'Independent School District'::text, 'Place'::text, 'School District'::text, 'Township'::text, 'Ward'::text])) AND ((government.governmentstatus)::text = ANY (ARRAY[('defunct'::character varying)::text, 'nonfunctioning'::text, 'paper'::text, 'unknown'::text, (''::character varying)::text])) AND (extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentcurrentleadparent)) = ANY (ARRAY['DE'::text, 'ME'::text, 'MA'::text, 'MD'::text, 'MI'::text, 'MN'::text, 'NJ'::text, 'NJ'::text, 'OH'::text, 'PA'::text])))
-  GROUP BY 'incorporated'::text, 'state'::text, (extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentcurrentleadparent))), 0::integer
-UNION
- SELECT 'total'::text AS grouptype,
-    'nation'::text AS governmenttype,
-    'development'::text AS governmentstate,
-    0 AS governmentcounty,
-    round((((sum(
-        CASE
-            WHEN governmentmapstatus.governmentmapstatustimelapse THEN 1
-            ELSE 0
-        END))::numeric / (COALESCE(count(*), (1)::bigint))::numeric) * (100)::numeric), 2) AS percentmapped
-   FROM (geohistory.government
-     JOIN geohistory.governmentmapstatus ON ((government.governmentmapstatus = governmentmapstatus.governmentmapstatusid)))
-  WHERE ((government.governmentsubstitute IS NULL) AND (government.governmentlevel = 4) AND ((government.governmenttype)::text <> ALL (ARRAY['Independent School District'::text, 'Place'::text, 'School District'::text, 'Ward'::text])) AND ((government.governmentstatus)::text = ANY (ARRAY[('defunct'::character varying)::text, 'nonfunctioning'::text, 'paper'::text, 'unknown'::text, (''::character varying)::text])) AND (extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentcurrentleadparent)) = ANY (ARRAY['DE'::text, 'ME'::text, 'MA'::text, 'MD'::text, 'MI'::text, 'MN'::text, 'NJ'::text, 'NJ'::text, 'OH'::text, 'PA'::text])))
-  GROUP BY 'total'::text, 'state'::text, (extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentcurrentleadparent))), 0::integer
-UNION
- SELECT 'incorporated'::text AS grouptype,
-    'nation'::text AS governmenttype,
-    'development'::text AS governmentstate,
-    0 AS governmentcounty,
-    round((((sum(
-        CASE
-            WHEN governmentmapstatus.governmentmapstatustimelapse THEN 1
-            ELSE 0
-        END))::numeric / (COALESCE(count(*), (1)::bigint))::numeric) * (100)::numeric), 2) AS percentmapped
-   FROM (geohistory.government
-     JOIN geohistory.governmentmapstatus ON ((government.governmentmapstatus = governmentmapstatus.governmentmapstatusid)))
-  WHERE ((government.governmentsubstitute IS NULL) AND (government.governmentlevel = 4) AND ((government.governmenttype)::text <> ALL (ARRAY['Hundred'::text, 'Independent School District'::text, 'Place'::text, 'School District'::text, 'Township'::text, 'Ward'::text])) AND ((government.governmentstatus)::text = ANY (ARRAY[('defunct'::character varying)::text, 'nonfunctioning'::text, 'paper'::text, 'unknown'::text, (''::character varying)::text])) AND (extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentcurrentleadparent)) = ANY (ARRAY['NJ'::text, 'PA'::text])))
-  GROUP BY 'incorporated'::text, 'state'::text, (extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentcurrentleadparent))), 0::integer
-UNION
- SELECT 'total'::text AS grouptype,
-    'nation'::text AS governmenttype,
-    'development'::text AS governmentstate,
-    0 AS governmentcounty,
-    round((((sum(
-        CASE
-            WHEN governmentmapstatus.governmentmapstatustimelapse THEN 1
-            ELSE 0
-        END))::numeric / (COALESCE(count(*), (1)::bigint))::numeric) * (100)::numeric), 2) AS percentmapped
-   FROM (geohistory.government
-     JOIN geohistory.governmentmapstatus ON ((government.governmentmapstatus = governmentmapstatus.governmentmapstatusid)))
-  WHERE ((government.governmentsubstitute IS NULL) AND (government.governmentlevel = 4) AND ((government.governmenttype)::text <> ALL (ARRAY['Independent School District'::text, 'Place'::text, 'School District'::text, 'Ward'::text])) AND ((government.governmentstatus)::text = ANY (ARRAY[('defunct'::character varying)::text, 'nonfunctioning'::text, 'paper'::text, 'unknown'::text, (''::character varying)::text])) AND (extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentcurrentleadparent)) = ANY (ARRAY['NJ'::text, 'PA'::text])))
-  GROUP BY 'total'::text, 'state'::text, (extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentcurrentleadparent))), 0::integer
-UNION
- SELECT 'incorporated_review'::text AS grouptype,
-    'county'::text AS governmenttype,
-    extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentcurrentleadparent)) AS governmentstate,
-        CASE
-            WHEN (governmentidentifier.governmentidentifier IS NULL) THEN 0
-            ELSE (governmentidentifier.governmentidentifier)::integer
-        END AS governmentcounty,
-    round((((sum(
-        CASE
-            WHEN governmentmapstatus.governmentmapstatusreviewed THEN 1
-            ELSE 0
-        END))::numeric / (COALESCE(count(*), (1)::bigint))::numeric) * (100)::numeric), 2) AS percentmapped
-   FROM ((geohistory.government
-     JOIN geohistory.governmentmapstatus ON ((government.governmentmapstatus = governmentmapstatus.governmentmapstatusid)))
-     LEFT JOIN geohistory.governmentidentifier ON (((government.governmentcurrentleadparent = governmentidentifier.government) AND (governmentidentifier.governmentidentifiertype = 1))))
-  WHERE ((government.governmentsubstitute IS NULL) AND (government.governmentlevel = 4) AND ((government.governmenttype)::text <> ALL (ARRAY['Hundred'::text, 'Independent School District'::text, 'Place'::text, 'School District'::text, 'Township'::text, 'Ward'::text])) AND ((government.governmentstatus)::text = ANY (ARRAY[('defunct'::character varying)::text, 'nonfunctioning'::text, 'paper'::text, 'unknown'::text, (''::character varying)::text])))
-  GROUP BY 'incorporated_review'::text, 'county'::text, (extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentcurrentleadparent))), government.governmentcurrentleadparent, governmentidentifier.governmentidentifier
-UNION
- SELECT 'total_review'::text AS grouptype,
-    'county'::text AS governmenttype,
-    extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentcurrentleadparent)) AS governmentstate,
-        CASE
-            WHEN (governmentidentifier.governmentidentifier IS NULL) THEN 0
-            ELSE (governmentidentifier.governmentidentifier)::integer
-        END AS governmentcounty,
-    round((((sum(
-        CASE
-            WHEN governmentmapstatus.governmentmapstatusreviewed THEN 1
-            ELSE 0
-        END))::numeric / (COALESCE(count(*), (1)::bigint))::numeric) * (100)::numeric), 2) AS percentmapped
-   FROM ((geohistory.government
-     JOIN geohistory.governmentmapstatus ON ((government.governmentmapstatus = governmentmapstatus.governmentmapstatusid)))
-     LEFT JOIN geohistory.governmentidentifier ON (((government.governmentcurrentleadparent = governmentidentifier.government) AND (governmentidentifier.governmentidentifiertype = 1))))
-  WHERE ((government.governmentsubstitute IS NULL) AND (government.governmentlevel = 4) AND ((government.governmenttype)::text <> ALL (ARRAY['Independent School District'::text, 'Place'::text, 'School District'::text, 'Ward'::text])) AND ((government.governmentstatus)::text = ANY (ARRAY[('defunct'::character varying)::text, 'nonfunctioning'::text, 'paper'::text, 'unknown'::text, (''::character varying)::text])))
-  GROUP BY 'total_review'::text, 'county'::text, (extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentcurrentleadparent))), government.governmentcurrentleadparent, governmentidentifier.governmentidentifier
-UNION
- SELECT 'incorporated_review'::text AS grouptype,
-    'state'::text AS governmenttype,
-    extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentcurrentleadparent)) AS governmentstate,
-    0 AS governmentcounty,
-    round((((sum(
-        CASE
-            WHEN governmentmapstatus.governmentmapstatusreviewed THEN 1
-            ELSE 0
-        END))::numeric / (COALESCE(count(*), (1)::bigint))::numeric) * (100)::numeric), 2) AS percentmapped
-   FROM (geohistory.government
-     JOIN geohistory.governmentmapstatus ON ((government.governmentmapstatus = governmentmapstatus.governmentmapstatusid)))
-  WHERE ((government.governmentsubstitute IS NULL) AND (government.governmentlevel = 4) AND ((government.governmenttype)::text <> ALL (ARRAY['Hundred'::text, 'Independent School District'::text, 'Place'::text, 'School District'::text, 'Township'::text, 'Ward'::text])) AND ((government.governmentstatus)::text = ANY (ARRAY[('defunct'::character varying)::text, 'nonfunctioning'::text, 'paper'::text, 'unknown'::text, (''::character varying)::text])))
-  GROUP BY 'incorporated_review'::text, 'state'::text, (extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentcurrentleadparent))), 0::integer
-UNION
- SELECT 'total_review'::text AS grouptype,
-    'state'::text AS governmenttype,
-    extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentcurrentleadparent)) AS governmentstate,
-    0 AS governmentcounty,
-    round((((sum(
-        CASE
-            WHEN governmentmapstatus.governmentmapstatusreviewed THEN 1
-            ELSE 0
-        END))::numeric / (COALESCE(count(*), (1)::bigint))::numeric) * (100)::numeric), 2) AS percentmapped
-   FROM (geohistory.government
-     JOIN geohistory.governmentmapstatus ON ((government.governmentmapstatus = governmentmapstatus.governmentmapstatusid)))
-  WHERE ((government.governmentsubstitute IS NULL) AND (government.governmentlevel = 4) AND ((government.governmenttype)::text <> ALL (ARRAY['Independent School District'::text, 'Place'::text, 'School District'::text, 'Ward'::text])) AND ((government.governmentstatus)::text = ANY (ARRAY[('defunct'::character varying)::text, 'nonfunctioning'::text, 'paper'::text, 'unknown'::text, (''::character varying)::text])))
-  GROUP BY 'total_review'::text, 'state'::text, (extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentcurrentleadparent))), 0::integer
-UNION
- SELECT 'incorporated_review'::text AS grouptype,
-    'nation'::text AS governmenttype,
-    'development'::text AS governmentstate,
-    0 AS governmentcounty,
-    round((((sum(
-        CASE
-            WHEN governmentmapstatus.governmentmapstatusreviewed THEN 1
-            ELSE 0
-        END))::numeric / (COALESCE(count(*), (1)::bigint))::numeric) * (100)::numeric), 2) AS percentmapped
-   FROM (geohistory.government
-     JOIN geohistory.governmentmapstatus ON ((government.governmentmapstatus = governmentmapstatus.governmentmapstatusid)))
-  WHERE ((government.governmentsubstitute IS NULL) AND (government.governmentlevel = 4) AND ((government.governmenttype)::text <> ALL (ARRAY['Hundred'::text, 'Independent School District'::text, 'Place'::text, 'School District'::text, 'Township'::text, 'Ward'::text])) AND ((government.governmentstatus)::text = ANY (ARRAY[('defunct'::character varying)::text, 'nonfunctioning'::text, 'paper'::text, 'unknown'::text, (''::character varying)::text])) AND (extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentcurrentleadparent)) = ANY (ARRAY['DE'::text, 'ME'::text, 'MA'::text, 'MD'::text, 'MI'::text, 'MN'::text, 'NJ'::text, 'NJ'::text, 'OH'::text, 'PA'::text])))
-  GROUP BY 'incorporated_review'::text, 'state'::text, (extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentcurrentleadparent))), 0::integer
-UNION
- SELECT 'total_review'::text AS grouptype,
-    'nation'::text AS governmenttype,
-    'development'::text AS governmentstate,
-    0 AS governmentcounty,
-    round((((sum(
-        CASE
-            WHEN governmentmapstatus.governmentmapstatusreviewed THEN 1
-            ELSE 0
-        END))::numeric / (COALESCE(count(*), (1)::bigint))::numeric) * (100)::numeric), 2) AS percentmapped
-   FROM (geohistory.government
-     JOIN geohistory.governmentmapstatus ON ((government.governmentmapstatus = governmentmapstatus.governmentmapstatusid)))
-  WHERE ((government.governmentsubstitute IS NULL) AND (government.governmentlevel = 4) AND ((government.governmenttype)::text <> ALL (ARRAY['Independent School District'::text, 'Place'::text, 'School District'::text, 'Ward'::text])) AND ((government.governmentstatus)::text = ANY (ARRAY[('defunct'::character varying)::text, 'nonfunctioning'::text, 'paper'::text, 'unknown'::text, (''::character varying)::text])) AND (extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentcurrentleadparent)) = ANY (ARRAY['DE'::text, 'ME'::text, 'MA'::text, 'MD'::text, 'MI'::text, 'MN'::text, 'NJ'::text, 'NJ'::text, 'OH'::text, 'PA'::text])))
-  GROUP BY 'total_review'::text, 'state'::text, (extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentcurrentleadparent))), 0::integer
-UNION
- SELECT 'incorporated_review'::text AS grouptype,
-    'nation'::text AS governmenttype,
-    'development'::text AS governmentstate,
-    0 AS governmentcounty,
-    round((((sum(
-        CASE
-            WHEN governmentmapstatus.governmentmapstatusreviewed THEN 1
-            ELSE 0
-        END))::numeric / (COALESCE(count(*), (1)::bigint))::numeric) * (100)::numeric), 2) AS percentmapped
-   FROM (geohistory.government
-     JOIN geohistory.governmentmapstatus ON ((government.governmentmapstatus = governmentmapstatus.governmentmapstatusid)))
-  WHERE ((government.governmentsubstitute IS NULL) AND (government.governmentlevel = 4) AND ((government.governmenttype)::text <> ALL (ARRAY['Hundred'::text, 'Independent School District'::text, 'Place'::text, 'School District'::text, 'Township'::text, 'Ward'::text])) AND ((government.governmentstatus)::text = ANY (ARRAY[('defunct'::character varying)::text, 'nonfunctioning'::text, 'paper'::text, 'unknown'::text, (''::character varying)::text])) AND (extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentcurrentleadparent)) = ANY (ARRAY['NJ'::text, 'PA'::text])))
-  GROUP BY 'incorporated_review'::text, 'state'::text, (extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentcurrentleadparent))), 0::integer
-UNION
- SELECT 'total_review'::text AS grouptype,
-    'nation'::text AS governmenttype,
-    'development'::text AS governmentstate,
-    0 AS governmentcounty,
-    round((((sum(
-        CASE
-            WHEN governmentmapstatus.governmentmapstatusreviewed THEN 1
-            ELSE 0
-        END))::numeric / (COALESCE(count(*), (1)::bigint))::numeric) * (100)::numeric), 2) AS percentmapped
-   FROM (geohistory.government
-     JOIN geohistory.governmentmapstatus ON ((government.governmentmapstatus = governmentmapstatus.governmentmapstatusid)))
-  WHERE ((government.governmentsubstitute IS NULL) AND (government.governmentlevel = 4) AND ((government.governmenttype)::text <> ALL (ARRAY['Independent School District'::text, 'Place'::text, 'School District'::text, 'Ward'::text])) AND ((government.governmentstatus)::text = ANY (ARRAY[('defunct'::character varying)::text, 'nonfunctioning'::text, 'paper'::text, 'unknown'::text, (''::character varying)::text])) AND (extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentcurrentleadparent)) = ANY (ARRAY['NJ'::text, 'PA'::text])))
-  GROUP BY 'total_review'::text, 'state'::text, (extra.governmentabbreviation(extra.governmentcurrentleadstateid(government.governmentcurrentleadparent))), 0::integer
-  ORDER BY 1, 2, 3, 4
-  WITH NO DATA;
-
-
-ALTER MATERIALIZED VIEW extra.statistics_mapped OWNER TO postgres;
-
---
--- Name: eventtype; Type: TABLE; Schema: geohistory; Owner: postgres
---
-
-CREATE TABLE geohistory.eventtype (
-    eventtypeid integer NOT NULL,
-    eventtypelong text NOT NULL,
-    eventtypeshort character varying(50) NOT NULL,
-    eventtypeborders character varying(15) DEFAULT ''::character varying NOT NULL,
-    eventtypeinclude boolean DEFAULT false NOT NULL,
-    eventtypecreate character varying(1) DEFAULT 'n'::text NOT NULL,
-    eventtypegroup character varying(20),
-    CONSTRAINT eventtype_check CHECK (((eventtypelong <> ''::text) AND ((eventtypeshort)::text <> ''::text)))
-);
-
-
-ALTER TABLE geohistory.eventtype OWNER TO postgres;
-
---
--- Name: COLUMN eventtype.eventtypelong; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.eventtype.eventtypelong IS 'Rewrite';
-
-
---
--- Name: COLUMN eventtype.eventtypecreate; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.eventtype.eventtypecreate IS 'c = only events affecting counties included; 
-n = no events included;
-s = separate/subordinate events are included for townships and all events included for all other types;
-t = begin/end events are included for townships and all events included for all other types;
-y = all events included';
-
-
---
--- Name: COLUMN eventtype.eventtypegroup; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.eventtype.eventtypegroup IS '"Omit" items are omitted from open data, and events with foreign key "Placeholder" are omitted from open data.';
-
-
---
--- Name: governmentform; Type: TABLE; Schema: geohistory; Owner: postgres
---
-
-CREATE TABLE geohistory.governmentform (
-    governmentformid integer NOT NULL,
-    governmentstate integer NOT NULL,
-    governmentformpublication boolean DEFAULT true NOT NULL,
-    recategorize boolean DEFAULT false NOT NULL,
-    governmentformpublicationdate boolean DEFAULT false NOT NULL,
-    governmentformtype text DEFAULT ''::text NOT NULL,
-    governmentformclass text DEFAULT ''::text NOT NULL,
-    governmentformqualifier text DEFAULT ''::text NOT NULL,
-    governmentformqualifierinclude boolean DEFAULT true NOT NULL,
-    governmentformextended text DEFAULT ''::text NOT NULL,
-    governmentformlong text GENERATED ALWAYS AS (((governmentformtype ||
-CASE
-    WHEN (governmentformclass <> ''::text) THEN (', '::text || governmentformclass)
-    ELSE ''::text
-END) ||
-CASE
-    WHEN (governmentformqualifier <> ''::text) THEN ((' ('::text || governmentformqualifier) || ')'::text)
-    ELSE ''::text
-END)) STORED,
-    governmentformlongreport text GENERATED ALWAYS AS (((governmentformtype ||
-CASE
-    WHEN (governmentformclass <> ''::text) THEN (', '::text || governmentformclass)
-    ELSE ''::text
-END) ||
-CASE
-    WHEN (governmentformqualifierinclude AND (governmentformqualifier <> ''::text)) THEN ((' ('::text || governmentformqualifier) || ')'::text)
-    ELSE ''::text
-END)) STORED,
-    governmentformlongextended text GENERATED ALWAYS AS ((((governmentformtype ||
-CASE
-    WHEN (governmentformclass <> ''::text) THEN (', '::text || governmentformclass)
-    ELSE ''::text
-END) ||
-CASE
-    WHEN (governmentformqualifier <> ''::text) THEN ((' ('::text || governmentformqualifier) || ')'::text)
-    ELSE ''::text
-END) ||
-CASE
-    WHEN (governmentformextended <> ''::text) THEN (': '::text || governmentformextended)
-    ELSE ''::text
-END)) STORED
-);
-
-
-ALTER TABLE geohistory.governmentform OWNER TO postgres;
-
---
--- Name: COLUMN governmentform.governmentformpublication; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.governmentform.governmentformpublication IS 'Whether this record should be included in book publication form. This field is used for internal tracking purposes, and is always shown as the default value in open data.';
-
-
---
--- Name: COLUMN governmentform.recategorize; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.governmentform.recategorize IS 'This field is used for internal tracking purposes, and is always shown as the default value in open data.';
-
-
---
--- Name: COLUMN governmentform.governmentformpublicationdate; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.governmentform.governmentformpublicationdate IS 'This field is used for internal tracking purposes, and is always shown as the default value in open data.';
-
-
---
--- Name: COLUMN governmentform.governmentformextended; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.governmentform.governmentformextended IS 'This field is used for internal tracking purposes, and is not included in open data.';
-
-
---
--- Name: metesdescriptionline; Type: TABLE; Schema: geohistory; Owner: postgres
---
-
-CREATE TABLE geohistory.metesdescriptionline (
-    metesdescriptionlineid integer NOT NULL,
-    metesdescription integer NOT NULL,
-    metesdescriptionline smallint NOT NULL,
-    thencepoint text DEFAULT ''::text NOT NULL,
-    northsouth character varying(1) DEFAULT ''::character varying NOT NULL,
-    degree double precision,
-    eastwest character varying(1) DEFAULT ''::character varying NOT NULL,
-    foot double precision,
-    topoint text DEFAULT ''::text NOT NULL,
-    curveleftright character varying(5) DEFAULT ''::character varying NOT NULL,
-    curveradiusfoot double precision,
-    curvetangent smallint DEFAULT (0)::smallint NOT NULL,
-    manualxchange double precision,
-    manualychange double precision,
-    metesdescriptionlinenotes text DEFAULT ''::text NOT NULL,
-    curveinternalangle double precision,
-    CONSTRAINT metesdescriptionline_curvetangent_check CHECK (((curvetangent = 0) OR (curvetangent = 1) OR (curvetangent = '-1'::integer))),
-    CONSTRAINT metesdescriptionline_degree_check CHECK ((degree <> (0)::double precision)),
-    CONSTRAINT metesdescriptionline_eastwest_check CHECK (((eastwest)::text = ANY (ARRAY[('E'::character varying)::text, ('W'::character varying)::text, (''::character varying)::text]))),
-    CONSTRAINT metesdescriptionline_manualxchange_check CHECK ((manualxchange <> (0)::double precision)),
-    CONSTRAINT metesdescriptionline_northsouth_check CHECK (((northsouth)::text = ANY (ARRAY[('N'::character varying)::text, ('S'::character varying)::text, (''::character varying)::text])))
-);
-
-
-ALTER TABLE geohistory.metesdescriptionline OWNER TO postgres;
-
---
 -- Name: researchlog; Type: TABLE; Schema: geohistory; Owner: postgres
 --
 
@@ -6176,6 +2982,8 @@ CREATE TABLE geohistory.researchlog (
     researchlognotes text DEFAULT ''::text NOT NULL,
     researchlogdisposition character varying(2) DEFAULT ''::character varying NOT NULL,
     event integer,
+    researchlogvolume text GENERATED ALWAYS AS (geohistory.rangeformat((researchlogvolumefrom)::text, (researchlogvolumeto)::text)) STORED,
+    researchlogyear text GENERATED ALWAYS AS (geohistory.rangeformat((researchlogfrom)::text, (researchlogto)::text)) STORED,
     CONSTRAINT researchlog_check CHECK (((((researchlogfrom)::text = ''::text) AND ((researchlogto)::text = ''::text)) OR (((researchlogfrom)::text <> ''::text) AND ((researchlogto)::text <> ''::text) AND ((researchlogvolumefrom)::text = ''::text) AND ((researchlogvolumeto)::text = ''::text)) OR (((researchlogvolumefrom)::text <> ''::text) AND ((researchlogvolumeto)::text <> ''::text))))
 );
 
@@ -6262,6 +3070,57 @@ CREATE TABLE geohistory.recordingevent (
 ALTER TABLE geohistory.recordingevent OWNER TO postgres;
 
 --
+-- Name: sourcecitation; Type: TABLE; Schema: geohistory; Owner: postgres
+--
+
+CREATE TABLE geohistory.sourcecitation (
+    sourcecitationid integer NOT NULL,
+    source integer,
+    sourcecitationdate calendar.historicdatetext DEFAULT (''::text)::calendar.historicdatetext NOT NULL,
+    sourcecitationdatetype character varying(50) DEFAULT ''::character varying NOT NULL,
+    sourcecitationdaterange calendar.historicdatetext DEFAULT (''::text)::calendar.historicdatetext NOT NULL,
+    sourcecitationdaterangetype character varying(50) DEFAULT ''::character varying NOT NULL,
+    sourcecitationvolume character varying(20) DEFAULT ''::character varying NOT NULL,
+    sourcecitationpagefrom character varying(7) DEFAULT ''::character varying NOT NULL,
+    sourcecitationpageto character varying(7) DEFAULT ''::character varying NOT NULL,
+    sourcecitationurl text DEFAULT ''::text NOT NULL,
+    sourcecitationtypetitle text DEFAULT ''::text NOT NULL,
+    sourcecitationperson text DEFAULT ''::text NOT NULL,
+    sourcecitationgovernmentreferences text DEFAULT ''::text NOT NULL,
+    sourcecitationarchiveslotfilm character varying(25) DEFAULT ''::character varying NOT NULL,
+    sourcecitationarchivecarton character varying(15) DEFAULT ''::character varying NOT NULL,
+    sourcecitationstatus character varying(1) DEFAULT ''::character varying NOT NULL,
+    sourcecitationissue character varying(20) DEFAULT ''::character varying NOT NULL,
+    sourcecitationname text DEFAULT ''::text NOT NULL,
+    sourcecitationslug text GENERATED ALWAYS AS (lower(regexp_replace(regexp_replace(btrim(((((((((((((((geohistory.sourceshort(source) || ' '::text) || split_part(sourcecitationtypetitle, ' '::text, 1)) || ' '::text) || split_part(sourcecitationtypetitle, ' '::text, 2)) || ' '::text) || split_part(regexp_replace(sourcecitationgovernmentreferences, '[;]+'::text, ' '::text, 'g'::text), ' '::text, 1)) || ' '::text) || split_part(regexp_replace(sourcecitationgovernmentreferences, '[;]+'::text, ' '::text, 'g'::text), ' '::text, 2)) || ' '::text) || (sourcecitationvolume)::text) || ' '::text) || (sourcecitationpagefrom)::text) || ' '::text) || sourcecitationname)), '[ –—]+'::text, '-'::text, 'g'::text), '[\.\/''\(\);:,&"#§\?\[\]]'::text, ''::text, 'g'::text))) STORED,
+    sourcecitationpage text GENERATED ALWAYS AS (geohistory.rangeformat((sourcecitationpagefrom)::text, (sourcecitationpageto)::text)) STORED
+);
+
+
+ALTER TABLE geohistory.sourcecitation OWNER TO postgres;
+
+--
+-- Name: COLUMN sourcecitation.sourcecitationstatus; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.sourcecitation.sourcecitationstatus IS 'This field is used for internal tracking purposes, and is not included in open data.';
+
+
+--
+-- Name: sourcecitationevent; Type: TABLE; Schema: geohistory; Owner: postgres
+--
+
+CREATE TABLE geohistory.sourcecitationevent (
+    sourcecitationeventid integer NOT NULL,
+    sourcecitation integer NOT NULL,
+    event integer NOT NULL,
+    sourcecitationeventinclude boolean
+);
+
+
+ALTER TABLE geohistory.sourcecitationevent OWNER TO postgres;
+
+--
 -- Name: sourcecitationnote; Type: TABLE; Schema: geohistory; Owner: postgres
 --
 
@@ -6298,6 +3157,56 @@ COMMENT ON COLUMN geohistory.sourcecitationnotetype.sourcecitationnotetypeisdeta
 
 
 --
+-- Name: governmentidentifier; Type: TABLE; Schema: geohistory; Owner: postgres
+--
+
+CREATE TABLE geohistory.governmentidentifier (
+    governmentidentifierid integer NOT NULL,
+    government integer,
+    governmentidentifiertype integer NOT NULL,
+    governmentidentifierprefix character varying(20) DEFAULT ''::character varying NOT NULL,
+    governmentidentifier character varying(20) DEFAULT ''::character varying NOT NULL,
+    governmentidentifiernote text DEFAULT ''::text NOT NULL,
+    governmentidentifiermatchtype character varying(30) DEFAULT ''::character varying NOT NULL,
+    governmentidentifiermatchdate date,
+    governmentidentifierlead boolean GENERATED ALWAYS AS ((((governmentidentifiermatchtype)::text ~~ 'current%'::text) OR ((governmentidentifiermatchtype)::text = 'full'::text) OR ((governmentidentifiermatchtype)::text ~~ '%lead'::text))) STORED,
+    governmentidentifierstatus text GENERATED ALWAYS AS (
+CASE
+    WHEN (((governmentidentifiermatchtype)::text ~~ 'current%'::text) OR ((governmentidentifiermatchtype)::text = 'full'::text) OR ((governmentidentifiermatchtype)::text ~~ '%lead'::text)) THEN 'Lead'::text
+    WHEN ((governmentidentifiermatchtype)::text = ANY (ARRAY[('historic-successor'::character varying)::text, ('reference'::character varying)::text])) THEN 'Reference'::text
+    WHEN ((governmentidentifiermatchtype)::text ~~ 'historic%'::text) THEN 'Historic'::text
+    WHEN ((governmentidentifiermatchtype)::text = ''::text) THEN ''::text
+    ELSE 'Other'::text
+END) STORED
+);
+
+
+ALTER TABLE geohistory.governmentidentifier OWNER TO postgres;
+
+--
+-- Name: COLUMN governmentidentifier.governmentidentifiermatchtype; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.governmentidentifier.governmentidentifiermatchtype IS 'current-alternate: Current government with correct spelling shown as USGS alternate.
+current-obsolete: Current government with obsolete USGS spelling.
+current-spelling: Current government with USGS spelling mismatch.
+current-status: Current government with USGS historic flag.
+delete: Should be merged into another feature ID.
+full: Spelling and status match.
+historic-alternate: Historic government with correct spelling shown as USGS alternate.
+historic-county: Temporary historic government created after county division.
+historic-error: Government-identifier link created in error.
+historic-match: Secondary records with spelling match.
+historic-missing: Successor current government does not list as USGS alternate (name change).
+historic-obsolete: Historic government with USGS spelling match.
+historic-spelling: Historic government with USGS alternate spelling mismatch.
+historic-status: Historic government missing USGS historic flag.
+historic-successor: Successor current government does not list as USGS alternate (merger-consolidation).
+
+Entries other than current-* or full can also be combined with -lead flag.';
+
+
+--
 -- Name: lawgroup; Type: TABLE; Schema: geohistory; Owner: postgres
 --
 
@@ -6314,7 +3223,8 @@ CREATE TABLE geohistory.lawgroup (
     lawgroupplanningagency boolean,
     lawgroupprocedure text DEFAULT ''::text NOT NULL,
     lawgroupgroup text DEFAULT ''::text NOT NULL,
-    lawgroupsectionlead text DEFAULT ''::text NOT NULL
+    lawgroupsectionlead text DEFAULT ''::text NOT NULL,
+    lawgroupyear text GENERATED ALWAYS AS (geohistory.rangeformat((lawgroupfrom)::text, (lawgroupto)::text)) STORED
 );
 
 
@@ -6405,6 +3315,95 @@ CREATE TABLE geohistory.lawgroupgovernmenttype (
 
 
 ALTER TABLE geohistory.lawgroupgovernmenttype OWNER TO postgres;
+
+--
+-- Name: tribunaltype; Type: TABLE; Schema: geohistory; Owner: postgres
+--
+
+CREATE TABLE geohistory.tribunaltype (
+    tribunaltypeid integer NOT NULL,
+    tribunaltypelevel integer NOT NULL,
+    tribunaltypeshort character varying(20) NOT NULL,
+    tribunaltypelong text NOT NULL,
+    tribunaltypedivision character varying(25) DEFAULT ''::character varying NOT NULL,
+    tribunaltypefilingoffice character varying(50) NOT NULL,
+    tribunaltypefilingofficerlevel boolean DEFAULT false NOT NULL,
+    tribunaldescription text DEFAULT ''::text NOT NULL,
+    tribunaltypesummary character varying(50) DEFAULT ''::character varying NOT NULL,
+    CONSTRAINT tribunaltype_check CHECK ((((tribunaltypefilingoffice)::text <> ''::text) AND (tribunaltypelong <> ''::text) AND ((tribunaltypeshort)::text <> ''::text)))
+);
+
+
+ALTER TABLE geohistory.tribunaltype OWNER TO postgres;
+
+--
+-- Name: adjudicationsourcecitation; Type: TABLE; Schema: geohistory; Owner: postgres
+--
+
+CREATE TABLE geohistory.adjudicationsourcecitation (
+    adjudicationsourcecitationid integer NOT NULL,
+    source integer NOT NULL,
+    adjudicationsourcecitationvolume smallint NOT NULL,
+    adjudicationsourcecitationpagefrom smallint NOT NULL,
+    adjudicationsourcecitationpageto smallint,
+    adjudicationsourcecitationyear character varying(4) DEFAULT ''::character varying NOT NULL,
+    adjudicationsourcecitationdate calendar.historicdatetext DEFAULT (''::text)::calendar.historicdatetext NOT NULL,
+    adjudicationsourcecitationtitle text DEFAULT ''::text NOT NULL,
+    adjudicationsourcecitationauthor character varying(45) DEFAULT ''::character varying NOT NULL,
+    adjudicationsourcecitationjudge character varying(45) DEFAULT ''::character varying NOT NULL,
+    adjudicationsourcecitationdissentjudge character varying(45) DEFAULT ''::character varying NOT NULL,
+    adjudicationsourcecitationurl text DEFAULT ''::text NOT NULL,
+    adjudication integer NOT NULL,
+    adjudicationsourcecitationname text DEFAULT ''::text NOT NULL,
+    adjudicationsourcecitationslug text GENERATED ALWAYS AS (lower(replace(replace(replace(btrim((((((
+CASE
+    WHEN (adjudicationsourcecitationvolume = 0) THEN ''::text
+    ELSE (adjudicationsourcecitationvolume || '-'::text)
+END || geohistory.sourceshort(source)) ||
+CASE
+    WHEN (adjudicationsourcecitationpagefrom = 0) THEN ''::text
+    ELSE ('-'::text || adjudicationsourcecitationpagefrom)
+END) ||
+CASE
+    WHEN (((adjudicationsourcecitationdate)::text = ''::text) OR ("left"((adjudicationsourcecitationdate)::text, 4) = '0000'::text)) THEN
+    CASE
+        WHEN ((adjudicationsourcecitationyear)::text = ''::text) THEN ''::text
+        ELSE ('-'::text || (adjudicationsourcecitationyear)::text)
+    END
+    ELSE ('-'::text || "left"((adjudicationsourcecitationdate)::text, 4))
+END) || ' '::text) || adjudicationsourcecitationname)), '.'::text, ''::text), '& '::text, ''::text), ' '::text, '-'::text))) STORED,
+    adjudicationsourcecitationpage text GENERATED ALWAYS AS (geohistory.rangeformat((adjudicationsourcecitationpagefrom)::text, (adjudicationsourcecitationpageto)::text)) STORED
+);
+
+
+ALTER TABLE geohistory.adjudicationsourcecitation OWNER TO postgres;
+
+--
+-- Name: lawalternatesection; Type: TABLE; Schema: geohistory; Owner: postgres
+--
+
+CREATE TABLE geohistory.lawalternatesection (
+    lawalternatesectionid integer NOT NULL,
+    lawalternate integer NOT NULL,
+    lawsection integer NOT NULL,
+    lawalternatesectionpagefrom smallint,
+    lawalternatesectionpageto smallint,
+    lawalternatesectioncitation text GENERATED ALWAYS AS ((((geohistory.lawalternatecitation(lawalternate) || ', '::text) || geohistory.lawsectionsymbol(lawsection)) ||
+CASE
+    WHEN (geohistory.lawsectionfrom(lawsection) = '0'::text) THEN '___'::text
+    WHEN (geohistory.lawsectionfrom(lawsection) = geohistory.lawsectionto(lawsection)) THEN (' '::text || geohistory.lawsectionfrom(lawsection))
+    ELSE ((('§ '::text || geohistory.lawsectionfrom(lawsection)) || '-'::text) || geohistory.lawsectionto(lawsection))
+END)) STORED,
+    lawalternatesectionslug text GENERATED ALWAYS AS (lower(replace(replace(regexp_replace(regexp_replace((((geohistory.lawalternatecitation(lawalternate) || ', '::text) || geohistory.lawsectionsymbol(lawsection)) ||
+CASE
+    WHEN (geohistory.lawsectionfrom(lawsection) = '0'::text) THEN '___'::text
+    WHEN (geohistory.lawsectionfrom(lawsection) = geohistory.lawsectionto(lawsection)) THEN (' '::text || geohistory.lawsectionfrom(lawsection))
+    ELSE ((('§ '::text || geohistory.lawsectionfrom(lawsection)) || '-'::text) || geohistory.lawsectionto(lawsection))
+END), '[,\.\[\]\(\)\'']'::text, ''::text, 'g'::text), '([ :\–\—\/]| of )'::text, '-'::text, 'g'::text), '§'::text, 's'::text), '¶'::text, 'p'::text))) STORED
+);
+
+
+ALTER TABLE geohistory.lawalternatesection OWNER TO postgres;
 
 --
 -- Name: adjudication_adjudicationid_seq; Type: SEQUENCE; Schema: geohistory; Owner: postgres
@@ -7275,6 +4274,17 @@ ALTER SEQUENCE geohistory.governmentsourceevent_governmentsourceeventid_seq OWNE
 
 
 --
+-- Name: lastrefresh; Type: MATERIALIZED VIEW; Schema: geohistory; Owner: postgres
+--
+
+CREATE MATERIALIZED VIEW geohistory.lastrefresh AS
+ SELECT '2024-11-02'::date AS lastrefreshdate
+  WITH NO DATA;
+
+
+ALTER MATERIALIZED VIEW geohistory.lastrefresh OWNER TO postgres;
+
+--
 -- Name: law_lawid_seq; Type: SEQUENCE; Schema: geohistory; Owner: postgres
 --
 
@@ -7307,7 +4317,101 @@ CREATE TABLE geohistory.lawalternate (
     lawalternatepage smallint NOT NULL,
     lawalternatenumberchapter smallint NOT NULL,
     lawalternatetype character varying(20) DEFAULT ''::character varying NOT NULL,
-    lawalternateurl text DEFAULT ''::text NOT NULL
+    lawalternateurl text DEFAULT ''::text NOT NULL,
+    lawalternatecitation text GENERATED ALWAYS AS ((geohistory.sourcelawtype(source) ||
+CASE
+    WHEN ((lawalternatepage = 0) AND (lawalternatenumberchapter = 0)) THEN ' Unknown'::text
+    ELSE (((((((((((
+    CASE
+        WHEN ((geohistory.lawapproved(law))::text = ''::text) THEN ''::text
+        ELSE ' of '::text
+    END || calendar.historicdatetextformat((geohistory.lawapproved(law))::calendar.historicdate, 'long'::text, 'en'::text)) || ' ('::text) ||
+    CASE
+        WHEN ((lawalternatevolume)::text ~~ '%/%'::text) THEN ((((((
+        CASE
+            WHEN (split_part((lawalternatevolume)::text, '/'::text, 3) <> ''::text) THEN (split_part((lawalternatevolume)::text, '/'::text, 3) || ', '::text)
+            ELSE ''::text
+        END || split_part((lawalternatevolume)::text, '/'::text, 2)) ||
+        CASE
+            WHEN (split_part((lawalternatevolume)::text, '/'::text, 2) = '1'::text) THEN 'st'::text
+            WHEN (split_part((lawalternatevolume)::text, '/'::text, 2) = '2'::text) THEN 'nd'::text
+            WHEN (split_part((lawalternatevolume)::text, '/'::text, 2) = '3'::text) THEN 'rd'::text
+            ELSE 'th'::text
+        END) || ' '::text) ||
+        CASE
+            WHEN geohistory.sourcelawhasspecialsession(source) THEN 'Sp.'::text
+            ELSE ''::text
+        END) || 'Sess., '::text) ||
+        CASE
+            WHEN ("left"((geohistory.lawapproved(law))::text, 4) <> split_part((lawalternatevolume)::text, '/'::text, 1)) THEN (split_part((lawalternatevolume)::text, '/'::text, 1) || ' '::text)
+            ELSE ''::text
+        END)
+        ELSE
+        CASE
+            WHEN (((lawalternatevolume)::text = "left"((geohistory.lawapproved(law))::text, 4)) OR ((lawalternatevolume)::text = ''::text)) THEN ''::text
+            ELSE ((lawalternatevolume)::text || ' '::text)
+        END
+    END) || geohistory.sourceshort(source)) || ' '::text) ||
+    CASE
+        WHEN (lawalternatepage = 0) THEN '___'::text
+        ELSE (lawalternatepage)::text
+    END) || ', '::text) ||
+    CASE
+        WHEN geohistory.sourcelawisbynumber(source) THEN 'No'::text
+        ELSE 'Ch'::text
+    END) || '. '::text) ||
+    CASE
+        WHEN (lawalternatenumberchapter = 0) THEN '___'::text
+        ELSE (lawalternatenumberchapter)::text
+    END) || ')'::text)
+END)) STORED,
+    lawalternateslug text GENERATED ALWAYS AS ((geohistory.sourcelawtype(source) ||
+CASE
+    WHEN ((lawalternatepage = 0) AND (lawalternatenumberchapter = 0)) THEN ' Unknown'::text
+    ELSE (((((((((((
+    CASE
+        WHEN ((geohistory.lawapproved(law))::text = ''::text) THEN ''::text
+        ELSE ' of '::text
+    END || calendar.historicdatetextformat((geohistory.lawapproved(law))::calendar.historicdate, 'short'::text, 'en'::text)) || ' ('::text) ||
+    CASE
+        WHEN ((lawalternatevolume)::text ~~ '%/%'::text) THEN ((((((
+        CASE
+            WHEN (split_part((lawalternatevolume)::text, '/'::text, 3) <> ''::text) THEN (split_part((lawalternatevolume)::text, '/'::text, 3) || ', '::text)
+            ELSE ''::text
+        END || split_part((lawalternatevolume)::text, '/'::text, 2)) ||
+        CASE
+            WHEN (split_part((lawalternatevolume)::text, '/'::text, 2) = '1'::text) THEN 'st'::text
+            WHEN (split_part((lawalternatevolume)::text, '/'::text, 2) = '2'::text) THEN 'nd'::text
+            WHEN (split_part((lawalternatevolume)::text, '/'::text, 2) = '3'::text) THEN 'rd'::text
+            ELSE 'th'::text
+        END) || ' '::text) ||
+        CASE
+            WHEN geohistory.sourcelawhasspecialsession(source) THEN 'Sp.'::text
+            ELSE ''::text
+        END) || 'Sess., '::text) ||
+        CASE
+            WHEN ("left"((geohistory.lawapproved(law))::text, 4) <> split_part((lawalternatevolume)::text, '/'::text, 1)) THEN (split_part((lawalternatevolume)::text, '/'::text, 1) || ' '::text)
+            ELSE ''::text
+        END)
+        ELSE
+        CASE
+            WHEN (((lawalternatevolume)::text = "left"((geohistory.lawapproved(law))::text, 4)) OR ((lawalternatevolume)::text = ''::text)) THEN ''::text
+            ELSE ((lawalternatevolume)::text || ' '::text)
+        END
+    END) || geohistory.sourceshort(source)) || ' '::text) ||
+    CASE
+        WHEN (lawalternatepage = 0) THEN '___'::text
+        ELSE (lawalternatepage)::text
+    END) || ', '::text) ||
+    CASE
+        WHEN geohistory.sourcelawisbynumber(source) THEN 'No'::text
+        ELSE 'Ch'::text
+    END) || '. '::text) ||
+    CASE
+        WHEN (lawalternatenumberchapter = 0) THEN '___'::text
+        ELSE (lawalternatenumberchapter)::text
+    END) || ')'::text)
+END)) STORED
 );
 
 
@@ -7968,7 +5072,42 @@ END) ||
 CASE
     WHEN ((plsstownshipduplicate)::text = '0'::text) THEN ''::text
     ELSE (' '::text || (plsstownshipduplicate)::text)
-END)) STORED
+END)) STORED,
+    plsstownshipabbreviation text GENERATED ALWAYS AS (((((((
+CASE
+    WHEN (plsstownshipnumber = 0) THEN ''::text
+    ELSE (plsstownshipnumber)::text
+END || (
+CASE
+    WHEN ((plsstownshipfraction)::text = '2'::text) THEN '.5'::character varying
+    WHEN ((plsstownshipfraction)::text = '0'::text) THEN ''::character varying
+    ELSE plsstownshipfraction
+END)::text) || (
+CASE
+    WHEN ((plsstownshipdirection)::text = '0'::text) THEN ''::character varying
+    ELSE plsstownshipdirection
+END)::text) ||
+CASE
+    WHEN (NOT ((plssrangenumber = 0) AND ((plssrangefraction)::text = '0'::text) AND ((plssrangedirection)::text = '0'::text))) THEN (((' R'::text ||
+    CASE
+        WHEN (plssrangenumber = 0) THEN ''::text
+        ELSE (plssrangenumber)::text
+    END) || (
+    CASE
+        WHEN ((plssrangefraction)::text = '2'::text) THEN '.5'::character varying
+        WHEN ((plssrangefraction)::text = '0'::text) THEN ''::character varying
+        ELSE plssrangefraction
+    END)::text) || (
+    CASE
+        WHEN ((plssrangedirection)::text = '0'::text) THEN ''::character varying
+        ELSE plssrangedirection
+    END)::text)
+    ELSE ''::text
+END) ||
+CASE
+    WHEN ((plsstownshipduplicate)::text = '0'::text) THEN ''::text
+    ELSE (' '::text || (plsstownshipduplicate)::text)
+END) || ' '::text) || geohistory.plssmeridianshort(plssmeridian))) STORED
 );
 
 
@@ -10102,269 +7241,10 @@ ALTER TABLE ONLY gis.metesdescriptiongis
 
 
 --
--- Name: adjudicationextracache_adjudicationid_idx; Type: INDEX; Schema: extra; Owner: postgres
+-- Name: adjudication_adjudicationslug_idx; Type: INDEX; Schema: geohistory; Owner: postgres
 --
 
-CREATE INDEX adjudicationextracache_adjudicationid_idx ON extra.adjudicationextracache USING btree (adjudicationid);
-
-
---
--- Name: adjudicationextracache_adjudicationslug_idx; Type: INDEX; Schema: extra; Owner: postgres
---
-
-CREATE INDEX adjudicationextracache_adjudicationslug_idx ON extra.adjudicationextracache USING btree (adjudicationslug);
-
-
---
--- Name: adjudicationgovernmentcache_adjudicationid_idx; Type: INDEX; Schema: extra; Owner: postgres
---
-
-CREATE INDEX adjudicationgovernmentcache_adjudicationid_idx ON extra.adjudicationgovernmentcache USING btree (adjudicationid);
-
-
---
--- Name: adjudicationgovernmentcache_governmentrelationstate_idx; Type: INDEX; Schema: extra; Owner: postgres
---
-
-CREATE INDEX adjudicationgovernmentcache_governmentrelationstate_idx ON extra.adjudicationgovernmentcache USING btree (governmentrelationstate);
-
-
---
--- Name: adjudicationsourcecitationextracache_id_idx; Type: INDEX; Schema: extra; Owner: postgres
---
-
-CREATE INDEX adjudicationsourcecitationextracache_id_idx ON extra.adjudicationsourcecitationextracache USING btree (adjudicationsourcecitationid);
-
-
---
--- Name: adjudicationsourcecitationextracache_slug_idx; Type: INDEX; Schema: extra; Owner: postgres
---
-
-CREATE INDEX adjudicationsourcecitationextracache_slug_idx ON extra.adjudicationsourcecitationextracache USING btree (adjudicationsourcecitationslug);
-
-
---
--- Name: areagovernmentcache_governmentrelationstate_idx; Type: INDEX; Schema: extra; Owner: postgres
---
-
-CREATE INDEX areagovernmentcache_governmentrelationstate_idx ON extra.areagovernmentcache USING btree (governmentrelationstate);
-
-
---
--- Name: areagovernmentcache_governmentshapeid_idx; Type: INDEX; Schema: extra; Owner: postgres
---
-
-CREATE INDEX areagovernmentcache_governmentshapeid_idx ON extra.areagovernmentcache USING btree (governmentshapeid);
-
-
---
--- Name: eventgovernmentcache_eventid_idx; Type: INDEX; Schema: extra; Owner: postgres
---
-
-CREATE INDEX eventgovernmentcache_eventid_idx ON extra.eventgovernmentcache USING btree (eventid);
-
-
---
--- Name: eventgovernmentcache_government_idx; Type: INDEX; Schema: extra; Owner: postgres
---
-
-CREATE INDEX eventgovernmentcache_government_idx ON extra.eventgovernmentcache USING btree (government);
-
-
---
--- Name: giscache_geometry_idx; Type: INDEX; Schema: extra; Owner: postgres
---
-
-CREATE INDEX giscache_geometry_idx ON extra.giscache USING gist (geometry);
-
-
---
--- Name: governmentextracache_governmentid_idx; Type: INDEX; Schema: extra; Owner: postgres
---
-
-CREATE INDEX governmentextracache_governmentid_idx ON extra.governmentextracache USING btree (governmentid);
-
-
---
--- Name: governmentextracache_governmentslug_idx; Type: INDEX; Schema: extra; Owner: postgres
---
-
-CREATE INDEX governmentextracache_governmentslug_idx ON extra.governmentextracache USING btree (governmentslug);
-
-
---
--- Name: governmentparentcache_governmentid_idx; Type: INDEX; Schema: extra; Owner: postgres
---
-
-CREATE INDEX governmentparentcache_governmentid_idx ON extra.governmentparentcache USING btree (governmentid);
-
-
---
--- Name: governmentparentcache_governmentparent_idx; Type: INDEX; Schema: extra; Owner: postgres
---
-
-CREATE INDEX governmentparentcache_governmentparent_idx ON extra.governmentparentcache USING btree (governmentparent);
-
-
---
--- Name: governmentrelationcache_governmentid_idx; Type: INDEX; Schema: extra; Owner: postgres
---
-
-CREATE INDEX governmentrelationcache_governmentid_idx ON extra.governmentrelationcache USING btree (governmentid);
-
-
---
--- Name: governmentrelationcache_governmentrelation_idx; Type: INDEX; Schema: extra; Owner: postgres
---
-
-CREATE INDEX governmentrelationcache_governmentrelation_idx ON extra.governmentrelationcache USING btree (governmentrelation);
-
-
---
--- Name: governmentrelationcache_governmentrelationstate_idx; Type: INDEX; Schema: extra; Owner: postgres
---
-
-CREATE INDEX governmentrelationcache_governmentrelationstate_idx ON extra.governmentrelationcache USING btree (governmentrelationstate);
-
-
---
--- Name: governmentrelationcache_governmentshort_idx1; Type: INDEX; Schema: extra; Owner: postgres
---
-
-CREATE INDEX governmentrelationcache_governmentshort_idx1 ON extra.governmentrelationcache USING btree (governmentshort);
-
-
---
--- Name: governmentrelationcache_governmentshort_idx2; Type: INDEX; Schema: extra; Owner: postgres
---
-
-CREATE INDEX governmentrelationcache_governmentshort_idx2 ON extra.governmentrelationcache USING btree (extra.punctuationnone(governmentshort));
-
-
---
--- Name: governmentshapeextracache_governmentshapeid_idx; Type: INDEX; Schema: extra; Owner: postgres
---
-
-CREATE INDEX governmentshapeextracache_governmentshapeid_idx ON extra.governmentshapeextracache USING btree (governmentshapeid);
-
-
---
--- Name: governmentshapeextracache_governmentshapeslug_idx; Type: INDEX; Schema: extra; Owner: postgres
---
-
-CREATE INDEX governmentshapeextracache_governmentshapeslug_idx ON extra.governmentshapeextracache USING btree (governmentshapeslug);
-
-
---
--- Name: governmentsubstitutecache_governmentid_idx; Type: INDEX; Schema: extra; Owner: postgres
---
-
-CREATE INDEX governmentsubstitutecache_governmentid_idx ON extra.governmentsubstitutecache USING btree (governmentid);
-
-
---
--- Name: governmentsubstitutecache_governmentsubstitute_idx; Type: INDEX; Schema: extra; Owner: postgres
---
-
-CREATE INDEX governmentsubstitutecache_governmentsubstitute_idx ON extra.governmentsubstitutecache USING btree (governmentsubstitute);
-
-
---
--- Name: lawalternatesectionextracache_lawsectionid_idx; Type: INDEX; Schema: extra; Owner: postgres
---
-
-CREATE INDEX lawalternatesectionextracache_lawsectionid_idx ON extra.lawalternatesectionextracache USING btree (lawsectionid);
-
-
---
--- Name: lawalternatesectionextracache_lawsectionslug_idx; Type: INDEX; Schema: extra; Owner: postgres
---
-
-CREATE INDEX lawalternatesectionextracache_lawsectionslug_idx ON extra.lawalternatesectionextracache USING btree (lawsectionslug);
-
-
---
--- Name: lawsectionextracache_lawsectionid_idx; Type: INDEX; Schema: extra; Owner: postgres
---
-
-CREATE INDEX lawsectionextracache_lawsectionid_idx ON extra.lawsectionextracache USING btree (lawsectionid);
-
-
---
--- Name: lawsectionextracache_lawsectionslug_idx; Type: INDEX; Schema: extra; Owner: postgres
---
-
-CREATE INDEX lawsectionextracache_lawsectionslug_idx ON extra.lawsectionextracache USING btree (lawsectionslug);
-
-
---
--- Name: lawsectiongovernmentcache_governmentrelationstate_idx; Type: INDEX; Schema: extra; Owner: postgres
---
-
-CREATE INDEX lawsectiongovernmentcache_governmentrelationstate_idx ON extra.lawsectiongovernmentcache USING btree (governmentrelationstate);
-
-
---
--- Name: lawsectiongovernmentcache_lawsectionid_idx; Type: INDEX; Schema: extra; Owner: postgres
---
-
-CREATE INDEX lawsectiongovernmentcache_lawsectionid_idx ON extra.lawsectiongovernmentcache USING btree (lawsectionid);
-
-
---
--- Name: metesdescriptionextracache_metesdescriptionid_idx; Type: INDEX; Schema: extra; Owner: postgres
---
-
-CREATE INDEX metesdescriptionextracache_metesdescriptionid_idx ON extra.metesdescriptionextracache USING btree (metesdescriptionid);
-
-
---
--- Name: metesdescriptionextracache_metesdescriptionslug_idx; Type: INDEX; Schema: extra; Owner: postgres
---
-
-CREATE INDEX metesdescriptionextracache_metesdescriptionslug_idx ON extra.metesdescriptionextracache USING btree (metesdescriptionslug);
-
-
---
--- Name: sourcecitationextracache_sourcecitationid_idx; Type: INDEX; Schema: extra; Owner: postgres
---
-
-CREATE INDEX sourcecitationextracache_sourcecitationid_idx ON extra.sourcecitationextracache USING btree (sourcecitationid);
-
-
---
--- Name: sourcecitationextracache_sourcecitationslug_idx; Type: INDEX; Schema: extra; Owner: postgres
---
-
-CREATE INDEX sourcecitationextracache_sourcecitationslug_idx ON extra.sourcecitationextracache USING btree (sourcecitationslug);
-
-
---
--- Name: sourcecitationgovernmentcache_governmentrelationstate_idx; Type: INDEX; Schema: extra; Owner: postgres
---
-
-CREATE INDEX sourcecitationgovernmentcache_governmentrelationstate_idx ON extra.sourcecitationgovernmentcache USING btree (governmentrelationstate);
-
-
---
--- Name: sourcecitationgovernmentcache_sourcecitationid_idx; Type: INDEX; Schema: extra; Owner: postgres
---
-
-CREATE INDEX sourcecitationgovernmentcache_sourcecitationid_idx ON extra.sourcecitationgovernmentcache USING btree (sourcecitationid);
-
-
---
--- Name: tribunalgovernmentcache_governmentrelationstate_idx; Type: INDEX; Schema: extra; Owner: postgres
---
-
-CREATE INDEX tribunalgovernmentcache_governmentrelationstate_idx ON extra.tribunalgovernmentcache USING btree (governmentrelationstate);
-
-
---
--- Name: tribunalgovernmentcache_tribunalid_idx; Type: INDEX; Schema: extra; Owner: postgres
---
-
-CREATE INDEX tribunalgovernmentcache_tribunalid_idx ON extra.tribunalgovernmentcache USING btree (tribunalid);
+CREATE INDEX adjudication_adjudicationslug_idx ON geohistory.adjudication USING btree (adjudicationslug) WITH (deduplicate_items='true');
 
 
 --
@@ -10414,6 +7294,13 @@ CREATE INDEX adjudicationlocationtype_tribunal_idx ON geohistory.adjudicationloc
 --
 
 CREATE INDEX adjudicationsourcecitation_adjudication_idx ON geohistory.adjudicationsourcecitation USING btree (adjudication);
+
+
+--
+-- Name: adjudicationsourcecitation_adjudicationsourcecitationslug_idx; Type: INDEX; Schema: geohistory; Owner: postgres
+--
+
+CREATE INDEX adjudicationsourcecitation_adjudicationsourcecitationslug_idx ON geohistory.adjudicationsourcecitation USING btree (adjudicationsourcecitationslug) WITH (deduplicate_items='true');
 
 
 --
@@ -10613,6 +7500,13 @@ CREATE INDEX fki_sourcecitationnote_sourcecitationnotetype_fk ON geohistory.sour
 
 
 --
+-- Name: government_governmentabbreviation_idx; Type: INDEX; Schema: geohistory; Owner: postgres
+--
+
+CREATE INDEX government_governmentabbreviation_idx ON geohistory.government USING btree (governmentabbreviation) WITH (deduplicate_items='true');
+
+
+--
 -- Name: government_governmentcurrentleadparent_idx; Type: INDEX; Schema: geohistory; Owner: postgres
 --
 
@@ -10631,6 +7525,27 @@ CREATE INDEX government_governmentlevel_idx ON geohistory.government USING btree
 --
 
 CREATE INDEX government_governmentname_idx ON geohistory.government USING btree (governmentname);
+
+
+--
+-- Name: government_governmentsearch_idx; Type: INDEX; Schema: geohistory; Owner: postgres
+--
+
+CREATE INDEX government_governmentsearch_idx ON geohistory.government USING btree (governmentsearch) WITH (deduplicate_items='true');
+
+
+--
+-- Name: government_governmentshort_idx; Type: INDEX; Schema: geohistory; Owner: postgres
+--
+
+CREATE INDEX government_governmentshort_idx ON geohistory.government USING btree (governmentshort) WITH (deduplicate_items='true');
+
+
+--
+-- Name: government_governmentslugsubstitute_idx; Type: INDEX; Schema: geohistory; Owner: postgres
+--
+
+CREATE INDEX government_governmentslugsubstitute_idx ON geohistory.government USING btree (governmentslugsubstitute) WITH (deduplicate_items='true');
 
 
 --
@@ -10739,6 +7654,20 @@ CREATE INDEX lawalternatesection_lawalternate_idx ON geohistory.lawalternatesect
 
 
 --
+-- Name: lawalternatesection_lawalternatesectioncitation_idx; Type: INDEX; Schema: geohistory; Owner: postgres
+--
+
+CREATE INDEX lawalternatesection_lawalternatesectioncitation_idx ON geohistory.lawalternatesection USING btree (lawalternatesectioncitation) WITH (deduplicate_items='true');
+
+
+--
+-- Name: lawalternatesection_lawalternatesectionslug_idx; Type: INDEX; Schema: geohistory; Owner: postgres
+--
+
+CREATE INDEX lawalternatesection_lawalternatesectionslug_idx ON geohistory.lawalternatesection USING btree (lawalternatesectionslug) WITH (deduplicate_items='true');
+
+
+--
 -- Name: lawalternatesection_lawsection_idx; Type: INDEX; Schema: geohistory; Owner: postgres
 --
 
@@ -10788,10 +7717,24 @@ CREATE INDEX lawsection_lawsectionamend_idx ON geohistory.lawsection USING btree
 
 
 --
+-- Name: lawsection_lawsectioncitation_idx; Type: INDEX; Schema: geohistory; Owner: postgres
+--
+
+CREATE INDEX lawsection_lawsectioncitation_idx ON geohistory.lawsection USING btree (lawsectioncitation) WITH (deduplicate_items='true');
+
+
+--
 -- Name: lawsection_lawsectionnewlaw_idx; Type: INDEX; Schema: geohistory; Owner: postgres
 --
 
 CREATE INDEX lawsection_lawsectionnewlaw_idx ON geohistory.lawsection USING btree (lawsectionnewlaw);
+
+
+--
+-- Name: lawsection_lawsectionslug_idx; Type: INDEX; Schema: geohistory; Owner: postgres
+--
+
+CREATE INDEX lawsection_lawsectionslug_idx ON geohistory.lawsection USING btree (lawsectionslug) WITH (deduplicate_items='true');
 
 
 --
@@ -10820,6 +7763,13 @@ CREATE INDEX lawsectionevent_lawsection_idx ON geohistory.lawsectionevent USING 
 --
 
 CREATE INDEX metesdescription_event_idx ON geohistory.metesdescription USING btree (event);
+
+
+--
+-- Name: metesdescription_metesdescriptionslug_idx; Type: INDEX; Schema: geohistory; Owner: postgres
+--
+
+CREATE INDEX metesdescription_metesdescriptionslug_idx ON geohistory.metesdescription USING btree (metesdescriptionslug) WITH (deduplicate_items='true');
 
 
 --
@@ -10935,6 +7885,13 @@ CREATE INDEX sourcecitation_source_idx ON geohistory.sourcecitation USING btree 
 
 
 --
+-- Name: sourcecitation_sourcecitationslug_idx; Type: INDEX; Schema: geohistory; Owner: postgres
+--
+
+CREATE INDEX sourcecitation_sourcecitationslug_idx ON geohistory.sourcecitation USING btree (sourcecitationslug) WITH (deduplicate_items='true');
+
+
+--
 -- Name: sourcecitationevent_event_idx; Type: INDEX; Schema: geohistory; Owner: postgres
 --
 
@@ -10984,6 +7941,13 @@ CREATE INDEX fki_governmentshape_governmentshapeplsstownship_fk ON gis.governmen
 
 
 --
+-- Name: governmentshape_governmentshapeslug_idx; Type: INDEX; Schema: gis; Owner: postgres
+--
+
+CREATE INDEX governmentshape_governmentshapeslug_idx ON gis.governmentshape USING btree (governmentshapeslug) WITH (deduplicate_items='true');
+
+
+--
 -- Name: governmentshape_idx; Type: INDEX; Schema: gis; Owner: postgres
 --
 
@@ -10995,6 +7959,13 @@ CREATE INDEX governmentshape_idx ON gis.governmentshape USING gist (governmentsh
 --
 
 CREATE INDEX governmentshape_municipality_idx ON gis.governmentshape USING btree (governmentsubmunicipality, governmentmunicipality);
+
+
+--
+-- Name: governmentshapecache_geometry_idx; Type: INDEX; Schema: gis; Owner: postgres
+--
+
+CREATE INDEX governmentshapecache_geometry_idx ON gis.governmentshapecache USING gist (geometry);
 
 
 --
@@ -12016,13 +8987,6 @@ ALTER TABLE ONLY gis.metesdescriptiongis
 
 
 --
--- Name: SCHEMA extra; Type: ACL; Schema: -; Owner: postgres
---
-
-GRANT USAGE ON SCHEMA extra TO readonly;
-
-
---
 -- Name: SCHEMA geohistory; Type: ACL; Schema: -; Owner: postgres
 --
 
@@ -12037,496 +9001,39 @@ GRANT USAGE ON SCHEMA gis TO readonly;
 
 
 --
--- Name: FUNCTION affectedtypeshort(integer); Type: ACL; Schema: extra; Owner: postgres
+-- Name: FUNCTION adjudicationtypegovernmentshort(i_id integer); Type: ACL; Schema: geohistory; Owner: postgres
 --
 
-REVOKE ALL ON FUNCTION extra.affectedtypeshort(integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION extra.affectedtypeshort(integer) TO readonly;
+REVOKE ALL ON FUNCTION geohistory.adjudicationtypegovernmentshort(i_id integer) FROM PUBLIC;
 
 
 --
--- Name: FUNCTION array_combine(integer[]); Type: ACL; Schema: extra; Owner: postgres
+-- Name: FUNCTION adjudicationtypegovernmentslug(i_id integer); Type: ACL; Schema: geohistory; Owner: postgres
 --
 
-REVOKE ALL ON FUNCTION extra.array_combine(integer[]) FROM PUBLIC;
-GRANT ALL ON FUNCTION extra.array_combine(integer[]) TO readonly;
+REVOKE ALL ON FUNCTION geohistory.adjudicationtypegovernmentslug(i_id integer) FROM PUBLIC;
 
 
 --
--- Name: FUNCTION emptytonull(text); Type: ACL; Schema: extra; Owner: postgres
+-- Name: FUNCTION adjudicationtypelong(i_id integer); Type: ACL; Schema: geohistory; Owner: postgres
 --
 
-REVOKE ALL ON FUNCTION extra.emptytonull(text) FROM PUBLIC;
-GRANT ALL ON FUNCTION extra.emptytonull(text) TO readonly;
+REVOKE ALL ON FUNCTION geohistory.adjudicationtypelong(i_id integer) FROM PUBLIC;
 
 
 --
--- Name: FUNCTION eventeffectivetype(integer); Type: ACL; Schema: extra; Owner: postgres
+-- Name: FUNCTION adjudicationtypetribunaltypesummary(i_id integer); Type: ACL; Schema: geohistory; Owner: postgres
 --
 
-REVOKE ALL ON FUNCTION extra.eventeffectivetype(integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION extra.eventeffectivetype(integer) TO readonly;
+REVOKE ALL ON FUNCTION geohistory.adjudicationtypetribunaltypesummary(i_id integer) FROM PUBLIC;
 
 
 --
--- Name: FUNCTION eventeffectivetype(eventeffectivetypegroup character varying, eventeffectivetypequalifier character varying); Type: ACL; Schema: extra; Owner: postgres
+-- Name: FUNCTION array_combine(integer[]); Type: ACL; Schema: geohistory; Owner: postgres
 --
 
-REVOKE ALL ON FUNCTION extra.eventeffectivetype(eventeffectivetypegroup character varying, eventeffectivetypequalifier character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION extra.eventeffectivetype(eventeffectivetypegroup character varying, eventeffectivetypequalifier character varying) TO readonly;
-
-
---
--- Name: FUNCTION fulldate(text); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.fulldate(text) FROM PUBLIC;
-GRANT ALL ON FUNCTION extra.fulldate(text) TO readonly;
-
-
---
--- Name: FUNCTION governmentabbreviation(integer); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.governmentabbreviation(integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION extra.governmentabbreviation(integer) TO readonly;
-
-
---
--- Name: FUNCTION governmentabbreviation(integer, character varying); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.governmentabbreviation(integer, character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION extra.governmentabbreviation(integer, character varying) TO readonly;
-
-
---
--- Name: FUNCTION governmentabbreviationid(text); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.governmentabbreviationid(text) FROM PUBLIC;
-GRANT ALL ON FUNCTION extra.governmentabbreviationid(text) TO readonly;
-
-
---
--- Name: FUNCTION governmentcurrentleadparent(integer); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.governmentcurrentleadparent(integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION extra.governmentcurrentleadparent(integer) TO readonly;
-
-
---
--- Name: FUNCTION governmentcurrentleadstateid(integer); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.governmentcurrentleadstateid(integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION extra.governmentcurrentleadstateid(integer) TO readonly;
-
-
---
--- Name: FUNCTION governmentformlong(integer); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.governmentformlong(integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION extra.governmentformlong(integer) TO readonly;
-
-
---
--- Name: FUNCTION governmentformlong(integer, boolean); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.governmentformlong(integer, boolean) FROM PUBLIC;
-GRANT ALL ON FUNCTION extra.governmentformlong(integer, boolean) TO readonly;
-
-
---
--- Name: FUNCTION governmentformlongreport(integer); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.governmentformlongreport(integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION extra.governmentformlongreport(integer) TO readonly;
-
-
---
--- Name: FUNCTION governmentindigobook(integer); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.governmentindigobook(integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION extra.governmentindigobook(integer) TO readonly;
-
-
---
--- Name: FUNCTION governmentindigobook(integer, character varying); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.governmentindigobook(integer, character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION extra.governmentindigobook(integer, character varying) TO readonly;
-
-
---
--- Name: FUNCTION governmentlevel(integer); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.governmentlevel(integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION extra.governmentlevel(integer) TO readonly;
-
-
---
--- Name: FUNCTION governmentlong(integer); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.governmentlong(integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION extra.governmentlong(integer) TO readonly;
-
-
---
--- Name: FUNCTION governmentlong(integer, character varying); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.governmentlong(integer, character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION extra.governmentlong(integer, character varying) TO readonly;
-
-
---
--- Name: FUNCTION governmentname(integer); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.governmentname(integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION extra.governmentname(integer) TO readonly;
-
-
---
--- Name: FUNCTION governmentshapeslugid(text); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.governmentshapeslugid(text) FROM PUBLIC;
-GRANT ALL ON FUNCTION extra.governmentshapeslugid(text) TO readonly;
-
-
---
--- Name: FUNCTION governmentshort(integer); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.governmentshort(integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION extra.governmentshort(integer) TO readonly;
-
-
---
--- Name: FUNCTION governmentshort(integer, character varying); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.governmentshort(integer, character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION extra.governmentshort(integer, character varying) TO readonly;
-
-
---
--- Name: FUNCTION governmentslug(integer); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.governmentslug(integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION extra.governmentslug(integer) TO readonly;
-
-
---
--- Name: FUNCTION governmentslugalternate(integer); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.governmentslugalternate(integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION extra.governmentslugalternate(integer) TO readonly;
-
-
---
--- Name: FUNCTION governmentstate(integer); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.governmentstate(integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION extra.governmentstate(integer) TO readonly;
-
-
---
--- Name: FUNCTION governmentstatelink(integer); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.governmentstatelink(integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION extra.governmentstatelink(integer) TO readonly;
-
-
---
--- Name: FUNCTION governmentstatelink(v_governmentid integer, v_state character varying, v_locale character varying); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.governmentstatelink(v_governmentid integer, v_state character varying, v_locale character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION extra.governmentstatelink(v_governmentid integer, v_state character varying, v_locale character varying) TO readonly;
-
-
---
--- Name: FUNCTION governmentstatus(integer); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.governmentstatus(integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION extra.governmentstatus(integer) TO readonly;
-
-
---
--- Name: FUNCTION governmentsubstitutedcache(integer); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.governmentsubstitutedcache(integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION extra.governmentsubstitutedcache(integer) TO readonly;
-
-
---
--- Name: FUNCTION governmenttype(integer); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.governmenttype(integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION extra.governmenttype(integer) TO readonly;
-
-
---
--- Name: FUNCTION lawalternatecitation(integer); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.lawalternatecitation(integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION extra.lawalternatecitation(integer) TO readonly;
-
-
---
--- Name: FUNCTION lawalternatecitation(integer, boolean); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.lawalternatecitation(integer, boolean) FROM PUBLIC;
-GRANT ALL ON FUNCTION extra.lawalternatecitation(integer, boolean) TO readonly;
-
-
---
--- Name: FUNCTION lawalternatesectioncitation(integer); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.lawalternatesectioncitation(integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION extra.lawalternatesectioncitation(integer) TO readonly;
-
-
---
--- Name: FUNCTION lawalternatesectioncitation(integer, boolean); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.lawalternatesectioncitation(integer, boolean) FROM PUBLIC;
-GRANT ALL ON FUNCTION extra.lawalternatesectioncitation(integer, boolean) TO readonly;
-
-
---
--- Name: FUNCTION lawalternatesectionslug(integer); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.lawalternatesectionslug(integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION extra.lawalternatesectionslug(integer) TO readonly;
-
-
---
--- Name: FUNCTION lawcitation(integer); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.lawcitation(integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION extra.lawcitation(integer) TO readonly;
-
-
---
--- Name: FUNCTION lawcitation(integer, boolean); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.lawcitation(integer, boolean) FROM PUBLIC;
-GRANT ALL ON FUNCTION extra.lawcitation(integer, boolean) TO readonly;
-
-
---
--- Name: FUNCTION lawsectioncitation(integer); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.lawsectioncitation(integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION extra.lawsectioncitation(integer) TO readonly;
-
-
---
--- Name: FUNCTION lawsectioncitation(integer, boolean); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.lawsectioncitation(integer, boolean) FROM PUBLIC;
-GRANT ALL ON FUNCTION extra.lawsectioncitation(integer, boolean) TO readonly;
-
-
---
--- Name: FUNCTION lawsectionslug(integer); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.lawsectionslug(integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION extra.lawsectionslug(integer) TO readonly;
-
-
---
--- Name: FUNCTION metesdescriptionlong(integer); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.metesdescriptionlong(integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION extra.metesdescriptionlong(integer) TO readonly;
-
-
---
--- Name: FUNCTION metesdescriptionslug(integer); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.metesdescriptionslug(integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION extra.metesdescriptionslug(integer) TO readonly;
-
-
---
--- Name: FUNCTION plsstownshiplong(integer); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.plsstownshiplong(integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION extra.plsstownshiplong(integer) TO readonly;
-
-
---
--- Name: FUNCTION plsstownshipshort(integer); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.plsstownshipshort(integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION extra.plsstownshipshort(integer) TO readonly;
-
-
---
--- Name: FUNCTION punctuationhyphen(text); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.punctuationhyphen(text) FROM PUBLIC;
-GRANT ALL ON FUNCTION extra.punctuationhyphen(text) TO readonly;
-
-
---
--- Name: FUNCTION punctuationnone(text); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.punctuationnone(text) FROM PUBLIC;
-GRANT ALL ON FUNCTION extra.punctuationnone(text) TO readonly;
-
-
---
--- Name: FUNCTION punctuationnonefuzzy(text); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.punctuationnonefuzzy(text) FROM PUBLIC;
-GRANT ALL ON FUNCTION extra.punctuationnonefuzzy(text) TO readonly;
-
-
---
--- Name: FUNCTION rangefix(text, text); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.rangefix(text, text) FROM PUBLIC;
-GRANT ALL ON FUNCTION extra.rangefix(text, text) TO readonly;
-
-
---
--- Name: FUNCTION refresh_sequence(); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.refresh_sequence() FROM PUBLIC;
-
-
---
--- Name: FUNCTION refresh_view_long(); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.refresh_view_long() FROM PUBLIC;
-
-
---
--- Name: FUNCTION refresh_view_quick(); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.refresh_view_quick() FROM PUBLIC;
-
-
---
--- Name: FUNCTION shortdate(text); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.shortdate(text) FROM PUBLIC;
-GRANT ALL ON FUNCTION extra.shortdate(text) TO readonly;
-
-
---
--- Name: FUNCTION sourceurlid(integer); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.sourceurlid(integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION extra.sourceurlid(integer) TO readonly;
-
-
---
--- Name: FUNCTION tribunalfilingoffice(integer); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.tribunalfilingoffice(integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION extra.tribunalfilingoffice(integer) TO readonly;
-
-
---
--- Name: FUNCTION tribunalgovernmentshort(integer); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.tribunalgovernmentshort(integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION extra.tribunalgovernmentshort(integer) TO readonly;
-
-
---
--- Name: FUNCTION tribunalgovernmentshort(integer, character varying); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.tribunalgovernmentshort(integer, character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION extra.tribunalgovernmentshort(integer, character varying) TO readonly;
-
-
---
--- Name: FUNCTION tribunalgovernmentshort(integer, character varying, boolean); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.tribunalgovernmentshort(integer, character varying, boolean) FROM PUBLIC;
-GRANT ALL ON FUNCTION extra.tribunalgovernmentshort(integer, character varying, boolean) TO readonly;
-
-
---
--- Name: FUNCTION tribunallong(integer); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.tribunallong(integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION extra.tribunallong(integer) TO readonly;
-
-
---
--- Name: FUNCTION tribunalshort(integer); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.tribunalshort(integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION extra.tribunalshort(integer) TO readonly;
-
-
---
--- Name: FUNCTION tribunalshort(integer, character varying); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.tribunalshort(integer, character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION extra.tribunalshort(integer, character varying) TO readonly;
-
-
---
--- Name: FUNCTION tribunalshort(integer, integer, character varying); Type: ACL; Schema: extra; Owner: postgres
---
-
-REVOKE ALL ON FUNCTION extra.tribunalshort(integer, integer, character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION extra.tribunalshort(integer, integer, character varying) TO readonly;
+REVOKE ALL ON FUNCTION geohistory.array_combine(integer[]) FROM PUBLIC;
+GRANT ALL ON FUNCTION geohistory.array_combine(integer[]) TO readonly;
 
 
 --
@@ -12534,7 +9041,28 @@ GRANT ALL ON FUNCTION extra.tribunalshort(integer, integer, character varying) T
 --
 
 REVOKE ALL ON FUNCTION geohistory.datetonumeric(date) FROM PUBLIC;
-GRANT ALL ON FUNCTION geohistory.datetonumeric(date) TO readonly;
+
+
+--
+-- Name: FUNCTION emptytonull(text); Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+REVOKE ALL ON FUNCTION geohistory.emptytonull(text) FROM PUBLIC;
+GRANT ALL ON FUNCTION geohistory.emptytonull(text) TO readonly;
+
+
+--
+-- Name: FUNCTION eventlong(i_id integer); Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+REVOKE ALL ON FUNCTION geohistory.eventlong(i_id integer) FROM PUBLIC;
+
+
+--
+-- Name: FUNCTION eventslug(i_id integer); Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+REVOKE ALL ON FUNCTION geohistory.eventslug(i_id integer) FROM PUBLIC;
 
 
 --
@@ -12545,10 +9073,52 @@ REVOKE ALL ON FUNCTION geohistory.government_insertupdate() FROM PUBLIC;
 
 
 --
+-- Name: FUNCTION governmentcurrentleadstate(i_id integer, i_level integer); Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+REVOKE ALL ON FUNCTION geohistory.governmentcurrentleadstate(i_id integer, i_level integer) FROM PUBLIC;
+
+
+--
+-- Name: FUNCTION governmentcurrentleadstateid(i_id integer, i_level integer); Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+REVOKE ALL ON FUNCTION geohistory.governmentcurrentleadstateid(i_id integer, i_level integer) FROM PUBLIC;
+
+
+--
+-- Name: FUNCTION governmentname(i_id integer); Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+REVOKE ALL ON FUNCTION geohistory.governmentname(i_id integer) FROM PUBLIC;
+
+
+--
 -- Name: FUNCTION governmentothercurrentparent_insertupdate(); Type: ACL; Schema: geohistory; Owner: postgres
 --
 
 REVOKE ALL ON FUNCTION geohistory.governmentothercurrentparent_insertupdate() FROM PUBLIC;
+
+
+--
+-- Name: FUNCTION governmentslug(i_id integer); Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+REVOKE ALL ON FUNCTION geohistory.governmentslug(i_id integer) FROM PUBLIC;
+
+
+--
+-- Name: FUNCTION governmentslugsubstitute(i_id integer, i_level integer); Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+REVOKE ALL ON FUNCTION geohistory.governmentslugsubstitute(i_id integer, i_level integer) FROM PUBLIC;
+
+
+--
+-- Name: FUNCTION implode(text[]); Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+REVOKE ALL ON FUNCTION geohistory.implode(text[]) FROM PUBLIC;
 
 
 --
@@ -12566,10 +9136,38 @@ REVOKE ALL ON FUNCTION geohistory.lawalternate_update() FROM PUBLIC;
 
 
 --
+-- Name: FUNCTION lawalternatecitation(i_id integer); Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+REVOKE ALL ON FUNCTION geohistory.lawalternatecitation(i_id integer) FROM PUBLIC;
+
+
+--
 -- Name: FUNCTION lawalternatesection_insertupdate(); Type: ACL; Schema: geohistory; Owner: postgres
 --
 
 REVOKE ALL ON FUNCTION geohistory.lawalternatesection_insertupdate() FROM PUBLIC;
+
+
+--
+-- Name: FUNCTION lawalternateslug(i_id integer); Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+REVOKE ALL ON FUNCTION geohistory.lawalternateslug(i_id integer) FROM PUBLIC;
+
+
+--
+-- Name: FUNCTION lawapproved(i_id integer); Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+REVOKE ALL ON FUNCTION geohistory.lawapproved(i_id integer) FROM PUBLIC;
+
+
+--
+-- Name: FUNCTION lawcitation(i_id integer); Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+REVOKE ALL ON FUNCTION geohistory.lawcitation(i_id integer) FROM PUBLIC;
 
 
 --
@@ -12594,6 +9192,34 @@ REVOKE ALL ON FUNCTION geohistory.lawsectionevent_insertupdate() FROM PUBLIC;
 
 
 --
+-- Name: FUNCTION lawsectionfrom(i_id integer); Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+REVOKE ALL ON FUNCTION geohistory.lawsectionfrom(i_id integer) FROM PUBLIC;
+
+
+--
+-- Name: FUNCTION lawsectionsymbol(i_id integer); Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+REVOKE ALL ON FUNCTION geohistory.lawsectionsymbol(i_id integer) FROM PUBLIC;
+
+
+--
+-- Name: FUNCTION lawsectionto(i_id integer); Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+REVOKE ALL ON FUNCTION geohistory.lawsectionto(i_id integer) FROM PUBLIC;
+
+
+--
+-- Name: FUNCTION lawslug(i_id integer); Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+REVOKE ALL ON FUNCTION geohistory.lawslug(i_id integer) FROM PUBLIC;
+
+
+--
 -- Name: FUNCTION metesdescriptionline_insertupdate(); Type: ACL; Schema: geohistory; Owner: postgres
 --
 
@@ -12601,11 +9227,47 @@ REVOKE ALL ON FUNCTION geohistory.metesdescriptionline_insertupdate() FROM PUBLI
 
 
 --
+-- Name: FUNCTION plssmeridianlong(i_id integer); Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+REVOKE ALL ON FUNCTION geohistory.plssmeridianlong(i_id integer) FROM PUBLIC;
+GRANT ALL ON FUNCTION geohistory.plssmeridianlong(i_id integer) TO readonly;
+
+
+--
+-- Name: FUNCTION plssmeridianshort(i_id integer); Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+REVOKE ALL ON FUNCTION geohistory.plssmeridianshort(i_id integer) FROM PUBLIC;
+
+
+--
+-- Name: FUNCTION punctuationnone(text); Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+REVOKE ALL ON FUNCTION geohistory.punctuationnone(text) FROM PUBLIC;
+
+
+--
+-- Name: FUNCTION punctuationnonefuzzy(text); Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+REVOKE ALL ON FUNCTION geohistory.punctuationnonefuzzy(text) FROM PUBLIC;
+GRANT ALL ON FUNCTION geohistory.punctuationnonefuzzy(text) TO readonly;
+
+
+--
 -- Name: FUNCTION rangeformat(text, text); Type: ACL; Schema: geohistory; Owner: postgres
 --
 
 REVOKE ALL ON FUNCTION geohistory.rangeformat(text, text) FROM PUBLIC;
-GRANT ALL ON FUNCTION geohistory.rangeformat(text, text) TO readonly;
+
+
+--
+-- Name: FUNCTION refresh_view(); Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+REVOKE ALL ON FUNCTION geohistory.refresh_view() FROM PUBLIC;
 
 
 --
@@ -12620,6 +9282,34 @@ REVOKE ALL ON FUNCTION geohistory.source_insert() FROM PUBLIC;
 --
 
 REVOKE ALL ON FUNCTION geohistory.source_update() FROM PUBLIC;
+
+
+--
+-- Name: FUNCTION sourcelawhasspecialsession(i_id integer); Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+REVOKE ALL ON FUNCTION geohistory.sourcelawhasspecialsession(i_id integer) FROM PUBLIC;
+
+
+--
+-- Name: FUNCTION sourcelawisbynumber(i_id integer); Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+REVOKE ALL ON FUNCTION geohistory.sourcelawisbynumber(i_id integer) FROM PUBLIC;
+
+
+--
+-- Name: FUNCTION sourcelawtype(i_id integer); Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+REVOKE ALL ON FUNCTION geohistory.sourcelawtype(i_id integer) FROM PUBLIC;
+
+
+--
+-- Name: FUNCTION sourceshort(i_id integer); Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+REVOKE ALL ON FUNCTION geohistory.sourceshort(i_id integer) FROM PUBLIC;
 
 
 --
@@ -12644,10 +9334,24 @@ REVOKE ALL ON FUNCTION gis.governmentshape_insert() FROM PUBLIC;
 
 
 --
--- Name: TABLE adjudication; Type: ACL; Schema: geohistory; Owner: postgres
+-- Name: FUNCTION refresh_sequence(); Type: ACL; Schema: gis; Owner: postgres
 --
 
-GRANT SELECT ON TABLE geohistory.adjudication TO readonly;
+REVOKE ALL ON FUNCTION gis.refresh_sequence() FROM PUBLIC;
+
+
+--
+-- Name: FUNCTION refresh_view(); Type: ACL; Schema: gis; Owner: postgres
+--
+
+REVOKE ALL ON FUNCTION gis.refresh_view() FROM PUBLIC;
+
+
+--
+-- Name: TABLE adjudicationlocationtype; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.adjudicationlocationtype TO readonly;
 
 
 --
@@ -12665,45 +9369,10 @@ GRANT SELECT ON TABLE geohistory.tribunal TO readonly;
 
 
 --
--- Name: TABLE tribunaltype; Type: ACL; Schema: geohistory; Owner: postgres
+-- Name: TABLE adjudication; Type: ACL; Schema: geohistory; Owner: postgres
 --
 
-GRANT SELECT ON TABLE geohistory.tribunaltype TO readonly;
-
-
---
--- Name: TABLE adjudicationextra; Type: ACL; Schema: extra; Owner: postgres
---
-
-GRANT SELECT ON TABLE extra.adjudicationextra TO readonly;
-
-
---
--- Name: TABLE adjudicationextracache; Type: ACL; Schema: extra; Owner: postgres
---
-
-GRANT SELECT ON TABLE extra.adjudicationextracache TO readonly;
-
-
---
--- Name: TABLE government; Type: ACL; Schema: geohistory; Owner: postgres
---
-
-GRANT SELECT ON TABLE geohistory.government TO readonly;
-
-
---
--- Name: TABLE governmentsubstitute; Type: ACL; Schema: extra; Owner: postgres
---
-
-GRANT SELECT ON TABLE extra.governmentsubstitute TO readonly;
-
-
---
--- Name: TABLE adjudicationevent; Type: ACL; Schema: geohistory; Owner: postgres
---
-
-GRANT SELECT ON TABLE geohistory.adjudicationevent TO readonly;
+GRANT SELECT ON TABLE geohistory.adjudication TO readonly;
 
 
 --
@@ -12711,13 +9380,6 @@ GRANT SELECT ON TABLE geohistory.adjudicationevent TO readonly;
 --
 
 GRANT SELECT ON TABLE geohistory.adjudicationlocation TO readonly;
-
-
---
--- Name: TABLE adjudicationlocationtype; Type: ACL; Schema: geohistory; Owner: postgres
---
-
-GRANT SELECT ON TABLE geohistory.adjudicationlocationtype TO readonly;
 
 
 --
@@ -12735,6 +9397,13 @@ GRANT SELECT ON TABLE geohistory.affectedgovernmentgrouppart TO readonly;
 
 
 --
+-- Name: TABLE affectedgovernmentlevel; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.affectedgovernmentlevel TO readonly;
+
+
+--
 -- Name: TABLE affectedgovernmentpart; Type: ACL; Schema: geohistory; Owner: postgres
 --
 
@@ -12742,10 +9411,10 @@ GRANT SELECT ON TABLE geohistory.affectedgovernmentpart TO readonly;
 
 
 --
--- Name: TABLE currentgovernment; Type: ACL; Schema: geohistory; Owner: postgres
+-- Name: TABLE affectedtype; Type: ACL; Schema: geohistory; Owner: postgres
 --
 
-GRANT SELECT ON TABLE geohistory.currentgovernment TO readonly;
+GRANT SELECT ON TABLE geohistory.affectedtype TO readonly;
 
 
 --
@@ -12753,6 +9422,76 @@ GRANT SELECT ON TABLE geohistory.currentgovernment TO readonly;
 --
 
 GRANT SELECT ON TABLE geohistory.event TO readonly;
+
+
+--
+-- Name: TABLE eventgranted; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.eventgranted TO readonly;
+
+
+--
+-- Name: TABLE eventtype; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.eventtype TO readonly;
+
+
+--
+-- Name: TABLE governmentform; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.governmentform TO readonly;
+
+
+--
+-- Name: TABLE government; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.government TO readonly;
+
+
+--
+-- Name: TABLE governmentmapstatus; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.governmentmapstatus TO readonly;
+
+
+--
+-- Name: TABLE affectedgovernmentgis; Type: ACL; Schema: gis; Owner: postgres
+--
+
+GRANT SELECT ON TABLE gis.affectedgovernmentgis TO readonly;
+
+
+--
+-- Name: TABLE governmentshape; Type: ACL; Schema: gis; Owner: postgres
+--
+
+GRANT SELECT ON TABLE gis.governmentshape TO readonly;
+
+
+--
+-- Name: TABLE governmentshapecache; Type: ACL; Schema: gis; Owner: postgres
+--
+
+GRANT SELECT ON TABLE gis.governmentshapecache TO readonly;
+
+
+--
+-- Name: TABLE adjudicationevent; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.adjudicationevent TO readonly;
+
+
+--
+-- Name: TABLE currentgovernment; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.currentgovernment TO readonly;
 
 
 --
@@ -12805,248 +9544,10 @@ GRANT SELECT ON TABLE geohistory.sourcegovernment TO readonly;
 
 
 --
--- Name: TABLE affectedgovernmentgis; Type: ACL; Schema: gis; Owner: postgres
---
-
-GRANT SELECT ON TABLE gis.affectedgovernmentgis TO readonly;
-
-
---
--- Name: TABLE governmentshape; Type: ACL; Schema: gis; Owner: postgres
---
-
-GRANT SELECT ON TABLE gis.governmentshape TO readonly;
-
-
---
 -- Name: TABLE metesdescriptiongis; Type: ACL; Schema: gis; Owner: postgres
 --
 
 GRANT SELECT ON TABLE gis.metesdescriptiongis TO readonly;
-
-
---
--- Name: TABLE eventgovernment; Type: ACL; Schema: extra; Owner: postgres
---
-
-GRANT SELECT ON TABLE extra.eventgovernment TO readonly;
-
-
---
--- Name: TABLE affectedgovernmentlevel; Type: ACL; Schema: geohistory; Owner: postgres
---
-
-GRANT SELECT ON TABLE geohistory.affectedgovernmentlevel TO readonly;
-
-
---
--- Name: TABLE eventgranted; Type: ACL; Schema: geohistory; Owner: postgres
---
-
-GRANT SELECT ON TABLE geohistory.eventgranted TO readonly;
-
-
---
--- Name: TABLE governmentothercurrentparent; Type: ACL; Schema: geohistory; Owner: postgres
---
-
-GRANT SELECT ON TABLE geohistory.governmentothercurrentparent TO readonly;
-
-
---
--- Name: TABLE governmentparent; Type: ACL; Schema: extra; Owner: postgres
---
-
-GRANT SELECT ON TABLE extra.governmentparent TO readonly;
-
-
---
--- Name: TABLE governmentrelation; Type: ACL; Schema: extra; Owner: postgres
---
-
-GRANT SELECT ON TABLE extra.governmentrelation TO readonly;
-
-
---
--- Name: TABLE adjudicationgovernment; Type: ACL; Schema: extra; Owner: postgres
---
-
-GRANT SELECT ON TABLE extra.adjudicationgovernment TO readonly;
-
-
---
--- Name: TABLE adjudicationgovernmentcache; Type: ACL; Schema: extra; Owner: postgres
---
-
-GRANT SELECT ON TABLE extra.adjudicationgovernmentcache TO readonly;
-
-
---
--- Name: TABLE tribunalgovernment; Type: ACL; Schema: extra; Owner: postgres
---
-
-GRANT SELECT ON TABLE extra.tribunalgovernment TO readonly;
-
-
---
--- Name: TABLE tribunalgovernmentcache; Type: ACL; Schema: extra; Owner: postgres
---
-
-GRANT SELECT ON TABLE extra.tribunalgovernmentcache TO readonly;
-
-
---
--- Name: TABLE adjudicationsearch; Type: ACL; Schema: extra; Owner: postgres
---
-
-GRANT SELECT ON TABLE extra.adjudicationsearch TO readonly;
-
-
---
--- Name: TABLE adjudicationsearchcache; Type: ACL; Schema: extra; Owner: postgres
---
-
-GRANT SELECT ON TABLE extra.adjudicationsearchcache TO readonly;
-
-
---
--- Name: TABLE adjudicationsourcecitation; Type: ACL; Schema: geohistory; Owner: postgres
---
-
-GRANT SELECT ON TABLE geohistory.adjudicationsourcecitation TO readonly;
-
-
---
--- Name: TABLE source; Type: ACL; Schema: geohistory; Owner: postgres
---
-
-GRANT SELECT ON TABLE geohistory.source TO readonly;
-
-
---
--- Name: TABLE adjudicationsourcecitationextra; Type: ACL; Schema: extra; Owner: postgres
---
-
-GRANT SELECT ON TABLE extra.adjudicationsourcecitationextra TO readonly;
-
-
---
--- Name: TABLE adjudicationsourcecitationextracache; Type: ACL; Schema: extra; Owner: postgres
---
-
-GRANT SELECT ON TABLE extra.adjudicationsourcecitationextracache TO readonly;
-
-
---
--- Name: TABLE adjudicationsourcecitationsourcegovernment; Type: ACL; Schema: extra; Owner: postgres
---
-
-GRANT SELECT ON TABLE extra.adjudicationsourcecitationsourcegovernment TO readonly;
-
-
---
--- Name: TABLE adjudicationsourcecitationsourcegovernmentcache; Type: ACL; Schema: extra; Owner: postgres
---
-
-GRANT SELECT ON TABLE extra.adjudicationsourcecitationsourcegovernmentcache TO readonly;
-
-
---
--- Name: TABLE affectedgovernment_reconstructed; Type: ACL; Schema: extra; Owner: postgres
---
-
-GRANT SELECT ON TABLE extra.affectedgovernment_reconstructed TO readonly;
-
-
---
--- Name: TABLE affectedgovernmentform; Type: ACL; Schema: extra; Owner: postgres
---
-
-GRANT SELECT ON TABLE extra.affectedgovernmentform TO readonly;
-
-
---
--- Name: TABLE affectedgovernmentformcache; Type: ACL; Schema: extra; Owner: postgres
---
-
-GRANT SELECT ON TABLE extra.affectedgovernmentformcache TO readonly;
-
-
---
--- Name: TABLE areagovernment; Type: ACL; Schema: extra; Owner: postgres
---
-
-GRANT SELECT ON TABLE extra.areagovernment TO readonly;
-
-
---
--- Name: TABLE areagovernmentcache; Type: ACL; Schema: extra; Owner: postgres
---
-
-GRANT SELECT ON TABLE extra.areagovernmentcache TO readonly;
-
-
---
--- Name: TABLE eventgovernmentcache; Type: ACL; Schema: extra; Owner: postgres
---
-
-GRANT SELECT ON TABLE extra.eventgovernmentcache TO readonly;
-
-
---
--- Name: TABLE giscache; Type: ACL; Schema: extra; Owner: postgres
---
-
-GRANT SELECT ON TABLE extra.giscache TO readonly;
-
-
---
--- Name: TABLE giscountycache; Type: ACL; Schema: extra; Owner: postgres
---
-
-GRANT SELECT ON TABLE extra.giscountycache TO readonly;
-
-
---
--- Name: TABLE gismunicipalitycache; Type: ACL; Schema: extra; Owner: postgres
---
-
-GRANT SELECT ON TABLE extra.gismunicipalitycache TO readonly;
-
-
---
--- Name: TABLE gisplsstownshipcache; Type: ACL; Schema: extra; Owner: postgres
---
-
-GRANT SELECT ON TABLE extra.gisplsstownshipcache TO readonly;
-
-
---
--- Name: TABLE gisschooldistrictcache; Type: ACL; Schema: extra; Owner: postgres
---
-
-GRANT SELECT ON TABLE extra.gisschooldistrictcache TO readonly;
-
-
---
--- Name: TABLE gissubmunicipalitycache; Type: ACL; Schema: extra; Owner: postgres
---
-
-GRANT SELECT ON TABLE extra.gissubmunicipalitycache TO readonly;
-
-
---
--- Name: TABLE giswardcache; Type: ACL; Schema: extra; Owner: postgres
---
-
-GRANT SELECT ON TABLE extra.giswardcache TO readonly;
-
-
---
--- Name: TABLE affectedtype; Type: ACL; Schema: geohistory; Owner: postgres
---
-
-GRANT SELECT ON TABLE geohistory.affectedtype TO readonly;
 
 
 --
@@ -13064,185 +9565,24 @@ GRANT SELECT ON TABLE geohistory.eventrelationship TO readonly;
 
 
 --
--- Name: TABLE governmentchangecount; Type: ACL; Schema: extra; Owner: postgres
+-- Name: TABLE governmentothercurrentparent; Type: ACL; Schema: geohistory; Owner: postgres
 --
 
-GRANT SELECT ON TABLE extra.governmentchangecount TO readonly;
-
-
---
--- Name: TABLE governmentchangecountcache; Type: ACL; Schema: extra; Owner: postgres
---
-
-GRANT SELECT ON TABLE extra.governmentchangecountcache TO readonly;
+GRANT SELECT ON TABLE geohistory.governmentothercurrentparent TO readonly;
 
 
 --
--- Name: TABLE governmentchangecountpart; Type: ACL; Schema: extra; Owner: postgres
+-- Name: TABLE metesdescriptionline; Type: ACL; Schema: geohistory; Owner: postgres
 --
 
-GRANT SELECT ON TABLE extra.governmentchangecountpart TO readonly;
-
-
---
--- Name: TABLE governmentchangecountpartcache; Type: ACL; Schema: extra; Owner: postgres
---
-
-GRANT SELECT ON TABLE extra.governmentchangecountpartcache TO readonly;
+GRANT SELECT ON TABLE geohistory.metesdescriptionline TO readonly;
 
 
 --
--- Name: TABLE governmentextra; Type: ACL; Schema: extra; Owner: postgres
+-- Name: TABLE source; Type: ACL; Schema: geohistory; Owner: postgres
 --
 
-GRANT SELECT ON TABLE extra.governmentextra TO readonly;
-
-
---
--- Name: TABLE governmentextracache; Type: ACL; Schema: extra; Owner: postgres
---
-
-GRANT SELECT ON TABLE extra.governmentextracache TO readonly;
-
-
---
--- Name: TABLE governmenthasmappedevent; Type: ACL; Schema: extra; Owner: postgres
---
-
-GRANT SELECT ON TABLE extra.governmenthasmappedevent TO readonly;
-
-
---
--- Name: TABLE governmenthasmappedeventcache; Type: ACL; Schema: extra; Owner: postgres
---
-
-GRANT SELECT ON TABLE extra.governmenthasmappedeventcache TO readonly;
-
-
---
--- Name: TABLE governmentparentcache; Type: ACL; Schema: extra; Owner: postgres
---
-
-GRANT SELECT ON TABLE extra.governmentparentcache TO readonly;
-
-
---
--- Name: TABLE governmentrelationcache; Type: ACL; Schema: extra; Owner: postgres
---
-
-GRANT SELECT ON TABLE extra.governmentrelationcache TO readonly;
-
-
---
--- Name: TABLE governmentshape_history; Type: ACL; Schema: extra; Owner: postgres
---
-
-GRANT SELECT ON TABLE extra.governmentshape_history TO readonly;
-
-
---
--- Name: TABLE governmentshapeextra; Type: ACL; Schema: extra; Owner: postgres
---
-
-GRANT SELECT ON TABLE extra.governmentshapeextra TO readonly;
-
-
---
--- Name: TABLE governmentshapeextracache; Type: ACL; Schema: extra; Owner: postgres
---
-
-GRANT SELECT ON TABLE extra.governmentshapeextracache TO readonly;
-
-
---
--- Name: TABLE governmentsourceextra; Type: ACL; Schema: extra; Owner: postgres
---
-
-GRANT SELECT ON TABLE extra.governmentsourceextra TO readonly;
-
-
---
--- Name: TABLE governmentsourceextracache; Type: ACL; Schema: extra; Owner: postgres
---
-
-GRANT SELECT ON TABLE extra.governmentsourceextracache TO readonly;
-
-
---
--- Name: TABLE governmentsubstitutecache; Type: ACL; Schema: extra; Owner: postgres
---
-
-GRANT SELECT ON TABLE extra.governmentsubstitutecache TO readonly;
-
-
---
--- Name: TABLE lastrefresh; Type: ACL; Schema: extra; Owner: postgres
---
-
-GRANT SELECT ON TABLE extra.lastrefresh TO readonly;
-
-
---
--- Name: TABLE lawalternatesection; Type: ACL; Schema: geohistory; Owner: postgres
---
-
-GRANT SELECT ON TABLE geohistory.lawalternatesection TO readonly;
-
-
---
--- Name: TABLE lawalternatesectionextra; Type: ACL; Schema: extra; Owner: postgres
---
-
-GRANT SELECT ON TABLE extra.lawalternatesectionextra TO readonly;
-
-
---
--- Name: TABLE lawalternatesectionextracache; Type: ACL; Schema: extra; Owner: postgres
---
-
-GRANT SELECT ON TABLE extra.lawalternatesectionextracache TO readonly;
-
-
---
--- Name: TABLE lawsectionextra; Type: ACL; Schema: extra; Owner: postgres
---
-
-GRANT SELECT ON TABLE extra.lawsectionextra TO readonly;
-
-
---
--- Name: TABLE lawsectionextracache; Type: ACL; Schema: extra; Owner: postgres
---
-
-GRANT SELECT ON TABLE extra.lawsectionextracache TO readonly;
-
-
---
--- Name: TABLE lawsectiongovernment; Type: ACL; Schema: extra; Owner: postgres
---
-
-GRANT SELECT ON TABLE extra.lawsectiongovernment TO readonly;
-
-
---
--- Name: TABLE lawsectiongovernmentcache; Type: ACL; Schema: extra; Owner: postgres
---
-
-GRANT SELECT ON TABLE extra.lawsectiongovernmentcache TO readonly;
-
-
---
--- Name: TABLE metesdescriptionextra; Type: ACL; Schema: extra; Owner: postgres
---
-
-GRANT SELECT ON TABLE extra.metesdescriptionextra TO readonly;
-
-
---
--- Name: TABLE metesdescriptionextracache; Type: ACL; Schema: extra; Owner: postgres
---
-
-GRANT SELECT ON TABLE extra.metesdescriptionextracache TO readonly;
+GRANT SELECT ON TABLE geohistory.source TO readonly;
 
 
 --
@@ -13274,125 +9614,6 @@ GRANT SELECT ON TABLE geohistory.recordingtype TO readonly;
 
 
 --
--- Name: TABLE recordingextra; Type: ACL; Schema: extra; Owner: postgres
---
-
-GRANT SELECT ON TABLE extra.recordingextra TO readonly;
-
-
---
--- Name: TABLE recordingextracache; Type: ACL; Schema: extra; Owner: postgres
---
-
-GRANT SELECT ON TABLE extra.recordingextracache TO readonly;
-
-
---
--- Name: TABLE sourcecitation; Type: ACL; Schema: geohistory; Owner: postgres
---
-
-GRANT SELECT ON TABLE geohistory.sourcecitation TO readonly;
-
-
---
--- Name: TABLE sourcecitationextra; Type: ACL; Schema: extra; Owner: postgres
---
-
-GRANT SELECT ON TABLE extra.sourcecitationextra TO readonly;
-
-
---
--- Name: TABLE sourcecitationextracache; Type: ACL; Schema: extra; Owner: postgres
---
-
-GRANT SELECT ON TABLE extra.sourcecitationextracache TO readonly;
-
-
---
--- Name: TABLE sourcecitationevent; Type: ACL; Schema: geohistory; Owner: postgres
---
-
-GRANT SELECT ON TABLE geohistory.sourcecitationevent TO readonly;
-
-
---
--- Name: TABLE sourcecitationgovernment; Type: ACL; Schema: extra; Owner: postgres
---
-
-GRANT SELECT ON TABLE extra.sourcecitationgovernment TO readonly;
-
-
---
--- Name: TABLE sourcecitationgovernmentcache; Type: ACL; Schema: extra; Owner: postgres
---
-
-GRANT SELECT ON TABLE extra.sourcecitationgovernmentcache TO readonly;
-
-
---
--- Name: TABLE sourceextra; Type: ACL; Schema: extra; Owner: postgres
---
-
-GRANT SELECT ON TABLE extra.sourceextra TO readonly;
-
-
---
--- Name: TABLE governmentidentifier; Type: ACL; Schema: geohistory; Owner: postgres
---
-
-GRANT SELECT ON TABLE geohistory.governmentidentifier TO readonly;
-
-
---
--- Name: TABLE statistics_createddissolved; Type: ACL; Schema: extra; Owner: postgres
---
-
-GRANT SELECT ON TABLE extra.statistics_createddissolved TO readonly;
-
-
---
--- Name: TABLE statistics_eventtype; Type: ACL; Schema: extra; Owner: postgres
---
-
-GRANT SELECT ON TABLE extra.statistics_eventtype TO readonly;
-
-
---
--- Name: TABLE governmentmapstatus; Type: ACL; Schema: geohistory; Owner: postgres
---
-
-GRANT SELECT ON TABLE geohistory.governmentmapstatus TO readonly;
-
-
---
--- Name: TABLE statistics_mapped; Type: ACL; Schema: extra; Owner: postgres
---
-
-GRANT SELECT ON TABLE extra.statistics_mapped TO readonly;
-
-
---
--- Name: TABLE eventtype; Type: ACL; Schema: geohistory; Owner: postgres
---
-
-GRANT SELECT ON TABLE geohistory.eventtype TO readonly;
-
-
---
--- Name: TABLE governmentform; Type: ACL; Schema: geohistory; Owner: postgres
---
-
-GRANT SELECT ON TABLE geohistory.governmentform TO readonly;
-
-
---
--- Name: TABLE metesdescriptionline; Type: ACL; Schema: geohistory; Owner: postgres
---
-
-GRANT SELECT ON TABLE geohistory.metesdescriptionline TO readonly;
-
-
---
 -- Name: TABLE researchlog; Type: ACL; Schema: geohistory; Owner: postgres
 --
 
@@ -13414,6 +9635,20 @@ GRANT SELECT ON TABLE geohistory.recordingevent TO readonly;
 
 
 --
+-- Name: TABLE sourcecitation; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.sourcecitation TO readonly;
+
+
+--
+-- Name: TABLE sourcecitationevent; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.sourcecitationevent TO readonly;
+
+
+--
 -- Name: TABLE sourcecitationnote; Type: ACL; Schema: geohistory; Owner: postgres
 --
 
@@ -13425,6 +9660,13 @@ GRANT SELECT ON TABLE geohistory.sourcecitationnote TO readonly;
 --
 
 GRANT SELECT ON TABLE geohistory.sourcecitationnotetype TO readonly;
+
+
+--
+-- Name: TABLE governmentidentifier; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.governmentidentifier TO readonly;
 
 
 --
@@ -13446,6 +9688,27 @@ GRANT SELECT ON TABLE geohistory.lawgroupsection TO readonly;
 --
 
 GRANT SELECT ON TABLE geohistory.lawgroupgovernmenttype TO readonly;
+
+
+--
+-- Name: TABLE tribunaltype; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.tribunaltype TO readonly;
+
+
+--
+-- Name: TABLE adjudicationsourcecitation; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.adjudicationsourcecitation TO readonly;
+
+
+--
+-- Name: TABLE lawalternatesection; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.lawalternatesection TO readonly;
 
 
 --
@@ -13502,6 +9765,13 @@ GRANT SELECT ON TABLE geohistory.governmentformgovernment TO readonly;
 --
 
 GRANT SELECT ON TABLE geohistory.governmentidentifiertype TO readonly;
+
+
+--
+-- Name: TABLE lastrefresh; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.lastrefresh TO readonly;
 
 
 --
@@ -13628,20 +9898,6 @@ GRANT SELECT ON TABLE gis.deleted_affectedgovernmentgis TO readonly;
 --
 
 GRANT SELECT ON TABLE gis.deleted_metesdescriptiongis TO readonly;
-
-
---
--- Name: DEFAULT PRIVILEGES FOR FUNCTIONS; Type: DEFAULT ACL; Schema: extra; Owner: postgres
---
-
-ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA extra GRANT ALL ON FUNCTIONS TO readonly;
-
-
---
--- Name: DEFAULT PRIVILEGES FOR TABLES; Type: DEFAULT ACL; Schema: extra; Owner: postgres
---
-
-ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA extra GRANT SELECT ON TABLES TO readonly;
 
 
 --
