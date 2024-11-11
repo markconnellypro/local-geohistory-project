@@ -78,8 +78,6 @@ class GovernmentShapeModel extends BaseModel
         return $this->getObject($query);
     }
 
-    // FUNCTION: extra.emptytonull
-
     public function getPartByGovernment(int $id): array
     {
         $query = <<<QUERY
@@ -158,7 +156,7 @@ class GovernmentShapeModel extends BaseModel
                         WHEN governmentshapeeventpartparts.eventstatus = '{add,remove}' THEN 'name' 
                         ELSE governmentshapeeventpartparts.eventstatus[1] 
                     END AS eventstatus,
-                    extra.emptytonull(array_to_string(governmentshapeeventpartparts.governmentto, ','))::integer AS governmentto
+                    geohistory.emptytonull(array_to_string(governmentshapeeventpartparts.governmentto, ','))::integer AS governmentto
                 FROM governmentshapeeventpartparts
             ), lasteventstatus AS (
                 SELECT governmentshapeeventparts.governmentshapeid,
