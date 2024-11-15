@@ -358,7 +358,6 @@ class EventModel extends BaseModel
         $for = $parameters[0];
         $from = $parameters[1];
         $to = $parameters[2];
-        $by = $parameters[3];
         $jurisdiction = $parameters[4];
         if ($jurisdiction === '') {
             $jurisdiction = implode(',', \App\Controllers\BaseController::getJurisdictions());
@@ -462,7 +461,6 @@ class EventModel extends BaseModel
         $for = $parameters[0];
         $from = $parameters[1];
         $to = $parameters[2];
-        $by = $parameters[3];
         $jurisdiction = $parameters[4];
         if ($jurisdiction === '') {
             $jurisdiction = implode(',', \App\Controllers\BaseController::getJurisdictions());
@@ -657,7 +655,6 @@ class EventModel extends BaseModel
         $for = $parameters[0];
         $from = $parameters[1];
         $to = $parameters[2];
-        $by = $parameters[3];
         $jurisdiction = strtoupper($parameters[4]);
 
         $query = <<<QUERY

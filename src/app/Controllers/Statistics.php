@@ -141,8 +141,8 @@ class Statistics extends BaseController
             'eventtype' => 'Event',
             'mapped' => 'GovernmentShape',
         ];
-        if ($types[$for] === 'GovernmentShape' && class_exists("App\\Models\\Development\\GovernmentShapeModel")) {
-            $model = "App\\Models\\Development\\GovernmentShapeModel";
+        if ($types[$for] === 'GovernmentShape' && class_exists(\App\Models\Development\GovernmentShapeModel::class)) {
+            $model = \App\Models\Development\GovernmentShapeModel::class;
         } else {
             $model = "App\\Models\\" . $types[$for] . 'Model';
         }
