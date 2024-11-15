@@ -19,7 +19,7 @@
                     <td><?php echo view('core/link', [
                         'type' => 'government',
                         'link' => $row->governmentslug,
-                        'text' => $row->governmentlong
+                        'text' => $row->governmentlong,
                     ]) ?></td>
                     <?php if ($type !== 'government') { ?>
                         <td><?= $row->governmentparentstatus ?></td>

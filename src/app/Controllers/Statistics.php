@@ -144,7 +144,7 @@ class Statistics extends BaseController
         if ($types[$for] === 'GovernmentShape' && class_exists("App\\Models\\Development\\GovernmentShapeModel")) {
             $model = "App\\Models\\Development\\GovernmentShapeModel";
         } else {
-            $model = "App\\Models\\" . $types[$for] . 'Model';   
+            $model = "App\\Models\\" . $types[$for] . 'Model';
         }
         $model = new $model();
         $type = 'getByStatistics' . ($jurisdiction === '' ? 'Nation' : 'State') . 'Whole';

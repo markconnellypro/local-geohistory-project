@@ -328,7 +328,7 @@ while ($prevException = $last->getPrevious()) {
                                     echo esc($value->getValueLine(), 'html');
                                 } else {
                                     foreach ($value as $i => $header) {
-                                        echo ' ('. $i + 1 . ') ' . esc($header->getValueLine(), 'html');
+                                        echo ' (' . $i + 1 . ') ' . esc($header->getValueLine(), 'html');
                                     }
                                 }
                             ?>
@@ -375,7 +375,7 @@ $response->setStatusCode(http_response_code());
                         echo esc($response->getHeaderLine($name), 'html');
                     } else {
                         foreach ($value as $i => $header) {
-                            echo ' ('. $i + 1 . ') ' . esc($header->getValueLine(), 'html');
+                            echo ' (' . $i + 1 . ') ' . esc($header->getValueLine(), 'html');
                         }
                     }
                             ?>

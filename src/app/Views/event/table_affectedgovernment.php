@@ -32,7 +32,7 @@ $isComplete ??= true;
                         <td data-sort="<?= $row->eventsort ?>"><?php echo view('core/link', [
                             'type' => 'event',
                             'link' => $row->eventslug,
-                            'text' => ($row->eventslug  === '' ? 'Missing' : 'View')
+                            'text' => ($row->eventslug  === '' ? 'Missing' : 'View'),
                         ]) ?></td>
                         <td data-sort="<?= $row->eventsort ?>"><?= $row->eventeffective ?></td>
                     <?php } elseif (\App\Controllers\BaseController::isLive() && $isComplete) { ?>
@@ -45,7 +45,7 @@ $isComplete ??= true;
                                         <?php echo view('core/link', [
                                             'type' => 'governmentmap',
                                             'link' => $row->{ucfirst($fromTo) . ' ' . $level . ' Link'} . '/' . $id,
-                                            'text' => ucfirst($fromTo)
+                                            'text' => ucfirst($fromTo),
                                         ]) ?><br>
                             <?php
                                         }
@@ -62,7 +62,7 @@ $isComplete ??= true;
                                     <?php echo view('core/link', [
                                         'type' => 'government',
                                         'link' => $row->{ucfirst($fromTo) . ' ' . $level . ' Link'},
-                                        'text' => $row->{ucfirst($fromTo) . ' ' . $level . ' Long'}
+                                        'text' => $row->{ucfirst($fromTo) . ' ' . $level . ' Long'},
                                     ]) ?>
                                     <br><span class="i"><?= $row->{ucfirst($fromTo) . ' ' . $level . ' Affected'} ?> <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#affectedtype" aria-label="Affected Type Key"><?= view('core/svg_icon', ['iconLabel' => 'key icon', 'iconName' => 'key', 'iconType' => 'keyicontext']); ?></a></span>
                                 <?php } ?>

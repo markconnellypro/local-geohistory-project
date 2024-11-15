@@ -155,7 +155,7 @@ class Government extends BaseController
                         'onEachFeature2' => false,
                         'weight' => 1.25,
                         'color' => 'D5103F',
-                        'fillOpacity' => 0
+                        'fillOpacity' => 0,
                     ]);
                     $layers['metesdescription'] = 'Descriptions';
                     $primaryLayer = 'metesdescription';
@@ -170,7 +170,7 @@ class Government extends BaseController
                         'onEachFeature2' => false,
                         'weight' => 3,
                         'color' => '000000',
-                        'fillOpacity' => 0
+                        'fillOpacity' => 0,
                     ]);
                     $layers['current'] = 'Approximate Current Boundary';
                 }
@@ -181,7 +181,7 @@ class Government extends BaseController
                         'element' => 'shape',
                         'onEachFeature' => false,
                         'onEachFeature2' => true,
-                        'customStyle' => 'dispositionStyle'
+                        'customStyle' => 'dispositionStyle',
                     ]);
                     $layers['shape'] = 'Government Area';
                     $primaryLayer = 'shape';

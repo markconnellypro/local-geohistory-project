@@ -9,17 +9,17 @@ class MetesDescriptionLineModel extends BaseModel
     public function getByMetesDescription(int $id): array
     {
         $query = <<<QUERY
-            SELECT metesdescriptionline.metesdescriptionline,
-                metesdescriptionline.thencepoint,
-                metesdescriptionline.northsouth,
-                metesdescriptionline.degree,
-                metesdescriptionline.eastwest,
-                metesdescriptionline.foot,
-                metesdescriptionline.topoint
-            FROM geohistory.metesdescriptionline
-            WHERE metesdescriptionline.metesdescription = ?
-            ORDER BY metesdescriptionline.metesdescriptionline
-        QUERY;
+                SELECT metesdescriptionline.metesdescriptionline,
+                    metesdescriptionline.thencepoint,
+                    metesdescriptionline.northsouth,
+                    metesdescriptionline.degree,
+                    metesdescriptionline.eastwest,
+                    metesdescriptionline.foot,
+                    metesdescriptionline.topoint
+                FROM geohistory.metesdescriptionline
+                WHERE metesdescriptionline.metesdescription = ?
+                ORDER BY metesdescriptionline.metesdescriptionline
+            QUERY;
 
         $query = $this->db->query($query, [
             $id,

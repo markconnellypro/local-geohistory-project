@@ -15,15 +15,15 @@ if (mb_strpos(base_url(), $_ENV['app_baseLocalGeohistoryProjectUrl']) !== false)
     foreach ($controllerRegex as $c) {
         $routes->add('{locale}/' . $c . '/(:segment)', ucwords($c) . '::view/$1');
         if ($_ENV['app_jurisdiction'] !== '') {
-            $routes->add('{locale}/('. $_ENV['app_jurisdiction'] . ')/' . $c . '/(:segment)', ucwords($c) . '::redirect/$2');
+            $routes->add('{locale}/(' . $_ENV['app_jurisdiction'] . ')/' . $c . '/(:segment)', ucwords($c) . '::redirect/$2');
         }
         $routes->add('{locale}/' . $c, ucwords($c) . '::noRecord');
     }
 
     if ($_ENV['app_jurisdiction'] !== '') {
-        $routes->add('{locale}/('. $_ENV['app_jurisdiction'] . ')/about', 'About::redirect/$1');
-        $routes->add('{locale}/('. $_ENV['app_jurisdiction'] . ')/statistics', 'Statistics::redirect');
-        $routes->add('{locale}/('. $_ENV['app_jurisdiction'] . ')', 'Search::redirect');
+        $routes->add('{locale}/(' . $_ENV['app_jurisdiction'] . ')/about', 'About::redirect/$1');
+        $routes->add('{locale}/(' . $_ENV['app_jurisdiction'] . ')/statistics', 'Statistics::redirect');
+        $routes->add('{locale}/(' . $_ENV['app_jurisdiction'] . ')', 'Search::redirect');
     }
 
     $routes->add('{locale}/lookup/government/(:segment)', 'Search::governmentlookup/$1/');

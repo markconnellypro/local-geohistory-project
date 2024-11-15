@@ -72,7 +72,7 @@ class Search extends BaseController
         foreach ($months as $k => $m) {
             $months[$k] = [
                 'monthNumber' => $k + 1,
-                'monthName' => $m
+                'monthName' => $m,
             ];
         }
         $GovernmentModel = new GovernmentModel();
@@ -168,7 +168,7 @@ class Search extends BaseController
             echo view('core/header', ['title' => $this->title]);
             $model = "App\\Models\\" . $model;
             $model = new $model();
-            $modelType = 'getSearchBy'. ucwords($type);
+            $modelType = 'getSearchBy' . ucwords($type);
             $searchParameter = [
                 'Search For' => $this->categoryType[$category],
                 'Search By' => $this->typeType[$this->request->getPost('type')],

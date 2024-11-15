@@ -24,7 +24,7 @@
                             echo view('core/link', [
                                 'type' => 'government',
                                 'link' => $row->governmentsubmunicipality,
-                                'text' => $row->governmentsubmunicipalitylong
+                                'text' => $row->governmentsubmunicipalitylong,
                             ]);
                         } ?>
                     </td>
@@ -32,21 +32,21 @@
                         <?php echo view('core/link', [
                             'type' => 'government',
                             'link' => $row->governmentmunicipality,
-                            'text' => $row->governmentmunicipalitylong
+                            'text' => $row->governmentmunicipalitylong,
                         ]); ?>
                     </td>
                     <td>
                         <?php echo view('core/link', [
                             'type' => 'government',
                             'link' => $row->governmentcounty,
-                            'text' => $row->governmentcountyshort
+                            'text' => $row->governmentcountyshort,
                         ]); ?>
                     </td>
                     <td>
                         <?php echo view('core/link', [
                             'type' => 'government',
                             'link' => $row->governmentstate,
-                            'text' => $row->governmentstateabbreviation
+                            'text' => $row->governmentstateabbreviation,
                         ]); ?>
                     </td>
                 </tr>

@@ -99,7 +99,7 @@ class Event extends BaseController
                         'onEachFeature2' => false,
                         'weight' => 1.25,
                         'color' => 'D5103F',
-                        'fillOpacity' => 0.1
+                        'fillOpacity' => 0.1,
                     ]);
                 }
                 $layers = [];
@@ -111,7 +111,7 @@ class Event extends BaseController
                         'onEachFeature2' => false,
                         'weight' => 1.25,
                         'color' => 'D5103F',
-                        'fillOpacity' => 0.1
+                        'fillOpacity' => 0.1,
                     ]);
                     $layers['metesdescription'] = 'Descriptions';
                 }

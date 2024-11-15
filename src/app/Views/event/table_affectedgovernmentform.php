@@ -29,7 +29,7 @@
                         <td><?php echo view('core/link', [
                             'type' => 'government',
                             'link' => $row->governmentslug,
-                            'text' => $row->governmentlong
+                            'text' => $row->governmentlong,
                         ]) ?></td>
                     <?php } else { ?>
                         <td data-sort="<?= $row->eventsort ?>"><?= ($isHistory ? $i : '<a href="/' . \Config\Services::request()->getLocale() . '/event/' . $row->eventslug . '/">View</a>') ?></td>

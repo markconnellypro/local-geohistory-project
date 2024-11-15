@@ -20,14 +20,14 @@ if (is_array($query) && $query !== []) {
             $row = [
                 'type' => 'Line',
                 'line' => $row->line,
-                'description' => $row->linedescription
+                'description' => $row->linedescription,
             ];
         } elseif ($element === 'point') {
             $geometry = $row->pointgeometry;
             $row = [
                 'type' => 'Point',
                 'line' => $row->line,
-                'description' => $row->pointdescription
+                'description' => $row->pointdescription,
             ];
         } elseif (isset($row->geometry) && (is_null($row->geometry) || $row->geometry === '')) {
             $geometry = null;

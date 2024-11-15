@@ -14,11 +14,11 @@ class SourceModel extends BaseModel
     public function getSearch(): array
     {
         $query = <<<QUERY
-            SELECT DISTINCT source.sourceshort
-            FROM geohistory.source
-            WHERE source.sourcetype = 'court reporters'
-            ORDER BY 1
-        QUERY;
+                SELECT DISTINCT source.sourceshort
+                FROM geohistory.source
+                WHERE source.sourcetype = 'court reporters'
+                ORDER BY 1
+            QUERY;
 
         $query = $this->db->query($query);
 

@@ -99,7 +99,7 @@ class Area extends BaseController
                 $currentQuery[0]->governmentsubmunicipalitylong,
                 $currentQuery[0]->governmentmunicipalitylong,
                 $currentQuery[0]->governmentcountyshort,
-                $currentQuery[0]->governmentstateabbreviation
+                $currentQuery[0]->governmentstateabbreviation,
             ];
             $jurisdictions = [
                 strtolower($currentQuery[0]->governmentstateabbreviation),
@@ -141,13 +141,13 @@ class Area extends BaseController
                 'onEachFeature2' => false,
                 'weight' => 0,
                 'color' => '07517D',
-                'fillOpacity' => 0.5
+                'fillOpacity' => 0.5,
             ]);
             $includePoint = false;
             if ($x !== 0.0 && $y !== 0.0) {
                 $includePoint = true;
                 echo view('core/gis', [
-                    'query' => [(object)[
+                    'query' => [(object) [
                         'line' => '',
                         'pointdescription' => '',
                         'pointgeometry' => '{"type":"Point","coordinates":[' . $x . ',' . $y . ']}',
@@ -159,7 +159,7 @@ class Area extends BaseController
                     'color' => 'D5103F',
                     'fillOpacity' => .5,
                     'radius' => 6,
-                    'attribution' => $this->extraAttribution
+                    'attribution' => $this->extraAttribution,
                 ]);
             }
             echo view('area/end', ['includePoint' => $includePoint]);

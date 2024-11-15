@@ -37,7 +37,7 @@ class Map extends BaseController
                     'coalesce',
                     ['get', 'name_' . \Config\Services::request()->getLocale()],
                     ['get', 'name:' . \Config\Services::request()->getLocale()],
-                    ['get', 'name']
+                    ['get', 'name'],
                 ];
                 if (!in_array(\Config\Services::request()->getLocale(), ['de', 'en'])) {
                     $json['layers'][$layerNumber]['layout']['text-field'][] = ['get', 'name_en'];

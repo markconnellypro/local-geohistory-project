@@ -29,7 +29,7 @@ class Key extends BaseController
             'Event Type' => 'EventType',
             'How Affected' => 'AffectedType',
             'Relationship' => 'EventRelationship',
-            'Successful?' => 'EventGranted'
+            'Successful?' => 'EventGranted',
         ];
         $keys = array_merge($keys, $modelKeys);
         foreach ($modelKeys as $k => $v) {

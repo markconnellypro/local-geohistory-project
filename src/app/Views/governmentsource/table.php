@@ -40,7 +40,7 @@
                         <td><?php echo view('core/link', [
                             'type' => 'government',
                             'link' => $row->governmentslug,
-                            'text' => $row->governmentlong
+                            'text' => $row->governmentlong,
                         ]); ?></td>
                     <?php } ?>
                     <td><span class="b">

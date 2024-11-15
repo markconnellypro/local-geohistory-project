@@ -36,7 +36,7 @@
                     <td><?php echo view('core/link', [
                         'type' => 'government',
                         'link' => $row->government,
-                        'text' => 'View'
+                        'text' => 'View',
                     ]) ?></td>
                 <?php } ?>
             </tr>

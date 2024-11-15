@@ -15,7 +15,7 @@
                     <td class="folder<?= (\App\Controllers\BaseController::isLive() ? $row->governmentcolor : 'none') ?>"><?php echo view('core/link', [
                         'type' => $row->governmentslugtype,
                         'link' => $row->governmentslug,
-                        'text' => $row->governmentlong
+                        'text' => $row->governmentlong,
                     ]) ?></td>
                     <td class="folder<?= (\App\Controllers\BaseController::isLive() ? $row->governmentcolor : 'none') ?>"><?= $row->governmentrelationship ?></td>
                     <td class="folder<?= (\App\Controllers\BaseController::isLive() ? $row->governmentcolor : 'none') ?>"><?= $row->governmentparentstatus ?></td>

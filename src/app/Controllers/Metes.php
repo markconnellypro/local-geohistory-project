@@ -66,7 +66,7 @@ class Metes extends BaseController
                         'onEachFeature2' => false,
                         'weight' => 0,
                         'color' => '07517D',
-                        'fillOpacity' => 0.5
+                        'fillOpacity' => 0.5,
                     ]);
                 }
                 if ($hasMetes) {
@@ -77,7 +77,7 @@ class Metes extends BaseController
                         'onEachFeature2' => false,
                         'weight' => 3,
                         'color' => 'D5103F',
-                        'fillOpacity' => 0
+                        'fillOpacity' => 0,
                     ]);
                     echo view('core/gis', [
                         'query' => $geometryQuery,
@@ -87,7 +87,7 @@ class Metes extends BaseController
                         'weight' => 3,
                         'color' => 'D5103F',
                         'fillOpacity' => 0,
-                        'radius' => 6
+                        'radius' => 6,
                     ]);
                 }
                 echo view('metes/end', ['includeBase' => $hasBegin, 'includeArea' => $hasArea, 'includeMetes' => $hasMetes]);

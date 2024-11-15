@@ -2,9 +2,9 @@
 $layers ??= ['default' => 'default'];
 $primaryLayer ??= '';
 $showTimeline ??= false;
-$updatedParts ??= (object)[
+$updatedParts ??= (object) [
     'sortdate' => '',
-    'sortdatetext' => ''
+    'sortdatetext' => '',
 ];
 ?>
 var map = L.map("map", {

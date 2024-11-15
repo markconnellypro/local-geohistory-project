@@ -9,22 +9,22 @@ class AffectedGovernmentGroupModel extends BaseModel
     public function getByEventForm(int $id): array
     {
         $query = <<<QUERY
-            SELECT DISTINCT government.governmentslugsubstitute AS governmentslug,
-                government.governmentlong,
-                governmentform.governmentformlong
-            FROM geohistory.affectedgovernmentgroup
-            JOIN geohistory.affectedgovernmentgrouppart
-                ON affectedgovernmentgroup.event = ?
-                AND affectedgovernmentgroup.affectedgovernmentgroupid = affectedgovernmentgrouppart.affectedgovernmentgroup
-            JOIN geohistory.affectedgovernmentpart
-                ON affectedgovernmentgrouppart.affectedgovernmentpart = affectedgovernmentpart.affectedgovernmentpartid
-                AND affectedgovernmentpart.governmentformto IS NOT NULL
-            JOIN geohistory.government
-                ON affectedgovernmentpart.governmentto = government.governmentid
-            JOIN geohistory.governmentform
-                ON affectedgovernmentpart.governmentformto = governmentform.governmentformid
-            ORDER BY 3, 2
-        QUERY;
+                SELECT DISTINCT government.governmentslugsubstitute AS governmentslug,
+                    government.governmentlong,
+                    governmentform.governmentformlong
+                FROM geohistory.affectedgovernmentgroup
+                JOIN geohistory.affectedgovernmentgrouppart
+                    ON affectedgovernmentgroup.event = ?
+                    AND affectedgovernmentgroup.affectedgovernmentgroupid = affectedgovernmentgrouppart.affectedgovernmentgroup
+                JOIN geohistory.affectedgovernmentpart
+                    ON affectedgovernmentgrouppart.affectedgovernmentpart = affectedgovernmentpart.affectedgovernmentpartid
+                    AND affectedgovernmentpart.governmentformto IS NOT NULL
+                JOIN geohistory.government
+                    ON affectedgovernmentpart.governmentto = government.governmentid
+                JOIN geohistory.governmentform
+                    ON affectedgovernmentpart.governmentformto = governmentform.governmentformid
+                ORDER BY 3, 2
+            QUERY;
 
         $query = $this->db->query($query, [
             $id,
@@ -36,20 +36,20 @@ class AffectedGovernmentGroupModel extends BaseModel
     public function getByEventGeometry(int $id): array
     {
         $query = <<<QUERY
-            SELECT DISTINCT affectedgovernmentgroup.affectedgovernmentgroupid AS id,
-                public.st_asgeojson(public.st_buffer(public.st_collect(governmentshape.governmentshapegeometry), 0)) AS geometry,
-                lower(array_to_string(array_agg(DISTINCT government.governmentabbreviation ORDER BY government.governmentabbreviation), ',')) AS jurisdictions
-            FROM geohistory.affectedgovernmentgroup
-            JOIN gis.affectedgovernmentgis
-                ON affectedgovernmentgroup.affectedgovernmentgroupid = affectedgovernmentgis.affectedgovernment
-                AND affectedgovernmentgroup.event = ?
-            JOIN gis.governmentshape
-                ON affectedgovernmentgis.governmentshape = governmentshape.governmentshapeid
-            JOIN geohistory.government
-                ON governmentshape.governmentstate = government.governmentid
-            GROUP BY 1
-            ORDER BY 1
-        QUERY;
+                SELECT DISTINCT affectedgovernmentgroup.affectedgovernmentgroupid AS id,
+                    public.st_asgeojson(public.st_buffer(public.st_collect(governmentshape.governmentshapegeometry), 0)) AS geometry,
+                    lower(array_to_string(array_agg(DISTINCT government.governmentabbreviation ORDER BY government.governmentabbreviation), ',')) AS jurisdictions
+                FROM geohistory.affectedgovernmentgroup
+                JOIN gis.affectedgovernmentgis
+                    ON affectedgovernmentgroup.affectedgovernmentgroupid = affectedgovernmentgis.affectedgovernment
+                    AND affectedgovernmentgroup.event = ?
+                JOIN gis.governmentshape
+                    ON affectedgovernmentgis.governmentshape = governmentshape.governmentshapeid
+                JOIN geohistory.government
+                    ON governmentshape.governmentstate = government.governmentid
+                GROUP BY 1
+                ORDER BY 1
+            QUERY;
 
         $query = $this->db->query($query, [
             $id,
@@ -61,34 +61,34 @@ class AffectedGovernmentGroupModel extends BaseModel
     public function getByEventGovernment(int $id): array
     {
         $query = <<<QUERY
-            SELECT DISTINCT affectedgovernmentgrouppart.affectedgovernmentgroup AS id,
-                affectedgovernmentlevel.affectedgovernmentlevellong AS affectedgovernmentlevellong,
-                affectedgovernmentlevel.affectedgovernmentleveldisplayorder AS affectedgovernmentleveldisplayorder,
-                affectedgovernmentlevel.affectedgovernmentlevelgroup = 4 AS includelink,
-                COALESCE(governmentfrom.governmentslugsubstitute, '') AS governmentfrom,
-                COALESCE(governmentfrom.governmentlong, '') AS governmentfromlong,
-                COALESCE(affectedtypefrom.affectedtypeshort, '') AS affectedtypefrom,
-                COALESCE(governmentto.governmentslugsubstitute, '') AS governmentto,
-                COALESCE(governmentto.governmentlong, '') AS governmenttolong,
-                COALESCE(affectedtypeto.affectedtypeshort, '') AS affectedtypeto
-            FROM geohistory.affectedgovernmentgroup
-            JOIN geohistory.affectedgovernmentgrouppart
-                ON affectedgovernmentgroup.affectedgovernmentgroupid = affectedgovernmentgrouppart.affectedgovernmentgroup
-                AND affectedgovernmentgroup.event = ?
-            JOIN geohistory.affectedgovernmentlevel
-                ON affectedgovernmentgrouppart.affectedgovernmentlevel = affectedgovernmentlevel.affectedgovernmentlevelid
-            JOIN geohistory.affectedgovernmentpart
-                ON affectedgovernmentgrouppart.affectedgovernmentpart = affectedgovernmentpart.affectedgovernmentpartid
-            LEFT JOIN geohistory.affectedtype affectedtypefrom
-                ON affectedgovernmentpart.affectedtypefrom = affectedtypefrom.affectedtypeid
-            LEFT JOIN geohistory.affectedtype affectedtypeto
-                ON affectedgovernmentpart.affectedtypeto = affectedtypeto.affectedtypeid
-            LEFT JOIN geohistory.government governmentfrom
-                ON affectedgovernmentpart.governmentfrom = governmentfrom.governmentid
-            LEFT JOIN geohistory.government governmentto
-                ON affectedgovernmentpart.governmentto = governmentto.governmentid
-            ORDER BY 1, 2
-        QUERY;
+                SELECT DISTINCT affectedgovernmentgrouppart.affectedgovernmentgroup AS id,
+                    affectedgovernmentlevel.affectedgovernmentlevellong AS affectedgovernmentlevellong,
+                    affectedgovernmentlevel.affectedgovernmentleveldisplayorder AS affectedgovernmentleveldisplayorder,
+                    affectedgovernmentlevel.affectedgovernmentlevelgroup = 4 AS includelink,
+                    COALESCE(governmentfrom.governmentslugsubstitute, '') AS governmentfrom,
+                    COALESCE(governmentfrom.governmentlong, '') AS governmentfromlong,
+                    COALESCE(affectedtypefrom.affectedtypeshort, '') AS affectedtypefrom,
+                    COALESCE(governmentto.governmentslugsubstitute, '') AS governmentto,
+                    COALESCE(governmentto.governmentlong, '') AS governmenttolong,
+                    COALESCE(affectedtypeto.affectedtypeshort, '') AS affectedtypeto
+                FROM geohistory.affectedgovernmentgroup
+                JOIN geohistory.affectedgovernmentgrouppart
+                    ON affectedgovernmentgroup.affectedgovernmentgroupid = affectedgovernmentgrouppart.affectedgovernmentgroup
+                    AND affectedgovernmentgroup.event = ?
+                JOIN geohistory.affectedgovernmentlevel
+                    ON affectedgovernmentgrouppart.affectedgovernmentlevel = affectedgovernmentlevel.affectedgovernmentlevelid
+                JOIN geohistory.affectedgovernmentpart
+                    ON affectedgovernmentgrouppart.affectedgovernmentpart = affectedgovernmentpart.affectedgovernmentpartid
+                LEFT JOIN geohistory.affectedtype affectedtypefrom
+                    ON affectedgovernmentpart.affectedtypefrom = affectedtypefrom.affectedtypeid
+                LEFT JOIN geohistory.affectedtype affectedtypeto
+                    ON affectedgovernmentpart.affectedtypeto = affectedtypeto.affectedtypeid
+                LEFT JOIN geohistory.government governmentfrom
+                    ON affectedgovernmentpart.governmentfrom = governmentfrom.governmentid
+                LEFT JOIN geohistory.government governmentto
+                    ON affectedgovernmentpart.governmentto = governmentto.governmentid
+                ORDER BY 1, 2
+            QUERY;
 
         $query = $this->db->query($query, [
             $id,
@@ -104,35 +104,35 @@ class AffectedGovernmentGroupModel extends BaseModel
     public function getByGovernmentForm(int $id): array
     {
         $query = <<<QUERY
-            SELECT DISTINCT event.eventsort,
-                event.eventid AS event,
-                event.eventslug,
-                governmentform.governmentformlong,
-                event.eventyear,
-                event.eventeffectivetext AS eventeffective,
-                event.eventeffective AS eventeffectivesort,
-                NOT eventgranted.eventgrantedcertainty AS eventreconstructed,
-                government.governmentlong AS governmentaffectedlong
-            FROM geohistory.event
-            JOIN geohistory.eventgranted
-                ON event.eventgranted = eventgranted.eventgrantedid
-                AND eventgranted.eventgrantedsuccess
-            JOIN geohistory.affectedgovernmentgroup
-                ON event.eventid = affectedgovernmentgroup.event
-            JOIN geohistory.affectedgovernmentgrouppart
-                ON affectedgovernmentgroup.affectedgovernmentgroupid = affectedgovernmentgrouppart.affectedgovernmentgroup
-            JOIN geohistory.affectedgovernmentpart
-                ON affectedgovernmentgrouppart.affectedgovernmentpart = affectedgovernmentpart.affectedgovernmentpartid
-                AND affectedgovernmentpart.governmentformto IS NOT NULL
-            JOIN geohistory.government
-                ON affectedgovernmentpart.governmentto = government.governmentid
-            JOIN geohistory.government governmentsubstitute
-                ON government.governmentslugsubstitute = governmentsubstitute.governmentslugsubstitute
-                AND governmentsubstitute.governmentid = ?
-            JOIN geohistory.governmentform
-                ON affectedgovernmentpart.governmentformto = governmentform.governmentformid
-            ORDER BY 1, 4
-        QUERY;
+                SELECT DISTINCT event.eventsort,
+                    event.eventid AS event,
+                    event.eventslug,
+                    governmentform.governmentformlong,
+                    event.eventyear,
+                    event.eventeffectivetext AS eventeffective,
+                    event.eventeffective AS eventeffectivesort,
+                    NOT eventgranted.eventgrantedcertainty AS eventreconstructed,
+                    government.governmentlong AS governmentaffectedlong
+                FROM geohistory.event
+                JOIN geohistory.eventgranted
+                    ON event.eventgranted = eventgranted.eventgrantedid
+                    AND eventgranted.eventgrantedsuccess
+                JOIN geohistory.affectedgovernmentgroup
+                    ON event.eventid = affectedgovernmentgroup.event
+                JOIN geohistory.affectedgovernmentgrouppart
+                    ON affectedgovernmentgroup.affectedgovernmentgroupid = affectedgovernmentgrouppart.affectedgovernmentgroup
+                JOIN geohistory.affectedgovernmentpart
+                    ON affectedgovernmentgrouppart.affectedgovernmentpart = affectedgovernmentpart.affectedgovernmentpartid
+                    AND affectedgovernmentpart.governmentformto IS NOT NULL
+                JOIN geohistory.government
+                    ON affectedgovernmentpart.governmentto = government.governmentid
+                JOIN geohistory.government governmentsubstitute
+                    ON government.governmentslugsubstitute = governmentsubstitute.governmentslugsubstitute
+                    AND governmentsubstitute.governmentid = ?
+                JOIN geohistory.governmentform
+                    ON affectedgovernmentpart.governmentformto = governmentform.governmentformid
+                ORDER BY 1, 4
+            QUERY;
 
         $query = $this->db->query($query, [
             $id,
@@ -144,156 +144,156 @@ class AffectedGovernmentGroupModel extends BaseModel
     public function getByGovernmentGovernment(int $id): array
     {
         $query = <<<QUERY
-            SELECT DISTINCT event.eventsort,
-                affectedgovernment.event,
-                event.eventslug,
-                affectedtypesame.affectedtypeshort || CASE
-                    WHEN affectedgovernment.affectedtypesamewithin THEN ' (Within)'
-                    ELSE ''
-                END AS affectedtypesame,
-                government.governmentlong,
-                CASE
-                    WHEN government.governmentslugsubstitute = governmentaffected.governmentslugsubstitute THEN ''
-                    ELSE government.governmentslugsubstitute
-                END AS governmentslug,
-                affectedtypeother.affectedtypeshort || CASE
-                    WHEN affectedgovernment.affectedtypeotherwithin THEN ' (Within)'
-                    ELSE ''
-                END AS affectedtypeother,
-                event.eventyear,
-                event.eventeffectivetext AS eventeffective,
-                event.eventeffective AS eventeffectivesort,
-                NOT eventgranted.eventgrantedcertainty AS eventreconstructed,
-                governmentaffected.governmentlong AS governmentaffectedlong
-            FROM (
-                -- To-From
-                    SELECT DISTINCT affectedgovernmentgroup.event,
-                        affectedgovernmentpart.affectedtypeto AS affectedtypesame,
-                        FALSE AS affectedtypesamewithin,
-                        affectedgovernmentpart.governmentfrom AS government,
-                        affectedgovernmentpart.affectedtypefrom AS affectedtypeother,
-                        FALSE AS affectedtypeotherwithin,
-                        affectedgovernmentpart.governmentto AS governmentaffected
-                    FROM geohistory.affectedgovernmentgroup
-                    JOIN geohistory.affectedgovernmentgrouppart
-                        ON affectedgovernmentgroup.affectedgovernmentgroupid = affectedgovernmentgrouppart.affectedgovernmentgroup
-                    JOIN geohistory.affectedgovernmentpart
-                        ON affectedgovernmentgrouppart.affectedgovernmentpart = affectedgovernmentpart.affectedgovernmentpartid
+                SELECT DISTINCT event.eventsort,
+                    affectedgovernment.event,
+                    event.eventslug,
+                    affectedtypesame.affectedtypeshort || CASE
+                        WHEN affectedgovernment.affectedtypesamewithin THEN ' (Within)'
+                        ELSE ''
+                    END AS affectedtypesame,
+                    government.governmentlong,
+                    CASE
+                        WHEN government.governmentslugsubstitute = governmentaffected.governmentslugsubstitute THEN ''
+                        ELSE government.governmentslugsubstitute
+                    END AS governmentslug,
+                    affectedtypeother.affectedtypeshort || CASE
+                        WHEN affectedgovernment.affectedtypeotherwithin THEN ' (Within)'
+                        ELSE ''
+                    END AS affectedtypeother,
+                    event.eventyear,
+                    event.eventeffectivetext AS eventeffective,
+                    event.eventeffective AS eventeffectivesort,
+                    NOT eventgranted.eventgrantedcertainty AS eventreconstructed,
+                    governmentaffected.governmentlong AS governmentaffectedlong
+                FROM (
+                    -- To-From
+                        SELECT DISTINCT affectedgovernmentgroup.event,
+                            affectedgovernmentpart.affectedtypeto AS affectedtypesame,
+                            FALSE AS affectedtypesamewithin,
+                            affectedgovernmentpart.governmentfrom AS government,
+                            affectedgovernmentpart.affectedtypefrom AS affectedtypeother,
+                            FALSE AS affectedtypeotherwithin,
+                            affectedgovernmentpart.governmentto AS governmentaffected
+                        FROM geohistory.affectedgovernmentgroup
+                        JOIN geohistory.affectedgovernmentgrouppart
+                            ON affectedgovernmentgroup.affectedgovernmentgroupid = affectedgovernmentgrouppart.affectedgovernmentgroup
+                        JOIN geohistory.affectedgovernmentpart
+                            ON affectedgovernmentgrouppart.affectedgovernmentpart = affectedgovernmentpart.affectedgovernmentpartid
+                        JOIN geohistory.government
+                            ON affectedgovernmentpart.governmentto = government.governmentid
+                        JOIN geohistory.government governmentsubstitute
+                            ON government.governmentslugsubstitute = governmentsubstitute.governmentslugsubstitute
+                            AND governmentsubstitute.governmentid = ?
+                        UNION
+                    -- From-To
+                        SELECT DISTINCT affectedgovernmentgroup.event,
+                            affectedgovernmentpart.affectedtypefrom AS affectedtypesame,
+                            FALSE AS affectedtypesamewithin,
+                            affectedgovernmentpart.governmentto AS government,
+                            affectedgovernmentpart.affectedtypeto AS affectedtypeother,
+                            FALSE AS affectedtypeotherwithin,
+                            affectedgovernmentpart.governmentfrom AS governmentaffected
+                        FROM geohistory.affectedgovernmentgroup
+                        JOIN geohistory.affectedgovernmentgrouppart
+                            ON affectedgovernmentgroup.affectedgovernmentgroupid = affectedgovernmentgrouppart.affectedgovernmentgroup
+                        JOIN geohistory.affectedgovernmentpart
+                            ON affectedgovernmentgrouppart.affectedgovernmentpart = affectedgovernmentpart.affectedgovernmentpartid
+                        JOIN geohistory.government
+                            ON affectedgovernmentpart.governmentfrom = government.governmentid
+                        JOIN geohistory.government governmentsubstitute
+                            ON government.governmentslugsubstitute = governmentsubstitute.governmentslugsubstitute
+                            AND governmentsubstitute.governmentid = ?
+                        UNION
+                    -- From-To (Different Level)
+                        SELECT DISTINCT affectedgovernmentgroup.event,
+                            affectedgovernmentpart.affectedtypefrom AS affectedtypesame,
+                            affectedgovernmentlevel.affectedgovernmentleveldisplayorder < otherlevel.affectedgovernmentleveldisplayorder AS affectedtypesamewithin,
+                            otherpart.governmentto AS government,
+                            otherpart.affectedtypeto AS affectedtypeother,
+                            affectedgovernmentlevel.affectedgovernmentleveldisplayorder > otherlevel.affectedgovernmentleveldisplayorder AS affectedtypeotherwithin,
+                            affectedgovernmentpart.governmentfrom AS governmentaffected
+                        FROM geohistory.affectedgovernmentgroup
+                        JOIN geohistory.affectedgovernmentgrouppart
+                            ON affectedgovernmentgroup.affectedgovernmentgroupid = affectedgovernmentgrouppart.affectedgovernmentgroup
+                        JOIN geohistory.affectedgovernmentpart
+                            ON affectedgovernmentgrouppart.affectedgovernmentpart = affectedgovernmentpart.affectedgovernmentpartid
+                        JOIN geohistory.government
+                            ON affectedgovernmentpart.governmentfrom = government.governmentid
+                        JOIN geohistory.government governmentsubstitute
+                            ON government.governmentslugsubstitute = governmentsubstitute.governmentslugsubstitute
+                            AND governmentsubstitute.governmentid = ?
+                        JOIN geohistory.affectedgovernmentlevel
+                            ON affectedgovernmentgrouppart.affectedgovernmentlevel = affectedgovernmentlevel.affectedgovernmentlevelid
+                        JOIN geohistory.affectedgovernmentlevel otherlevel
+                            ON affectedgovernmentlevel.affectedgovernmentlevelgroup = otherlevel.affectedgovernmentlevelgroup
+                            AND affectedgovernmentlevel.affectedgovernmentlevelid <> otherlevel.affectedgovernmentlevelid
+                        JOIN geohistory.affectedgovernmentgrouppart othergrouppart
+                            ON affectedgovernmentgroup.affectedgovernmentgroupid = othergrouppart.affectedgovernmentgroup
+                            AND othergrouppart.affectedgovernmentlevel = otherlevel.affectedgovernmentlevelid
+                        JOIN geohistory.affectedgovernmentpart otherpart
+                            ON othergrouppart.affectedgovernmentpart = otherpart.affectedgovernmentpartid
+                            AND otherpart.governmentto IS NOT NULL
+                        UNION
+                    -- To-From (Different Level)
+                        SELECT DISTINCT affectedgovernmentgroup.event,
+                            affectedgovernmentpart.affectedtypeto AS affectedtypesame,
+                            affectedgovernmentlevel.affectedgovernmentleveldisplayorder < otherlevel.affectedgovernmentleveldisplayorder AS affectedtypesamewithin,
+                            otherpart.governmentfrom AS government,
+                            otherpart.affectedtypefrom AS affectedtypeother,
+                            affectedgovernmentlevel.affectedgovernmentleveldisplayorder > otherlevel.affectedgovernmentleveldisplayorder AS affectedtypeotherwithin,
+                            affectedgovernmentpart.governmentto AS governmentaffected
+                        FROM geohistory.affectedgovernmentgroup
+                        JOIN geohistory.affectedgovernmentgrouppart
+                            ON affectedgovernmentgroup.affectedgovernmentgroupid = affectedgovernmentgrouppart.affectedgovernmentgroup
+                        JOIN geohistory.affectedgovernmentpart
+                            ON affectedgovernmentgrouppart.affectedgovernmentpart = affectedgovernmentpart.affectedgovernmentpartid
+                        JOIN geohistory.government
+                            ON affectedgovernmentpart.governmentto = government.governmentid
+                        JOIN geohistory.government governmentsubstitute
+                            ON government.governmentslugsubstitute = governmentsubstitute.governmentslugsubstitute
+                            AND governmentsubstitute.governmentid = ?
+                        JOIN geohistory.affectedgovernmentlevel
+                            ON affectedgovernmentgrouppart.affectedgovernmentlevel = affectedgovernmentlevel.affectedgovernmentlevelid
+                        JOIN geohistory.affectedgovernmentlevel otherlevel
+                            ON affectedgovernmentlevel.affectedgovernmentlevelgroup = otherlevel.affectedgovernmentlevelgroup
+                            AND affectedgovernmentlevel.affectedgovernmentlevelid <> otherlevel.affectedgovernmentlevelid
+                        JOIN geohistory.affectedgovernmentgrouppart othergrouppart
+                            ON affectedgovernmentgroup.affectedgovernmentgroupid = othergrouppart.affectedgovernmentgroup
+                            AND othergrouppart.affectedgovernmentlevel = otherlevel.affectedgovernmentlevelid
+                        JOIN geohistory.affectedgovernmentpart otherpart
+                            ON othergrouppart.affectedgovernmentpart = otherpart.affectedgovernmentpartid
+                            AND otherpart.governmentfrom IS NOT NULL
+                ) AS affectedgovernment
+                    JOIN geohistory.event
+                        ON affectedgovernment.event = event.eventid
+                    JOIN geohistory.eventgranted
+                        ON event.eventgranted = eventgranted.eventgrantedid
+                        AND eventgranted.eventgrantedsuccess
+                    JOIN geohistory.affectedtype affectedtypesame
+                        ON affectedgovernment.affectedtypesame = affectedtypesame.affectedtypeid
+                    JOIN geohistory.affectedtype affectedtypeother
+                        ON affectedgovernment.affectedtypeother = affectedtypeother.affectedtypeid
                     JOIN geohistory.government
-                        ON affectedgovernmentpart.governmentto = government.governmentid
-                    JOIN geohistory.government governmentsubstitute
-                        ON government.governmentslugsubstitute = governmentsubstitute.governmentslugsubstitute
-                        AND governmentsubstitute.governmentid = ?
-                    UNION
-                -- From-To
-                    SELECT DISTINCT affectedgovernmentgroup.event,
-                        affectedgovernmentpart.affectedtypefrom AS affectedtypesame,
-                        FALSE AS affectedtypesamewithin,
-                        affectedgovernmentpart.governmentto AS government,
-                        affectedgovernmentpart.affectedtypeto AS affectedtypeother,
-                        FALSE AS affectedtypeotherwithin,
-                        affectedgovernmentpart.governmentfrom AS governmentaffected
-                    FROM geohistory.affectedgovernmentgroup
-                    JOIN geohistory.affectedgovernmentgrouppart
-                        ON affectedgovernmentgroup.affectedgovernmentgroupid = affectedgovernmentgrouppart.affectedgovernmentgroup
-                    JOIN geohistory.affectedgovernmentpart
-                        ON affectedgovernmentgrouppart.affectedgovernmentpart = affectedgovernmentpart.affectedgovernmentpartid
-                    JOIN geohistory.government
-                        ON affectedgovernmentpart.governmentfrom = government.governmentid
-                    JOIN geohistory.government governmentsubstitute
-                        ON government.governmentslugsubstitute = governmentsubstitute.governmentslugsubstitute
-                        AND governmentsubstitute.governmentid = ?
-                    UNION
-                -- From-To (Different Level)
-                    SELECT DISTINCT affectedgovernmentgroup.event,
-                        affectedgovernmentpart.affectedtypefrom AS affectedtypesame,
-                        affectedgovernmentlevel.affectedgovernmentleveldisplayorder < otherlevel.affectedgovernmentleveldisplayorder AS affectedtypesamewithin,
-                        otherpart.governmentto AS government,
-                        otherpart.affectedtypeto AS affectedtypeother,
-                        affectedgovernmentlevel.affectedgovernmentleveldisplayorder > otherlevel.affectedgovernmentleveldisplayorder AS affectedtypeotherwithin,
-                        affectedgovernmentpart.governmentfrom AS governmentaffected
-                    FROM geohistory.affectedgovernmentgroup
-                    JOIN geohistory.affectedgovernmentgrouppart
-                        ON affectedgovernmentgroup.affectedgovernmentgroupid = affectedgovernmentgrouppart.affectedgovernmentgroup
-                    JOIN geohistory.affectedgovernmentpart
-                        ON affectedgovernmentgrouppart.affectedgovernmentpart = affectedgovernmentpart.affectedgovernmentpartid
-                    JOIN geohistory.government
-                        ON affectedgovernmentpart.governmentfrom = government.governmentid
-                    JOIN geohistory.government governmentsubstitute
-                        ON government.governmentslugsubstitute = governmentsubstitute.governmentslugsubstitute
-                        AND governmentsubstitute.governmentid = ?
-                    JOIN geohistory.affectedgovernmentlevel
-                        ON affectedgovernmentgrouppart.affectedgovernmentlevel = affectedgovernmentlevel.affectedgovernmentlevelid
-                    JOIN geohistory.affectedgovernmentlevel otherlevel
-                        ON affectedgovernmentlevel.affectedgovernmentlevelgroup = otherlevel.affectedgovernmentlevelgroup
-                        AND affectedgovernmentlevel.affectedgovernmentlevelid <> otherlevel.affectedgovernmentlevelid
-                    JOIN geohistory.affectedgovernmentgrouppart othergrouppart
-                        ON affectedgovernmentgroup.affectedgovernmentgroupid = othergrouppart.affectedgovernmentgroup
-                        AND othergrouppart.affectedgovernmentlevel = otherlevel.affectedgovernmentlevelid
-                    JOIN geohistory.affectedgovernmentpart otherpart
-                        ON othergrouppart.affectedgovernmentpart = otherpart.affectedgovernmentpartid
-                        AND otherpart.governmentto IS NOT NULL
-                    UNION
-                -- To-From (Different Level)
-                    SELECT DISTINCT affectedgovernmentgroup.event,
-                        affectedgovernmentpart.affectedtypeto AS affectedtypesame,
-                        affectedgovernmentlevel.affectedgovernmentleveldisplayorder < otherlevel.affectedgovernmentleveldisplayorder AS affectedtypesamewithin,
-                        otherpart.governmentfrom AS government,
-                        otherpart.affectedtypefrom AS affectedtypeother,
-                        affectedgovernmentlevel.affectedgovernmentleveldisplayorder > otherlevel.affectedgovernmentleveldisplayorder AS affectedtypeotherwithin,
-                        affectedgovernmentpart.governmentto AS governmentaffected
-                    FROM geohistory.affectedgovernmentgroup
-                    JOIN geohistory.affectedgovernmentgrouppart
-                        ON affectedgovernmentgroup.affectedgovernmentgroupid = affectedgovernmentgrouppart.affectedgovernmentgroup
-                    JOIN geohistory.affectedgovernmentpart
-                        ON affectedgovernmentgrouppart.affectedgovernmentpart = affectedgovernmentpart.affectedgovernmentpartid
-                    JOIN geohistory.government
-                        ON affectedgovernmentpart.governmentto = government.governmentid
-                    JOIN geohistory.government governmentsubstitute
-                        ON government.governmentslugsubstitute = governmentsubstitute.governmentslugsubstitute
-                        AND governmentsubstitute.governmentid = ?
-                    JOIN geohistory.affectedgovernmentlevel
-                        ON affectedgovernmentgrouppart.affectedgovernmentlevel = affectedgovernmentlevel.affectedgovernmentlevelid
-                    JOIN geohistory.affectedgovernmentlevel otherlevel
-                        ON affectedgovernmentlevel.affectedgovernmentlevelgroup = otherlevel.affectedgovernmentlevelgroup
-                        AND affectedgovernmentlevel.affectedgovernmentlevelid <> otherlevel.affectedgovernmentlevelid
-                    JOIN geohistory.affectedgovernmentgrouppart othergrouppart
-                        ON affectedgovernmentgroup.affectedgovernmentgroupid = othergrouppart.affectedgovernmentgroup
-                        AND othergrouppart.affectedgovernmentlevel = otherlevel.affectedgovernmentlevelid
-                    JOIN geohistory.affectedgovernmentpart otherpart
-                        ON othergrouppart.affectedgovernmentpart = otherpart.affectedgovernmentpartid
-                        AND otherpart.governmentfrom IS NOT NULL
-            ) AS affectedgovernment
-                JOIN geohistory.event
-                    ON affectedgovernment.event = event.eventid
-                JOIN geohistory.eventgranted
-                    ON event.eventgranted = eventgranted.eventgrantedid
-                    AND eventgranted.eventgrantedsuccess
-                JOIN geohistory.affectedtype affectedtypesame
-                    ON affectedgovernment.affectedtypesame = affectedtypesame.affectedtypeid
-                JOIN geohistory.affectedtype affectedtypeother
-                    ON affectedgovernment.affectedtypeother = affectedtypeother.affectedtypeid
-                JOIN geohistory.government
-                    ON affectedgovernment.government = government.governmentid
-                JOIN geohistory.government governmentaffected
-                    ON affectedgovernment.governmentaffected = governmentaffected.governmentid
-            WHERE affectedgovernment.government <> affectedgovernment.governmentaffected
-                AND NOT (
-                (
-                    affectedtypesame.affectedtypecreationdissolution = ''
-                    AND affectedtypeother.affectedtypecreationdissolution = ''
-                ) OR (
-                    affectedtypesame.affectedtypecreationdissolution IN ('separate', 'subordinate')
-                    AND affectedgovernment.affectedtypesamewithin
-                ) OR (
-                    affectedtypeother.affectedtypecreationdissolution IN ('separate', 'subordinate')
-                    AND affectedgovernment.affectedtypeotherwithin
-                )
-                )
-                AND affectedtypesame.affectedtypecreationdissolution <> 'reference'
-                AND affectedtypeother.affectedtypecreationdissolution <> 'reference'
-            ORDER BY 1, 4, 5, 7
-        QUERY;
+                        ON affectedgovernment.government = government.governmentid
+                    JOIN geohistory.government governmentaffected
+                        ON affectedgovernment.governmentaffected = governmentaffected.governmentid
+                WHERE affectedgovernment.government <> affectedgovernment.governmentaffected
+                    AND NOT (
+                    (
+                        affectedtypesame.affectedtypecreationdissolution = ''
+                        AND affectedtypeother.affectedtypecreationdissolution = ''
+                    ) OR (
+                        affectedtypesame.affectedtypecreationdissolution IN ('separate', 'subordinate')
+                        AND affectedgovernment.affectedtypesamewithin
+                    ) OR (
+                        affectedtypeother.affectedtypecreationdissolution IN ('separate', 'subordinate')
+                        AND affectedgovernment.affectedtypeotherwithin
+                    )
+                    )
+                    AND affectedtypesame.affectedtypecreationdissolution <> 'reference'
+                    AND affectedtypeother.affectedtypecreationdissolution <> 'reference'
+                ORDER BY 1, 4, 5, 7
+            QUERY;
 
         $query = $this->db->query($query, [
             $id,
@@ -308,42 +308,42 @@ class AffectedGovernmentGroupModel extends BaseModel
     public function getByGovernmentShape(int $id): array
     {
         $query = <<<QUERY
-            SELECT DISTINCT affectedgovernmentgrouppart.affectedgovernmentgroup AS id,
-                affectedgovernmentlevel.affectedgovernmentlevellong AS affectedgovernmentlevellong,
-                affectedgovernmentlevel.affectedgovernmentleveldisplayorder AS affectedgovernmentleveldisplayorder,
-                affectedgovernmentlevel.affectedgovernmentlevelgroup = 4 AS includelink,
-                COALESCE(governmentfrom.governmentslugsubstitute, '') AS governmentfrom,
-                COALESCE(governmentfrom.governmentlong, '') AS governmentfromlong,
-                COALESCE(affectedtypefrom.affectedtypeshort, '') AS affectedtypefrom,
-                COALESCE(governmentto.governmentslugsubstitute, '') AS governmentto,
-                COALESCE(governmentto.governmentlong, '') AS governmenttolong,
-                COALESCE(affectedtypeto.affectedtypeshort, '') AS affectedtypeto,
-                event.eventid,
-                event.eventslug,
-                event.eventdatetext,
-                event.eventsort
-            FROM gis.affectedgovernmentgis
-            JOIN geohistory.affectedgovernmentgroup
-                ON affectedgovernmentgis.affectedgovernment = affectedgovernmentgroup.affectedgovernmentgroupid
-                AND affectedgovernmentgis.governmentshape = ?
-            JOIN geohistory.event
-                ON affectedgovernmentgroup.event = event.eventid
-            JOIN geohistory.affectedgovernmentgrouppart
-                ON affectedgovernmentgroup.affectedgovernmentgroupid = affectedgovernmentgrouppart.affectedgovernmentgroup
-            JOIN geohistory.affectedgovernmentlevel
-                ON affectedgovernmentgrouppart.affectedgovernmentlevel = affectedgovernmentlevel.affectedgovernmentlevelid
-            JOIN geohistory.affectedgovernmentpart
-                ON affectedgovernmentgrouppart.affectedgovernmentpart = affectedgovernmentpart.affectedgovernmentpartid
-            LEFT JOIN geohistory.affectedtype affectedtypefrom
-                ON affectedgovernmentpart.affectedtypefrom = affectedtypefrom.affectedtypeid
-            LEFT JOIN geohistory.affectedtype affectedtypeto
-                ON affectedgovernmentpart.affectedtypeto = affectedtypeto.affectedtypeid
-            LEFT JOIN geohistory.government governmentfrom
-                ON affectedgovernmentpart.governmentfrom = governmentfrom.governmentid
-            LEFT JOIN geohistory.government governmentto
-                ON affectedgovernmentpart.governmentto = governmentto.governmentid
-            ORDER BY 1, 2
-        QUERY;
+                SELECT DISTINCT affectedgovernmentgrouppart.affectedgovernmentgroup AS id,
+                    affectedgovernmentlevel.affectedgovernmentlevellong AS affectedgovernmentlevellong,
+                    affectedgovernmentlevel.affectedgovernmentleveldisplayorder AS affectedgovernmentleveldisplayorder,
+                    affectedgovernmentlevel.affectedgovernmentlevelgroup = 4 AS includelink,
+                    COALESCE(governmentfrom.governmentslugsubstitute, '') AS governmentfrom,
+                    COALESCE(governmentfrom.governmentlong, '') AS governmentfromlong,
+                    COALESCE(affectedtypefrom.affectedtypeshort, '') AS affectedtypefrom,
+                    COALESCE(governmentto.governmentslugsubstitute, '') AS governmentto,
+                    COALESCE(governmentto.governmentlong, '') AS governmenttolong,
+                    COALESCE(affectedtypeto.affectedtypeshort, '') AS affectedtypeto,
+                    event.eventid,
+                    event.eventslug,
+                    event.eventdatetext,
+                    event.eventsort
+                FROM gis.affectedgovernmentgis
+                JOIN geohistory.affectedgovernmentgroup
+                    ON affectedgovernmentgis.affectedgovernment = affectedgovernmentgroup.affectedgovernmentgroupid
+                    AND affectedgovernmentgis.governmentshape = ?
+                JOIN geohistory.event
+                    ON affectedgovernmentgroup.event = event.eventid
+                JOIN geohistory.affectedgovernmentgrouppart
+                    ON affectedgovernmentgroup.affectedgovernmentgroupid = affectedgovernmentgrouppart.affectedgovernmentgroup
+                JOIN geohistory.affectedgovernmentlevel
+                    ON affectedgovernmentgrouppart.affectedgovernmentlevel = affectedgovernmentlevel.affectedgovernmentlevelid
+                JOIN geohistory.affectedgovernmentpart
+                    ON affectedgovernmentgrouppart.affectedgovernmentpart = affectedgovernmentpart.affectedgovernmentpartid
+                LEFT JOIN geohistory.affectedtype affectedtypefrom
+                    ON affectedgovernmentpart.affectedtypefrom = affectedtypefrom.affectedtypeid
+                LEFT JOIN geohistory.affectedtype affectedtypeto
+                    ON affectedgovernmentpart.affectedtypeto = affectedtypeto.affectedtypeid
+                LEFT JOIN geohistory.government governmentfrom
+                    ON affectedgovernmentpart.governmentfrom = governmentfrom.governmentid
+                LEFT JOIN geohistory.government governmentto
+                    ON affectedgovernmentpart.governmentto = governmentto.governmentid
+                ORDER BY 1, 2
+            QUERY;
 
         $query = $this->db->query($query, [
             $id,
