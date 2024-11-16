@@ -52,7 +52,7 @@ keyText = key[0].toUpperCase() + key.substring(1);
 Object.values(affectedgovernmenttype[key]).forEach(value => {
 if (props[keyText + ' ' + value + ' Long']) {
 affectedGovernmentString += (keyText == 'To' || keyNumber > 0 ? '<br>' : '') + '<div class="mapwidth">' + (keyNumber == 0 ? keyText + ': ' : '') + '</div>';
-affectedGovernmentString += (props[keyText + ' ' + value + ' Link'] ? '<a href="' + props[keyText + ' ' + value + ' Link'] + '">' : '');
+affectedGovernmentString += (props[keyText + ' ' + value + ' Link'] ? '<a href="/<?= \Config\Services::request()->getLocale() ?>/government/' + props[keyText + ' ' + value + ' Link'] + '/">' : '');
     affectedGovernmentString += props[keyText + ' ' + value + ' Long'];
     affectedGovernmentString += (props[keyText + ' ' + value + ' Link'] ? '</a>' : '');
 affectedGovernmentString += ' (<span class="i">' + props[keyText + ' ' + value + ' Affected'] + '</span>)';
