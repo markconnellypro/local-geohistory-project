@@ -470,16 +470,14 @@ h1 {
     display: inherit;
 }
 
-.mapwidth {
-    font-weight: bold;
-    min-width: 40px;
-    display: inline-block;
+#mapinfo {
+    display: grid;
+    grid-template-columns: minmax(10px, auto) minmax(10px, auto);
 }
 
-.mapwidth2 {
+.mapwidth {
     font-weight: bold;
-    min-width: 115px;
-    display: inline-block;
+    margin-right: 10px;
 }
 
 /* Search */
