@@ -1,0 +1,9 @@
+Icons used in project:
+
+https://raw.githubusercontent.com/google/material-design-icons/refs/tags/4.0.0/src/action/info_outline/materialicons/24px.svg
+https://raw.githubusercontent.com/google/material-design-icons/refs/tags/4.0.0/src/action/home/materialicons/24px.svg
+https://raw.githubusercontent.com/google/material-design-icons/refs/tags/4.0.0/src/communication/vpn_key/materialicons/24px.svg
+https://raw.githubusercontent.com/google/material-design-icons/refs/tags/4.0.0/src/action/search/materialicons/24px.svg
+https://raw.githubusercontent.com/google/material-design-icons/refs/tags/4.0.0/src/editor/insert_chart_outlined/materialicons/24px.svg
+
+Modifications made to wrap paths in g tag to modify color in CSS.
