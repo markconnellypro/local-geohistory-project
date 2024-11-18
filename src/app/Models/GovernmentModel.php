@@ -13,6 +13,7 @@ class GovernmentModel extends BaseModel
         }
 
         $query = <<<QUERY
+                -- BEGIN: PORTION TAKEN FROM GOVERNMENTCHANGECOUNT
                 WITH affectedgovernmentsummary AS (
                     SELECT DISTINCT affectedgovernmentgroup.event AS eventid,
                         government_1.governmentid,
@@ -205,6 +206,7 @@ class GovernmentModel extends BaseModel
                         LEFT JOIN affectedgovernmentform ON government.governmentid = affectedgovernmentform.government AND affectedgovernmentform.recentness = 1
                     WHERE government.governmentid = ?
                 )
+                -- END: PORTION TAKEN FROM GOVERNMENTCHANGECOUNT
                 SELECT government.governmentid,
                     government.governmentlong,
                         CASE
