@@ -1240,7 +1240,8 @@ class GovernmentModel extends BaseModel
                     SELECT DISTINCT governmentsubstitute.governmentid,
                         governmentsubstitute.governmentstatus,
                         governmentsubstitute.governmentcurrentleadparent,
-                        governmentsubstitute.governmentcurrentleadstateid
+                        governmentsubstitute.governmentcurrentleadstateid,
+                        governmentsubstitute.governmentlevel
                     FROM geohistory.government
                     JOIN geohistory.government governmentsubstitute
                         ON government.governmentslugsubstitute = governmentsubstitute.governmentslugsubstitute
@@ -1295,6 +1296,11 @@ class GovernmentModel extends BaseModel
                         ON affectedgovernmentgrouppart.affectedgovernmentgroup = otheraffectedgovernmentgrouppart.affectedgovernmentgroup
                     JOIN geohistory.affectedgovernmentlevel otheraffectedgovernmentlevel
                         ON otheraffectedgovernmentgrouppart.affectedgovernmentlevel = otheraffectedgovernmentlevel.affectedgovernmentlevelid
+                        AND (
+                            governmentmatch.governmentlevel > 2
+                            OR affectedgovernmentlevel.affectedgovernmentlevelgroup >= otheraffectedgovernmentlevel.affectedgovernmentlevelgroup
+                            OR otheraffectedgovernmentlevel.affectedgovernmentlevelgroup - governmentmatch.governmentlevel = 1
+                        )
                     JOIN geohistory.affectedgovernmentpart otheraffectedgovernmentpart
                         ON otheraffectedgovernmentgrouppart.affectedgovernmentpart = otheraffectedgovernmentpart.affectedgovernmentpartid
                     JOIN geohistory.affectedtype
@@ -1337,6 +1343,11 @@ class GovernmentModel extends BaseModel
                         ON affectedgovernmentgrouppart.affectedgovernmentgroup = otheraffectedgovernmentgrouppart.affectedgovernmentgroup
                     JOIN geohistory.affectedgovernmentlevel otheraffectedgovernmentlevel
                         ON otheraffectedgovernmentgrouppart.affectedgovernmentlevel = otheraffectedgovernmentlevel.affectedgovernmentlevelid
+                        AND (
+                            governmentmatch.governmentlevel > 2
+                            OR affectedgovernmentlevel.affectedgovernmentlevelgroup >= otheraffectedgovernmentlevel.affectedgovernmentlevelgroup
+                            OR otheraffectedgovernmentlevel.affectedgovernmentlevelgroup - governmentmatch.governmentlevel = 1
+                        )
                     JOIN geohistory.affectedgovernmentpart otheraffectedgovernmentpart
                         ON otheraffectedgovernmentgrouppart.affectedgovernmentpart = otheraffectedgovernmentpart.affectedgovernmentpartid
                     JOIN geohistory.affectedtype
@@ -1381,6 +1392,10 @@ class GovernmentModel extends BaseModel
                     JOIN geohistory.government governmentsubstitute
                         ON government.governmentslugsubstitute = governmentsubstitute.governmentslugsubstitute
                         AND governmentsubstitute.governmentid <> ?
+                        AND (
+                            governmentmatch.governmentlevel > 2
+                            OR governmentsubstitute.governmentlevel - governmentmatch.governmentlevel = 1
+                        )
                     UNION DISTINCT
                     SELECT DISTINCT governmentsubstitute.governmentslugsubstitute AS governmentslug,
                         governmentsubstitute.governmentlong,
@@ -1415,6 +1430,10 @@ class GovernmentModel extends BaseModel
                     JOIN geohistory.government governmentsubstitute
                         ON government.governmentslugsubstitute = governmentsubstitute.governmentslugsubstitute
                         AND governmentsubstitute.governmentid <> ?
+                        AND (
+                            governmentmatch.governmentlevel > 2
+                            OR governmentsubstitute.governmentlevel - governmentmatch.governmentlevel = 1
+                        )
                     UNION DISTINCT
                     SELECT DISTINCT governmentsubstitute.governmentslugsubstitute AS governmentslug,
                         governmentsubstitute.governmentlong,
@@ -1453,6 +1472,10 @@ class GovernmentModel extends BaseModel
                     JOIN geohistory.government governmentsubstitute
                         ON government.governmentslugsubstitute = governmentsubstitute.governmentslugsubstitute
                         AND governmentsubstitute.governmentid <> ?
+                        AND (
+                            governmentmatch.governmentlevel > 2
+                            OR governmentsubstitute.governmentlevel - governmentmatch.governmentlevel = 1
+                        )
                 ), governmentrelationrank AS (
                     SELECT governmentrelation.governmentslug,
                         governmentrelation.governmentlong,
