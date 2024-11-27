@@ -1,6 +1,6 @@
 <?php
 $icons ??= [];
-$mastodon = getenv('mastodon') ?? '';
+$mastodon = $_ENV['mastodon'] ?? '';
 $welcome ??= '';
 ?>
 <?php if ($mastodon !== '') { ?>
