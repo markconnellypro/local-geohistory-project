@@ -14,8 +14,9 @@ if [ "$CI_ENVIRONMENT" = "production" ]; then
   for tableName in "${geohistoryTables[@]}"
   do
     if [ -f "/inpostgis/${tableName,,}.tsv" ]; then
+      tsvHeader=$(head -n +1 "/inpostgis/${tableName,,}.tsv" | sed "s/\t/,/g")
       tail -n +2 "/inpostgis/${tableName,,}.tsv" > "/tmp/inpostgis/${tableName,,}.tsv"
-      tableString+="\COPY geohistory.${tableName,,} FROM '/tmp/inpostgis/${tableName,,}.tsv';
+      tableString+="\COPY geohistory.${tableName,,} ($tsvHeader) FROM '/tmp/inpostgis/${tableName,,}.tsv';
       "
     else
       echo "ERROR: ${tableName,,} data file missing"
@@ -28,8 +29,9 @@ if [ "$CI_ENVIRONMENT" = "production" ]; then
   for tableName in "${gisTables[@]}"
   do
     if [ -f "/inpostgis/${tableName,,}.tsv" ]; then
+      tsvHeader=$(head -n +1 "/inpostgis/${tableName,,}.tsv" | sed "s/\t/,/g")
       tail -n +2 "/inpostgis/${tableName,,}.tsv" > "/tmp/inpostgis/${tableName,,}.tsv"
-      tableString+="\COPY gis.${tableName,,} FROM '/tmp/inpostgis/${tableName,,}.tsv';
+      tableString+="\COPY gis.${tableName,,} ($tsvHeader) FROM '/tmp/inpostgis/${tableName,,}.tsv';
       "
     else
       echo "ERROR: ${tableName,,} data file missing"
