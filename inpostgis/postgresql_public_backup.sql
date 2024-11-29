@@ -1490,6 +1490,259 @@ COMMENT ON COLUMN geohistory.adjudicationtype.adjudicationtypeshort IS 'Conform 
 
 
 --
+-- Name: government; Type: TABLE; Schema: geohistory; Owner: postgres
+--
+
+CREATE TABLE geohistory.government (
+    governmentid integer NOT NULL,
+    governmentname character varying(75) NOT NULL,
+    governmenttype character varying(30) NOT NULL,
+    governmentstatus character varying(35) DEFAULT ''::character varying NOT NULL,
+    governmentstatusdefacto boolean DEFAULT false NOT NULL,
+    governmentstyle character varying(20) DEFAULT ''::character varying NOT NULL,
+    governmentlevel smallint NOT NULL,
+    governmentcurrentleadparent integer,
+    governmentabbreviation character varying(10) DEFAULT ''::character varying NOT NULL,
+    government1983stateplaneauthority character varying(100) DEFAULT ''::character varying NOT NULL,
+    governmentlead1983stateplane character varying(2) DEFAULT ''::character varying NOT NULL,
+    governmenthasmultiple1983stateplane boolean,
+    governmentdefaultsrid integer,
+    governmentnotecreation character varying(5) DEFAULT ''::character varying NOT NULL,
+    governmentnotedissolution character varying(5) DEFAULT ''::character varying NOT NULL,
+    governmentnotecurrentleadparent boolean DEFAULT false NOT NULL,
+    governmentcharterstatus integer,
+    governmentbooknote text[],
+    governmentbookcomplete jsonb,
+    governmentmultilevel boolean DEFAULT false NOT NULL,
+    governmentindigobook character varying(20) DEFAULT ''::character varying NOT NULL,
+    governmentsubstitute integer,
+    governmentnumber character varying(3) DEFAULT ''::character varying NOT NULL,
+    governmentmapstatus integer DEFAULT 1 NOT NULL,
+    locale character varying(2) DEFAULT 'en'::character varying NOT NULL,
+    governmentarticle character varying(10) DEFAULT ''::character varying NOT NULL,
+    governmentconnectingarticle character varying(10) DEFAULT ''::character varying NOT NULL,
+    governmentcurrentform integer,
+    governmentcurrentleadstate character varying(10) GENERATED ALWAYS AS (geohistory.governmentcurrentleadstate(governmentid, 1)) STORED,
+    governmentcurrentleadstateid integer GENERATED ALWAYS AS (geohistory.governmentcurrentleadstateid(governmentid, 1)) STORED,
+    governmentlong text GENERATED ALWAYS AS ((((
+CASE
+    WHEN ((governmentname)::text = ''::text) THEN (governmentnumber)::text
+    WHEN ((governmentnumber)::text = ''::text) THEN (governmentname)::text
+    ELSE ((((governmentname)::text || ' ('::text) || (governmentnumber)::text) || ')'::text)
+END ||
+CASE
+    WHEN (governmentlevel > 1) THEN ((', '::text || (
+    CASE
+        WHEN ((governmentstyle)::text <> ''::text) THEN governmentstyle
+        ELSE governmenttype
+    END)::text) ||
+    CASE
+        WHEN ((governmentconnectingarticle)::text <> ''::text) THEN (' '::text || (governmentconnectingarticle)::text)
+        WHEN ((locale)::text = ANY (ARRAY[('de'::character varying)::text, ('nl'::character varying)::text])) THEN ''::text
+        WHEN ((locale)::text = 'fr'::text) THEN ' de'::text
+        ELSE ' of'::text
+    END)
+    ELSE ''::text
+END) ||
+CASE
+    WHEN (((governmentstatus)::text <> ''::text) OR governmentnotecurrentleadparent OR ((governmentnotecreation)::text <> ''::text) OR ((governmentnotedissolution)::text <> ''::text)) THEN ((((((' ('::text || (
+    CASE
+        WHEN governmentnotecurrentleadparent THEN geohistory.governmentname(governmentcurrentleadparent)
+        ELSE ''::character varying
+    END)::text) ||
+    CASE
+        WHEN (governmentnotecurrentleadparent AND (((governmentnotecreation)::text <> ''::text) OR ((governmentnotedissolution)::text <> ''::text))) THEN ', '::text
+        ELSE ''::text
+    END) ||
+    CASE
+        WHEN (((governmentnotecreation)::text <> ''::text) AND ((governmentnotedissolution)::text <> ''::text)) THEN (((governmentnotecreation)::text || '-'::text) || (governmentnotedissolution)::text)
+        WHEN ((governmentnotecreation)::text <> ''::text) THEN ('since '::text || (governmentnotecreation)::text)
+        WHEN ((governmentnotedissolution)::text <> ''::text) THEN ('thru '::text || (governmentnotedissolution)::text)
+        ELSE ''::text
+    END) ||
+    CASE
+        WHEN (((governmentstatus)::text <> ''::text) AND (governmentnotecurrentleadparent OR ((governmentnotecreation)::text <> ''::text) OR ((governmentnotedissolution)::text <> ''::text))) THEN ', '::text
+        ELSE ''::text
+    END) || (governmentstatus)::text) || ')'::text)
+    ELSE ''::text
+END) ||
+CASE
+    WHEN (governmentlevel > 2) THEN ((' ('::text || (geohistory.governmentcurrentleadstate(governmentid, 1))::text) || ')'::text)
+    ELSE ''::text
+END)) STORED,
+    governmentsearch text GENERATED ALWAYS AS (geohistory.punctuationnone(((
+CASE
+    WHEN ((governmentlevel = 2) AND ((governmenttype)::text = 'District'::text)) THEN ((governmenttype)::text || ' of '::text)
+    ELSE ''::text
+END ||
+CASE
+    WHEN ((governmentname)::text = ''::text) THEN (governmentnumber)::text
+    WHEN ((governmentnumber)::text = ''::text) THEN (governmentname)::text
+    ELSE ((((governmentname)::text || ' ('::text) || (governmentnumber)::text) || ')'::text)
+END) ||
+CASE
+    WHEN (governmentlevel > 2) THEN ((((' '::text || (
+    CASE
+        WHEN ((governmentstyle)::text <> ''::text) THEN governmentstyle
+        ELSE governmenttype
+    END)::text) || ' ('::text) || (geohistory.governmentcurrentleadstate(governmentid, 1))::text) || ')'::text)
+    ELSE ''::text
+END))) STORED,
+    governmentshort text GENERATED ALWAYS AS (((
+CASE
+    WHEN ((governmentlevel = 2) AND ((governmenttype)::text = 'District'::text)) THEN ((governmenttype)::text || ' of '::text)
+    ELSE ''::text
+END ||
+CASE
+    WHEN ((governmentname)::text = ''::text) THEN (governmentnumber)::text
+    WHEN ((governmentnumber)::text = ''::text) THEN (governmentname)::text
+    ELSE ((((governmentname)::text || ' ('::text) || (governmentnumber)::text) || ')'::text)
+END) ||
+CASE
+    WHEN (governmentlevel > 2) THEN ((((' '::text || (
+    CASE
+        WHEN ((governmentstyle)::text <> ''::text) THEN governmentstyle
+        ELSE governmenttype
+    END)::text) || ' ('::text) || (geohistory.governmentcurrentleadstate(governmentid, 1))::text) || ')'::text)
+    ELSE ''::text
+END)) STORED,
+    governmentslug text GENERATED ALWAYS AS (lower(replace(regexp_replace(regexp_replace(
+CASE
+    WHEN ((governmentstatus)::text = 'placeholder'::text) THEN NULL::text
+    WHEN ((governmentlevel < 3) AND ((governmentabbreviation)::text <> ''::text)) THEN (governmentabbreviation)::text
+    ELSE ((((((geohistory.governmentcurrentleadstate(governmentid, 1))::text ||
+    CASE
+        WHEN ((governmentarticle)::text <> ''::text) THEN ('-'::text || (governmentarticle)::text)
+        ELSE ''::text
+    END) ||
+    CASE
+        WHEN ((governmentname)::text <> ''::text) THEN ('-'::text || (governmentname)::text)
+        ELSE ''::text
+    END) ||
+    CASE
+        WHEN ((governmentnumber)::text <> ''::text) THEN ('-'::text || (governmentnumber)::text)
+        ELSE ''::text
+    END) ||
+    CASE
+        WHEN (governmentlevel > 1) THEN ('-'::text || (
+        CASE
+            WHEN ((governmentstyle)::text <> ''::text) THEN governmentstyle
+            ELSE governmenttype
+        END)::text)
+        ELSE ''::text
+    END) ||
+    CASE
+        WHEN (((governmentstatus)::text <> ''::text) OR governmentnotecurrentleadparent OR ((governmentnotecreation)::text <> ''::text) OR ((governmentnotedissolution)::text <> ''::text)) THEN ((((('-'::text || (
+        CASE
+            WHEN governmentnotecurrentleadparent THEN geohistory.governmentname(governmentcurrentleadparent)
+            ELSE ''::character varying
+        END)::text) ||
+        CASE
+            WHEN (governmentnotecurrentleadparent AND (((governmentnotecreation)::text <> ''::text) OR ((governmentnotedissolution)::text <> ''::text))) THEN '-'::text
+            ELSE ''::text
+        END) ||
+        CASE
+            WHEN (((governmentnotecreation)::text <> ''::text) AND ((governmentnotedissolution)::text <> ''::text)) THEN (((governmentnotecreation)::text || '-'::text) || (governmentnotedissolution)::text)
+            WHEN ((governmentnotecreation)::text <> ''::text) THEN ('since-'::text || (governmentnotecreation)::text)
+            WHEN ((governmentnotedissolution)::text <> ''::text) THEN ('thru-'::text || (governmentnotedissolution)::text)
+            ELSE ''::text
+        END) ||
+        CASE
+            WHEN (((governmentstatus)::text <> ''::text) AND (governmentnotecurrentleadparent OR ((governmentnotecreation)::text <> ''::text) OR ((governmentnotedissolution)::text <> ''::text))) THEN '-'::text
+            ELSE ''::text
+        END) || (governmentstatus)::text)
+        ELSE ''::text
+    END)
+END, '[\(\)\,\.]'::text, ''::text, 'g'::text), '[ \/ʻ]'::text, '-'::text, 'g'::text), ''''::text, '-'::text))) STORED,
+    governmentslugsubstitute text GENERATED ALWAYS AS (geohistory.governmentslugsubstitute(governmentid, 1)) STORED,
+    governmentshortshort text GENERATED ALWAYS AS (((
+CASE
+    WHEN ((governmentlevel = 2) AND ((governmenttype)::text = 'District'::text)) THEN ((governmenttype)::text || ' of '::text)
+    ELSE ''::text
+END ||
+CASE
+    WHEN ((governmentname)::text = ''::text) THEN (governmentnumber)::text
+    WHEN ((governmentnumber)::text = ''::text) THEN (governmentname)::text
+    ELSE ((((governmentname)::text || ' ('::text) || (governmentnumber)::text) || ')'::text)
+END) ||
+CASE
+    WHEN (governmentlevel > 2) THEN (' '::text || (
+    CASE
+        WHEN ((governmentstyle)::text <> ''::text) THEN governmentstyle
+        ELSE governmenttype
+    END)::text)
+    ELSE ''::text
+END)) STORED,
+    CONSTRAINT government_check CHECK (((((governmentstatus)::text = ANY (ARRAY['cadastral'::text, 'defunct'::text, 'nonfunctioning'::text, 'paper'::text, 'placeholder'::text, 'proposed'::text, 'unincorporated'::text, 'unknown'::text, ''::text])) OR (((governmentstatus)::text = ANY (ARRAY['alternate'::text, 'language'::text])) AND (governmentsubstitute IS NOT NULL))) AND (governmentlevel >= 1) AND (governmentlevel <= 5) AND ((governmentlevel = 2) OR ((governmentlevel <> 2) AND ((government1983stateplaneauthority)::text = ''::text))) AND ((governmentlevel = 3) OR ((governmentlevel <> 3) AND ((governmentlead1983stateplane)::text = ''::text))) AND ((governmentlevel = 3) OR ((governmentlevel <> 3) AND (governmenthasmultiple1983stateplane IS NULL))) AND (((governmentname)::text <> ''::text) OR ((governmentnumber)::text <> ''::text)) AND ((governmenttype)::text <> ''::text) AND ((locale)::text <> ''::text) AND (NOT (((governmentstatus)::text = ANY (ARRAY['placeholder'::text, 'proposed'::text, 'unincorporated'::text])) AND (governmentmapstatus <> 0))) AND (((governmentlevel = 1) AND (governmentcurrentleadparent IS NULL)) OR ((governmentlevel > 1) AND (governmentcurrentleadparent IS NOT NULL) AND (governmentid <> governmentcurrentleadparent)))))
+);
+
+
+ALTER TABLE geohistory.government OWNER TO postgres;
+
+--
+-- Name: COLUMN government.governmentstyle; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.government.governmentstyle IS 'Signifies if the government uses a government type in its formal name that is different than its actual government type.';
+
+
+--
+-- Name: COLUMN government.governmentlevel; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.government.governmentlevel IS '1 = Nation; 2 = State/Province; 3 = County/Parish; 4 = Township/Municipality; 5 = Unincorporated Ward/Populated Place. Generally = floor((OSM admin_level + 1)/2) or GeoNames administrative division order + 1';
+
+
+--
+-- Name: COLUMN government.government1983stateplaneauthority; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.government.government1983stateplaneauthority IS 'Last checked January 29, 2017.';
+
+
+--
+-- Name: COLUMN government.governmentlead1983stateplane; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.government.governmentlead1983stateplane IS 'Last checked January 29, 2017.';
+
+
+--
+-- Name: COLUMN government.governmenthasmultiple1983stateplane; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.government.governmenthasmultiple1983stateplane IS 'Last checked January 29, 2017.';
+
+
+--
+-- Name: COLUMN government.governmentcharterstatus; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.government.governmentcharterstatus IS 'This field is used for internal tracking purposes, and is not included in open data.';
+
+
+--
+-- Name: COLUMN government.governmentbooknote; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.government.governmentbooknote IS 'This field is used for internal tracking purposes, and is not included in open data.';
+
+
+--
+-- Name: COLUMN government.governmentbookcomplete; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.government.governmentbookcomplete IS 'This field is used for internal tracking purposes, and is not included in open data.';
+
+
+--
+-- Name: COLUMN government.governmentmapstatus; Type: COMMENT; Schema: geohistory; Owner: postgres
+--
+
+COMMENT ON COLUMN geohistory.government.governmentmapstatus IS 'The values have been simplified in open data to remove certain information used for internal tracking purposes.';
+
+
+--
 -- Name: tribunal; Type: TABLE; Schema: geohistory; Owner: postgres
 --
 
@@ -1776,6 +2029,24 @@ COMMENT ON COLUMN geohistory.event.eventismappedtype IS 'This field is used for 
 
 
 --
+-- Name: eventeffectivetype; Type: TABLE; Schema: geohistory; Owner: postgres
+--
+
+CREATE TABLE geohistory.eventeffectivetype (
+    eventeffectivetypeid integer NOT NULL,
+    eventeffectivetypegroup character varying(100) DEFAULT ''::character varying NOT NULL,
+    eventeffectivetypequalifier character varying(100) DEFAULT ''::character varying NOT NULL,
+    eventeffectivetypelong text GENERATED ALWAYS AS (((eventeffectivetypegroup)::text ||
+CASE
+    WHEN ((eventeffectivetypequalifier)::text <> ''::text) THEN (': '::text || (eventeffectivetypequalifier)::text)
+    ELSE ''::text
+END)) STORED
+);
+
+
+ALTER TABLE geohistory.eventeffectivetype OWNER TO postgres;
+
+--
 -- Name: eventgranted; Type: TABLE; Schema: geohistory; Owner: postgres
 --
 
@@ -1911,259 +2182,6 @@ COMMENT ON COLUMN geohistory.governmentform.governmentformpublicationdate IS 'Th
 --
 
 COMMENT ON COLUMN geohistory.governmentform.governmentformextended IS 'This field is used for internal tracking purposes, and is not included in open data.';
-
-
---
--- Name: government; Type: TABLE; Schema: geohistory; Owner: postgres
---
-
-CREATE TABLE geohistory.government (
-    governmentid integer NOT NULL,
-    governmentname character varying(75) NOT NULL,
-    governmenttype character varying(30) NOT NULL,
-    governmentstatus character varying(35) DEFAULT ''::character varying NOT NULL,
-    governmentstatusdefacto boolean DEFAULT false NOT NULL,
-    governmentstyle character varying(20) DEFAULT ''::character varying NOT NULL,
-    governmentlevel smallint NOT NULL,
-    governmentcurrentleadparent integer,
-    governmentabbreviation character varying(10) DEFAULT ''::character varying NOT NULL,
-    government1983stateplaneauthority character varying(100) DEFAULT ''::character varying NOT NULL,
-    governmentlead1983stateplane character varying(2) DEFAULT ''::character varying NOT NULL,
-    governmenthasmultiple1983stateplane boolean,
-    governmentdefaultsrid integer,
-    governmentnotecreation character varying(5) DEFAULT ''::character varying NOT NULL,
-    governmentnotedissolution character varying(5) DEFAULT ''::character varying NOT NULL,
-    governmentnotecurrentleadparent boolean DEFAULT false NOT NULL,
-    governmentcharterstatus integer,
-    governmentbooknote text[],
-    governmentbookcomplete jsonb,
-    governmentmultilevel boolean DEFAULT false NOT NULL,
-    governmentindigobook character varying(20) DEFAULT ''::character varying NOT NULL,
-    governmentsubstitute integer,
-    governmentnumber character varying(3) DEFAULT ''::character varying NOT NULL,
-    governmentmapstatus integer DEFAULT 1 NOT NULL,
-    locale character varying(2) DEFAULT 'en'::character varying NOT NULL,
-    governmentarticle character varying(10) DEFAULT ''::character varying NOT NULL,
-    governmentconnectingarticle character varying(10) DEFAULT ''::character varying NOT NULL,
-    governmentcurrentform integer,
-    governmentcurrentleadstate character varying(10) GENERATED ALWAYS AS (geohistory.governmentcurrentleadstate(governmentid, 1)) STORED,
-    governmentcurrentleadstateid integer GENERATED ALWAYS AS (geohistory.governmentcurrentleadstateid(governmentid, 1)) STORED,
-    governmentlong text GENERATED ALWAYS AS ((((
-CASE
-    WHEN ((governmentname)::text = ''::text) THEN (governmentnumber)::text
-    WHEN ((governmentnumber)::text = ''::text) THEN (governmentname)::text
-    ELSE ((((governmentname)::text || ' ('::text) || (governmentnumber)::text) || ')'::text)
-END ||
-CASE
-    WHEN (governmentlevel > 1) THEN ((', '::text || (
-    CASE
-        WHEN ((governmentstyle)::text <> ''::text) THEN governmentstyle
-        ELSE governmenttype
-    END)::text) ||
-    CASE
-        WHEN ((governmentconnectingarticle)::text <> ''::text) THEN (' '::text || (governmentconnectingarticle)::text)
-        WHEN ((locale)::text = ANY (ARRAY[('de'::character varying)::text, ('nl'::character varying)::text])) THEN ''::text
-        WHEN ((locale)::text = 'fr'::text) THEN ' de'::text
-        ELSE ' of'::text
-    END)
-    ELSE ''::text
-END) ||
-CASE
-    WHEN (((governmentstatus)::text <> ''::text) OR governmentnotecurrentleadparent OR ((governmentnotecreation)::text <> ''::text) OR ((governmentnotedissolution)::text <> ''::text)) THEN ((((((' ('::text || (
-    CASE
-        WHEN governmentnotecurrentleadparent THEN geohistory.governmentname(governmentcurrentleadparent)
-        ELSE ''::character varying
-    END)::text) ||
-    CASE
-        WHEN (governmentnotecurrentleadparent AND (((governmentnotecreation)::text <> ''::text) OR ((governmentnotedissolution)::text <> ''::text))) THEN ', '::text
-        ELSE ''::text
-    END) ||
-    CASE
-        WHEN (((governmentnotecreation)::text <> ''::text) AND ((governmentnotedissolution)::text <> ''::text)) THEN (((governmentnotecreation)::text || '-'::text) || (governmentnotedissolution)::text)
-        WHEN ((governmentnotecreation)::text <> ''::text) THEN ('since '::text || (governmentnotecreation)::text)
-        WHEN ((governmentnotedissolution)::text <> ''::text) THEN ('thru '::text || (governmentnotedissolution)::text)
-        ELSE ''::text
-    END) ||
-    CASE
-        WHEN (((governmentstatus)::text <> ''::text) AND (governmentnotecurrentleadparent OR ((governmentnotecreation)::text <> ''::text) OR ((governmentnotedissolution)::text <> ''::text))) THEN ', '::text
-        ELSE ''::text
-    END) || (governmentstatus)::text) || ')'::text)
-    ELSE ''::text
-END) ||
-CASE
-    WHEN (governmentlevel > 2) THEN ((' ('::text || (geohistory.governmentcurrentleadstate(governmentid, 1))::text) || ')'::text)
-    ELSE ''::text
-END)) STORED,
-    governmentsearch text GENERATED ALWAYS AS (geohistory.punctuationnone(((
-CASE
-    WHEN ((governmentlevel = 2) AND ((governmenttype)::text = 'District'::text)) THEN ((governmenttype)::text || ' of '::text)
-    ELSE ''::text
-END ||
-CASE
-    WHEN ((governmentname)::text = ''::text) THEN (governmentnumber)::text
-    WHEN ((governmentnumber)::text = ''::text) THEN (governmentname)::text
-    ELSE ((((governmentname)::text || ' ('::text) || (governmentnumber)::text) || ')'::text)
-END) ||
-CASE
-    WHEN (governmentlevel > 2) THEN ((((' '::text || (
-    CASE
-        WHEN ((governmentstyle)::text <> ''::text) THEN governmentstyle
-        ELSE governmenttype
-    END)::text) || ' ('::text) || (geohistory.governmentcurrentleadstate(governmentid, 1))::text) || ')'::text)
-    ELSE ''::text
-END))) STORED,
-    governmentshort text GENERATED ALWAYS AS (((
-CASE
-    WHEN ((governmentlevel = 2) AND ((governmenttype)::text = 'District'::text)) THEN ((governmenttype)::text || ' of '::text)
-    ELSE ''::text
-END ||
-CASE
-    WHEN ((governmentname)::text = ''::text) THEN (governmentnumber)::text
-    WHEN ((governmentnumber)::text = ''::text) THEN (governmentname)::text
-    ELSE ((((governmentname)::text || ' ('::text) || (governmentnumber)::text) || ')'::text)
-END) ||
-CASE
-    WHEN (governmentlevel > 2) THEN ((((' '::text || (
-    CASE
-        WHEN ((governmentstyle)::text <> ''::text) THEN governmentstyle
-        ELSE governmenttype
-    END)::text) || ' ('::text) || (geohistory.governmentcurrentleadstate(governmentid, 1))::text) || ')'::text)
-    ELSE ''::text
-END)) STORED,
-    governmentslug text GENERATED ALWAYS AS (lower(replace(regexp_replace(regexp_replace(
-CASE
-    WHEN ((governmentstatus)::text = 'placeholder'::text) THEN NULL::text
-    WHEN ((governmentlevel < 3) AND ((governmentabbreviation)::text <> ''::text)) THEN (governmentabbreviation)::text
-    ELSE ((((((geohistory.governmentcurrentleadstate(governmentid, 1))::text ||
-    CASE
-        WHEN ((governmentarticle)::text <> ''::text) THEN ('-'::text || (governmentarticle)::text)
-        ELSE ''::text
-    END) ||
-    CASE
-        WHEN ((governmentname)::text <> ''::text) THEN ('-'::text || (governmentname)::text)
-        ELSE ''::text
-    END) ||
-    CASE
-        WHEN ((governmentnumber)::text <> ''::text) THEN ('-'::text || (governmentnumber)::text)
-        ELSE ''::text
-    END) ||
-    CASE
-        WHEN (governmentlevel > 1) THEN ('-'::text || (
-        CASE
-            WHEN ((governmentstyle)::text <> ''::text) THEN governmentstyle
-            ELSE governmenttype
-        END)::text)
-        ELSE ''::text
-    END) ||
-    CASE
-        WHEN (((governmentstatus)::text <> ''::text) OR governmentnotecurrentleadparent OR ((governmentnotecreation)::text <> ''::text) OR ((governmentnotedissolution)::text <> ''::text)) THEN ((((('-'::text || (
-        CASE
-            WHEN governmentnotecurrentleadparent THEN geohistory.governmentname(governmentcurrentleadparent)
-            ELSE ''::character varying
-        END)::text) ||
-        CASE
-            WHEN (governmentnotecurrentleadparent AND (((governmentnotecreation)::text <> ''::text) OR ((governmentnotedissolution)::text <> ''::text))) THEN '-'::text
-            ELSE ''::text
-        END) ||
-        CASE
-            WHEN (((governmentnotecreation)::text <> ''::text) AND ((governmentnotedissolution)::text <> ''::text)) THEN (((governmentnotecreation)::text || '-'::text) || (governmentnotedissolution)::text)
-            WHEN ((governmentnotecreation)::text <> ''::text) THEN ('since-'::text || (governmentnotecreation)::text)
-            WHEN ((governmentnotedissolution)::text <> ''::text) THEN ('thru-'::text || (governmentnotedissolution)::text)
-            ELSE ''::text
-        END) ||
-        CASE
-            WHEN (((governmentstatus)::text <> ''::text) AND (governmentnotecurrentleadparent OR ((governmentnotecreation)::text <> ''::text) OR ((governmentnotedissolution)::text <> ''::text))) THEN '-'::text
-            ELSE ''::text
-        END) || (governmentstatus)::text)
-        ELSE ''::text
-    END)
-END, '[\(\)\,\.]'::text, ''::text, 'g'::text), '[ \/ʻ]'::text, '-'::text, 'g'::text), ''''::text, '-'::text))) STORED,
-    governmentslugsubstitute text GENERATED ALWAYS AS (geohistory.governmentslugsubstitute(governmentid, 1)) STORED,
-    governmentshortshort text GENERATED ALWAYS AS (((
-CASE
-    WHEN ((governmentlevel = 2) AND ((governmenttype)::text = 'District'::text)) THEN ((governmenttype)::text || ' of '::text)
-    ELSE ''::text
-END ||
-CASE
-    WHEN ((governmentname)::text = ''::text) THEN (governmentnumber)::text
-    WHEN ((governmentnumber)::text = ''::text) THEN (governmentname)::text
-    ELSE ((((governmentname)::text || ' ('::text) || (governmentnumber)::text) || ')'::text)
-END) ||
-CASE
-    WHEN (governmentlevel > 2) THEN (' '::text || (
-    CASE
-        WHEN ((governmentstyle)::text <> ''::text) THEN governmentstyle
-        ELSE governmenttype
-    END)::text)
-    ELSE ''::text
-END)) STORED,
-    CONSTRAINT government_check CHECK (((((governmentstatus)::text = ANY (ARRAY['cadastral'::text, 'defunct'::text, 'nonfunctioning'::text, 'paper'::text, 'placeholder'::text, 'proposed'::text, 'unincorporated'::text, 'unknown'::text, ''::text])) OR (((governmentstatus)::text = ANY (ARRAY['alternate'::text, 'language'::text])) AND (governmentsubstitute IS NOT NULL))) AND (governmentlevel >= 1) AND (governmentlevel <= 5) AND ((governmentlevel = 2) OR ((governmentlevel <> 2) AND ((government1983stateplaneauthority)::text = ''::text))) AND ((governmentlevel = 3) OR ((governmentlevel <> 3) AND ((governmentlead1983stateplane)::text = ''::text))) AND ((governmentlevel = 3) OR ((governmentlevel <> 3) AND (governmenthasmultiple1983stateplane IS NULL))) AND (((governmentname)::text <> ''::text) OR ((governmentnumber)::text <> ''::text)) AND ((governmenttype)::text <> ''::text) AND ((locale)::text <> ''::text) AND (NOT (((governmentstatus)::text = ANY (ARRAY['placeholder'::text, 'proposed'::text, 'unincorporated'::text])) AND (governmentmapstatus <> 0))) AND (((governmentlevel = 1) AND (governmentcurrentleadparent IS NULL)) OR ((governmentlevel > 1) AND (governmentcurrentleadparent IS NOT NULL) AND (governmentid <> governmentcurrentleadparent)))))
-);
-
-
-ALTER TABLE geohistory.government OWNER TO postgres;
-
---
--- Name: COLUMN government.governmentstyle; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.government.governmentstyle IS 'Signifies if the government uses a government type in its formal name that is different than its actual government type.';
-
-
---
--- Name: COLUMN government.governmentlevel; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.government.governmentlevel IS '1 = Nation; 2 = State/Province; 3 = County/Parish; 4 = Township/Municipality; 5 = Unincorporated Ward/Populated Place. Generally = floor((OSM admin_level + 1)/2) or GeoNames administrative division order + 1';
-
-
---
--- Name: COLUMN government.government1983stateplaneauthority; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.government.government1983stateplaneauthority IS 'Last checked January 29, 2017.';
-
-
---
--- Name: COLUMN government.governmentlead1983stateplane; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.government.governmentlead1983stateplane IS 'Last checked January 29, 2017.';
-
-
---
--- Name: COLUMN government.governmenthasmultiple1983stateplane; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.government.governmenthasmultiple1983stateplane IS 'Last checked January 29, 2017.';
-
-
---
--- Name: COLUMN government.governmentcharterstatus; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.government.governmentcharterstatus IS 'This field is used for internal tracking purposes, and is not included in open data.';
-
-
---
--- Name: COLUMN government.governmentbooknote; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.government.governmentbooknote IS 'This field is used for internal tracking purposes, and is not included in open data.';
-
-
---
--- Name: COLUMN government.governmentbookcomplete; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.government.governmentbookcomplete IS 'This field is used for internal tracking purposes, and is not included in open data.';
-
-
---
--- Name: COLUMN government.governmentmapstatus; Type: COMMENT; Schema: geohistory; Owner: postgres
---
-
-COMMENT ON COLUMN geohistory.government.governmentmapstatus IS 'The values have been simplified in open data to remove certain information used for internal tracking purposes.';
 
 
 --
@@ -2676,24 +2694,6 @@ CREATE TABLE gis.metesdescriptiongis (
 
 
 ALTER TABLE gis.metesdescriptiongis OWNER TO postgres;
-
---
--- Name: eventeffectivetype; Type: TABLE; Schema: geohistory; Owner: postgres
---
-
-CREATE TABLE geohistory.eventeffectivetype (
-    eventeffectivetypeid integer NOT NULL,
-    eventeffectivetypegroup character varying(100) DEFAULT ''::character varying NOT NULL,
-    eventeffectivetypequalifier character varying(100) DEFAULT ''::character varying NOT NULL,
-    eventeffectivetypelong text GENERATED ALWAYS AS (((eventeffectivetypegroup)::text ||
-CASE
-    WHEN ((eventeffectivetypequalifier)::text <> ''::text) THEN (': '::text || (eventeffectivetypequalifier)::text)
-    ELSE ''::text
-END)) STORED
-);
-
-
-ALTER TABLE geohistory.eventeffectivetype OWNER TO postgres;
 
 --
 -- Name: eventrelationship; Type: TABLE; Schema: geohistory; Owner: postgres
@@ -9362,6 +9362,13 @@ GRANT SELECT ON TABLE geohistory.adjudicationtype TO readonly;
 
 
 --
+-- Name: TABLE government; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.government TO readonly;
+
+
+--
 -- Name: TABLE tribunal; Type: ACL; Schema: geohistory; Owner: postgres
 --
 
@@ -9425,6 +9432,13 @@ GRANT SELECT ON TABLE geohistory.event TO readonly;
 
 
 --
+-- Name: TABLE eventeffectivetype; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.eventeffectivetype TO readonly;
+
+
+--
 -- Name: TABLE eventgranted; Type: ACL; Schema: geohistory; Owner: postgres
 --
 
@@ -9443,13 +9457,6 @@ GRANT SELECT ON TABLE geohistory.eventtype TO readonly;
 --
 
 GRANT SELECT ON TABLE geohistory.governmentform TO readonly;
-
-
---
--- Name: TABLE government; Type: ACL; Schema: geohistory; Owner: postgres
---
-
-GRANT SELECT ON TABLE geohistory.government TO readonly;
 
 
 --
@@ -9548,13 +9555,6 @@ GRANT SELECT ON TABLE geohistory.sourcegovernment TO readonly;
 --
 
 GRANT SELECT ON TABLE gis.metesdescriptiongis TO readonly;
-
-
---
--- Name: TABLE eventeffectivetype; Type: ACL; Schema: geohistory; Owner: postgres
---
-
-GRANT SELECT ON TABLE geohistory.eventeffectivetype TO readonly;
 
 
 --
