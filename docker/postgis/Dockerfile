@@ -1,9 +1,11 @@
-FROM postgis/postgis:16-3.4
+FROM postgis/postgis:17-3.5
 # Install pg_tle
 RUN apt-get update
-RUN apt-get install -y flex git make postgresql-server-dev-16
+RUN apt-get install -y flex git libkrb5-dev make postgresql-server-dev-17
 RUN mkdir /tmp/pg_tle/
-RUN git clone -b v1.1.1 https://github.com/aws/pg_tle.git /tmp/pg_tle/
+WORKDIR /tmp/pg_tle/
+RUN git clone https://github.com/aws/pg_tle.git .
+RUN git checkout -b last-tested f557f0c3d65f595ceff4e5dff430bd9d74126e0b
 RUN make -C /tmp/pg_tle/
 RUN make -C /tmp/pg_tle/ install
 # Copy scripts and imports to launch database
