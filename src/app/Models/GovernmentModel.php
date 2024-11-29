@@ -314,7 +314,6 @@ class GovernmentModel extends BaseModel
             $id,
             $id,
             $id,
-            $id,
         ]);
 
         return $this->getObject($query);
