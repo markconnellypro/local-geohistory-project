@@ -41,7 +41,6 @@ if [ "$CI_ENVIRONMENT" = "production" ]; then
   tableString+="COMMIT;
   ALTER TABLE gis.governmentshape ENABLE TRIGGER governmentshape_insert_trigger;
   SELECT geohistory.refresh_view();
-  SELECT geohistory.refresh_view();
   SELECT gis.refresh_view();
   SELECT gis.refresh_sequence();
   "
