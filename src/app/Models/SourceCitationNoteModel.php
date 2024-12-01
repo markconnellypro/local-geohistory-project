@@ -25,7 +25,7 @@ class SourceCitationNoteModel extends BaseModel
                 JOIN geohistory.sourcecitationnotetype
                     ON sourcecitationnote.sourcecitationnotetype = sourcecitationnotetype.sourcecitationnotetypeid
                 WHERE sourcecitationnote.sourcecitation = ?
-                ORDER BY 1, 2;
+                ORDER BY 1, 2
             QUERY;
 
         $query = $this->db->query($query, [

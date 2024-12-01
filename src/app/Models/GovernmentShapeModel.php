@@ -312,7 +312,7 @@ class GovernmentShapeModel extends BaseModel
                 UNION
                 SELECT ST_AsMVT(mvtgeometry.*, mvtgeometry.governmentlayer) AS mvt
                 FROM mvtgeometry
-                WHERE mvtgeometry.governmentlayer = 'submunicipality';
+                WHERE mvtgeometry.governmentlayer = 'submunicipality'
             QUERY;
 
         $query = $this->db->query($query, [

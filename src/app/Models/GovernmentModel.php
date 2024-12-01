@@ -351,7 +351,7 @@ class GovernmentModel extends BaseModel
                 FROM geohistory.governmentidentifier
                 JOIN geohistory.government
                     ON governmentidentifier.government = government.governmentid
-                WHERE governmentidentifier.governmentidentifierid = ANY (?);
+                WHERE governmentidentifier.governmentidentifierid = ANY (?)
             QUERY;
 
         $query = $this->db->query($query, [

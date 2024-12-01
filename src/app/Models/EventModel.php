@@ -143,7 +143,7 @@ class EventModel extends BaseModel
                 JOIN geohistory.adjudicationsourcecitation
                     ON adjudicationevent.adjudication = adjudicationsourcecitation.adjudication
                     AND adjudicationsourcecitation.adjudicationsourcecitationid = ?
-                ORDER BY event.eventsort, event.eventlong;
+                ORDER BY event.eventsort, event.eventlong
             QUERY;
 
         $query = $this->db->query($query, [
@@ -315,7 +315,7 @@ class EventModel extends BaseModel
                     ON lawsectionevent.eventrelationship = eventrelationship.eventrelationshipid
                 LEFT JOIN geohistory.lawgroup
                     ON lawsectionevent.lawgroup = lawgroup.lawgroupid
-                ORDER BY event.eventsort, event.eventlong;
+                ORDER BY event.eventsort, event.eventlong
             QUERY;
 
         $query = $this->db->query($query, [

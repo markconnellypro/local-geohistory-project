@@ -20,7 +20,7 @@ class GovernmentIdentifierModel extends BaseModel
                     ON governmentidentifier.governmentidentifiertype = governmentidentifiertype.governmentidentifiertypeid
                     AND governmentidentifiertype.governmentidentifiertypeslug = ?
                 WHERE lower(governmentidentifier.governmentidentifierprefix || governmentidentifiertype.governmentidentifiertypeprefixdelimiter || governmentidentifier.governmentidentifier) = ?
-                GROUP BY 1, 2, 3, 4;
+                GROUP BY 1, 2, 3, 4
             QUERY;
 
         $query = $this->db->query($query, [
@@ -82,7 +82,7 @@ class GovernmentIdentifierModel extends BaseModel
                     JOIN geohistory.governmentidentifiertype
                     ON governmentidentifier.governmentidentifiertype = governmentidentifiertype.governmentidentifiertypeid
                 WHERE governmentidentifier.government = ANY (?)
-                    AND governmentidentifier.governmentidentifierid <> ALL (?);
+                    AND governmentidentifier.governmentidentifierid <> ALL (?)
             QUERY;
 
         $query = $this->db->query($query, [

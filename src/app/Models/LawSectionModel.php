@@ -158,7 +158,7 @@ class LawSectionModel extends BaseModel
                       AND law.lawapproved = ?
                     JOIN geohistory.source
                       ON law.source = source.sourceid
-                      AND source.sourcetype = 'session laws';
+                      AND source.sourcetype = 'session laws'
             QUERY;
 
         $query = $this->db->query($query, [
