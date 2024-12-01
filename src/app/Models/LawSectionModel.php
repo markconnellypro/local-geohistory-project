@@ -52,9 +52,9 @@ class LawSectionModel extends BaseModel
                     lawgroup.lawgrouplong
                 FROM geohistory.law
                 JOIN geohistory.lawsection
-                    ON law.lawid = lawsection.law   
+                    ON law.lawid = lawsection.law
                 JOIN geohistory.lawsectionevent
-                    ON lawsection.lawsectionid = lawsectionevent.lawsection 
+                    ON lawsection.lawsectionid = lawsectionevent.lawsection
                     AND lawsectionevent.event = ?
                 JOIN geohistory.eventrelationship
                     ON lawsectionevent.eventrelationship = eventrelationship.eventrelationshipid
@@ -81,7 +81,7 @@ class LawSectionModel extends BaseModel
                     law.lawnumberchapter
                 FROM geohistory.law
                 JOIN geohistory.lawsection
-                    ON law.lawid = lawsection.law   
+                    ON law.lawid = lawsection.law
                 JOIN geohistory.lawsection currentlawsection
                     ON lawsection.lawsectionid = currentlawsection.lawsectionamend
                     AND currentlawsection.lawsectionid = ?
@@ -149,7 +149,7 @@ class LawSectionModel extends BaseModel
                   FROM geohistory.lawsection
                     JOIN geohistory.eventtype
                       ON lawsection.eventtype = eventtype.eventtypeid
-                      AND (? = ''::text 
+                      AND (? = ''::text
                      OR ? = 'Any Type'::text
                      OR (? = 'Only Border Changes'::text AND eventtype.eventtypeborders ~~ 'yes%')
                      OR eventtype.eventtypeshort = ?)
@@ -183,7 +183,7 @@ class LawSectionModel extends BaseModel
                    lawsection.lawsectioncitation,
                    lawapproved,
                    eventtypeshort
-                  FROM geohistory.lawsection  
+                  FROM geohistory.lawsection
                     JOIN geohistory.eventtype
                       ON lawsection.eventtype = eventtype.eventtypeid
                     JOIN geohistory.law

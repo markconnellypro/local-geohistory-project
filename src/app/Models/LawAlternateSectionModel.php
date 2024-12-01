@@ -53,7 +53,7 @@ class LawAlternateSectionModel extends BaseModel
                     law.lawnumberchapter
                 FROM geohistory.law
                 JOIN geohistory.lawsection
-                    ON law.lawid = lawsection.law   
+                    ON law.lawid = lawsection.law
                 JOIN geohistory.lawsection currentlawsection
                     ON lawsection.lawsectionid = currentlawsection.lawsectionamend
                 JOIN geohistory.lawalternatesection

@@ -246,7 +246,7 @@ class GovernmentModel extends BaseModel
                     CASE
                         WHEN government.governmentslug <> government.governmentslugsubstitute THEN government.governmentslugsubstitute
                         ELSE NULL
-                    END AS governmentslugsubstitute, 
+                    END AS governmentslugsubstitute,
                     government.governmentcurrentleadstate,
                     COUNT(DISTINCT governmentsubstitute.governmentid) > 1 AS governmentsubstitutemultiple
                 FROM geohistory.government
@@ -1551,7 +1551,7 @@ class GovernmentModel extends BaseModel
                 FROM geohistory.government
                 JOIN geohistory.government governmentsubstitute
                     ON government.governmentslugsubstitute = governmentsubstitute.governmentslugsubstitute
-                    AND government.governmentid = ANY (?) 
+                    AND government.governmentid = ANY (?)
                     AND governmentsubstitute.governmentlevel = ?
                 UNION DISTINCT
                 SELECT DISTINCT governmentsubstitute.governmentslugsubstitute AS governmentslug,

@@ -14,7 +14,7 @@ class EventModel extends BaseModel
         }
 
         $query = <<<QUERY
-                SELECT DISTINCT 
+                SELECT DISTINCT
                     event.eventid,
                     eventtype.eventtypeshort,
                     eventmethod.eventmethodlong,
@@ -39,7 +39,7 @@ class EventModel extends BaseModel
                     JOIN geohistory.eventgranted
                     ON event.eventgranted = eventgranted.eventgrantedid
                     JOIN geohistory.eventmethod
-                    ON event.eventmethod = eventmethod.eventmethodid 
+                    ON event.eventmethod = eventmethod.eventmethodid
                     JOIN geohistory.eventtype
                     ON event.eventtype = eventtype.eventtypeid
                     LEFT JOIN geohistory.government
@@ -109,7 +109,7 @@ class EventModel extends BaseModel
                 JOIN geohistory.eventtype
                     ON event.eventtype = eventtype.eventtypeid
                 JOIN geohistory.adjudicationevent
-                    ON event.eventid = adjudicationevent.event 
+                    ON event.eventid = adjudicationevent.event
                     AND adjudicationevent.adjudication = ?
                 JOIN geohistory.eventrelationship
                     ON adjudicationevent.eventrelationship = eventrelationship.eventrelationshipid
@@ -212,7 +212,7 @@ class EventModel extends BaseModel
                         FROM geohistory.event event_1,
                             geohistory.metesdescription,
                             gis.metesdescriptiongis
-                        WHERE event_1.eventid = metesdescription.event 
+                        WHERE event_1.eventid = metesdescription.event
                             AND metesdescription.metesdescriptionid = metesdescriptiongis.metesdescription
                             AND metesdescriptiongis.governmentshape = ?))
                 ORDER BY event.eventsort, event.eventlong
@@ -243,7 +243,7 @@ class EventModel extends BaseModel
                 JOIN geohistory.eventtype
                     ON event.eventtype = eventtype.eventtypeid
                 JOIN geohistory.governmentsourceevent
-                    ON event.eventid = governmentsourceevent.event 
+                    ON event.eventid = governmentsourceevent.event
                     AND governmentsourceevent.governmentsource = ?
                 ORDER BY event.eventsort, event.eventlong
             QUERY;
@@ -341,7 +341,7 @@ class EventModel extends BaseModel
                 JOIN geohistory.eventtype
                     ON event.eventtype = eventtype.eventtypeid
                 JOIN geohistory.sourcecitationevent
-                    ON event.eventid = sourcecitationevent.event 
+                    ON event.eventid = sourcecitationevent.event
                     AND sourcecitationevent.sourcecitation = ?
                 ORDER BY event.eventsort, event.eventlong
             QUERY;
@@ -897,9 +897,9 @@ class EventModel extends BaseModel
                         ON event.eventgranted = eventgranted.eventgrantedid
                         AND NOT eventgranted.eventgrantedplaceholder
                     JOIN geohistory.eventtype
-                        ON event.eventtype = eventtype.eventtypeid  
+                        ON event.eventtype = eventtype.eventtypeid
                     WHERE event.eventid = ANY (?)
-                    AND (? = ''::text 
+                    AND (? = ''::text
                         OR ? = 'Any Type'::text
                         OR (? = 'Only Border Changes'::text AND eventtype.eventtypeborders ~~ 'yes%')
                         OR eventtype.eventtypeshort = ?)

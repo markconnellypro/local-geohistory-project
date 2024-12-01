@@ -39,7 +39,7 @@ class ResearchLogModel extends BaseModel
                     ?
                     OR (researchlogtype.researchlogtypeisrecord AND NOT researchlog.researchlogismissing)
                 )
-                ORDER BY researchlogtype.researchlogtypelong, researchlog.researchlogfrom, researchlogdatesort    
+                ORDER BY researchlogtype.researchlogtypelong, researchlog.researchlogfrom, researchlogdatesort
             QUERY;
 
         $query = $this->db->query($query, [

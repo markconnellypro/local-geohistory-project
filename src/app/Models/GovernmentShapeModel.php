@@ -153,8 +153,8 @@ class GovernmentShapeModel extends BaseModel
                         governmentshapeeventpartparts.eventtextsortdate,
                         governmentshapeeventpartparts.eventslug,
                         CASE
-                            WHEN governmentshapeeventpartparts.eventstatus = '{add,remove}' THEN 'name' 
-                            ELSE governmentshapeeventpartparts.eventstatus[1] 
+                            WHEN governmentshapeeventpartparts.eventstatus = '{add,remove}' THEN 'name'
+                            ELSE governmentshapeeventpartparts.eventstatus[1]
                         END AS eventstatus,
                         geohistory.emptytonull(array_to_string(governmentshapeeventpartparts.governmentto, ','))::integer AS governmentto
                     FROM governmentshapeeventpartparts

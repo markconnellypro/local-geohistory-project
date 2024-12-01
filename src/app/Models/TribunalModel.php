@@ -14,7 +14,7 @@ class TribunalModel extends BaseModel
                     ELSE tribunaltype.tribunaltypefilingoffice || ' of ' ||
                     CASE
                         WHEN tribunaltype.tribunaltypefilingofficerlevel THEN government.governmentshortshort || ', ' || governmentstate.governmentshortshort
-                        ELSE 'the ' || 
+                        ELSE 'the ' ||
             QUERY . $this->getLong() . <<<QUERY
                     END
                 END

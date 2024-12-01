@@ -15,11 +15,11 @@ class SourceCitationModel extends BaseModel
         $query = <<<QUERY
                 SELECT DISTINCT sourcecitation.sourcecitationid,
                     source.sourceabbreviation,
-                    sourcecitation.sourcecitationdatetype || 
+                    sourcecitation.sourcecitationdatetype ||
                         CASE WHEN sourcecitation.sourcecitationdatetype = '' THEN '' ELSE ' ' END ||
                         calendar.historicdatetextformat(sourcecitation.sourcecitationdate::calendar.historicdate, 'short', ?) AS sourcecitationdate,
                     sourcecitation.sourcecitationdate AS sourcecitationdatesort,
-                    sourcecitation.sourcecitationdaterangetype || 
+                    sourcecitation.sourcecitationdaterangetype ||
                         CASE WHEN sourcecitation.sourcecitationdaterangetype = '' THEN '' ELSE ' ' END ||
                     calendar.historicdatetextformat(sourcecitation.sourcecitationdaterange::calendar.historicdate, 'short', ?) AS sourcecitationdaterange,
                     sourcecitation.sourcecitationdaterange AS sourcecitationdaterangesort,
@@ -52,11 +52,11 @@ class SourceCitationModel extends BaseModel
         $query = <<<QUERY
                 SELECT sourcecitation.sourcecitationslug,
                     source.sourceabbreviation,
-                    sourcecitation.sourcecitationdatetype || 
+                    sourcecitation.sourcecitationdatetype ||
                         CASE WHEN sourcecitation.sourcecitationdatetype = '' THEN '' ELSE ' ' END ||
                         calendar.historicdatetextformat(sourcecitation.sourcecitationdate::calendar.historicdate, 'short', ?) AS sourcecitationdate,
                     sourcecitation.sourcecitationdate AS sourcecitationdatesort,
-                    sourcecitation.sourcecitationdaterangetype || 
+                    sourcecitation.sourcecitationdaterangetype ||
                         CASE WHEN sourcecitation.sourcecitationdaterangetype = '' THEN '' ELSE ' ' END ||
                     calendar.historicdatetextformat(sourcecitation.sourcecitationdaterange::calendar.historicdate, 'short', ?) AS sourcecitationdaterange,
                     sourcecitation.sourcecitationdaterange AS sourcecitationdaterangesort,
@@ -68,7 +68,7 @@ class SourceCitationModel extends BaseModel
                 JOIN geohistory.sourcecitation
                     ON source.sourceid = sourcecitation.source
                 JOIN geohistory.sourcecitationevent
-                    ON sourcecitation.sourcecitationid = sourcecitationevent.sourcecitation 
+                    ON sourcecitation.sourcecitationid = sourcecitationevent.sourcecitation
                     AND sourcecitationevent.event = ?
                 ORDER BY 1, 6, 7, 10
             QUERY;
