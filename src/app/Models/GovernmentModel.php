@@ -1285,8 +1285,10 @@ class GovernmentModel extends BaseModel
                         governmentrelation.governmentlong,
                         governmentrelation.governmentrelationship,
                         governmentrelation.governmentparentstatus,
+                        governmentrelation.governmentslugtype,
                         ROW_NUMBER () OVER (PARTITION BY governmentrelation.governmentlong
-                            ORDER BY CASE
+                            ORDER BY governmentrelation.governmentslugtype,
+                            CASE
                                 WHEN governmentrelation.governmentrelationship = 'Historic' THEN 1
                                 WHEN governmentrelation.governmentrelationship = 'Variant' THEN 2
                                 ELSE 3
@@ -1300,8 +1302,7 @@ class GovernmentModel extends BaseModel
                     FROM governmentrelation
                 )
                 SELECT *,
-                    'none' AS governmentcolor,
-                    'government' AS governmentslugtype
+                    'none' AS governmentcolor
                 FROM governmentrelationrank
                 WHERE governmentrelationrank = 1
                 ORDER BY 2
