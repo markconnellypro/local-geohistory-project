@@ -397,7 +397,7 @@ class AffectedGovernmentGroupModel extends BaseModel
             'eventslug' => '',
             'eventsort' => '',
         ];
-        foreach ($query['affectedGovernment']['types']['from'] as $governmentType) {
+        foreach ($query['affectedGovernment']['types']['from'] ?? [] as $governmentType) {
             $emptyRow['From ' . $governmentType . ' Affected'] = 'Missing';
             $emptyRow['From ' . $governmentType . ' Link'] = '';
             $emptyRow['From ' . $governmentType . ' Long'] = '';
