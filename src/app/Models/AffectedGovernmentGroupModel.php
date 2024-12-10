@@ -328,6 +328,9 @@ class AffectedGovernmentGroupModel extends BaseModel
                     AND affectedgovernmentgis.governmentshape = ?
                 JOIN geohistory.event
                     ON affectedgovernmentgroup.event = event.eventid
+                JOIN geohistory.eventgranted
+                    ON event.eventgranted = eventgranted.eventgrantedid
+                    AND eventgranted.eventgrantedsuccess
                 JOIN geohistory.affectedgovernmentgrouppart
                     ON affectedgovernmentgroup.affectedgovernmentgroupid = affectedgovernmentgrouppart.affectedgovernmentgroup
                 JOIN geohistory.affectedgovernmentlevel

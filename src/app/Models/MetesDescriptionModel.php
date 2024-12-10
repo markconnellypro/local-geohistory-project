@@ -98,6 +98,9 @@ class MetesDescriptionModel extends BaseModel
                     ON metesdescription.metesdescriptionid = metesdescriptiongis.metesdescription
                 JOIN geohistory.event
                     ON metesdescription.event = event.eventid
+                JOIN geohistory.eventgranted
+                    ON event.eventgranted = eventgranted.eventgrantedid
+                    AND eventgranted.eventgrantedsuccess
                 WHERE governmentshape = ?
                 ORDER BY 5
             QUERY;
@@ -106,7 +109,18 @@ class MetesDescriptionModel extends BaseModel
             $id,
         ]);
 
-        return $this->getObject($query);
+        $query = $this->getObject($query);
+
+        $output = [
+            'event' => [],
+            'query' => $query,
+        ];
+
+        foreach ($query as $row) {
+            $output['event'][] = $row->event;
+        }
+
+        return $output;
     }
 
     private function getSlugId(string $id): int

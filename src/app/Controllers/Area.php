@@ -130,8 +130,9 @@ class Area extends BaseController
                 echo view('event/table_affectedgovernment', ['affectedGovernment' => $query['affectedGovernment'], 'includeDate' => true, 'isComplete' => true]);
             }
             $MetesDescriptionModel = new MetesDescriptionModel();
-            echo view('metes/table', ['query' => $MetesDescriptionModel->getByGovernmentShape($id), 'hasLink' => true, 'title' => 'Metes and Bounds Description']);
-            $events = array_unique($events);
+            $query = $MetesDescriptionModel->getByGovernmentShape($id);
+            $events = array_merge($events, $query['event']);
+            echo view('metes/table', ['query' => $query['query'], 'hasLink' => true, 'title' => 'Metes and Bounds Description']);
             $EventModel = new EventModel();
             echo view('event/table', ['query' => $EventModel->getByGovernmentShapeFailure($id, $events), 'title' => 'Other Event Links']);
             echo view('leaflet/start', ['type' => 'area', 'jurisdictions' => $jurisdictions, 'includeBase' => true, 'needRotation' => false]);
