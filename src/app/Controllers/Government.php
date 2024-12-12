@@ -138,7 +138,7 @@ class Government extends BaseController
                     echo view(ENVIRONMENT . '/government/office', ['query' => $query, 'isMultiple' => $isMultiple]);
                 }
                 if (file_exists(APPPATH . 'Views/' . ENVIRONMENT . '/government/live.php')) {
-                    echo view(ENVIRONMENT . '/government/live', ['id' => $id, 'isMunicipalityOrLower' => $isMunicipalityOrLower, 'isCountyOrLower' => $isCountyOrLower, 'isCountyOrState' => $isCountyOrState, 'isState' => $isStateOrHigher, 'includeGovernment' => false]);
+                    echo view(ENVIRONMENT . '/government/live', ['id' => $id, 'isMunicipalityOrLower' => $isMunicipalityOrLower, 'isCountyOrLower' => $isCountyOrLower, 'isCountyOrState' => $isCountyOrState, 'isState' => $isStateOrHigher, 'includeGovernment' => false, 'jurisdiction' => $jurisdictions[0]]);
                 }
                 echo view('core/chartjs', ['query' => $populationQuery, 'xLabel' => 'Year', 'yLabel' => 'Population']);
             }
