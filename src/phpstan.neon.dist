@@ -23,7 +23,6 @@ parameters:
 		- app/Config/Toolbar.php
 		- app/Config/View.php
 		- app/Controllers/Development
-		- app/ThirdParty/development
 		- app/Views/development
 		- app/Views/errors
 	checkMissingCallableSignature: true
