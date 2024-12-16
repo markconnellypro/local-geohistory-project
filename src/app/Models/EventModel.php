@@ -866,10 +866,14 @@ class EventModel extends BaseModel
         return '{' . implode(',', $result) . '}';
     }
 
-    public function getIdByGovernmentShort(string $government, string $parent = ''): string
+    public function getIdByGovernmentShort(int|string $government, string $parent = ''): string
     {
         $GovernmentModel = new GovernmentModel();
-        $government = $GovernmentModel->getIdByGovernmentShort($government, $parent);
+        if (is_int($government)) {
+            $government = $GovernmentModel->getIdByGovernment($government);
+        } else {
+            $government = $GovernmentModel->getIdByGovernmentShort($government, $parent);
+        }
         return $this->getIdByGovernment($government);
     }
 
