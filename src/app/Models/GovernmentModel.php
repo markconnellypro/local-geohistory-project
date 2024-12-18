@@ -1356,7 +1356,9 @@ class GovernmentModel extends BaseModel
         $query = <<<QUERY
                 SELECT DISTINCT governmentsubstitute.governmentslugsubstitute AS governmentslug,
                     governmentsubstitute.governmentlong,
-                    governmentsubstitute.governmentid
+                    governmentsubstitute.governmentid,
+                    governmentsubstitute.governmentshort,
+                    governmentsubstitute.governmentstatus
                 FROM geohistory.government
                 JOIN geohistory.government governmentsubstitute
                     ON government.governmentslugsubstitute = governmentsubstitute.governmentslugsubstitute
@@ -1365,7 +1367,9 @@ class GovernmentModel extends BaseModel
                 UNION DISTINCT
                 SELECT DISTINCT governmentsubstitute.governmentslugsubstitute AS governmentslug,
                     governmentsubstitute.governmentlong,
-                    governmentsubstitute.governmentid
+                    governmentsubstitute.governmentid,
+                    governmentsubstitute.governmentshort,
+                    governmentsubstitute.governmentstatus
                 FROM geohistory.affectedgovernmentpart
                 JOIN geohistory.affectedgovernmentgrouppart
                     ON affectedgovernmentpart.governmentfrom = ANY (?)
@@ -1382,7 +1386,9 @@ class GovernmentModel extends BaseModel
                 UNION DISTINCT
                 SELECT DISTINCT governmentsubstitute.governmentslugsubstitute AS governmentslug,
                     governmentsubstitute.governmentlong,
-                    governmentsubstitute.governmentid
+                    governmentsubstitute.governmentid,
+                    governmentsubstitute.governmentshort,
+                    governmentsubstitute.governmentstatus
                 FROM geohistory.affectedgovernmentpart
                 JOIN geohistory.affectedgovernmentgrouppart
                     ON affectedgovernmentpart.governmentto = ANY (?)
@@ -1399,7 +1405,9 @@ class GovernmentModel extends BaseModel
                 UNION DISTINCT
                 SELECT DISTINCT governmentsubstitute.governmentslugsubstitute AS governmentslug,
                     governmentsubstitute.governmentlong,
-                    governmentsubstitute.governmentid
+                    governmentsubstitute.governmentid,
+                    governmentsubstitute.governmentshort,
+                    governmentsubstitute.governmentstatus
                 FROM geohistory.government lookupgovernment
                 JOIN geohistory.government
                     ON lookupgovernment.governmentid = ANY (?)
@@ -1410,7 +1418,9 @@ class GovernmentModel extends BaseModel
                 UNION DISTINCT
                 SELECT DISTINCT governmentsubstitute.governmentslugsubstitute AS governmentslug,
                     governmentsubstitute.governmentlong,
-                    governmentsubstitute.governmentid
+                    governmentsubstitute.governmentid,
+                    governmentsubstitute.governmentshort,
+                    governmentsubstitute.governmentstatus
                 FROM geohistory.government lookupgovernment
                 JOIN geohistory.government
                     ON lookupgovernment.governmentid = ANY (?)
@@ -1421,7 +1431,9 @@ class GovernmentModel extends BaseModel
                 UNION DISTINCT
                 SELECT DISTINCT governmentsubstitute.governmentslugsubstitute AS governmentslug,
                     governmentsubstitute.governmentlong,
-                    governmentsubstitute.governmentid
+                    governmentsubstitute.governmentid,
+                    governmentsubstitute.governmentshort,
+                    governmentsubstitute.governmentstatus
                 FROM geohistory.government lookupgovernment
                 JOIN geohistory.government
                     ON lookupgovernment.governmentid = ANY (?)
@@ -1432,7 +1444,9 @@ class GovernmentModel extends BaseModel
                 UNION DISTINCT
                 SELECT DISTINCT governmentsubstitute.governmentslugsubstitute AS governmentslug,
                     governmentsubstitute.governmentlong,
-                    governmentsubstitute.governmentid
+                    governmentsubstitute.governmentid,
+                    governmentsubstitute.governmentshort,
+                    governmentsubstitute.governmentstatus
                 FROM geohistory.government lookupgovernment
                 JOIN geohistory.government
                     ON lookupgovernment.governmentid = ANY (?)
@@ -1443,7 +1457,9 @@ class GovernmentModel extends BaseModel
                 UNION DISTINCT
                 SELECT DISTINCT governmentsubstitute.governmentslugsubstitute AS governmentslug,
                     governmentsubstitute.governmentlong,
-                    governmentsubstitute.governmentid
+                    governmentsubstitute.governmentid,
+                    governmentsubstitute.governmentshort,
+                    governmentsubstitute.governmentstatus
                 FROM geohistory.governmentothercurrentparent
                 JOIN geohistory.government
                     ON governmentothercurrentparent.government = ANY (?)
@@ -1454,7 +1470,9 @@ class GovernmentModel extends BaseModel
                 UNION DISTINCT
                 SELECT DISTINCT governmentsubstitute.governmentslugsubstitute AS governmentslug,
                     governmentsubstitute.governmentlong,
-                    governmentsubstitute.governmentid
+                    governmentsubstitute.governmentid,
+                    governmentsubstitute.governmentshort,
+                    governmentsubstitute.governmentstatus
                 FROM geohistory.governmentothercurrentparent
                 JOIN geohistory.government
                     ON governmentothercurrentparent.governmentothercurrentparent = ANY (?)
