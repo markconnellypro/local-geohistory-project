@@ -795,12 +795,16 @@ class GovernmentModel extends BaseModel
                 JOIN geohistory.government
                     ON lookupgovernment.governmentslugsubstitute = government.governmentslugsubstitute
                     AND government.governmentstatus <> 'placeholder'
-                    AND lookupgovernment.governmentshort = ?
+                    AND (
+                        lookupgovernment.governmentshort = ?
+                        OR lookupgovernment.governmentabbreviation = ?
+                    )
                 ORDER BY 1
             QUERY;
 
         $query = $this->db->query($query, [
             $government,
+            strtoupper($government),
         ]);
 
         $result = [];
@@ -1351,15 +1355,17 @@ class GovernmentModel extends BaseModel
 
         $query = <<<QUERY
                 SELECT DISTINCT governmentsubstitute.governmentslugsubstitute AS governmentslug,
-                    governmentsubstitute.governmentlong
+                    governmentsubstitute.governmentlong,
+                    governmentsubstitute.governmentid
                 FROM geohistory.government
                 JOIN geohistory.government governmentsubstitute
                     ON government.governmentslugsubstitute = governmentsubstitute.governmentslugsubstitute
                     AND government.governmentid = ANY (?)
-                    AND governmentsubstitute.governmentlevel = ?
+                    AND governmentsubstitute.governmentlevel = ANY (?)
                 UNION DISTINCT
                 SELECT DISTINCT governmentsubstitute.governmentslugsubstitute AS governmentslug,
-                    governmentsubstitute.governmentlong
+                    governmentsubstitute.governmentlong,
+                    governmentsubstitute.governmentid
                 FROM geohistory.affectedgovernmentpart
                 JOIN geohistory.affectedgovernmentgrouppart
                     ON affectedgovernmentpart.governmentfrom = ANY (?)
@@ -1372,10 +1378,11 @@ class GovernmentModel extends BaseModel
                     ON otheraffectedgovernmentpart.governmentfrom = government.governmentid
                 JOIN geohistory.government governmentsubstitute
                     ON government.governmentslugsubstitute = governmentsubstitute.governmentslugsubstitute
-                    AND governmentsubstitute.governmentlevel = ?
+                    AND governmentsubstitute.governmentlevel = ANY (?)
                 UNION DISTINCT
                 SELECT DISTINCT governmentsubstitute.governmentslugsubstitute AS governmentslug,
-                    governmentsubstitute.governmentlong
+                    governmentsubstitute.governmentlong,
+                    governmentsubstitute.governmentid
                 FROM geohistory.affectedgovernmentpart
                 JOIN geohistory.affectedgovernmentgrouppart
                     ON affectedgovernmentpart.governmentto = ANY (?)
@@ -1388,67 +1395,73 @@ class GovernmentModel extends BaseModel
                     ON otheraffectedgovernmentpart.governmentto = government.governmentid
                 JOIN geohistory.government governmentsubstitute
                     ON government.governmentslugsubstitute = governmentsubstitute.governmentslugsubstitute
-                    AND governmentsubstitute.governmentlevel = ?
+                    AND governmentsubstitute.governmentlevel = ANY (?)
                 UNION DISTINCT
                 SELECT DISTINCT governmentsubstitute.governmentslugsubstitute AS governmentslug,
-                    governmentsubstitute.governmentlong
+                    governmentsubstitute.governmentlong,
+                    governmentsubstitute.governmentid
                 FROM geohistory.government lookupgovernment
                 JOIN geohistory.government
                     ON lookupgovernment.governmentid = ANY (?)
                     AND lookupgovernment.governmentcurrentleadparent = government.governmentid
                 JOIN geohistory.government governmentsubstitute
                     ON government.governmentslugsubstitute = governmentsubstitute.governmentslugsubstitute
-                    AND governmentsubstitute.governmentlevel = ?
+                    AND governmentsubstitute.governmentlevel = ANY (?)
                 UNION DISTINCT
                 SELECT DISTINCT governmentsubstitute.governmentslugsubstitute AS governmentslug,
-                    governmentsubstitute.governmentlong
+                    governmentsubstitute.governmentlong,
+                    governmentsubstitute.governmentid
                 FROM geohistory.government lookupgovernment
                 JOIN geohistory.government
                     ON lookupgovernment.governmentid = ANY (?)
                     AND lookupgovernment.governmentid = government.governmentcurrentleadparent
                 JOIN geohistory.government governmentsubstitute
                     ON government.governmentslugsubstitute = governmentsubstitute.governmentslugsubstitute
-                    AND governmentsubstitute.governmentlevel = ?
+                    AND governmentsubstitute.governmentlevel = ANY (?)
                 UNION DISTINCT
                 SELECT DISTINCT governmentsubstitute.governmentslugsubstitute AS governmentslug,
-                    governmentsubstitute.governmentlong
+                    governmentsubstitute.governmentlong,
+                    governmentsubstitute.governmentid
                 FROM geohistory.government lookupgovernment
                 JOIN geohistory.government
                     ON lookupgovernment.governmentid = ANY (?)
                     AND lookupgovernment.governmentcurrentleadstateid = government.governmentid
                 JOIN geohistory.government governmentsubstitute
                     ON government.governmentslugsubstitute = governmentsubstitute.governmentslugsubstitute
-                    AND governmentsubstitute.governmentlevel = ?
+                    AND governmentsubstitute.governmentlevel = ANY (?)
                 UNION DISTINCT
                 SELECT DISTINCT governmentsubstitute.governmentslugsubstitute AS governmentslug,
-                    governmentsubstitute.governmentlong
+                    governmentsubstitute.governmentlong,
+                    governmentsubstitute.governmentid
                 FROM geohistory.government lookupgovernment
                 JOIN geohistory.government
                     ON lookupgovernment.governmentid = ANY (?)
                     AND lookupgovernment.governmentid = government.governmentcurrentleadstateid
                 JOIN geohistory.government governmentsubstitute
                     ON government.governmentslugsubstitute = governmentsubstitute.governmentslugsubstitute
-                    AND governmentsubstitute.governmentlevel = ?
+                    AND governmentsubstitute.governmentlevel = ANY (?)
                 UNION DISTINCT
                 SELECT DISTINCT governmentsubstitute.governmentslugsubstitute AS governmentslug,
-                    governmentsubstitute.governmentlong
+                    governmentsubstitute.governmentlong,
+                    governmentsubstitute.governmentid
                 FROM geohistory.governmentothercurrentparent
                 JOIN geohistory.government
                     ON governmentothercurrentparent.government = ANY (?)
                     AND governmentothercurrentparent.governmentothercurrentparent = government.governmentid
                 JOIN geohistory.government governmentsubstitute
                     ON government.governmentslugsubstitute = governmentsubstitute.governmentslugsubstitute
-                    AND governmentsubstitute.governmentlevel = ?
+                    AND governmentsubstitute.governmentlevel = ANY (?)
                 UNION DISTINCT
                 SELECT DISTINCT governmentsubstitute.governmentslugsubstitute AS governmentslug,
-                    governmentsubstitute.governmentlong
+                    governmentsubstitute.governmentlong,
+                    governmentsubstitute.governmentid
                 FROM geohistory.governmentothercurrentparent
                 JOIN geohistory.government
                     ON governmentothercurrentparent.governmentothercurrentparent = ANY (?)
                     AND governmentothercurrentparent.government = government.governmentid
                 JOIN geohistory.government governmentsubstitute
                     ON government.governmentslugsubstitute = governmentsubstitute.governmentslugsubstitute
-                    AND governmentsubstitute.governmentlevel = ?
+                    AND governmentsubstitute.governmentlevel = ANY (?)
                 ORDER BY 2
             QUERY;
 

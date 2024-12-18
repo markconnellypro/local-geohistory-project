@@ -122,7 +122,7 @@ class Search extends BaseController
                         $fields = [
                             $this->request->getPost('government'),
                             ($type === 'statewide' ? $this->request->getPost('governmentjurisdiction') : $this->request->getPost('governmentparent')),
-                            $this->governmentLevel($this->request->getPost('governmentlevel')),
+                            '{' . $this->governmentLevel($this->request->getPost('governmentlevel')) . '}',
                             $type,
                         ];
                         $model = 'GovernmentModel';
