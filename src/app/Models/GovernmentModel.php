@@ -1347,7 +1347,11 @@ class GovernmentModel extends BaseModel
     public function getSearchByGovernment(array $parameters): array
     {
         if ($parameters[3] === 'statewide') {
-            $government = $this->getIdByGovernmentShort($parameters[1]);
+            if (preg_match('/^\d+$/', $parameters[1]) === 1) {
+                $government = $this->getIdByGovernment(intval($parameters[1]));
+            } else {
+                $government = $this->getIdByGovernmentShort($parameters[1]);
+            }
         } else {
             $government = $this->getIdByGovernmentShort($parameters[0], $parameters[1]);
         }
