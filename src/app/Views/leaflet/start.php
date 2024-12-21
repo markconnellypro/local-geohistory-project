@@ -18,6 +18,6 @@ if (ENVIRONMENT === 'development' && $needRotation) {
 } ?>"></script>
 <script src="/asset/map/leaflet-start.js"></script>
 <?php if ($type !== 'area') { ?>
-    <script src="/asset/<?= ($type === 'governmentmap' ? 'development/' : '') ?>map/<?= $type ?>-start.js"></script>
+    <script src="/<?= ($type === 'governmentmap' ? 'module/development' : 'asset') ?>/map/<?= $type ?>-start.js"></script>
 <?php } ?>
 <script>
