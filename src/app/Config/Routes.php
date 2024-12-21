@@ -6,9 +6,9 @@ use CodeIgniter\Router\RouteCollection;
  * @var RouteCollection $routes
  */
 
-$routes->add('robots.txt', 'Bot::robotsTxt');
-
 if (mb_strpos(base_url(), $_ENV['app_baseLocalGeohistoryProjectUrl']) !== false) {
+    $routes->add('robots.txt', 'Bot::robotsTxt');
+
     $controllerRegex = ['adjudication', 'area', 'event', 'government', 'governmentsource', 'law', 'metes', 'reporter', 'source'];
     $mainSearchRegex = '(event|government|adjudication|law)';
 
@@ -69,13 +69,10 @@ if (mb_strpos(base_url(), $_ENV['app_baseLocalGeohistoryProjectUrl']) !== false)
  * You will have access to the $routes object within that file without
  * needing to reload it.
  */
-if (is_file(APPPATH . 'Config/' . ENVIRONMENT . '/Routes.php')) {
-    require APPPATH . 'Config/' . ENVIRONMENT . '/Routes.php';
-}
 
 if (mb_strpos(base_url(), $_ENV['app_baseLocalGeohistoryProjectUrl']) !== false) {
     $routes->add('{locale}', 'Welcome');
     $routes->add('/', 'Welcome::language');
     $routes->set404Override(\App\Controllers\Fourofour::class);
-    $routes->add('(:any)', 'Fourofour');
+    // $routes->add('(:any)', 'Fourofour');
 }
