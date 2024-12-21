@@ -10,7 +10,6 @@ asset/dependency/js/*
 !asset/dependency/js/.gitkeep
 asset/dependency/js/standalone/**
 !asset/dependency/js/standalone/.gitkeep
-build/**
 env/**
 !env/Sample.env
 pgdata/**
@@ -36,6 +35,7 @@ inpostgis/**
 !inpostgis/postgresql_calendar_extension_update**
 outpostgis/**
 !outpostgis/.gitkeep
-.php-cs-fixer.cache
+src/build/**
+src/.php-cs-fixer.cache
 src/private/**
-vendor/**
+src/vendor/**
