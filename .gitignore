@@ -23,6 +23,7 @@ inpostgis/**
 !inpostgis/postgresql_calendar_extension_update**
 outpostgis/**
 !outpostgis/.gitkeep
+src/auth.json
 src/build/**
 src/html/asset/dependency/*
 !src/html/asset/dependency/**/
