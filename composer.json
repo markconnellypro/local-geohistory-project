@@ -1,4 +1,12 @@
 {
+    "name": "localgeohistoryproject/application",
+    "license": "CC-BY-SA-4.0",
+    "authors": [
+        {
+            "name": "Mark A. Connelly",
+            "email": "mark@markconnelly.pro"
+        }
+    ],
     "require": {
         "codeigniter4/framework": "4.5.5"
     },
@@ -14,5 +22,8 @@
         "allow-plugins": {
             "phpstan/extension-installer": true
         }
+    },
+    "extra": {
+        "asset-folder": "asset/"
     }
 }
