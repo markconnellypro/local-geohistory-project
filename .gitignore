@@ -37,6 +37,10 @@ src/html/asset/dependency/js/*
 !src/html/asset/dependency/js/.gitkeep
 src/html/asset/dependency/js/standalone/**
 !src/html/asset/dependency/js/standalone/.gitkeep
+src/html/module/**
+!src/html/module/.gitkeep
+src/html/tile/**
+!src/html/tile/.gitkeep
 src/.php-cs-fixer.cache
 src/private/**
 src/vendor/**
