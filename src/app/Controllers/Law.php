@@ -44,23 +44,23 @@ class Law extends BaseController
                 echo view('core/url', ['query' => $query, 'title' => 'Actual URL']);
             }
             if ($this->isLive()) {
-                $LawGroupSectionModel = new \App\Models\Development\LawGroupSectionModel();
-                $SourceCitationModel = new \App\Models\Development\SourceCitationModel();
+                $LawGroupSectionModel = new \Localgeohistoryproject\Development\Models\LawGroupSectionModel();
+                $SourceCitationModel = new \Localgeohistoryproject\Development\Models\SourceCitationModel();
             } else {
                 $LawGroupSectionModel = new \App\Models\LawGroupSectionModel();
                 $SourceCitationModel = new \App\Models\SourceCitationModel();
             }
             $query = $SourceCitationModel->getByLawNation($id);
             if ($query !== []) {
-                echo view(ENVIRONMENT . '/usa/newberrylaw', ['query' => $query]);
+                echo view('Localgeohistoryproject\Development\usa/newberrylaw', ['query' => $query]);
             }
             $query = $SourceCitationModel->getByLawState($id);
             if ($query !== []) {
-                echo view(ENVIRONMENT . '/law/ny', ['query' => $query]);
+                echo view('Localgeohistoryproject\Development\law/ny', ['query' => $query]);
             }
             $query = $LawGroupSectionModel->getByLawSection($id);
             if ($query !== []) {
-                echo view(ENVIRONMENT . '/lawgroup/table', ['query' => $query, 'includeForm' => false]);
+                echo view('Localgeohistoryproject\Development\lawgroup/table', ['query' => $query, 'includeForm' => false]);
             }
             echo view('law/table', ['query' => $LawSectionModel->getRelated($id), 'title' => 'Related Law', 'type' => 'relationship']);
             $SourceItemPartModel = new SourceItemPartModel();

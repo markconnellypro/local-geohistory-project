@@ -23,7 +23,7 @@ class Governmentidentifier extends BaseController
             return redirect()->to("/" . $this->request->getLocale() . '/governmentidentifier/' . $type . '/' . strtolower($id) . '/');
         }
         if ($this->isLive()) {
-            $GovernmentIdentifierModel = new \App\Models\Development\GovernmentIdentifierModel();
+            $GovernmentIdentifierModel = new \Localgeohistoryproject\Development\Models\GovernmentIdentifierModel();
         } else {
             $GovernmentIdentifierModel = new \App\Models\GovernmentIdentifierModel();
         }

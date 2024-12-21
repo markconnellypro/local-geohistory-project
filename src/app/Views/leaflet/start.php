@@ -3,8 +3,8 @@ $needRotation ??= false;
 $jurisdictions ??= [];
 $type ??= '';
 echo view('leaflet/source');
-if (file_exists(APPPATH . 'Views/' . ENVIRONMENT . '/leaflet/rotation.php') && $needRotation) {
-    echo view(ENVIRONMENT . '/leaflet/rotation');
+if (ENVIRONMENT === 'development' && $needRotation) {
+    echo view('Localgeohistoryproject\Development\leaflet/rotation');
 } ?>
 <script src="/<?= (\App\Controllers\BaseController::isOnline() ? '/' . getenv('dependency_leaflet_fullscreen') : 'asset/dependency') ?>/Leaflet.fullscreen.min.js"></script>
 <link rel="stylesheet" href="/<?= (\App\Controllers\BaseController::isOnline() ? '/' . getenv('dependency_leaflet_fullscreen') : 'asset/dependency') ?>/leaflet.fullscreen.css">

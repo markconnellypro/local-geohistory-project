@@ -29,7 +29,7 @@ $title ??= '';
     <link rel="preload" href="/asset/font/frederickathegreat.woff2" as="font" type="font/woff2" crossorigin="anonymous">
     <link rel="stylesheet" href="/asset/css/geohistory.css" media="all">
     <?php if (\App\Controllers\BaseController::isLive()) { ?>
-        <link rel="stylesheet" href="/asset/development/css/development.css" media="all">
+        <link rel="stylesheet" href="/module/development/css/development.css" media="all">
     <?php } ?>
     <link rel="icon" href="/asset/image/favicon.png" type="image/png">
     <script src="/<?= (\App\Controllers\BaseController::isOnline() ? '/' . getenv('dependency_jquery') : 'asset/dependency') ?>/jquery.min.js"></script>

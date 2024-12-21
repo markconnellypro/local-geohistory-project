@@ -32,13 +32,13 @@ class Government extends BaseController
     {
         $id = $this->getIdInt($id);
         if ($this->isLive()) {
-            $GovernmentFormGovernmentModel = new \App\Models\Development\GovernmentFormGovernmentModel();
-            $GovernmentMapStatusModel = new \App\Models\Development\GovernmentMapStatusModel();
-            $GovernmentModel = new \App\Models\Development\GovernmentModel();
-            $GovernmentPopulationModel = new \App\Models\Development\GovernmentPopulationModel();
-            $MetesDescriptionLineModel = new \App\Models\Development\MetesDescriptionLineModel();
-            $SourceModel = new \App\Models\Development\SourceModel();
-            $SourceCitationModel = new \App\Models\Development\SourceCitationModel();
+            $GovernmentFormGovernmentModel = new \Localgeohistoryproject\Development\Models\GovernmentFormGovernmentModel();
+            $GovernmentMapStatusModel = new \Localgeohistoryproject\Development\Models\GovernmentMapStatusModel();
+            $GovernmentModel = new \Localgeohistoryproject\Development\Models\GovernmentModel();
+            $GovernmentPopulationModel = new \Localgeohistoryproject\Development\Models\GovernmentPopulationModel();
+            $MetesDescriptionLineModel = new \Localgeohistoryproject\Development\Models\MetesDescriptionLineModel();
+            $SourceModel = new \Localgeohistoryproject\Development\Models\SourceModel();
+            $SourceCitationModel = new \Localgeohistoryproject\Development\Models\SourceCitationModel();
         } else {
             $GovernmentFormGovernmentModel = new \App\Models\GovernmentFormGovernmentModel();
             $GovernmentMapStatusModel = new \App\Models\GovernmentMapStatusModel();
@@ -74,7 +74,7 @@ class Government extends BaseController
             if (!$isHistory) {
                 $query = $SourceCitationModel->getByGovernment($id, $jurisdictions);
                 if ($query !== [] && $query['data'] !== []) {
-                    echo view(ENVIRONMENT . '/government/' . $query['jurisdiction'], ['query' => $query['data']]);
+                    echo view('Localgeohistoryproject\Development\government/' . $query['jurisdiction'], ['query' => $query['data']]);
                 }
             }
             if ($hasMap) {
@@ -118,15 +118,15 @@ class Government extends BaseController
                 }
                 $query = $GovernmentModel->getNote($id);
                 if ($query !== []) {
-                    echo view(ENVIRONMENT . '/government/note', ['query' => $query, 'isMultiple' => $isMultiple]);
+                    echo view('Localgeohistoryproject\Development\government/note', ['query' => $query, 'isMultiple' => $isMultiple]);
                 }
                 $query = $GovernmentFormGovernmentModel->getByGovernment($id);
                 if ($query !== []) {
-                    echo view(ENVIRONMENT . '/government/governmentform', ['query' => $query, 'isMultiple' => $isMultiple]);
+                    echo view('Localgeohistoryproject\Development\government/governmentform', ['query' => $query, 'isMultiple' => $isMultiple]);
                 }
                 $query = $GovernmentModel->getSchoolDistrict($id);
                 if ($query !== []) {
-                    echo view(ENVIRONMENT . '/government/schooldistrict', ['query' => $query, 'isMultiple' => $isMultiple]);
+                    echo view('Localgeohistoryproject\Development\government/schooldistrict', ['query' => $query, 'isMultiple' => $isMultiple]);
                 }
                 echo view('source/table', ['query' => $SourceModel->getByGovernment($id), 'hasLink' => true]);
                 $ResearchLogModel = new ResearchLogModel();
@@ -135,11 +135,9 @@ class Government extends BaseController
                 echo view('government/nationalarchives', ['query' => $NationalArchivesModel->getByGovernment($id), 'isMultiple' => $isMultiple]);
                 $query = $GovernmentModel->getOffice($id);
                 if ($query !== []) {
-                    echo view(ENVIRONMENT . '/government/office', ['query' => $query, 'isMultiple' => $isMultiple]);
+                    echo view('Localgeohistoryproject\Development\government/office', ['query' => $query, 'isMultiple' => $isMultiple]);
                 }
-                if (file_exists(APPPATH . 'Views/' . ENVIRONMENT . '/government/live.php')) {
-                    echo view(ENVIRONMENT . '/government/live', ['id' => $id, 'isMunicipalityOrLower' => $isMunicipalityOrLower, 'isCountyOrLower' => $isCountyOrLower, 'isCountyOrState' => $isCountyOrState, 'isState' => $isStateOrHigher, 'includeGovernment' => false, 'jurisdiction' => $jurisdictions[0]]);
-                }
+                echo view('Localgeohistoryproject\Development\government/live', ['id' => $id, 'isMunicipalityOrLower' => $isMunicipalityOrLower, 'isCountyOrLower' => $isCountyOrLower, 'isCountyOrState' => $isCountyOrState, 'isState' => $isStateOrHigher, 'includeGovernment' => false, 'jurisdiction' => $jurisdictions[0]]);
                 echo view('core/chartjs', ['query' => $populationQuery, 'xLabel' => 'Year', 'yLabel' => 'Population']);
             }
             if ($hasMap) {

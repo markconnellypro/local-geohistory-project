@@ -49,7 +49,7 @@ class Event extends BaseController
             $hasAffectedGovernmentMap = $hasMap;
             $affectedGovernment = $affectedGovernment['affectedGovernment'];
             if ($this->isLive()) {
-                $MetesDescriptionLineModel = new \App\Models\Development\MetesDescriptionLineModel();
+                $MetesDescriptionLineModel = new \Localgeohistoryproject\Development\Models\MetesDescriptionLineModel();
             } else {
                 $MetesDescriptionLineModel = new \App\Models\MetesDescriptionLineModel();
             }
@@ -84,8 +84,8 @@ class Event extends BaseController
             $SourceCitationModel = new SourceCitationModel();
             echo view('source/table_citation', ['query' => $SourceCitationModel->getByEvent($id), 'hasColor' => false, 'hasLink' => true, 'title' => 'Source']);
             if ($this->isLive()) {
-                $FileSourceModel = new \App\Models\Development\FileSourceModel();
-                echo view(ENVIRONMENT . '/filesource/table', ['query' => $FileSourceModel->getByEvent($id)]);
+                $FileSourceModel = new \Localgeohistoryproject\Development\Models\FileSourceModel();
+                echo view('Localgeohistoryproject\Development\filesource/table', ['query' => $FileSourceModel->getByEvent($id)]);
             }
             if ($hasMap) {
                 $i = 0;

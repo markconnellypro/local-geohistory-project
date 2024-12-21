@@ -16,11 +16,7 @@ class Bot extends BaseController
     public function robotsTxt(): void
     {
         $this->response->setHeader('Content-Type', 'text/plain');
-        if (file_exists(APPPATH . 'Views/' . ENVIRONMENT . '/bot_robotstxt.php')) {
-            echo view(ENVIRONMENT . '/bot_robotstxt');
-        } else {
-            echo view('bot/robotstxt_localgeohistory');
-        }
         echo view('bot/robotstxt');
+        echo view('bot/robotstxt_app');
     }
 }

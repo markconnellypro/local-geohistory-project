@@ -44,7 +44,7 @@ class Metes extends BaseController
             $hasArea = (!is_null($areaQuery[0]->geometry));
             $hasBegin = ($areaQuery[0]->hasbeginpoint === 't' || $hasArea);
             if ($this->isLive()) {
-                $MetesDescriptionLineModel = new \App\Models\Development\MetesDescriptionLineModel();
+                $MetesDescriptionLineModel = new \Localgeohistoryproject\Development\Models\MetesDescriptionLineModel();
             } else {
                 $MetesDescriptionLineModel = new \App\Models\MetesDescriptionLineModel();
             }
