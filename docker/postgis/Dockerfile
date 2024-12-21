@@ -1,4 +1,4 @@
-FROM postgis/postgis:16-3.4
+FROM postgis/postgis:16-3.5
 # Install pg_tle
 RUN apt-get update
 RUN apt-get install -y flex git make postgresql-server-dev-16
