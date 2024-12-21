@@ -41,6 +41,8 @@ src/html/module/**
 !src/html/module/.gitkeep
 src/html/tile/**
 !src/html/tile/.gitkeep
+src/module/**
+!src/module/.gitkeep
 src/.php-cs-fixer.cache
 src/private/**
 src/vendor/**
