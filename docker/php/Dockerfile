@@ -26,7 +26,7 @@ COPY /docker/php/import_common_php.sh /docker/php/import_dependency.sh /src/priv
 RUN chmod -R 764 /usr/src/docker/*
 ARG CI_ENVIRONMENT
 RUN apt-get update
-RUN apt-get install -y unzip zip
+RUN apt-get install -y git unzip zip
 RUN /usr/src/docker/import_common_php.sh
 # Restart Apache
 RUN service apache2 restart
