@@ -44,17 +44,6 @@ Within the newly-created **PHP** folder, there is a Sample.env file that can be 
 
 First, copy the Sample.env, and name the copy **.env** (with nothing before the period). Then, populate the values labeled ***, following the directions in the file.
 
-### Modifications for other operating systems
-
-The application uses symbolic links to propagate the .env file to 2 other locations without having to copy the .env file itself: the root of the **PHP** folder, and in the **src** folder. If you are deploying this application in another operating system, such as Windows, these symbolic links may not work, and the .env file in the **env** folder may have to be copied into these other locations. **If symbolic links are not used to propagate the .env files to other folders, the .gitignore file must be changed to prevent the inadvertent release of credentials by adding the following 2 files:**
-
-```bash
-.env
-src/.env
-```
-
-The application also contains 2 Dockerfiles, one in **docker/php** and one in **docker/postgis**.
-
 ### Copy data files into the inpostgis folder
 
 The **inpostgis** folder contains 2 SQL files containing the structural elements of the database. To replicate the data as presented on the [project website](https://www.localgeohistory.pro/en/), download the tab-separated values (TSV) files from the **data** folder in the [Open Data repository](https://github.com/localgeohistoryproject/open-data) and place them in the **inpostgis** folder.
