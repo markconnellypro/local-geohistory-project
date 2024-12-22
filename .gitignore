@@ -13,8 +13,8 @@ html/asset/application/dependency/js/*
 !html/asset/application/dependency/js/.gitkeep
 html/asset/application/dependency/js/standalone/**
 !html/asset/application/dependency/js/standalone/.gitkeep
-html/tile/**
-!html/tile/.gitkeep
+html/asset/tile/**
+!html/asset/tile/.gitkeep
 inphp/e/**
 !inphp/e/.gitkeep
 inphp/g/**
