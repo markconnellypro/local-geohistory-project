@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 16.4 (Debian 16.4-1.pgdg110+2)
+-- Dumped from database version 16.6 (Debian 16.6-1.pgdg110+1)
 -- Dumped by pg_dump version 16.6 (Ubuntu 16.6-0ubuntu0.24.04.1)
 
 SET statement_timeout = 0;
@@ -2704,19 +2704,6 @@ CREATE TABLE gis.metesdescriptiongis (
 ALTER TABLE gis.metesdescriptiongis OWNER TO postgres;
 
 --
--- Name: governmentothercurrentparent; Type: TABLE; Schema: geohistory; Owner: postgres
---
-
-CREATE TABLE geohistory.governmentothercurrentparent (
-    governmentothercurrentparentid integer NOT NULL,
-    government integer NOT NULL,
-    governmentothercurrentparent integer NOT NULL
-);
-
-
-ALTER TABLE geohistory.governmentothercurrentparent OWNER TO postgres;
-
---
 -- Name: source; Type: TABLE; Schema: geohistory; Owner: postgres
 --
 
@@ -3735,6 +3722,19 @@ CREATE TABLE geohistory.lawgroupsection (
 ALTER TABLE geohistory.lawgroupsection OWNER TO postgres;
 
 --
+-- Name: governmentothercurrentparent; Type: TABLE; Schema: geohistory; Owner: postgres
+--
+
+CREATE TABLE geohistory.governmentothercurrentparent (
+    governmentothercurrentparentid integer NOT NULL,
+    government integer NOT NULL,
+    governmentothercurrentparent integer NOT NULL
+);
+
+
+ALTER TABLE geohistory.governmentothercurrentparent OWNER TO postgres;
+
+--
 -- Name: lawgroupgovernmenttype; Type: TABLE; Schema: geohistory; Owner: postgres
 --
 
@@ -3760,7 +3760,7 @@ CREATE TABLE geohistory.tribunaltype (
     tribunaltypedivision character varying(25) DEFAULT ''::character varying NOT NULL,
     tribunaltypefilingoffice character varying(50) NOT NULL,
     tribunaltypefilingofficerlevel boolean DEFAULT false NOT NULL,
-    tribunaldescription text DEFAULT ''::text NOT NULL,
+    tribunaltypedistrictcircuit text DEFAULT ''::text NOT NULL,
     tribunaltypesummary character varying(50) DEFAULT ''::character varying NOT NULL,
     CONSTRAINT tribunaltype_check CHECK ((((tribunaltypefilingoffice)::text <> ''::text) AND (tribunaltypelong <> ''::text) AND ((tribunaltypeshort)::text <> ''::text)))
 );
@@ -10021,13 +10021,6 @@ GRANT SELECT ON TABLE gis.metesdescriptiongis TO readonly;
 
 
 --
--- Name: TABLE governmentothercurrentparent; Type: ACL; Schema: geohistory; Owner: postgres
---
-
-GRANT SELECT ON TABLE geohistory.governmentothercurrentparent TO readonly;
-
-
---
 -- Name: TABLE source; Type: ACL; Schema: geohistory; Owner: postgres
 --
 
@@ -10165,6 +10158,13 @@ GRANT SELECT ON TABLE geohistory.lawgroup TO readonly;
 --
 
 GRANT SELECT ON TABLE geohistory.lawgroupsection TO readonly;
+
+
+--
+-- Name: TABLE governmentothercurrentparent; Type: ACL; Schema: geohistory; Owner: postgres
+--
+
+GRANT SELECT ON TABLE geohistory.governmentothercurrentparent TO readonly;
 
 
 --
