@@ -40,7 +40,7 @@ This will create a subfolder named **PHP**, which contains the application code.
 
 ### Create a .env file from the Sample.env
 
-Within the newly-created **PHP** folder, the **env** folder contains a Sample.env file that can be used to create the necessary .env file for the application, which is where information like credentials is stored.
+Within the newly-created **PHP** folder, there is a Sample.env file that can be used to create the necessary .env file for the application, which is where information like credentials is stored.
 
 First, copy the Sample.env, and name the copy **.env** (with nothing before the period). Then, populate the values labeled ***, following the directions in the file.
 

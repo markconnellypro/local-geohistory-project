@@ -22,8 +22,5 @@
         "allow-plugins": {
             "phpstan/extension-installer": true
         }
-    },
-    "extra": {
-        "asset-folder": "asset/"
     }
 }
