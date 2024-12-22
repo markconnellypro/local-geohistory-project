@@ -26,7 +26,7 @@ services:
             - ${INPHP_PROJECT}:/inphp/project:ro
             - ${INPHP_S}:/inphp/s:ro
             - ./license:/var/www/license
-            - ./asset:/var/www/asset
+            - ./module:/var/www/module
             - ./.php-cs-fixer.dist.php:/var/www/.php-cs-fixer.dist.php
             - ./phpstan.neon.dist:/var/www/phpstan.neon.dist
             - ./rector.php:/var/www/rector.php
