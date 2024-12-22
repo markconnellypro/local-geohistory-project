@@ -15,6 +15,7 @@ services:
         volumes:
             - ./app:/var/www/app
             - ./${DOCKER_COMPOSER}composer.json:/var/www/composer.json
+            - ./${DOCKER_COMPOSER}composer.lock:/var/www/composer.lock
             - ./.env:/var/www/.env
             - ./html:/var/www/html
             - ${INPHP_E}:/inphp/e:ro
