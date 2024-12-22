@@ -16,7 +16,6 @@ services:
             - ./app:/var/www/app
             - ./${DOCKER_COMPOSER}composer.json:/var/www/composer.json
             - ./.env:/var/www/.env
-            - ./.htaccess:/var/www/.htaccess
             - ./html:/var/www/html
             - ${INPHP_E}:/inphp/e:ro
             - ${INPHP_G}:/inphp/g:ro
