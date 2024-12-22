@@ -7,53 +7,53 @@ use CodeIgniter\Router\RouteCollection;
  */
 
 if (mb_strpos(base_url(), $_ENV['app_baseLocalGeohistoryProjectUrl']) !== false) {
-    $routes->add('robots.txt', 'Bot::robotsTxt');
+    $routes->get('robots.txt', 'Bot::robotsTxt');
 
     $controllerRegex = ['adjudication', 'area', 'event', 'government', 'governmentsource', 'law', 'metes', 'reporter', 'source'];
     $mainSearchRegex = '(event|government|adjudication|law)';
 
     foreach ($controllerRegex as $c) {
-        $routes->add('{locale}/' . $c . '/(:segment)', ucwords($c) . '::view/$1');
+        $routes->get('{locale}/' . $c . '/(:segment)', ucwords($c) . '::view/$1');
         if ($_ENV['app_jurisdiction'] !== '') {
-            $routes->add('{locale}/(' . $_ENV['app_jurisdiction'] . ')/' . $c . '/(:segment)', ucwords($c) . '::redirect/$2');
+            $routes->get('{locale}/(' . $_ENV['app_jurisdiction'] . ')/' . $c . '/(:segment)', ucwords($c) . '::redirect/$2');
         }
-        $routes->add('{locale}/' . $c, ucwords($c) . '::noRecord');
+        $routes->get('{locale}/' . $c, ucwords($c) . '::noRecord');
     }
 
     if ($_ENV['app_jurisdiction'] !== '') {
-        $routes->add('{locale}/(' . $_ENV['app_jurisdiction'] . ')/about', 'About::redirect/$1');
-        $routes->add('{locale}/(' . $_ENV['app_jurisdiction'] . ')/statistics', 'Statistics::redirect');
-        $routes->add('{locale}/(' . $_ENV['app_jurisdiction'] . ')', 'Search::redirect');
+        $routes->get('{locale}/(' . $_ENV['app_jurisdiction'] . ')/about', 'About::redirect/$1');
+        $routes->get('{locale}/(' . $_ENV['app_jurisdiction'] . ')/statistics', 'Statistics::redirect');
+        $routes->get('{locale}/(' . $_ENV['app_jurisdiction'] . ')', 'Search::redirect');
     }
 
-    $routes->add('{locale}/lookup/government/(:segment)', 'Search::governmentlookup/$1/');
-    $routes->add('{locale}/lookup/government-jurisdiction/(:segment)', 'Search::governmentlookup/$1/jurisdiction');
-    $routes->add('{locale}/lookup/government-parent/(:segment)', 'Search::governmentlookup/$1/parent');
-    $routes->add('{locale}/lookup/tribunal/(:num)', 'Search::tribunallookup');
+    $routes->get('{locale}/lookup/government/(:segment)', 'Search::governmentlookup/$1/');
+    $routes->get('{locale}/lookup/government-jurisdiction/(:segment)', 'Search::governmentlookup/$1/jurisdiction');
+    $routes->get('{locale}/lookup/government-parent/(:segment)', 'Search::governmentlookup/$1/parent');
+    $routes->get('{locale}/lookup/tribunal/(:num)', 'Search::tribunallookup');
 
-    $routes->add('{locale}/search', 'Search::index');
-    $routes->add('{locale}/search/' . $mainSearchRegex, 'Search::view/$1');
-    $routes->add('{locale}/search/(:segment)', 'Search::noRecord');
+    $routes->get('{locale}/search', 'Search::index');
+    $routes->post('{locale}/search/' . $mainSearchRegex, 'Search::view/$1');
+    $routes->get('{locale}/search/(:segment)', 'Search::noRecord');
 
-    $routes->add('{locale}/address', 'Area::address');
-    $routes->add('{locale}/point/(:segment)/(:segment)', 'Area::point/$1/$2');
-    $routes->add('{locale}/point', 'Area::point');
+    $routes->post('{locale}/address', 'Area::address');
+    $routes->get('{locale}/point/(:segment)/(:segment)', 'Area::point/$1/$2');
+    $routes->post('{locale}/point', 'Area::point');
 
-    $routes->add('{locale}/about/(:segment)', 'About::index/$1');
-    $routes->add('{locale}/about', 'About::index');
-    $routes->add('{locale}/bot', 'Bot::index');
-    $routes->add('{locale}/disclaimer', 'Disclaimer');
-    $routes->add('{locale}/key', 'Key::index');
+    $routes->get('{locale}/about/(:segment)', 'About::index/$1');
+    $routes->get('{locale}/about', 'About::index');
+    $routes->get('{locale}/bot', 'Bot::index');
+    $routes->get('{locale}/disclaimer', 'Disclaimer');
+    $routes->get('{locale}/key', 'Key::index');
 
-    $routes->add('{locale}/governmentidentifier/(:segment)/(:segment)', 'Governmentidentifier::view/$1/$2');
+    $routes->get('{locale}/governmentidentifier/(:segment)/(:segment)', 'Governmentidentifier::view/$1/$2');
 
-    $routes->add('{locale}/leaflet', 'Map::leaflet');
-    $routes->add('{locale}/map-base', 'Map::baseStyle');
-    $routes->add('{locale}/map-overlay', 'Map::overlayStyle');
-    $routes->add('{locale}/map-tile/(:num)/(:num)/(:num)', 'Map::tile/$1/$2/$3');
+    $routes->get('{locale}/leaflet', 'Map::leaflet');
+    $routes->get('{locale}/map-base', 'Map::baseStyle');
+    $routes->get('{locale}/map-overlay', 'Map::overlayStyle');
+    $routes->get('{locale}/map-tile/(:num)/(:num)/(:num)', 'Map::tile/$1/$2/$3');
 
-    $routes->add('{locale}/statistics/report/', 'Statistics::view');
-    $routes->add('{locale}/statistics/', 'Statistics::index');
+    $routes->get('{locale}/statistics/report/', 'Statistics::view');
+    $routes->get('{locale}/statistics/', 'Statistics::index');
 }
 
 /*
@@ -71,8 +71,7 @@ if (mb_strpos(base_url(), $_ENV['app_baseLocalGeohistoryProjectUrl']) !== false)
  */
 
 if (mb_strpos(base_url(), $_ENV['app_baseLocalGeohistoryProjectUrl']) !== false) {
-    $routes->add('{locale}', 'Welcome');
-    $routes->add('/', 'Welcome::language');
+    $routes->get('{locale}', 'Welcome');
+    $routes->get('/', 'Welcome::language');
     $routes->set404Override(\App\Controllers\Fourofour::class);
-    // $routes->add('(:any)', 'Fourofour');
 }
