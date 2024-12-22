@@ -2,7 +2,7 @@
 # Allowed asset scraping
 
 User-agent: *
-Allow: /asset/
+Allow: /asset/application/
 
 # Allowed bots
 

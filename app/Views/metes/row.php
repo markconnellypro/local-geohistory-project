@@ -48,5 +48,5 @@
         <input value="6" name="metesfoottype" type="radio">Chains.
     </form>
 </section>
-<script src="/asset/tool/metes.js"></script>
+<script src="/asset/application/tool/metes.js"></script>
 <?php } ?>

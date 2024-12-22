@@ -1,6 +1,6 @@
 #!/bin/bash
 source /var/www/.env
-asset_folder=/var/www/html/module/application/dependency
+asset_folder=/var/www/html/asset/application/dependency
 license_folder=/var/www/license/dependency
 
 curl -s -S --output-dir ${asset_folder} -O "https:/${dependency_c3}/c3.min.css"

@@ -10,7 +10,7 @@
         <div id="map" class="map"></div>
     </section>
     <section>
-        <h2>By Year: <a href="#" class="chartdownload"><img style="vertical-align: middle;" src="/asset/map/baseline_save_alt_black_24dp.png" alt="Download"></a></h2>
+        <h2>By Year: <a href="#" class="chartdownload"><img style="vertical-align: middle;" src="/asset/application/map/baseline_save_alt_black_24dp.png" alt="Download"></a></h2>
         <div id="chart" class="chart"></div>
     </section>
     <section>
@@ -30,7 +30,7 @@
     </section>
     <script>
         var mapPath = [
-            '/asset/<?= ((\App\Controllers\BaseController::isLive() && ($jurisdiction === '' || !in_array($jurisdiction, \App\Controllers\BaseController::getProductionJurisdictions()))) ? 'development/' : '') ?>map/statistics/<?= ($jurisdiction === '' ? (\App\Controllers\BaseController::isLive() ? 'development' : 'production') : $jurisdiction) ?>.geojson'
+            '/asset/<?= ((\App\Controllers\BaseController::isLive() && ($jurisdiction === '' || !in_array($jurisdiction, \App\Controllers\BaseController::getProductionJurisdictions()))) ? 'development' : 'application') ?>/map/statistics/<?= ($jurisdiction === '' ? (\App\Controllers\BaseController::isLive() ? 'development' : 'production') : $jurisdiction) ?>.geojson'
         ];
         var partData = <?= $query ?>;
         var lastLayer = "";
@@ -41,8 +41,8 @@
             background-color: rgba(255, 0, 0, 0.0);
         }
     </style>
-    <script src="/<?= (\App\Controllers\BaseController::isOnline() ? '/' . getenv('dependency_classybrew') : 'asset/dependency') ?>/classybrew.js"></script>
-    <script src="/asset/map/statistics.js"></script>
+    <script src="/<?= (\App\Controllers\BaseController::isOnline() ? '/' . getenv('dependency_classybrew') : 'asset/application/dependency') ?>/classybrew.js"></script>
+    <script src="/asset/application/map/statistics.js"></script>
 <?php } else { ?>
     <br>No results found!
 <?php } ?>

@@ -11,7 +11,7 @@ class Map extends BaseController
         $this->response->removeHeader('Cache-Control');
         $this->response->setHeader('Cache-Control', 'max-age=86400');
         $this->response->setHeader('Content-Type', 'application/json');
-        $json = json_decode(file_get_contents(__DIR__ . '/../../html/asset/map/map_style_base.json'), true);
+        $json = json_decode(file_get_contents(__DIR__ . '/../../html/asset/application/map/map_style_base.json'), true);
         if (str_contains(getenv('map_tile'), '.json') || str_contains(getenv('map_tile'), '.pmtiles')) {
             $json['sources']['street-tile']['url'] = getenv('map_tile');
             unset($json['sources']['street-tile']['tiles']);
@@ -82,7 +82,7 @@ class Map extends BaseController
         $this->response->removeHeader('Cache-Control');
         $this->response->setHeader('Cache-Control', 'max-age=86400');
         $this->response->setHeader('Content-Type', 'application/json');
-        $json = json_decode(file_get_contents(__DIR__ . '/../../html/asset/map/map_style_overlay.json'), true);
+        $json = json_decode(file_get_contents(__DIR__ . '/../../html/asset/application/map/map_style_overlay.json'), true);
         $json['sources']['localgeohistoryproject']['tiles'][0] = getenv('app_baseLocalGeohistoryProjectUrl') . '/' . \Config\Services::request()->getLocale() . $json['sources']['localgeohistoryproject']['tiles'][0];
         echo json_encode($json);
     }

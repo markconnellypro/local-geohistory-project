@@ -22,25 +22,25 @@ $title ??= '';
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta charset="UTF-8">
     <title><?= (isset($pageTitle) ? $pageTitle . ' | ' : '') . (isset($pageTitleType) ? $pageTitleType . ' | ' : '') . $title ?> | <?= lang('Template.projectName') ?></title>
-    <link rel="preload" href="/asset/font/lora-regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-    <link rel="preload" href="/asset/font/lora-semibold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-    <link rel="preload" href="/asset/font/lora-italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-    <link rel="preload" href="/asset/font/lora-semibolditalic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-    <link rel="preload" href="/asset/font/frederickathegreat.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-    <link rel="stylesheet" href="/asset/css/geohistory.css" media="all">
+    <link rel="preload" href="/asset/application/font/lora-regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    <link rel="preload" href="/asset/application/font/lora-semibold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    <link rel="preload" href="/asset/application/font/lora-italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    <link rel="preload" href="/asset/application/font/lora-semibolditalic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    <link rel="preload" href="/asset/application/font/frederickathegreat.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    <link rel="stylesheet" href="/asset/application/css/geohistory.css" media="all">
     <?php if (\App\Controllers\BaseController::isLive()) { ?>
-        <link rel="stylesheet" href="/module/development/css/development.css" media="all">
+        <link rel="stylesheet" href="/asset/development/css/development.css" media="all">
     <?php } ?>
-    <link rel="icon" href="/asset/image/favicon.png" type="image/png">
-    <script src="/<?= (\App\Controllers\BaseController::isOnline() ? '/' . getenv('dependency_jquery') : 'asset/dependency') ?>/jquery.min.js"></script>
-    <script src="/<?= (\App\Controllers\BaseController::isOnline() ? '/' . getenv('dependency_datatables') : 'asset/dependency') ?>/js/dataTables.min.js"></script>
-    <link rel="stylesheet" href="/<?= (\App\Controllers\BaseController::isOnline() ? '/' . getenv('dependency_datatables') : 'asset/dependency') ?>/css/dataTables.dataTables.min.css">
-    <script src="/asset/tool/table.js"></script>
+    <link rel="icon" href="/asset/application/image/favicon.png" type="image/png">
+    <script src="/<?= (\App\Controllers\BaseController::isOnline() ? '/' . getenv('dependency_jquery') : 'asset/application/dependency') ?>/jquery.min.js"></script>
+    <script src="/<?= (\App\Controllers\BaseController::isOnline() ? '/' . getenv('dependency_datatables') : 'asset/application/dependency') ?>/js/dataTables.min.js"></script>
+    <link rel="stylesheet" href="/<?= (\App\Controllers\BaseController::isOnline() ? '/' . getenv('dependency_datatables') : 'asset/application/dependency') ?>/css/dataTables.dataTables.min.css">
+    <script src="/asset/application/tool/table.js"></script>
 </head>
 
 <body>
     <?php if ($title === 'Welcome') { ?>
-        <img src="/asset/image/ct001800.jpg" id="welcome" alt="Map of annexations to Los Angeles from 1916">
+        <img src="/asset/application/image/ct001800.jpg" id="welcome" alt="Map of annexations to Los Angeles from 1916">
     <?php } ?>
     <div class="wrapper" <?= ($title === 'Welcome' ? ' id="welcomewrapper"' : '') ?>>
         <header class="headerfooter">
