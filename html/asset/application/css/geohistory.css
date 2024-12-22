@@ -3,7 +3,7 @@
     font-weight: normal;
     font-style: normal;
     font-display: swap;
-    src: url('/asset/font/frederickathegreat.woff2') format('woff2');
+    src: url('/asset/application/font/frederickathegreat.woff2') format('woff2');
 }
 
 /* https://github.com/cyrealtype/Lora-Cyrillic/releases/tag/v3.005 */
@@ -13,7 +13,7 @@
     font-weight: bold;
     font-style: normal;
     font-display: swap;
-    src: url('/asset/font/lora-semibold.woff2') format('woff2');
+    src: url('/asset/application/font/lora-semibold.woff2') format('woff2');
 }
 
 @font-face {
@@ -21,7 +21,7 @@
     font-weight: bold;
     font-style: italic;
     font-display: swap;
-    src: url('/asset/font/lora-semibolditalic.woff2') format('woff2');
+    src: url('/asset/application/font/lora-semibolditalic.woff2') format('woff2');
 }
 
 @font-face {
@@ -29,7 +29,7 @@
     font-weight: normal;
     font-style: italic;
     font-display: swap;
-    src: url('/asset/font/lora-italic.woff2') format('woff2');
+    src: url('/asset/application/font/lora-italic.woff2') format('woff2');
 }
 
 @font-face {
@@ -37,7 +37,7 @@
     font-weight: normal;
     font-style: normal;
     font-display: swap;
-    src: url('/asset/font/lora-regular.woff2') format('woff2');
+    src: url('/asset/application/font/lora-regular.woff2') format('woff2');
 }
 
 .b {
@@ -436,15 +436,15 @@ h1 {
 }
 
 .leaflet-control-download-button {
-    background: #fff url(/asset/map/baseline_save_alt_black_24dp.png);
+    background: #fff url(/asset/application/map/baseline_save_alt_black_24dp.png);
 }
 
 .leaflet-control-timelapse-button {
-    background: #fff url(/asset/map/baseline_timelapse_black_24dp.png);
+    background: #fff url(/asset/application/map/baseline_timelapse_black_24dp.png);
 }
 
 .leaflet-control-regular-button {
-    background: #fff url(/asset/map/outline_cancel_black_24dp.png);
+    background: #fff url(/asset/application/map/outline_cancel_black_24dp.png);
 }
 
 .leaflet-control-timelapse {
