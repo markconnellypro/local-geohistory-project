@@ -8,13 +8,13 @@
                 <?php if (\App\Controllers\BaseController::isLive()) { ?>
                     <th>ID</th>
                 <?php } ?>
-                <th>Type <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#eventtype" aria-label="Type Key"><span class="keyiconfill">vpn_key</span></a></th>
+                <th>Type <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#eventtype" aria-label="Type Key" title="Type Key"><span class="keyiconfill">vpn_key</span></a></th>
                 <?php if ($row->eventgranted !== 'government') { ?>
                     <th>Method</th>
                 <?php } ?>
                 <th>Description</th>
                 <?php if ($row->eventgranted !== 'government') { ?>
-                    <th>Successful? <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#eventgranted" aria-label="Successful? Key"><span class="keyiconfill">vpn_key</span></a></th>
+                    <th>Successful? <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#eventgranted" aria-label="Successful? Key" title="Successful? Key"><span class="keyiconfill">vpn_key</span></a></th>
                 <?php } else { ?>
                     <th>Government</th>
                 <?php } ?>
@@ -49,9 +49,9 @@
         <table class="normal cell-border compact stripe">
             <thead>
                 <tr>
-                    <th>Event Year(s) <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#date" aria-label="Date Key"><span class="keyiconfill">vpn_key</span></a></th>
+                    <th>Event Year(s) <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#date" aria-label="Date Key" title="Date Key"><span class="keyiconfill">vpn_key</span></a></th>
                     <th><?= (is_null($row->otherdatetype) ? 'Final Decree' : $row->otherdatetype) ?> Date</th>
-                    <th>Effective Date <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#date" aria-label="Date Key"><span class="keyiconfill">vpn_key</span></a></th>
+                    <th>Effective Date <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#date" aria-label="Date Key" title="Date Key"><span class="keyiconfill">vpn_key</span></a></th>
                     <th>How Effective Date Determined</th>
                 </tr>
             </thead>

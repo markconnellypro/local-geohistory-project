@@ -10,7 +10,7 @@
                 <th>No.</th>
                 <th>Term</th>
                 <?php if (isset($eventRelationship)) { ?>
-                    <th>Relationship <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#eventrelationship" aria-label="Relationship Key"><span class="keyiconfill">vpn_key</span></a></th>
+                    <th>Relationship <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#eventrelationship" aria-label="Relationship Key" title="Relationship Key"><span class="keyiconfill">vpn_key</span></a></th>
                 <?php } ?>
             </tr>
         </thead>

@@ -52,32 +52,32 @@ $title ??= '';
                             <div id="headernavigationpart">
                                 <div id="headernavigationpartpart">
                                     <div class="keyiconcontainer">
-                                        <a href="/<?= \Config\Services::request()->getLocale() ?>/" aria-label="Return to Home">
+                                        <a href="/<?= \Config\Services::request()->getLocale() ?>/" aria-label="Return to Home" title="Return to Home">
                                             <span class="headericonfill">home</span>
                                         </a>
                                     </div>
                                     <div class="keyiconcontainer">
-                                        <a href="/<?= \Config\Services::request()->getLocale() ?>/about/" aria-label="About">
+                                        <a href="/<?= \Config\Services::request()->getLocale() ?>/about/" aria-label="About" title="About">
                                             <span class="headericon">info</span>
                                         </a>
                                     </div>
                                     <div class="keyiconcontainer">
-                                        <a href="/<?= \Config\Services::request()->getLocale() ?>/key/" aria-label="Key">
+                                        <a href="/<?= \Config\Services::request()->getLocale() ?>/key/" aria-label="Key" title="Key">
                                         <span class="headericonfill">vpn_key</span>
                                         </a>
                                     </div>
                                     <div class="keyiconcontainer">
-                                        <a href="/<?= \Config\Services::request()->getLocale() ?>/search/" aria-label="Search">
+                                        <a href="/<?= \Config\Services::request()->getLocale() ?>/search/" aria-label="Search" title="Search">
                                             <span class="headericon">search</span>
                                         </a>
                                     </div>
                                     <div class="keyiconcontainer">
-                                        <a href="/<?= \Config\Services::request()->getLocale() ?>/statistics/" aria-label="Statistics">
+                                        <a href="/<?= \Config\Services::request()->getLocale() ?>/statistics/" aria-label="Statistics" title="Statistics">
                                             <span class="headericon">insert_chart</span>
                                         </a>
                                     </div>
                                     <div class="keyiconcontainer">
-                                        <a href="/<?= \Config\Services::request()->getLocale() ?>/status/" aria-label="Status">
+                                        <a href="/<?= \Config\Services::request()->getLocale() ?>/status/" aria-label="Status" title="Status">
                                             <span class="headericon">map</span>
                                         </a>
                                     </div>

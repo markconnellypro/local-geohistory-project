@@ -10,7 +10,7 @@
         <div id="map" class="map"></div>
     </section>
     <section>
-        <h2>By Year: <a href="#" class="chartdownload" aria-label="Download"><span class="statisticsicon">download</span></a></h2>
+        <h2>By Year: <a href="#" class="chartdownload" aria-label="Download" title="Download"><span class="statisticsicon">download</span></a></h2>
         <div id="chart" class="chart"></div>
     </section>
     <section>

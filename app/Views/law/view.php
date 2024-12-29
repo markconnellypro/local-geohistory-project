@@ -7,7 +7,7 @@
                 <?php if (\App\Controllers\BaseController::isLive()) { ?>
                     <th>ID</th>
                 <?php } ?>
-                <th>Citation <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#law" aria-label="Law Key"><span class="keyiconfill">vpn_key</span></a></th>
+                <th>Citation <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#law" aria-label="Law Key" title="Law Key"><span class="keyiconfill">vpn_key</span></a></th>
                 <th>Title</th>
                 <th>Page Begin</th>
             </tr>

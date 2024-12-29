@@ -9,7 +9,7 @@
                 <th>Location</th>
                 <th>Alternate Location</th>
                 <th>Date</th>
-                <th>Relationship <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#eventrelationship" aria-label="Relationship Key"><span class="keyiconfill">vpn_key</span></a></th>
+                <th>Relationship <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#eventrelationship" aria-label="Relationship Key" title="Relationship Key"><span class="keyiconfill">vpn_key</span></a></th>
             </tr>
         </thead>
         <tbody>

@@ -172,7 +172,7 @@ function toTimeLine() {
   timeString = '';
   nameString = '';
   infoTimeUpdate = function(props) {
-    newTimeString = '<span class="b">Event Date <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#date" aria-label="Date Key"><span class="keyiconfill">vpn_key</span></a>:</span> ' + timeString;
+    newTimeString = '<span class="b">Event Date <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#date" aria-label="Date Key" title="Date Key"><span class="keyiconfill">vpn_key</span></a>:</span> ' + timeString;
     if (nameString) {
       newTimeString += '<br><span class="b">Government:</span> ' + nameString;
     }
