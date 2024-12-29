@@ -76,8 +76,9 @@ L.Control.DownloadButton = L.Control.extend({
     onAdd: function (map) {
         // Create download control
         var controlDiv = L.DomUtil.create("div", "leaflet-bar leaflet-control");
-        var controlUI = L.DomUtil.create("a", "leaflet-control-download-button leaflet-bar-part", controlDiv);
+        var controlUI = L.DomUtil.create("a", "leaflet-bar-part", controlDiv);
         controlUI.href = "#";
+        controlUI.innerHTML = '<span class="mapicon">download</span>';
         this._button = controlUI;
         this._button.title = "Toggle Download Options";
         this._container = controlDiv;

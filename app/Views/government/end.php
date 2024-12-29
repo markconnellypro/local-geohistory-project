@@ -269,8 +269,9 @@ L.Control.TimeLine = L.Control.extend({
 	onAdd : function (map) {
 		// Create control
 		var controlDiv = L.DomUtil.create("div", "leaflet-bar leaflet-control");
-		var controlUI = L.DomUtil.create("a", "leaflet-control-timelapse-button leaflet-bar-part", controlDiv);
+		var controlUI = L.DomUtil.create("a", "leaflet-bar-part", controlDiv);
 		controlUI.href = "#";
+    controlUI.innerHTML = '<span class="leaflet-control-timelapse-button mapicon">timelapse</span>';
 		this._button = controlUI;
     this._button.title = "View Timelapse";
 		this._container = controlDiv;
@@ -285,14 +286,12 @@ L.Control.TimeLine = L.Control.extend({
 			timeLineActive = !timeLineActive;
   		if (timeLineActive) {
 				toTimeLine();
-        L.DomUtil.addClass(this,"leaflet-control-regular-button");
-        L.DomUtil.removeClass(this,"leaflet-control-timelapse-button");
+        $('.leaflet-control-timelapse-button').html('cancel');
         document.getElementsByClassName('timelapsebox')[0].style.display = 'flex';
         this.title = "Exit Timelapse";
 			} else {
 				toRegular();
-        L.DomUtil.addClass(this,"leaflet-control-timelapse-button");
-        L.DomUtil.removeClass(this,"leaflet-control-regular-button");
+        $('.leaflet-control-timelapse-button').html('timelapse');
         document.getElementsByClassName('timelapsebox')[0].style.display = 'none';
         this.title = "View Timelapse";
 			}
