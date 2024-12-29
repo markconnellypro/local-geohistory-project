@@ -154,9 +154,6 @@ header A:hover {
     align-items: center;
     justify-content: center;
     font-weight: bold;
-    background: rgba(255, 251, 247, 0.85);
-    color: #003A70;
-    /* Pantone 654 C */
     text-align: center;
 }
 
@@ -242,6 +239,7 @@ h1 {
 }
 
 .keyiconfill {
+    color: black;
     font-size: 14px;
     font-variation-settings:
         'FILL' 1,
@@ -252,6 +250,7 @@ h1 {
 }
 
 .mapicon {
+    color: black;
     font-size: 28px;
     font-variation-settings:
         'FILL' 0,
@@ -273,12 +272,6 @@ h1 {
     vertical-align: middle;
 }
 
-.welcomeicon,
-.welcomeiconfill {
-    fill: #003A70;
-    /* Pantone 654 C */
-}
-
 .welcomeiconcontainer {
     width: 120px;
     text-align: center;
@@ -290,8 +283,6 @@ h1 {
 .welcomeiconcontainer:active,
 .welcomeiconcontainer:hover {
     text-decoration: none;
-    color: #003A70;
-    /* Pantone 654 C */
 }
 
 .welcomeicon {
@@ -324,9 +315,22 @@ div.dt-container div.dt-layout-row {
     }
 
     .headericon,
-    .headericonfill,
-    .keyiconfill {
+    .headericonfill {
         color: white;
+    }
+
+    .welcomecontent {
+        background: rgba(255, 251, 247, 0.85);
+        color: #003A70;
+        /* Pantone 654 C */
+    }
+
+    .welcomeiconcontainer:link,
+    .welcomeiconcontainer:visited,
+    .welcomeiconcontainer:active,
+    .welcomeiconcontainer:hover {
+        color: #003A70;
+        /* Pantone 654 C */
     }
 
     header A:link,
@@ -376,7 +380,6 @@ div.dt-container div.dt-layout-row {
 }
 
 @media print {
-
     html,
     body {
         background-color: white;
@@ -388,37 +391,43 @@ div.dt-container div.dt-layout-row {
 
     .headerfooter {
         background-color: white;
-        color: #003A70;
-        /* Pantone 654 C */
+        color: black;
     }
 
     .headericon,
-    .headericonfill,
-    .keyiconfill {
-        color: #003A70;
-        /* Pantone 654 C */
+    .headericonfill {
+        color: black;
+    }
+
+    .welcomecontent {
+        background-color: white;
+        color: black;
+    }
+
+    .welcomeiconcontainer:link,
+    .welcomeiconcontainer:visited,
+    .welcomeiconcontainer:active,
+    .welcomeiconcontainer:hover {
+        color: black;
     }
 
     header A:link,
     header A:visited,
     header A:active,
     header A:hover {
-        color: #003A70;
-        /* Pantone 654 C */
+        color: black;
     }
 
     footer A:link,
     footer A:visited,
     footer A:active,
     footer A:hover {
-        color: #003A70;
-        /* Pantone 654 C */
+        color: black;
     }
 
     table.dataTable thead tr {
         background-color: white;
-        color: #003A70;
-        /* Pantone 654 C */
+        color: black;
     }
 
     table.dataTable tr {
@@ -427,12 +436,10 @@ div.dt-container div.dt-layout-row {
 
     table.dataTable th,
     td {
-        border: 1px solid #003A70 !important;
-        /* Pantone 654 C */
+        border: 1px solid black !important;
         border-spacing: 0px !important;
         border-collapse: collapse !important;
     }
-
 }
 
 @media screen and (max-width: 689px) {
