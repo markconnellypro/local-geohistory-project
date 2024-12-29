@@ -17,6 +17,7 @@ html/asset/application/dependency/js/*
 html/asset/application/dependency/js/standalone/*
 !html/asset/application/dependency/js/standalone
 !html/asset/application/dependency/js/standalone/.gitkeep
+!html/asset/font**
 html/asset/tile/*
 !html/asset/tile
 !html/asset/tile/.gitkeep

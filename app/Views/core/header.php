@@ -22,12 +22,12 @@ $title ??= '';
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta charset="UTF-8">
     <title><?= (isset($pageTitle) ? $pageTitle . ' | ' : '') . (isset($pageTitleType) ? $pageTitleType . ' | ' : '') . $title ?> | <?= lang('Template.projectName') ?></title>
-    <link rel="preload" href="/asset/application/font/lora-regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-    <link rel="preload" href="/asset/application/font/lora-semibold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-    <link rel="preload" href="/asset/application/font/lora-italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-    <link rel="preload" href="/asset/application/font/lora-semibolditalic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-    <link rel="preload" href="/asset/application/font/materialsymbolsoutlined.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-    <link rel="preload" href="/asset/application/font/frederickathegreat.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    <link rel="preload" href="/asset/font/lora-regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    <link rel="preload" href="/asset/font/lora-semibold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    <link rel="preload" href="/asset/font/lora-italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    <link rel="preload" href="/asset/font/lora-semibolditalic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    <link rel="preload" href="/asset/font/materialsymbolsoutlined.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    <link rel="preload" href="/asset/font/frederickathegreat.woff2" as="font" type="font/woff2" crossorigin="anonymous">
     <link rel="stylesheet" href="/asset/application/css/geohistory.css" media="all">
     <?php if (\App\Controllers\BaseController::isLive()) { ?>
         <link rel="stylesheet" href="/asset/development/css/development.css" media="all">

@@ -3,7 +3,7 @@
     font-weight: normal;
     font-style: normal;
     font-display: swap;
-    src: url('/asset/application/font/frederickathegreat.woff2') format('woff2');
+    src: url('/asset/font/frederickathegreat.woff2') format('woff2');
 }
 
 /* https://github.com/cyrealtype/Lora-Cyrillic/releases/tag/v3.005 */
@@ -13,7 +13,7 @@
     font-weight: bold;
     font-style: normal;
     font-display: swap;
-    src: url('/asset/application/font/lora-semibold.woff2') format('woff2');
+    src: url('/asset/font/lora-semibold.woff2') format('woff2');
 }
 
 @font-face {
@@ -21,7 +21,7 @@
     font-weight: bold;
     font-style: italic;
     font-display: swap;
-    src: url('/asset/application/font/lora-semibolditalic.woff2') format('woff2');
+    src: url('/asset/font/lora-semibolditalic.woff2') format('woff2');
 }
 
 @font-face {
@@ -29,7 +29,7 @@
     font-weight: normal;
     font-style: italic;
     font-display: swap;
-    src: url('/asset/application/font/lora-italic.woff2') format('woff2');
+    src: url('/asset/font/lora-italic.woff2') format('woff2');
 }
 
 @font-face {
@@ -37,7 +37,7 @@
     font-weight: normal;
     font-style: normal;
     font-display: swap;
-    src: url('/asset/application/font/lora-regular.woff2') format('woff2');
+    src: url('/asset/font/lora-regular.woff2') format('woff2');
 }
 
 /* https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=cancel,download,home,info,insert_chart,map,search,timelapse,vpn_key */
@@ -47,7 +47,7 @@
     font-weight: normal;
     font-style: normal;
     font-display: swap;
-    src: url('/asset/application/font/materialsymbolsoutlined.woff2') format('woff2');
+    src: url('/asset/font/materialsymbolsoutlined.woff2') format('woff2');
 }
 
 .b {
