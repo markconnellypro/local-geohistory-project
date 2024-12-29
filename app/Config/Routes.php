@@ -52,7 +52,7 @@ if (mb_strpos(base_url(), $_ENV['app_baseLocalGeohistoryProjectUrl']) !== false)
     $routes->get('{locale}/map-overlay', 'Map::overlayStyle');
     $routes->get('{locale}/map-tile/(:num)/(:num)/(:num)', 'Map::tile/$1/$2/$3');
 
-    $routes->get('{locale}/statistics/report/', 'Statistics::view');
+    $routes->post('{locale}/statistics/report/', 'Statistics::view');
     $routes->get('{locale}/statistics/', 'Statistics::index');
 }
 
