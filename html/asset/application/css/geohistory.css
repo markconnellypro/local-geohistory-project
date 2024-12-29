@@ -112,10 +112,10 @@ header .headerfooter {
     max-width: 960px;
 }
 
-header A:link,
-header A:visited,
-header A:active,
-header A:hover {
+header a:link,
+header a:visited,
+header a:active,
+header a:hover {
     text-decoration: none;
 }
 
@@ -333,17 +333,17 @@ div.dt-container div.dt-layout-row {
         /* Pantone 654 C */
     }
 
-    header A:link,
-    header A:visited,
-    header A:active,
-    header A:hover {
+    header a:link,
+    header a:visited,
+    header a:active,
+    header a:hover {
         color: white;
     }
 
-    footer A:link,
-    footer A:visited,
-    footer A:active,
-    footer A:hover {
+    footer a:link,
+    footer a:visited,
+    footer a:active,
+    footer a:hover {
         color: white;
     }
 
@@ -404,24 +404,10 @@ div.dt-container div.dt-layout-row {
         color: black;
     }
 
-    .welcomeiconcontainer:link,
-    .welcomeiconcontainer:visited,
-    .welcomeiconcontainer:active,
-    .welcomeiconcontainer:hover {
-        color: black;
-    }
-
-    header A:link,
-    header A:visited,
-    header A:active,
-    header A:hover {
-        color: black;
-    }
-
-    footer A:link,
-    footer A:visited,
-    footer A:active,
-    footer A:hover {
+    a:link,
+    a:visited,
+    a:active,
+    a:hover {
         color: black;
     }
 
