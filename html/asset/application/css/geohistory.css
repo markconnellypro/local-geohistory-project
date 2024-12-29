@@ -40,6 +40,16 @@
     src: url('/asset/application/font/lora-regular.woff2') format('woff2');
 }
 
+/* https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=cancel,download,home,info,insert_chart,map,search,timelapse,vpn_key */
+
+@font-face {
+    font-family: 'Material Symbols Outlined';
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+    src: url('/asset/application/font/materialsymbolsoutlined.woff2') format('woff2');
+}
+
 .b {
     font-weight: bold;
 }
@@ -162,15 +172,64 @@ header A:hover {
     max-height: 640px;
 }
 
+h1 {
+    text-align: center;
+    font-size: 175%;
+}
+
+.warning {
+    color: #BE3A34;
+    /* Pantone 180 C */
+}
+
 #footertext {
     text-align: center;
 }
 
-.keyicon,
-.keyicontext {
-    width: 14px;
-    height: 14px;
-    vertical-align: middle;
+.headericon,
+.headericonfill,
+.keyiconfill,
+.welcomeicon,
+.welcomeiconfill {
+    font-family: 'Material Symbols Outlined';
+    font-weight: normal;
+    font-style: normal;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    -webkit-font-feature-settings: 'liga';
+    -webkit-font-smoothing: antialiased;
+}
+
+.headericon {
+    font-size: 30px;
+    font-variation-settings:
+        'FILL' 0,
+        'wght' 400,
+        'GRAD' 0,
+        'opsz' 24;
+}
+
+.headericonfill {
+    font-size: 30px;
+    font-variation-settings:
+        'FILL' 1,
+        'wght' 400,
+        'GRAD' 0,
+        'opsz' 24;
+}
+
+#headernavigationpart {
+    display: flex;
+    align-items: center;
+}
+
+.headernavigationpartpart {
+    margin-top: 4px;
 }
 
 .keyiconcontainer {
@@ -178,6 +237,55 @@ header A:hover {
     width: 30px;
     vertical-align: middle;
     display: inline-block;
+}
+
+.keyiconfill {
+    font-size: 14px;
+    font-variation-settings:
+        'FILL' 1,
+        'wght' 400,
+        'GRAD' 0,
+        'opsz' 20;
+    vertical-align: middle;
+}
+
+.welcomeicon,
+.welcomeiconfill {
+    fill: #003A70;
+    /* Pantone 654 C */
+}
+
+.welcomeiconcontainer {
+    width: 120px;
+    text-align: center;
+    margin: 0 auto;
+}
+
+.welcomeiconcontainer:link,
+.welcomeiconcontainer:visited,
+.welcomeiconcontainer:active,
+.welcomeiconcontainer:hover {
+    text-decoration: none;
+    color: #003A70;
+    /* Pantone 654 C */
+}
+
+.welcomeicon {
+    font-size: 100px;
+    font-variation-settings:
+        'FILL' 0,
+        'wght' 400,
+        'GRAD' 0,
+        'opsz' 48;
+}
+
+.welcomeiconfill {
+    font-size: 100px;
+    font-variation-settings:
+        'FILL' 1,
+        'wght' 400,
+        'GRAD' 0,
+        'opsz' 48;
 }
 
 div.dt-container div.dt-layout-row {
@@ -192,9 +300,9 @@ div.dt-container div.dt-layout-row {
     }
 
     .headericon,
-    .keyicon,
-    .keyiconlarge {
-        fill: white;
+    .headericonfill,
+    .keyiconfill {
+        color: white;
     }
 
     header A:link,
@@ -261,9 +369,9 @@ div.dt-container div.dt-layout-row {
     }
 
     .headericon,
-    .keyicon,
-    .keyiconlarge {
-        fill: #003A70;
+    .headericonfill,
+    .keyiconfill {
+        color: #003A70;
         /* Pantone 654 C */
     }
 
@@ -371,43 +479,6 @@ screen and (min-width: 690px) {
     .tablewrap {
         overflow-x: auto;
     }
-}
-
-.headerimageblock {
-    width: 100px;
-    text-align: center;
-    margin: 0 auto;
-}
-
-.bodyicon {
-    fill: #003A70;
-    /* Pantone 654 C */
-    display: block;
-    margin: 0 auto;
-}
-
-.bodyiconcontainer:link,
-.bodyiconcontainer:visited,
-.bodyiconcontainer:active,
-.bodyiconcontainer:hover {
-    text-decoration: none;
-    color: #003A70;
-    /* Pantone 654 C */
-}
-
-#headernavigationpart {
-    display: flex;
-    align-items: center;
-}
-
-h1 {
-    text-align: center;
-    font-size: 175%;
-}
-
-.warning {
-    color: #BE3A34;
-    /* Pantone 180 C */
 }
 
 /* Map */

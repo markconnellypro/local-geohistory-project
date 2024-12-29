@@ -12,7 +12,7 @@ $isComplete ??= true;
             <tr>
                 <?php if ($includeDate) { ?>
                     <th>Detail</th>
-                    <th>Date <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#date" aria-label="Date Key"><?= view('core/svg_icon', ['iconLabel' => 'key icon', 'iconName' => 'key', 'iconType' => 'keyicon']); ?></a>
+                    <th>Date <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#date" aria-label="Date Key"><span class="keyiconfill">vpn_key</span></a>
                     </th>
                 <?php } elseif (\App\Controllers\BaseController::isLive() && $isComplete) { ?>
                     <th>Map<br>Link</th>
@@ -64,7 +64,7 @@ $isComplete ??= true;
                                         'link' => $row->{ucfirst($fromTo) . ' ' . $level . ' Link'},
                                         'text' => $row->{ucfirst($fromTo) . ' ' . $level . ' Long'},
                                     ]) ?>
-                                    <br><span class="i"><?= $row->{ucfirst($fromTo) . ' ' . $level . ' Affected'} ?> <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#affectedtype" aria-label="Affected Type Key"><?= view('core/svg_icon', ['iconLabel' => 'key icon', 'iconName' => 'key', 'iconType' => 'keyicontext']); ?></a></span>
+                                    <br><span class="i"><?= $row->{ucfirst($fromTo) . ' ' . $level . ' Affected'} ?> <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#affectedtype" aria-label="Affected Type Key"><span class="keyiconfill">vpn_key</span></a></span>
                                 <?php } ?>
                             </td>
                     <?php }

@@ -9,7 +9,7 @@
             <tr>
                 <th>Name</th>
                 <?php if ($type !== 'government') { ?>
-                    <th>Relationship <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#eventrelationship" aria-label="Relationship Key"><?= view('core/svg_icon', ['iconLabel' => 'key icon', 'iconName' => 'key', 'iconType' => 'keyicon']); ?></a></th>
+                    <th>Relationship <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#eventrelationship" aria-label="Relationship Key"><span class="keyiconfill">vpn_key</span></a></th>
                 <?php } ?>
             </tr>
         </thead>

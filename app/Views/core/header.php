@@ -26,6 +26,7 @@ $title ??= '';
     <link rel="preload" href="/asset/application/font/lora-semibold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
     <link rel="preload" href="/asset/application/font/lora-italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
     <link rel="preload" href="/asset/application/font/lora-semibolditalic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    <link rel="preload" href="/asset/application/font/materialsymbolsoutlined.woff2" as="font" type="font/woff2" crossorigin="anonymous">
     <link rel="preload" href="/asset/application/font/frederickathegreat.woff2" as="font" type="font/woff2" crossorigin="anonymous">
     <link rel="stylesheet" href="/asset/application/css/geohistory.css" media="all">
     <?php if (\App\Controllers\BaseController::isLive()) { ?>
@@ -52,27 +53,32 @@ $title ??= '';
                                 <div id="headernavigationpartpart">
                                     <div class="keyiconcontainer">
                                         <a href="/<?= \Config\Services::request()->getLocale() ?>/" aria-label="Return to Home">
-                                            <?= view('core/svg_icon', ['iconLabel' => 'home icon', 'iconName' => 'home', 'iconType' => 'keyiconlarge']); ?>
+                                            <span class="headericonfill">home</span>
                                         </a>
                                     </div>
                                     <div class="keyiconcontainer">
                                         <a href="/<?= \Config\Services::request()->getLocale() ?>/about/" aria-label="About">
-                                            <?= view('core/svg_icon', ['iconLabel' => 'about icon', 'iconName' => 'about', 'iconType' => 'keyiconlarge']); ?>
+                                            <span class="headericon">info</span>
                                         </a>
                                     </div>
                                     <div class="keyiconcontainer">
                                         <a href="/<?= \Config\Services::request()->getLocale() ?>/key/" aria-label="Key">
-                                            <?= view('core/svg_icon', ['iconLabel' => 'key icon', 'iconName' => 'key', 'iconType' => 'keyiconlarge']); ?>
+                                        <span class="headericonfill">vpn_key</span>
                                         </a>
                                     </div>
                                     <div class="keyiconcontainer">
                                         <a href="/<?= \Config\Services::request()->getLocale() ?>/search/" aria-label="Search">
-                                            <?= view('core/svg_icon', ['iconLabel' => 'search icon', 'iconName' => 'search', 'iconType' => 'keyiconlarge']); ?>
+                                            <span class="headericon">search</span>
                                         </a>
                                     </div>
                                     <div class="keyiconcontainer">
                                         <a href="/<?= \Config\Services::request()->getLocale() ?>/statistics/" aria-label="Statistics">
-                                            <?= view('core/svg_icon', ['iconLabel' => 'statistics icon', 'iconName' => 'statistics', 'iconType' => 'keyiconlarge']); ?>
+                                            <span class="headericon">insert_chart</span>
+                                        </a>
+                                    </div>
+                                    <div class="keyiconcontainer">
+                                        <a href="/<?= \Config\Services::request()->getLocale() ?>/status/" aria-label="Status">
+                                            <span class="headericon">map</span>
                                         </a>
                                     </div>
                                 </div>

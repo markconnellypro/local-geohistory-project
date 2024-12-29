@@ -11,15 +11,9 @@ class Welcome extends BaseController
 
     public function index(): void
     {
-        $icons = [
-            'about',
-            'key',
-            'search',
-            'statistics',
-        ];
-        echo view('core/header', ['state' => '', 'title' => $this->title]);
+        echo view('core/header', ['title' => $this->title]);
         $DocumentationModel = new DocumentationModel();
-        echo view('welcome/index', ['icons' => $icons, 'welcome' => $DocumentationModel->getWelcome()]);
+        echo view('welcome/index', ['welcome' => $DocumentationModel->getWelcome()]);
         echo view('core/footer');
     }
 

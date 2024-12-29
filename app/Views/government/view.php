@@ -13,7 +13,7 @@
                     <th>ID</th>
                 <?php } ?>
                 <th>Name</th>
-                <th>Level <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#governmentlevel" aria-label="Level Key"><?= view('core/svg_icon', ['iconLabel' => 'key icon', 'iconName' => 'key', 'iconType' => 'keyicon']); ?></a></th>
+                <th>Level <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#governmentlevel" aria-label="Level Key"><span class="keyiconfill">vpn_key</span></a></th>
                 <th>Type</th>
             </tr>
         </thead>
@@ -35,12 +35,12 @@
         <table class="normal cell-border compact stripe">
             <thead>
                 <tr>
-                    <th>Created <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#date" aria-label="Date Key"><?= view('core/svg_icon', ['iconLabel' => 'key icon', 'iconName' => 'key', 'iconType' => 'keyicon']); ?></a></th>
+                    <th>Created <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#date" aria-label="Date Key"><span class="keyiconfill">vpn_key</span></a></th>
                     <?php if ($row->governmentcreationlong !== '') { ?>
                         <th>Created As</th>
                     <?php } ?>
                     <th>Boundary-Name Alteration Count</th>
-                    <th>Dissolved <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#date" aria-label="Date Key"><?= view('core/svg_icon', ['iconLabel' => 'key icon', 'iconName' => 'key', 'iconType' => 'keyicon']); ?></a></th>
+                    <th>Dissolved <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#date" aria-label="Date Key"><span class="keyiconfill">vpn_key</span></a></th>
                     <?php if (\App\Controllers\BaseController::isLive()) { ?>
                         <th>Mapping Complete?</th>
                     <?php } ?>

@@ -17,7 +17,7 @@
                 <?php } ?>
                 <th>Government Form</th>
                 <?php if (!$includeGovernment) { ?>
-                    <th>Date <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#date" aria-label="Date Key"><?= view('core/svg_icon', ['iconLabel' => 'key icon', 'iconName' => 'key', 'iconType' => 'keyicon']); ?></a></th>
+                    <th>Date <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#date" aria-label="Date Key"><span class="keyiconfill">vpn_key</span></a></th>
                 <?php } ?>
             </tr>
         </thead>

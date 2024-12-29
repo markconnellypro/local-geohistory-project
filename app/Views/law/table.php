@@ -10,11 +10,11 @@
         <thead>
             <tr>
                 <th>Detail</th>
-                <th>Citation <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#law" aria-label="Law Key"><?= view('core/svg_icon', ['iconLabel' => 'key icon', 'iconName' => 'key', 'iconType' => 'keyicon']); ?></a></th>
+                <th>Citation <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#law" aria-label="Law Key"><span class="keyiconfill">vpn_key</span></a></th>
                 <th><?php if ($type === 'relationship') {
                     if (isset($includeLawGroup)) { ?>
                         Group</th>
-                        <th><?php } ?>Relationship <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#eventrelationship" aria-label="Relationship Key"><?= view('core/svg_icon', ['iconLabel' => 'key icon', 'iconName' => 'key', 'iconType' => 'keyicon']); ?></a>
+                        <th><?php } ?>Relationship <a href="/<?= \Config\Services::request()->getLocale() ?>/key/#eventrelationship" aria-label="Relationship Key"><span class="keyiconfill">vpn_key</span></a>
                     <?php } else { ?>
                         Type
                     <?php } ?>
