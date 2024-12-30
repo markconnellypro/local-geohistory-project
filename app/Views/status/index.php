@@ -1,3 +1,4 @@
+<?php $jurisdictions ??= []; ?>
     <section>
         <h2>Jurisdiction:</h2>
         <style>
