@@ -94,16 +94,6 @@ function updateMap() {
     statusLayer.addData(statusdata);
     statusBounds = statusLayer.getBounds();
     map.fitBounds(statusBounds);
-    var statusStart = map.latLngToContainerPoint(statusBounds.getNorthWest()).y;
-    var statusEnd = map.latLngToContainerPoint(statusBounds.getSouthEast()).y;
-    var mapElement = document.getElementById("map");
-    var mapElementHeight = mapElement.offsetHeight;
-    var statusDifference = statusStart + (mapElementHeight - statusEnd);
-    if (statusDifference > 70) {
-        mapElement.style.height = (mapElementHeight - (statusDifference - 70)) + 'px';
-        map.invalidateSize();
-    }
-    map.fitBounds(statusBounds);
     legend = L.control({ position: 'bottomright' });
     legend.onAdd = function (map) {
         var div = L.DomUtil.create('div', 'infolegend legend');
@@ -116,10 +106,7 @@ function updateMap() {
         div.innerHTML = '<span class="b">Legend: </span> ' + labels.join(' ');
         return div;
     };
-
     legend.addTo(map);
-    mapElementHeight = mapElement.offsetHeight;
-    mapElement.style.height = (mapElementHeight + 50) + 'px';
 }
 
 map.attributionControl.setPrefix('');
@@ -134,7 +121,7 @@ info.onAdd = function (map) {
 
 info.update = function (props) {
     this._div.innerHTML = (props ? '<span class="b">Government: </span>' + (props.NAME + ' ' + props.TYPE).trim() + '</span><br><span class="b">Status: </span>' + props.STATUS : '<span class="b">'
-        + 'Click on an area for more info.</span>');
+        + 'Click for more info.</span>');
 };
 
 info.addTo(map);

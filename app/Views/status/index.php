@@ -1,6 +1,28 @@
     <section>
         <h2>Jurisdiction:</h2>
-        <div id="map" class="map"></div>
+        <style>
+            @media screen and (max-width: 499px) {
+                #map {
+                    height: 370px;
+                }
+            }
+            @media screen and (min-width: 500px) and (max-width: 649px) {
+                #map {
+                    height: 470px;
+                }
+            }
+            @media screen and (min-width: 650px) and (max-width: 799px) {
+                #map {
+                    height: 570px;
+                }
+            }
+            @media screen and (min-width: 800px) {
+                #map {
+                    height: 670px;
+                }
+            }
+        </style>
+        <div id="map" class="map" style="margin: 0 auto;"></div>
     </section>
     <section>
         <h2>Detail:</h2>
