@@ -175,8 +175,8 @@ function updateMap() {
     var mapElement = document.getElementById("map");
     var mapElementHeight = mapElement.offsetHeight;
     var statisticsDifference = statisticsStart + (mapElementHeight - statisticsEnd);
-    if (statisticsDifference > 50) {
-        mapElement.style.height = (mapElementHeight - (statisticsDifference - 50)) + 'px';
+    if (statisticsDifference > 70) {
+        mapElement.style.height = (mapElementHeight - (statisticsDifference - 70)) + 'px';
         map.invalidateSize();
     }
     map.fitBounds(statisticsBounds);
@@ -197,7 +197,7 @@ function updateMap() {
 
     legend.addTo(map);
     mapElementHeight = mapElement.offsetHeight;
-    mapElement.style.height = (mapElementHeight + 30) + 'px';
+    mapElement.style.height = (mapElementHeight + 50) + 'px';
 }
 
 map.attributionControl.setPrefix('');
