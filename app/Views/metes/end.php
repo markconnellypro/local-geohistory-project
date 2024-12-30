@@ -53,7 +53,7 @@ if ($includeMetes) { ?>
 
     info.update = function(props) {
     this._div.innerHTML = (props ? '<span class="b">' + props.type + ' ' + props.line + ':</span> ' + props.description :
-    '<div class="b">Click on any feature for more info.</span>');
+    '<div class="b">Click for more info.</span>');
         };
 
         info.addTo(map);

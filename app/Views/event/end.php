@@ -65,7 +65,7 @@ keyNumber++;
 affectedGovernmentString += '</div>';
 
 } else {
-affectedGovernmentString = '<div class="b">Click on any area in<br>red for more info.</span>';
+affectedGovernmentString = '<div class="b">Click for more info.</span>';
     }
     this._div.innerHTML = affectedGovernmentString;
     };

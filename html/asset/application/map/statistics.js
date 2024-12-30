@@ -212,7 +212,7 @@ info.onAdd = function (map) {
 
 info.update = function (props) {
     this._div.innerHTML = (props ? '<span class="b">Government: </span>' + (props.NAME + ' ' + props.TYPE).trim() + '</span><br><span class="b">Count: </span>' + props.COUNT : '<span class="b">'
-        + 'Click on an area for more info.</span>');
+        + 'Click for more info.</span>');
 };
 
 info.addTo(map);

@@ -82,7 +82,7 @@ infoRegularUpdate = function(props) {
       + '<div><a href="/<?= \Config\Services::request()->getLocale() ?>/area/' + props.governmentshapeslug + '/">View</a></div>';
     t += '</>'
   } else {
-    t = '<div class="b">Click on any shaded<br>area for more info.</span>';
+    t = '<div class="b">Click for more info.</span>';
   }
 	this._div.innerHTML = t;
 };
@@ -103,7 +103,7 @@ info2.onAdd = function(map) {
 
 info2RegularUpdate = function(props) {
 	this._div.innerHTML = (props ? '<div class="mapwidth">Event: </div><a href="/<?= \Config\Services::request()->getLocale() ?>/event/' + props.event + '/">'
-    + props.metesdescriptionlong + '</a> <br>' : '<div class="b">Click on any description for more info.</span>');
+    + props.metesdescriptionlong + '</a> <br>' : '<div class="b">Click for more info.</span>');
 };
 
 info2.update = info2RegularUpdate;
