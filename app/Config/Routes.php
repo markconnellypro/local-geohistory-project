@@ -54,6 +54,8 @@ if (mb_strpos(base_url(), $_ENV['app_baseLocalGeohistoryProjectUrl']) !== false)
 
     $routes->post('{locale}/statistics/report/', 'Statistics::view');
     $routes->get('{locale}/statistics/', 'Statistics::index');
+
+    $routes->get('{locale}/status/', 'Status::index');
 }
 
 /*

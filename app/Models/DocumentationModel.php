@@ -78,6 +78,34 @@ class DocumentationModel extends BaseModel
         return $this->getObject($query);
     }
 
+    public function getStatus(): array
+    {
+        $query = <<<QUERY
+                SELECT upper(split_part(documentation.documentationtype, '_', 2)) AS jurisdiction,
+                    upper(replace(documentation.documentationshort, ' ', '')) AS documentationshort,
+                    documentation.documentationlong
+                FROM geohistory.documentation
+                WHERE documentation.documentationtype LIKE 'status_%'
+                ORDER BY 1, 2
+            QUERY;
+
+        $query = $this->db->query($query);
+
+        $query = $this->getObject($query);
+
+        $result = [];
+
+        foreach ($query as $row) {
+            if ($row->documentationshort === 'TASK') {
+                $result[$row->jurisdiction]['TASK'][] = $row->documentationlong;
+            } else {
+                $result[$row->jurisdiction][$row->documentationshort] = $row->documentationlong;
+            }
+        }
+
+        return $result;
+    }
+
     public function getWelcome(): string
     {
         $query = <<<QUERY
