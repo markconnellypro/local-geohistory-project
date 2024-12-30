@@ -11,7 +11,7 @@ class Governmentidentifier extends BaseController
 
     public function noRecord(): void
     {
-        echo view('core/header', ['state' => '', 'title' => $this->title]);
+        echo view('core/header', ['title' => $this->title]);
         echo view('core/norecord');
         echo view('core/footer');
     }
