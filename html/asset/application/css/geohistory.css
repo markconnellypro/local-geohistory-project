@@ -239,7 +239,6 @@ h1 {
 }
 
 .keyiconfill {
-    color: black;
     font-size: 14px;
     font-variation-settings:
         'FILL' 1,
@@ -315,7 +314,8 @@ div.dt-container div.dt-layout-row {
     }
 
     .headericon,
-    .headericonfill {
+    .headericonfill,
+    .keyiconfill {
         color: white;
     }
 
@@ -395,7 +395,8 @@ div.dt-container div.dt-layout-row {
     }
 
     .headericon,
-    .headericonfill {
+    .headericonfill,
+    .keyiconfill {
         color: black;
     }
 
