@@ -36,18 +36,6 @@ class Cache extends BaseConfig
 
     /**
      * --------------------------------------------------------------------------
-     * Cache Directory Path
-     * --------------------------------------------------------------------------
-     *
-     * The path to where cache files should be stored, if using a file-based
-     * system.
-     *
-     * @deprecated Use the driver-specific variant under $file
-     */
-    public string $storePath = WRITEPATH . 'cache/';
-
-    /**
-     * --------------------------------------------------------------------------
      * Key Prefix
      * --------------------------------------------------------------------------
      *
@@ -86,6 +74,7 @@ class Cache extends BaseConfig
      * --------------------------------------------------------------------------
      * File settings
      * --------------------------------------------------------------------------
+     *
      * Your file storage preferences can be specified below, if you are using
      * the File driver.
      *
@@ -93,13 +82,14 @@ class Cache extends BaseConfig
      */
     public array $file = [
         'storePath' => WRITEPATH . 'cache/',
-        'mode'      => 0o640,
+        'mode'      => 0640,
     ];
 
     /**
      * -------------------------------------------------------------------------
      * Memcached settings
      * -------------------------------------------------------------------------
+     *
      * Your Memcached servers can be specified below, if you are using
      * the Memcached drivers.
      *
