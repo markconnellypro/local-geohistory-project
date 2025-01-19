@@ -5,6 +5,12 @@ $finder = (new PhpCsFixer\Finder())
     ->exclude([
         'build',
     ])
+    ->notPath([
+        'app/Config/Cache.php',
+        'app/Config/Events.php',
+        'app/Config/ForeignCharacters.php',
+        'app/Config/Logger.php',
+    ])
 ;
 
 return (new PhpCsFixer\Config())
