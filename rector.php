@@ -10,7 +10,7 @@ return RectorConfig::configure()
     ->withPaths([
         __DIR__ . '/app',
     ])
-    ->withPhpSets(php83: true)
+    ->withPhpSets(php84: true)
     ->withPreparedSets(deadCode: true, codeQuality: true)
     ->withRules([
         AddVoidReturnTypeWhereNoReturnRector::class,
