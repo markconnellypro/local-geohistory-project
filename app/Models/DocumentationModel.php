@@ -63,7 +63,10 @@ class DocumentationModel extends BaseModel
     {
         $query = <<<QUERY
                 SELECT documentation.documentationshort AS keyshort,
-                    documentation.documentationshort AS keysort,
+                    CASE
+                        WHEN documentation.documentationshort = 'Text' THEN ''
+                        ELSE documentation.documentationshort
+                    END AS keysort,
                     documentation.documentationlong AS keylong,
                     documentation.documentationcolor AS keycolor
                 FROM geohistory.documentation
@@ -75,7 +78,14 @@ class DocumentationModel extends BaseModel
             $type,
         ]);
 
-        return $this->getObject($query);
+        $query = $this->getObject($query);
+
+        if ($query[0]->keysort === '') {
+            $query['Text'] = $query[0];
+            unset($query[0]);
+        }
+
+        return $query;
     }
 
     public function getStatus(): array

@@ -15,10 +15,12 @@ class Key extends BaseController
         $keyQueries = [];
 
         $keys = [
+            'Date' => 'date',
             'Government Level' => 'governmentlevel',
             'Government Map Status' => 'governmentmapstatus',
             'Government Timelapse Map Color' => 'governmenttimelapsemapcolor',
             'Law' => 'law',
+            'Name and Abbreviation' => 'nameabbreviation',
         ];
         $DocumentationModel = new DocumentationModel();
         foreach ($keys as $k => $v) {
