@@ -10,16 +10,6 @@ parameters:
 	bootstrapFiles:
 		- vendor/codeigniter4/framework/system/Test/bootstrap.php
 	excludePaths:
-		- app/Config/ContentSecurityPolicy.php
-		- app/Config/Exceptions.php
-		- app/Config/Kint.php
-		- app/Config/Logger.php
-		- app/Config/Mimes.php
-		- app/Config/Modules.php
-		- app/Config/Routes.php
-		- app/Config/Routing.php
-		- app/Config/Toolbar.php
-		- app/Config/View.php
 		- app/Views/errors
 	checkMissingCallableSignature: true
 	reportMaybesInPropertyPhpDocTypes: false
@@ -27,11 +17,15 @@ parameters:
 	ignoreErrors:
 		- identifier: missingType.generics
 		- identifier: missingType.iterableValue
+		- identifier: property.readOnlyByPhpDocDefaultValue
 	strictRules:
 		allRules: false
-		disallowedLooseComparison: true
 		booleansInConditions: true
-		disallowedConstructs: true
+		disallowedBacktick: true
+		disallowedEmpty: true
+		disallowedImplicitArrayCreation: true
+		disallowedLooseComparison: true
+		disallowedShortTernary: true
 		matchingInheritedMethodNames: true
 	universalObjectCratesClasses:
 		- CodeIgniter\Entity
