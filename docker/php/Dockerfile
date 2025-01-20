@@ -1,4 +1,4 @@
-FROM php:8.3.11-apache
+FROM php:8.4.3-apache-bookworm
 # Create writable dictory for CodeIgniter
 RUN mkdir /writable
 RUN mkdir /writable/cache
@@ -31,4 +31,4 @@ RUN /usr/src/docker/import_common_php.sh
 # Restart Apache
 RUN service apache2 restart
 # Install Composer and prerequisites
-COPY --from=composer:2.6.5 /usr/bin/composer /usr/bin/composer
+COPY --from=composer:2.8.4 /usr/bin/composer /usr/bin/composer
